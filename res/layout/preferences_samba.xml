@@ -1,0 +1,12 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:id="@+id/prefs"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_marginTop="30dip" >
+
+	<fragment class="com.archos.filecorelibrary.samba.SambaPreferencesFragment"
+	          android:id="@+id/sambaPreferencesFragment"
+	          android:layout_width="match_parent"
+	          android:layout_height="match_parent"/>
+</LinearLayout>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="file_info_label_name">Nom:</string>
+    <string name="file_info_label_size">Taille:</string>
+    <string name="file_info_label_size_internal">Taille (interne):</string>
+    <string name="file_info_label_size_sd">Taille (SD):</string>
+    <string name="file_info_label_permission">Permissions:</string>
+    <string name="file_info_label_can_read">lire</string>
+    <string name="file_info_label_cannot_read">ne peut pas lire</string>
+    <string name="file_info_label_can_write">écrire</string>
+    <string name="file_info_label_cannot_write">ne peut pas écrire</string>
+    <string name="file_info_label_last_modified">Modifié le:</string>
+    <string name="file_info_label_mime_type">Type Mime:</string>
+    <string name="file_info_directory_empty">Dossier vide</string>
+    <string name="file_info_one_directory">1 dossier</string>
+    <string name="file_info_directories">dossiers</string>
+    <string name="file_info_one_file">1 fichier</string>
+    <string name="file_info_files">fichiers</string>
+    <string name="usbhost_ptp_storage">Appareil photo externe</string>
+    <string name="network_media_servers">Serveurs de Média (UPnP)</string>
+    <string name="network_shared_folders">Dossiers partagés (SMB)</string>
+    <string name="file_copy_pattern">copie</string>
+    <string name="fast_scroll_numeric_alphabet" msgid="4030170524595123610">" 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"</string>
+    <string name="samba_settings_title">Paramètres des dossiers partagés</string>
+    <string name="samba_settings_summary">Configurer les noms d\'utilisateurs et les mots de passe pour accéder aux dossiers partagés sur votre réseau privé</string>
+    <string name="samba_profiles">Profils des dossiers partagés</string>
+    <string name="samba_delete_settings">Voulez-vous vraiment supprimer ce paramètre ?</string>
+    <string name="samba_add_server">Ajouter un serveur</string>
+    <string name="samba_server">Définir un serveur</string>
+    <string name="samba_share">Définir un partage</string>
+    <string name="refresh">Rafraîchir</string>
+    <string name="network_timeout">Désolé, le dossier distant est inaccessible.\nVérifiez votre connexion réseau et réessayez.</string>
+    <string name="samba_loading">Veuillez attendre pendant le chargement du dossier partagé&#8230;</string>
+    <string name="samba_reloading">Veuillez attendre que le dossier partagé soit rechargé&#8230;</string>
+    <string name="samba_password_request_title">Mot de passe pour ce partage</string>
+    <string name="samba_domain">Domaine</string>
+    <string name="samba_username">Utilisateur</string>
+    <string name="samba_password">Mot de passe</string>
+    <string name="samba_show_password">Afficher le mot de passe</string>
+    <string name="samba_wrong_password">Nom d\'utilisateur ou mot de passe incorrect</string>
+    <string name="preferences">Préférences</string>
+    <string name="shared_folder_credentials">Mots de passe</string>
+    <string name="no_saved_passwords">Pas de mot de passe sauvegardé</string>
+    <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">Recevoir ici par WiFi Direct</string>
+    <string name="empty"></string>
+    <string name="empty_message">Recherche des appareils destinataires disponibles&#8230;&lt;br/>L\'appareil destinataire doit activer l\'option &lt;b>&lt;i>%s&lt;/i>&lt;/b></string>
+    <string name="wifip2p_waiting">Le téléchargement en WiFi Direct va bientôt commencer</string>
+    <string name="connect_to_target">Connexion au destinataire</string>
+    <string name="upload_in_progress">Envoi en cours&#8230;</string>
+    <string name="file_uploading">Votre fichier est en cours d\'envoi</string>
+    <string name="back_cancel">Appuyez sur RETOUR pour annuler</string>
+    <string name="server_wait">En attente qu\'un client se connecte pour envoyer un fichier</string>
+    <string name="download_in_progress">Téléchargement en cours&#8230;</string>
+    <string name="file_downloading">Votre fichier est en cours de téléchargement</string>
+    <string name="server_ready">Prêt à recevoir un fichier</string>
+    <string name="nonetwork_title">Pas de connexion WiFi</string>
+    <string name="no_network_title">Pas de connexion réseau</string>
+    <string name="nonetwork_message">Vous devez activer le WiFi pour utiliser cette fonctionnalité</string>
+
+    <string name="storage_busy_message">Vous ne pouvez pas utiliser le stockage interne de l\'appareil pendant qu\'il est connecté et monté par USB.</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Réseau</string>
+    <string name="external_storage">Externe</string>
+    <string name="internal_storage">Interne</string>
+    <string name="internal_storage_unified">Stockage</string>
+    <string name="sd_card_storage">Carte SD</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Disque dur</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Cloud</string>
+
+    <string name="directory_empty">Dossier vide</string>
+    <string name="no_server">Aucun serveur trouvé</string>
+    <string name="loading">Chargement&#8230;</string>
+    <string name="ssh_error">Non autorisé à se connecter : vérifier votre connection et vos droits d\'accès</string>
+    <string name="ssh_remote_address">Adresse distante</string>
+    <string name="ssh_remote_address_error">Vous devez spécifier une adresse distante</string>
+    <string name="ssh_password">Mot de passe</string>
+    <string name="ssh_username">Nom d\'utilisateur</string>
+    <string name="ssh_port">Port (optionnel)</string>
+    <string name="ssh_path">Chemin d\'accès (optionnel)</string>
+    <string name="save_password">Sauvegarder le mot de passe</string>
+
+    <string name="ssh_prompt">Type FTP</string>
+    <string name="download_prompt">Télécharger le fichier dans le répertoire:</string>
+    <string name="browse_ftp_server">Serveur</string>
+    <string name="cannot_list">Impossible de lire le contenu</string>
+    <string name="error_listing">Une erreur s\'est produite</string>
+    <string name="error_host_not_found">Hôte non trouvé</string>
+    <string name="error_unknown_host">Hôte inconnu</string>
+    <string name="error_no_connection">Impossible de se connecter à l\'hôte</string>
+    <string name="error_credentials">Non autorisé à lire ce répertoire : vérifiez vos droits d\'accès</string>
+    <string name="error_no_permission">Ce compte n\'est pas autorisé à lire ce répertoire</string>
+    <string name="error_file_not_found">Fichier non trouvé</string>
+    <string name="error_time_out">Délai expiré</string>
+    <string name="deleting">Suppression&#8230;</string>
+    <string name="deleting_many">%1$d/%2$d fichiers supprimés</string>
+    <string name="deleting_one">Suppression d\'un fichier</string>
+    <string name="copying">Copie de fichiers&#8230;</string>
+    <string name="moving">Déplacement&#8230;</string>
+    <string name="open_file">Ouvrir le fichier</string>
+    <string name="open_file_after_download">Ouvrir le fichier à la fin de la copie</string>
+    <string name="pasting_copy_one">Copie du fichier (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Copie: %1$d/%2$d fichiers (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Déplacement du fichier (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Déplacement: %1$d/%2$d fichiers (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kO/s</string>
+    <string name="delete">Supprimer</string>
+    <string name="rename">Renommer</string>
+    <string name="details">Détails</string>
+    <string name="refresh_directory">Rafraîchir le dossier</string>
+    <string-array name="folder_or_file">
+        <item>Créer un dossier</item>
+        <item>Créer un fichier vide</item>
+    </string-array>
+    <string name="new_directory">Nouveau dossier</string>
+    <string name="new_file">Nouveau fichier</string>
+    <string name="new_folder_or_file">Nouveau dossier ou fichier</string>
+    <string name="refresh_servers_list">Recharger la liste des serveurs</string>
+    <string name="enable_network_shares">Autoriser les partages réseaux</string>
+    <string name="go_top">Revenir au début</string>
+    <string name="uncheck_impossible">Impossible de changer la sélection quand le répertoire parent est sélectionné</string>
+    <string name="confirm_delete_one">Voulez-vous réellement le supprimer ?</string>
+    <string name="confirm_delete_parent_folder">Il semble que le répertoire parent ne contient pas d\'autre vidéo, devons-nous le supprimer?</string>
+    <string name="confirm_delete_many">Voulez-vous réellement les supprimer ?</string>
+    <string name="enter_new_name">Nom</string>
+    <string name="file_name">Nom du fichier</string>
+    <string name="folder_name">Nom du dossier</string>
+    <string name="run_in_background">Réduire</string>
+    <string name="confirm_deleting_cancellation">Voulez-vous réellement annuler la suppression ?</string>
+    <string name="confirm_copying_cancellation">Voulez-vous réellement annuler la copie ?</string>
+    <string name="confirm_moving_cancellation">Voulez-vous réellement annuler le déplacement ?</string>
+    <string name="cannot_create_directory">Impossible de créer le nouveau dossier</string>
+    <string name="cannot_create_file">Impossible de créer le nouveau fichier</string>
+    <string name="cannot_delete_directory">Impossible de supprimer le dossier</string>
+    <string name="cannot_delete_file">Impossible de supprimer le fichier</string>
+    <string name="cannot_delete_files">Impossible de supprimer les fichiers</string>
+    <string name="directory_deleted">Le dossier a été supprimé</string>
+    <string name="file_deleted">Le fichier a été supprimé</string>
+    <string name="files_deleted">Les fichiers ont été supprimés</string>
+    <string name="cannot_rename">Impossible de renommer</string>
+    <string name="cannot_paste_folder_into_itself">Impossible de copier ou déplacer un dossier dans lui-même ou un de ses descendants</string>
+    <string name="cannot_paste_file_same_location">Impossible de copier ou déplacer un fichier dans son emplacement d\'origine</string>
+    <string name="cannot_paste_over_network">Impossible de copier ou déplacer des fichiers sur le réseau</string>
+    <string name="copy_directory_success_one">Le dossier a été copié</string>
+    <string name="copy_directory_success_many">Les dossiers ont été copiés</string>
+    <string name="copy_file_success_one">Le fichier a été copié</string>
+    <string name="copy_file_success_many">Les fichiers ont été copiés</string>
+    <string name="copy_directory_failed_one">Le dossier n\'a pas été copié</string>
+    <string name="copy_directory_failed_many">Les dossiers n\'ont pas été copiés</string>
+    <string name="copy_file_failed_one">Le fichier n\'a pas été copié</string>
+    <string name="copy_file_failed_many">Les fichiers n\'ont pas été copiés</string>
+    <string name="cut_directory_success_one">Le dossier a été déplacé</string>
+    <string name="cut_directory_success_many">Les dossiers ont été déplacés</string>
+    <string name="cut_file_success_one">Le fichier a été déplacé</string>
+    <string name="cut_file_success_many">Les fichiers ont été déplacés</string>
+    <string name="cut_directory_failed_one">Le dossier n\'a pas été déplacé</string>
+    <string name="cut_directory_failed_many">Les dossiers n\'ont pas été déplacés</string>
+    <string name="cut_file_failed_one">Le fichier n\'a pas été déplacé</string>
+    <string name="cut_file_failed_many">Les fichiers n\'ont pas été déplacés</string>
+    <string name="pasting_done">Collage fait</string>
+    <string name="copy_done">Copie réussie</string>
+    <string name="copy_canceled">Copie annulée</string>
+    <string name="cut_done">Déplacement réussi</string>
+    <string name="cut_canceled">Déplacement annulé</string>
+    <string name="delete_done">Suppression réussie</string>
+    <string name="delete_canceled">Suppression annulée</string>
+    <string name="cannot_open_file">Impossible d\'ouvrir le fichier</string>
+    <string name="no_application_to_open_file">Aucune application installée sur votre appareil ne permet d\'ouvrir ce fichier</string>
+    <string name="delete_still_ongoing">La suppression continue en arrière plan</string>
+    <string name="copy_on_device">Télécharger la vidéo sur l\'appareil</string>
+    <string name="copy_on_device_multi">Télécharger sur l\'appareil</string>
+    <string name="storage_swapped_primary">principal</string>
+    <string name="storage_swapped_secondary">secondaire</string>
+
+    <string name="yes">"Oui"</string>
+    <string name="no">"Non"</string>
+
+    <string name="share">Partager</string>
+    <string name="send_file">"Partager le fichier via"</string>
+    <string name="no_way_to_share_file">Aucune application disponible pour partager le fichier</string>
+    <string name="upnp_not_allowed">Vous n\'avez pas les droits d\'accès à ce serveur UPNP. Veuillez modifier les droits sur ce serveur puis essayer à nouveau.</string>
+
+    <string name="single_mode">Simple</string>
+    <string name="double_mode">Double</string>
+    <string name="swap_panel">Échanger</string>
+    <string name="move">Déplacer</string>
+
+    <string name="shortcuts">Raccourcis</string>
+    <string name="add_to_shortcuts">Créer un raccourci</string>
+    <string name="remove_from_shortcuts">Supprimer le raccourci</string>
+    <string name="shortcut_added">Raccourci %s ajouté</string>
+    <string name="shortcut_removed">Raccourci %s supprimé</string>
+    <string name="shortcut_created">Raccourci \"%1$s\" créé</string>
+    <string name="one_shortcut_removed">Un raccourci supprimé</string>
+    <string name="n_shortcut_removed">%1$d raccourcis supprimés</string>
+    <string name="server_not_available">Le serveur n\'est pas disponible actuellement</string>
+    <string name="server_not_available_2">%1$s  n\'est pas disponible actuellement</string>
+    <string name="cannot_open_shortcut">Le contenu de ce dossier n\'est pas disponible actuellement.\nVérifiez que vous avez bien les droits d\'accès.</string>
+    <string name="network_shortcuts">Raccourcis réseau</string>
+    <string name="media_servers">Serveurs de média</string>
+    <string name="shortcut_list_empty">Vous pouvez créer des raccourcis sur vos dossiers réseau favoris en faisant un clic long sur un dossier puis en sélectionnant \"%s\" dans la barre du haut.</string>
+
+    <string name="dlna_share">Partage multimédia</string>
+    <string name="video">Vidéo</string>
+    <string name="audio">Audio</string>
+    <string name="picture">Images</string>
+    <string name="share_types">Types de partage</string>
+
+    <string name="zip_extract_action">Extraire ici</string>
+    <string name="zip_extract_success_message">Extraction réussie</string>
+    <string name="zip_compress_action">Compresser en archive Zip</string>
+    <string name="zip_extracting_message">Extraction des fichiers depuis l\'archive Zip&#8230;</string>
+    <string name="zip_compressing_message">Compression des fichiers en archive Zip&#8230;</string>
+    <string name="zip_compressing_many">%1$d/%2$d fichiers compressés</string>
+    <string name="zip_compressing_one">Compression d\'un fichier</string>
+    <string name="zip_compressing_success">Compression réussie</string>
+    <string name="zip_compressing_canceled">Compression annulée</string>
+    <string name="zip_extracting_many">%1$d/%2$d fichiers extraits</string>
+    <string name="zip_extracting_one">Extraction d\'un fichier (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Une erreur est survenue lors de l\'extraction de votre archive.\nVérifiez l\'intégrité de celle-ci, ainsi que l\'espace disque disponible.</string>
+    <string name="zip_extract_canceled">Extraction annulée</string>
+    <string name="zip_compress_error_message">Une erreur est survenue lors de la création de votre archive.\nVérifiez son intégrité.</string>
+    <string name="zip_cannot_open_inner_entry">Impossible d\'ouvrir un fichier au sein d\'une archive. Extrayez-le d\'abord.</string>
+    <string name="zip_size_limit">La navigation dans les archives Zip est limitée aux fichiers de moins de 20Mo</string>
+
+    <string name="copy_error">Copie échouée</string>
+    <string name="cut_error">Déplacement échoué</string>
+    <string name="delete_error">Suppression échouée</string>
+
+    <string name="scan_network_index">Indexer les fichiers multimédia</string>
+    <string name="scan_network_remove">Retirer le fichier de la bibliothèque multimédia</string>
+
+    <string name="debug_browse_to_root">Naviguez jusqu\'à la racine de l\'appareil (seulement en debug)</string>
+
+    <string name="nomedia_create">Retirer de la bibliothèque multimédia</string>
+    <string name="nomedia_remove">Ajouter à la bibliothèque multimédia</string>
+    <string name="nomedia_fail">Échec, ce dossier ne peut être exclus de la bibliothèque multimédia.</string>
+    <string name="nomedia_warning">Le contenu multimédia de ce dossier n\'apparaitra plus dans les applications multimédia.\nÊtes-vous sûr de vouloir continuer ?</string>
+
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Choisissez un dossier</string>
+    <string name="choose_a_folder_help">Naviguer dans le dossier que vous voulez sélectionner et cliquez OK.</string>
+    <string name="current_choice">Choix actuel:</string>
+    <string name="no_selection">pas de sélection</string>
+    <string name="external_storage_fake_name">Stockage interne</string>
+    <string name="sdcard_fake_name">SD card</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(pas de dossier)</string>
+
+    <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
+    <string name="navigation_drawer_close">Fermer navigation drawer</string>
+
+    <string name="listing_sort_mode">Mode de tri</string>
+    <string name="listing_sort_by_name">Trier par nom</string>
+    <string name="listing_sort_by_size">Trier par taille</string>
+    <string name="listing_sort_by_date">Trier par date</string>
+    <string name="listing_ascending">Ascendant</string>
+    <string name="listing_descending">Descendant</string>
+
+</resources>

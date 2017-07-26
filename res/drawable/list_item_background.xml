@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_pressed="true" android:drawable="@android:color/holo_blue_light"/>
+    <item android:state_selected="true" android:drawable="@color/my_holo_blue_very_dark"/>
+    <item android:drawable="@color/list_item_background_grey"/>
+
+</selector>

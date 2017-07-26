@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialog_root_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:minHeight="9999dip"
+    android:minWidth="300dip"
+    android:orientation="vertical"
+    tools:context=".FolderPicker$FolderPickerDialogFragment" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/choose_a_folder_help"
+        android:layout_marginTop="18dip"
+        android:layout_marginLeft="18dip"
+        android:textColor="@android:color/white"
+        android:layout_marginRight="18dip"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="18dip"
+        android:background="#44000000"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dip"
+            android:layout_height="48dip"
+            android:src="@drawable/ic_find_previous_holo_dark" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dip"
+            android:layout_marginRight="6dip"
+            android:layout_marginTop="2dip"
+            android:layout_marginBottom="2dip"
+            android:textColor="@android:color/white"
+            android:text="@string/current_choice"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/current_selection"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dip"
+            android:layout_marginBottom="2dip"
+            android:text="/mnt/storage/Movies/AllMyMoviesOhMyGodALongNameAllMyMoviesOhMyGodALongNameAllMyMoviesOhMyGodALongName"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/blue_text_color_selector" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="1dip"
+            android:fadeScrollbars="false" />
+
+        <TextView
+            android:id="@+id/emptyview"
+            android:layout_width="fill_parent"
+            android:layout_height="200dip"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/directory_empty"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </FrameLayout>
+
+</LinearLayout>

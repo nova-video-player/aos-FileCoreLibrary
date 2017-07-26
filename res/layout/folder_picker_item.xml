@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This layout defines items of the browser list.
+There is a thumbnail, a first line for the name, and a second line
+for informations (duration for files, number of files for directories).
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="76dip"
+    android:background="@drawable/list_item_background"
+    android:descendantFocusability="blocksDescendants"
+    android:gravity="center_vertical" >
+
+    <RelativeLayout
+        android:id="@+id/left_area"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_alignParentTop="true" >
+
+        <ImageView
+            android:id="@+id/icon"
+            android:src="@drawable/filetype_music_folder"
+            android:layout_width="72dip"
+            android:layout_height="72dip"
+            android:scaleType="centerInside"
+            android:background="@android:color/transparent" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="14dip"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toRightOf="@id/left_area"
+        android:layout_toLeftOf="@+id/radio"
+        android:ellipsize="middle"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:textColor="@android:color/white"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="17dip"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@id/name"
+        android:layout_marginRight="3dp"
+        android:layout_toRightOf="@id/left_area"
+        android:layout_toLeftOf="@+id/radio"
+        android:ellipsize="start"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/blue_text_color_selector"
+        android:textSize="14dip"
+        android:typeface="sans" />
+
+</RelativeLayout>

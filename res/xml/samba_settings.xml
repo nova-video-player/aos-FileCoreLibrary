@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:title="@string/samba_settings_title">
+
+    <PreferenceCategory android:key="profile_list"
+                        android:title="@string/samba_profiles" />
+
+</PreferenceScreen>

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <string name="file_info_label_name">Name:</string>
+    <string name="file_info_label_size">Size:</string>
+    <string name="file_info_label_size_internal">Size (internal):</string>
+    <string name="file_info_label_size_sd">Size (SD):</string>
+    <string name="file_info_label_permission">Permission:</string>
+    <string name="file_info_label_can_read">read</string>
+    <string name="file_info_label_cannot_read">can\'t read</string>
+    <string name="file_info_label_can_write">write</string>
+    <string name="file_info_label_cannot_write">can\'t write</string>
+    <string name="file_info_label_last_modified">Last modified:</string>
+    <string name="file_info_label_mime_type">Mime type:</string>
+    <string name="file_info_directory_empty">Empty folder</string>
+    <string name="file_info_one_directory">1 folder</string>
+    <string name="file_info_directories">folders</string>
+    <string name="file_info_one_file">1 file</string>
+    <string name="file_info_files">files</string>
+    <string name="usbhost_ptp_storage">External camera</string>
+    <string name="network_media_servers">Media servers (UPnP)</string>
+    <string name="network_shared_folders">Shared folders (SMB)</string>
+
+    <!-- Archos file manager core -->
+
+    <string name="file_copy_pattern">copy</string>
+
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+
+    <!-- Samba share settings -->
+    <string name="samba_settings_title">Shared folders settings</string>
+    <string name="samba_settings_summary">Setup user names and passwords to access shared folders on your private network</string>
+    <string name="samba_profiles">Shared folders profiles</string>
+    <string name="samba_delete_settings">Do you really want to delete this setting?</string>
+    <string name="samba_add_server">Add a server</string>
+    <string name="samba_server">Define a server</string>
+    <string name="samba_share">Define a share</string>
+    <string name="refresh">Refresh</string>
+    <string name="network_timeout">Sorry, the remote folder is not accessible.\nCheck your network connection and try again.</string>
+    <string name="samba_loading">Please wait while loading shared folder&#8230;</string>
+    <string name="samba_reloading">Please wait while reloading shared folder&#8230;</string>
+    <string name="samba_password_request_title">Shared folder password request</string>
+    <string name="samba_domain">Domain</string>
+    <string name="samba_username">Username</string>
+    <string name="samba_password">Password</string>
+    <string name="samba_show_password">Show password</string>
+    <string name="samba_wrong_password">Username or password incorrect</string>
+    <string name="preferences">Preferences</string>
+    <string name="shared_folder_credentials">Passwords</string>
+    <string name="no_saved_passwords">No saved passwords</string>
+    <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">receive here via WiFi Direct</string>
+    <string name="empty"></string>
+    <string name="empty_message">Discovering available target devices&#8230;&lt;br/>Target device must activate &lt;b>&lt;i>%s&lt;/i>&lt;/b> option</string>
+    <string name="wifip2p_waiting">WiFi Direct transfer will begin shortly</string>
+    <string name="connect_to_target">Connecting to target</string>
+    <string name="upload_in_progress">Upload in progress&#8230;</string>
+    <string name="file_uploading">Your file is uploading</string>
+    <string name="back_cancel">Press back to cancel</string>
+    <string name="server_wait">Waiting for client to connect and send a file</string>
+    <string name="download_in_progress">Download in progress&#8230;</string>
+    <string name="file_downloading">Your file is downloading</string>
+    <string name="server_ready">Ready to receive</string>
+    <string name="nonetwork_title" comment="deprecated">No WiFi Connection</string>
+    <string name="no_network_title">No network connection</string>
+    <string name="nonetwork_message">You need to activate WiFi for this feature</string>
+
+    <!-- FileManager strings -->
+    <string name="storage_busy_message">You can not use the internal storage while it is connected and mounted through USB.</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Network</string>
+    <string name="external_storage">External</string>
+    <string name="internal_storage">Internal</string>
+    <string name="internal_storage_unified">Storage</string>
+    <string name="sd_card_storage">SD card</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Drive</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Cloud</string>
+
+    <string name="directory_empty">Empty folder</string>
+    <string name="no_server">No server found</string>
+    <string name="loading">Loading&#8230;</string>
+
+    <string name="ssh_error">Unable to connect : please, check your connection and credentials</string>
+    <string name="ssh_remote_address">Remote address</string>
+    <string name="ssh_remote_address_error">You must specify a remote address</string>
+    <string name="ssh_password">Password</string>
+    <string name="ssh_username">Username</string>
+    <string name="ssh_port">Port (optional)</string>
+    <string name="ssh_path">Path (optional)</string>
+    <string name="save_password">Save password</string>
+
+    <string name="ssh_prompt">FTP type</string>
+    <string-array name="ssh_types" translatable="false">
+        <item>ftp://</item>
+        <item>sftp://</item>
+        <item>ftps://</item>
+        <item>smb://</item>
+    </string-array>
+    <string name="download_prompt">Download file to folder:</string>
+    <string name="browse_ftp_server">Server</string>
+    <string name="cannot_list">Cannot list content</string>
+    <string name="error_listing">An error occurred</string>
+    <string name="error_host_not_found">Host not found</string>
+    <string name="error_unknown_host">Unknown host</string>
+    <string name="error_no_connection">Unable to connect to host</string>
+    <string name="error_credentials">Unable to list directory : check your credentials</string>
+    <string name="error_no_permission">This account isn\'t allowed to list this directory</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_time_out">Time out</string>
+    <string name="deleting">Deleting</string>
+    <string name="deleting_many">%1$d/%2$d deleted files</string>
+    <string name="deleting_one">Deleting one file</string>
+    <string name="copying">Copying&#8230;</string>
+    <string name="moving">Moving&#8230;</string>
+    <string name="open_file">Open file</string>
+    <string name="open_file_after_download">Open file after copy completes</string>
+    <string name="pasting_copy_one">Copying one file (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Copying: %1$d/%2$d files (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Moving one file (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Moving: %1$d/%2$d files (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Delete</string>
+    <string name="rename">Rename</string>
+    <string name="details">Details</string>
+    <string name="refresh_directory">Refresh folder</string>
+    <string-array name="folder_or_file">
+        <item>Create a folder</item>
+        <item>Create an empty file</item>
+    </string-array>
+    <string name="new_directory">New folder</string>
+    <string name="new_file">New file</string>
+    <string name="new_folder_or_file">New folder or file</string>
+    <string name="refresh_servers_list">Refresh server list</string>
+    <string name="enable_network_shares">Enable network shares</string>
+    <string name="go_top">Go back to top</string>
+    <string name="uncheck_impossible">Impossible to change selection when parent folder is selected</string>
+    <string name="confirm_delete_one">Do you really want to delete it?</string>
+    <string name="confirm_delete_parent_folder">It seems that parent folder does not contain any other video, should we delete it?</string>
+    <string name="confirm_delete_many">Do you really want to delete them?</string>
+    <string name="enter_new_name">Name:</string>
+    <string name="file_name">File name</string>
+    <string name="folder_name">Folder name</string>
+
+    <string name="run_in_background">Minimize</string>
+    <string name="confirm_deleting_cancellation">Do you really want to cancel deleting?</string>
+    <string name="confirm_copying_cancellation">Do you really want to cancel copying?</string>
+    <string name="confirm_moving_cancellation">Do you really want to cancel moving?</string>
+    <string name="cannot_create_directory">Cannot create new folder</string>
+    <string name="cannot_create_file">Cannot create new file</string>
+    <string name="cannot_delete_directory">Cannot delete the folder</string>
+    <string name="cannot_delete_file">Cannot delete the file</string>
+    <string name="cannot_delete_files">Cannot delete the files</string>
+    <string name="directory_deleted">The folder has been deleted</string>
+    <string name="file_deleted">The file was deleted</string>
+    <string name="files_deleted">The files were deleted</string>
+    <string name="cannot_rename">Cannot rename</string>
+    <string name="cannot_paste_folder_into_itself">Cannot copy or move folders into themselves or one of their subfolders</string>
+    <string name="cannot_paste_file_same_location">Cannot paste files to their original location</string>
+    <string name="cannot_paste_over_network">Cannot paste files over the network</string>
+    <string name="copy_directory_success_one">Folder copied</string>
+    <string name="copy_directory_success_many">Folders copied</string>
+    <string name="copy_file_success_one">File copied</string>
+    <string name="copy_file_success_many">Files copied</string>
+    <string name="copy_directory_failed_one">Folder wasn\'t copied</string>
+    <string name="copy_directory_failed_many">Folders weren\'t copied</string>
+    <string name="copy_file_failed_one">File wasn\'t copied</string>
+    <string name="copy_file_failed_many">Files weren\'t copied</string>
+    <string name="cut_directory_success_one">Folder moved</string>
+    <string name="cut_directory_success_many">Folders moved</string>
+    <string name="cut_file_success_one">File moved</string>
+    <string name="cut_file_success_many">Files moved</string>
+    <string name="cut_directory_failed_one">Folder wasn\'t moved</string>
+    <string name="cut_directory_failed_many">Folders weren\'t moved</string>
+    <string name="cut_file_failed_one">File wasn\'t moved</string>
+    <string name="cut_file_failed_many">Files weren\'t moved</string>
+    <string name="pasting_done">Pasting done</string>
+    <string name="copy_done">Copy success</string>
+    <string name="copy_canceled">Copy canceled</string>
+    <string name="cut_done">Cut success</string>
+    <string name="cut_canceled">Cut canceled</string>
+    <string name="delete_done">Delete success</string>
+    <string name="delete_canceled">Delete canceled</string>
+    <string name="cannot_open_file">Cannot open file</string>
+    <string name="no_application_to_open_file">No application on this device can open this file</string>
+    <string name="delete_still_ongoing">Delete is still proceeding in background</string>
+    <string name="copy_on_device">Download video on device</string>
+    <string name="copy_on_device_multi">Download on device</string>
+    <string name="storage_swapped_primary">main</string>
+    <string name="storage_swapped_secondary">secondary</string>
+
+    <string name="yes">"Yes"</string>
+    <string name="no">"No"</string>
+
+    <string name="share">Share</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Share file via</string>
+
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">No application available to share the file</string>
+    <string name="upnp_not_allowed">You are not allowed to access this UPNP server. Please change your access configuration first.</string>
+
+    <string name="single_mode">Single</string>
+    <string name="double_mode">Double</string>
+    <string name="swap_panel">Swap</string>
+    <string name="move">Move</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcuts">Shortcuts</string>
+    <string name="add_to_shortcuts">Create a shortcut</string>
+    <string name="remove_from_shortcuts">Remove the shortcut</string>
+    <string name="shortcut_added" comment="deprecated">Shortcut %s created</string>
+    <string name="shortcut_removed" comment="deprecated">Shortcut %s removed</string>
+    <string name="shortcut_created">Shortcut \"%1$s\" created</string>
+    <string name="one_shortcut_removed">One shortcut deleted</string>
+    <string name="n_shortcut_removed">%1$d shortcuts deleted</string>
+    <string name="server_not_available" comment="deprecated">The server is currently not available</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s is currently not available</string>
+    <string name="cannot_open_shortcut">The contents of this shortcut is currently not available.\nPlease check that you have the required permissions.</string>
+    <string name="network_shortcuts">Network shortcuts</string>
+    <string name="media_servers">Media servers</string>
+    <string name="shortcut_list_empty">To create shortcuts to your favorite remote folders long-click on the target folders and select \"%s\" in the top action bar.</string>
+
+    <!-- DLNA -->
+    <string name="dlna_share">Media share</string>
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="picture">Picture</string>
+    <string name="share_types">Share types</string>
+
+    <!-- ZIP -->
+    <string name="zip_extract_action">Extract here</string>
+    <string name="zip_extract_success_message">Extraction success</string>
+    <string name="zip_compress_action">Compress as Zip archive</string>
+    <string name="zip_extracting_message">Extracting files from ZIP archive..</string>
+    <string name="zip_compressing_message">Compressing files to Zip archive</string>
+    <string name="zip_compressing_many">%1$d/%2$d compressed files</string>
+    <string name="zip_compressing_one">Compressing one file</string>
+    <string name="zip_compressing_success">Compression success</string>
+    <string name="zip_compressing_canceled">Compression canceled</string>
+    <string name="zip_extracting_many">%1$d/%2$d extracted files</string>
+    <string name="zip_extracting_one">Extracting one file (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">An error occurred while extracting your archive.\nMaybe your archive is damaged or your free disk storage space is not enough.</string>
+    <string name="zip_extract_canceled">Extraction canceled</string>
+    <string name="zip_compress_error_message">An error occurred while creating your archive.\nMaybe your free disk storage space is not enough.</string>
+    <string name="zip_cannot_open_inner_entry">Cannot open file within an archive. Extract it first.</string>
+    <string name="zip_size_limit">Zip browsing is limited to files smaller than 20 MB</string>
+
+    <!-- Notifications -->
+    <string name="copy_error">Copy failed</string>
+    <string name="cut_error">Cut failed</string>
+    <string name="delete_error">Delete failed</string>
+
+    <!-- Network Scanning -->
+    <string name="scan_network_index">Index media files</string>
+    <string name="scan_network_remove">Remove media from index</string>
+
+    <string name="debug_browse_to_root">Browse to device root (debug only)</string>
+
+    <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Remove from media library</string>
+    <string name="nomedia_remove">Add to media library</string>
+    <string name="nomedia_fail">Failure, cannot remove this folder from media library</string>
+    <string name="nomedia_warning">Multimedia content of this folder will no longer appear in the multimedia applications.\nAre you sure you want to proceed?</string>
+
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Choose a folder</string>
+    <string name="choose_a_folder_help">Navigate into the folder you want to select and press OK. Use BACK button to go up one level.</string>
+    <string name="current_choice">Current choice:</string>
+    <string name="no_selection">no selection</string>
+    <string name="external_storage_fake_name">Device Storage</string>
+    <string name="sdcard_fake_name">SD card</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(no folder)</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="listing_sort_mode">Sort mode</string>
+    <string name="listing_sort_by_name">Sort by name</string>
+    <string name="listing_sort_by_size">Sort by size</string>
+    <string name="listing_sort_by_date">Sort by date</string>
+    <string name="listing_ascending">Ascending</string>
+    <string name="listing_descending">Descending</string>
+
+
+    <string name="acquire_external_usb_permission">File manager needs special permission to access external storage. Please select your storage on next screen</string>
+
+</resources>

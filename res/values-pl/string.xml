@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="file_info_label_name">Imię i nazwisko:</string>
+    <string name="file_info_label_size">Rozmiar:</string>
+    <string name="file_info_label_permission">Uprawnienia:</string>
+    <string name="file_info_label_can_read">odczyt</string>
+    <string name="file_info_label_cannot_read">brak możliwości odczytu</string>
+    <string name="file_info_label_can_write">zapis</string>
+    <string name="file_info_label_cannot_write">brak możliwości zapisu</string>
+    <string name="file_info_label_last_modified">Ostatnia modyfikacja:</string>
+    <string name="file_info_label_mime_type">Typ Mime:</string>
+    <string name="network_media_servers">Serwery mediów (UPnP)</string>
+    <string name="network_shared_folders">Foldery współużytkowane (SMB)</string>
+    <string name="fast_scroll_numeric_alphabet" msgid="4030170524595123610">" 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"</string>
+    <string name="samba_settings_title">Ustawienia folderów współdzielonych</string>
+    <string name="samba_settings_summary">Skonfiguruj nazwy użytkowników i hasła dostępu do folderów współdzielonych w sieci prywatnej</string>
+    <string name="samba_profiles">Profile folderów współdzielonych</string>
+    <string name="samba_delete_settings">Czy na pewno chcesz usunąć te ustawienia?</string>
+    <string name="samba_add_server">Dodaj serwer</string>
+    <string name="samba_server">Określ serwer</string>
+    <string name="samba_share">Określ obszar współdzielony</string>
+
+    <string name="storage_busy_message">Nie można korzystać z pamięci wewnętrznej, gdy urządzenie jest podłączone za pomocą USB.</string>
+    <string name="network_storage">Sieć</string>
+    <string name="external_storage">Zewnętrzna</string>
+    <string name="internal_storage">Wewnętrzna</string>
+    <string name="directory_empty">Folder jest pusty</string>
+    <string name="no_server">Nie znaleziono serwera</string>
+    <string name="loading">Ładowanie...</string>
+    <string name="samba_loading">Proszę czekać, trwa ładowanie foldera współdzielonego...</string>
+    <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego...</string>
+    <string name="cannot_list">Nie można wyświetlić zawartości</string>
+    <string name="deleting">Usuwanie&#8230;</string>
+    <string name="delete">Usuń</string>
+    <string name="rename">Zmień nazwę</string>
+    <string name="details">Szczegóły</string>
+    <string name="refresh_directory">Odśwież folder</string>
+    <string name="new_directory">Utwórz nowy folder</string>
+    <string name="refresh_servers_list">Odśwież listę serwerów</string>
+    <string name="go_top">Powrót do góry</string>
+    <string name="enter_new_name">Podaj nową nazwę:</string>
+    <string name="confirm_deleting_cancellation">Czy na pewno chcesz anulować usuwanie?</string>
+    <string name="confirm_copying_cancellation">Czy na pewno chcesz anulować kopiowanie?</string>
+    <string name="confirm_moving_cancellation">Czy na pewno chcesz anulować przenoszenie?</string>
+    <string name="cannot_create_directory">Nie można utworzyć nowego folderu</string>
+    <string name="cannot_delete_directory">Nie można usunąć folderu</string>
+    <string name="cannot_delete_file">Nie można usunąć pliku</string>
+    <string name="directory_deleted">Folder został usunięty</string>
+    <string name="file_deleted">Plik został usunięty</string>
+    <string name="files_deleted">Pliki zostały usunięte</string>
+    <string name="cannot_rename">Nie można zmienić nazwy</string>
+    <string name="cannot_open_file">Nie można otworzyć pliku</string>
+    <string name="delete_still_ongoing">W tle trwa przenoszenie usuwanie</string>
+    <string name="yes">„Tak”</string>
+    <string name="no">„Nie”</string>
+    <string name="share">Udostępnij</string>
+    <string name="send_file">Udostępnij plik poprzez</string>
+    <string name="no_way_to_share_file">Brak aplikacji do udostępnienia pliku</string>
+</resources>

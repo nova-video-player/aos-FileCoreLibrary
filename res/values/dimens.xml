@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+	<dimen name="archos_info_dialog_header_height">64dip</dimen>
+
+        <dimen name="action_bar_default_height">48dip</dimen>
+
+        <dimen name="status_bar_height">25dip</dimen>
+
+</resources>

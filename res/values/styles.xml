@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ArchosInfoDialog" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@drawable/archos_info_dialog_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="InfoDialogText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:textSize">17dip</item>
+    </style>
+
+    <style name="InfoDialogText.Grey">
+        <item name="android:textColor">#ff909090</item>
+    </style>
+
+    <style name="Theme.Holo.Archos" parent="android:Theme.Holo">
+        <item name="android:actionBarStyle">@style/Widget.Holo.ActionBar.Archos</item>
+    </style>
+
+    <style name="Widget.Holo.ActionBar.Archos" parent="android:Widget.Holo.ActionBar">
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="Theme.HoloBackground" parent="android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/Widget.Holo.ActionBar.Archos</item>
+        <item name="android:windowBackground">@drawable/background_holo_dark</item>
+    </style>
+
+    <style name="Theme.Holo.Transparent" parent="android:Theme.Holo.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+</resources>
