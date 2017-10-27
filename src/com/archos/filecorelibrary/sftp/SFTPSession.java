@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 public class SFTPSession {
     private static SFTPSession sshSession = null;
+    //Keep a cached Session ( = connection) per server
     private HashMap<Credential, Session> sessions;
     private HashMap<Session, Integer> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
     public SFTPSession(){
@@ -80,20 +81,10 @@ public class SFTPSession {
     private synchronized void keepSessionConnected(Channel channel){
         try {
             Session session = channel.getSession();
-            boolean contains = false;
-            for(Entry<Session, Integer> e2 : usedSessions.entrySet()){
-                if (e2.getKey() == session) {
-                    contains = true;
-                    break;
-                }
-            }
-            if(contains){
-                usedSessions.put(session,usedSessions.get(session)+1);
-            }
-            else {
-                usedSessions.put(session, 1);
+            Integer nSessions = usedSessions.get(session);
+            if(nSessions == null) nSessions = 0;
 
-            }
+            usedSessions.put(session, nSessions + 1);
         } catch (JSchException e) {
             e.printStackTrace();
         }
@@ -104,16 +95,15 @@ public class SFTPSession {
         try {
 
             Session session = channel.getSession();
-            boolean contains = false;
-            for(Entry<Session, Integer> e2 : usedSessions.entrySet()){
-                if (e2.getKey() == session) {
-                    contains = true;
-                    break;
-                }
-            }
+            boolean contains = usedSessions.get(session) != null;
+            //TODO: What do we do when it isn't there?
+            //This should be an error case
             if(contains){
                 if(usedSessions.get(session)<=1){
                     usedSessions.remove(session);
+		    //If the session is no longer used, and this isn't our cached session for this server
+		    //It means it won't ever be used again, so clear it.
+		    //This means that we usually keep always one connection open
                     if(!sessions.values().contains(session))
                         channel.getSession().disconnect();
                 }
@@ -132,13 +122,7 @@ public class SFTPSession {
         for(Entry<Credential, Session> e : sessions.entrySet()){
             Uri uri = Uri.parse(e.getKey().getUriString());
             if(uri.getHost().equals(cred.getHost())&&uri.getPort()==cred.getPort()){
-                boolean doNotDisconnect = false;
-                for(Entry<Session, Integer> e2 : usedSessions.entrySet()){
-                     if (e2.getKey() == e.getValue()) {
-                         doNotDisconnect = true;
-                         break;
-                     }
-                }
+                boolean doNotDisconnect = usedSessions.get(e.getValue()) != null;
                 if(!doNotDisconnect) {
                     e.getValue().disconnect();
                 }
