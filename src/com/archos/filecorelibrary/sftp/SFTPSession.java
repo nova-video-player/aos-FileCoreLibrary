@@ -24,15 +24,15 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public class SFTPSession {
     private static SFTPSession sshSession = null;
-    private ConcurrentHashMap<Credential, Session> sessions;
-    private ConcurrentHashMap<Session, Integer> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
+    private HashMap<Credential, Session> sessions;
+    private HashMap<Session, Integer> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
     public SFTPSession(){
-        sessions = new ConcurrentHashMap<Credential, Session>();
-        usedSessions = new ConcurrentHashMap<>();
+        sessions = new HashMap<Credential, Session>();
+        usedSessions = new HashMap<>();
     }
 	
 	
