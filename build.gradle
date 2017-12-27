@@ -56,7 +56,7 @@ android {
 }
 
 dependencies {
-    compile files('libs/jakarta-oro-2.0.1.jar')
-    compile 'com.android.support:appcompat-v7:23.2.0'
-    compile 'com.linkedin.dexmaker:dexmaker:2.2.0'
+    implementation files('libs/jakarta-oro-2.0.1.jar')
+    implementation 'com.android.support:appcompat-v7:23.2.0'
+    implementation 'com.linkedin.dexmaker:dexmaker:2.2.0'
 }
