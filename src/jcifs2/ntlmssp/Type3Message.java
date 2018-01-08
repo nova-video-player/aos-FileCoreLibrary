@@ -213,7 +213,6 @@ public class Type3Message extends NtlmMessage {
                         setSessionKey(exchangedKey);
                     } else {
                         masterKey = ntlm2SessionKey;
-                        setSessionKey(masterKey);
                     }
                 }
             }
@@ -261,7 +260,6 @@ public class Type3Message extends NtlmMessage {
                     setSessionKey(exchangedKey);
                 } else {
                     masterKey = userSessionKey;
-                    setSessionKey(masterKey);
                 }
             }
 

@@ -25,14 +25,12 @@ class SmbComReadAndX extends AndXServerMessageBlock {
     private static final int BATCH_LIMIT = Config.getInt( "jcifs.smb.client.ReadAndX.Close", 1 );
 
     private long offset;
-    private int fid,
-        openTimeout;
+    private int fid;
 int maxCount, minCount, remaining;
 
     SmbComReadAndX() {
         super( null );
         command = SMB_COM_READ_ANDX;
-        openTimeout = 0xFFFFFFFF;
     }
     SmbComReadAndX( int fid, long offset, int maxCount, ServerMessageBlock andx ) {
         super( andx );
@@ -40,7 +38,6 @@ int maxCount, minCount, remaining;
         this.offset = offset;
         this.maxCount = minCount = maxCount;
         command = SMB_COM_READ_ANDX;
-        openTimeout = 0xFFFFFFFF;
     }
 
     void setParam( int fid, long offset, int maxCount ) {
@@ -62,7 +59,7 @@ int maxCount, minCount, remaining;
         dstIndex += 2;
         writeInt2( minCount, dst, dstIndex );
         dstIndex += 2;
-        writeInt4( openTimeout, dst, dstIndex );
+        writeInt4( 0x00000000, dst, dstIndex );
         dstIndex += 4;
         writeInt2( remaining, dst, dstIndex );
         dstIndex += 2;
@@ -87,7 +84,6 @@ int maxCount, minCount, remaining;
             ",offset=" + offset +
             ",maxCount=" + maxCount +
             ",minCount=" + minCount +
-            ",openTimeout=" + openTimeout +
             ",remaining=" + remaining +
             ",offset=" + offset +
              "]" );
