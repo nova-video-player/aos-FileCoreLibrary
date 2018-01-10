@@ -24,15 +24,18 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbAuthException;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
-import jcifs2.smb.SmbFileFilter;
+import jcifs.EmptyIterator;
+import jcifs.context.SingletonContext;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbAuthException;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileFilter;
 
 
 /**
@@ -56,6 +59,7 @@ public class JcifListingEngine extends ListingEngine {
         else mUri = uri;
         mListingThread = new JcifListingThread();
     }
+
 
     @Override
     public void start() {
@@ -85,16 +89,21 @@ public class JcifListingEngine extends ListingEngine {
         @Override
         public boolean accept(SmbFile f) {
             final String filename = f.getName();
-            if (f.isFile_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
-                return keepFile(filename);
+            try {
+                if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
+                    return keepFile(filename);
+                }
+                else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
+                    return keepDirectory(filename);
+                }
+                else {
+                    Log.d(TAG, "neither file nor directory: "+filename);
+                    return false;
+                }
+            } catch (SmbException e) {
+                e.printStackTrace();
             }
-            else if (f.isDirectory_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
-                return keepDirectory(filename);
-            }
-            else {
-                Log.d(TAG, "neither file nor directory: "+filename);
-                return false;
-            }
+            return false;
         }
     };
 
@@ -106,8 +115,9 @@ public class JcifListingEngine extends ListingEngine {
                 NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
                 SmbFile[] listFiles;
                 if (cred != null) {
-                    NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("", cred.getUsername(), cred.getPassword());
-                    listFiles = new SmbFile(mUri.toString(), auth).listFiles(mFileFilter);
+                    SingletonContext context = SingletonContext.getInstance();
+                    NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "", cred.getUsername(), cred.getPassword());
+                    listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles(mFileFilter);
                 }
                 else {
                     listFiles = new SmbFile(mUri.toString()).listFiles(mFileFilter);
@@ -143,10 +153,10 @@ public class JcifListingEngine extends ListingEngine {
                 final ArrayList<JcifsFile2> directories = new ArrayList<>();
                 final ArrayList<JcifsFile2> files = new ArrayList<>();
                 for (SmbFile f : listFiles) {
-                    if (f.isFile_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
+                    if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
                         files.add(new JcifsFile2(f));
                     }
-                    else if (f.isDirectory_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
+                    else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
                         directories.add(new JcifsFile2(f));
                     }
                 }
