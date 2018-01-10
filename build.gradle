@@ -74,6 +74,7 @@ android {
 }
 
 dependencies {
+    implementation 'eu.agno3.jcifs:jcifs-ng:2.0.4'
     implementation 'oro:oro:2.0.8'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.preference:preference:1.1.0'
