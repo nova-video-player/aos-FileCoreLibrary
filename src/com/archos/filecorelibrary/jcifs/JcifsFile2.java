@@ -24,9 +24,10 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import java.net.MalformedURLException;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
+import jcifs.context.SingletonContext;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
 
 public class JcifsFile2 extends MetaFile2 {
 
@@ -45,19 +46,19 @@ public class JcifsFile2 extends MetaFile2 {
      * SmbFile argument must contain already valid data (name, size, etc.)
      * because this method won't make any network call
      */
-    public JcifsFile2(SmbFile file) {
+    public JcifsFile2(SmbFile file) throws SmbException {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null");
         }
         // Only use methods doing no network access here
         mUriString = file.getCanonicalPath();
         String name  = file.getName();
-        mIsDirectory = file.isDirectory_noquery();
-        mIsFile = file.isFile_noquery();
-        mLastModified = file.lastModified_noquery();
-        mCanRead = file.canRead_nonetwork();
-        mCanWrite = file.canWrite_nonetwork();
-        mLength = file.length_noNetwork();
+        mIsDirectory = file.isDirectory();
+        mIsFile = file.isFile();
+        mLastModified = file.lastModified();
+        mCanRead = file.canRead();
+        mCanWrite = file.canWrite();
+        mLength = file.length();
 
         // remove the '/' at the end of directory name (Jcifs adds it)
         if (mIsDirectory && name.endsWith("/")) {
@@ -77,8 +78,9 @@ public class JcifsFile2 extends MetaFile2 {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile file;
         if(cred!=null) {
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",cred.getUsername(), cred.getPassword());
-            file = new SmbFile(uri.toString(), auth);
+            SingletonContext context = SingletonContext.getInstance();
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "",cred.getUsername(), cred.getPassword());
+            file = new SmbFile(uri.toString(), context.withCredentials(auth));
         }
         else
             file = new SmbFile(uri.toString());
