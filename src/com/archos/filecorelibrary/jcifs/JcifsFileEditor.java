@@ -69,9 +69,10 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        SmbRandomAccess is = new SmbRandomAccessFile(getSmbFile(mUri), "r");
-        is.seek(from);
-        return (InputStream) is;
+
+        InputStream is = new SmbFileInputStream(getSmbFile(mUri));
+        is.skip(from);
+        return is;
     }
 
     @Override
