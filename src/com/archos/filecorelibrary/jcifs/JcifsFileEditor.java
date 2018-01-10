@@ -20,12 +20,14 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
-import jcifs2.smb.SmbFileInputStream;
-import jcifs2.smb.SmbFileOutputStream;
-import jcifs2.smb.SmbRandomAccessFile;
+import jcifs.SmbRandomAccess;
+import jcifs.context.SingletonContext;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbFileOutputStream;
+import jcifs.smb.SmbRandomAccessFile;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
@@ -67,11 +69,9 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-
-
-        InputStream is = new SmbRandomAccessFile(getSmbFile(mUri), "r");
-        ((SmbRandomAccessFile)is).seek(from);
-        return is;
+        SmbRandomAccess is = new SmbRandomAccessFile(getSmbFile(mUri), "r");
+        is.seek(from);
+        return (InputStream) is;
     }
 
     @Override
@@ -111,8 +111,9 @@ public class JcifsFileEditor extends FileEditor{
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile smbfile;
         if(cred!=null){
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",cred.getUsername(), cred.getPassword());
-            smbfile= new SmbFile(uri.toString(),auth);
+            SingletonContext context = SingletonContext.getInstance();
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "",cred.getUsername(), cred.getPassword());
+            smbfile= new SmbFile(uri.toString(), context.withCredentials(auth));
         }
         else {
             smbfile= new SmbFile(uri.toString());
