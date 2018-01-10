@@ -24,9 +24,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
+import jcifs.context.SingletonContext;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
 
 
 /**
@@ -43,8 +44,9 @@ public class JcifsRawLister extends RawLister {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
         SmbFile[] listFiles;
         if(cred!=null){
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",cred.getUsername(), cred.getPassword());
-            listFiles = new SmbFile(mUri.toString(), auth).listFiles();
+            SingletonContext context = SingletonContext.getInstance();
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "",cred.getUsername(), cred.getPassword());
+            listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles();
         }
         else
             listFiles = new SmbFile(mUri.toString()).listFiles();
