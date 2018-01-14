@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import jcifs2.Config;
-import jcifs2.smb.SmbFileInputStream;
 import jcifs2.util.LogStream;
 
 public class Lmhosts {
@@ -71,82 +70,5 @@ public class Lmhosts {
 
     public synchronized static void reset() {
         TAB.clear();
-    }
-
-
-    static void populate( Reader r ) throws IOException {
-        String line;
-        BufferedReader br = new BufferedReader( r );
-
-        while(( line = br.readLine() ) != null ) {
-            line = line.toUpperCase().trim();
-            if( line.length() == 0 ) {
-                continue;
-            } else if( line.charAt( 0 ) == '#' ) {
-                if( line.startsWith( "#INCLUDE " )) {
-                    line = line.substring( line.indexOf( '\\' ));
-                    String url = "smb:" + line.replace( '\\', '/' );
-
-                    if( alt > 0 ) {
-                        try {
-                            populate( new InputStreamReader( new SmbFileInputStream( url )));
-                        } catch( IOException ioe ) {
-                            log.println( "lmhosts URL: " + url );
-                            ioe.printStackTrace( log );
-                            continue;
-                        }
-
-                        /* An include was loaded successfully. We can skip
-                         * all other includes up to the #END_ALTERNATE tag.
-                         */
-
-                        alt--;
-                        while(( line = br.readLine() ) != null ) {
-                            line = line.toUpperCase().trim();
-                            if( line.startsWith( "#END_ALTERNATE" )) {
-                                break;
-                            }
-                        }
-                    } else {
-                        populate( new InputStreamReader( new SmbFileInputStream( url )));
-                    }
-                } else if( line.startsWith( "#BEGIN_ALTERNATE" )) {
-                    alt++;
-                } else if( line.startsWith( "#END_ALTERNATE" ) && alt > 0 ) {
-                    alt--;
-                    throw new IOException( "no lmhosts alternate includes loaded" );
-                }
-            } else if( Character.isDigit( line.charAt( 0 ))) {
-                char[] data = line.toCharArray();
-                int ip, i, j;
-                Name name;
-                NbtAddress addr;
-                char c;
-
-                c = '.';
-                ip = i = 0;
-                for( ; i < data.length && c == '.'; i++ ) {
-                    int b = 0x00;
-
-                    for( ; i < data.length && ( c = data[i] ) >= 48 && c <= 57; i++ ) {
-                        b = b * 10 + c - '0';
-                    }
-                    ip = ( ip << 8 ) + b;
-                }
-                while( i < data.length && Character.isWhitespace( data[i] )) {
-                    i++;
-                }
-                j = i;
-                while( j < data.length && Character.isWhitespace( data[j] ) == false ) {
-                    j++;
-                }
-
-                name = new Name( line.substring( i, j ), 0x20, null );
-                addr = new NbtAddress( name, ip, false, NbtAddress.B_NODE,
-                                    false, false, true, true,
-                                    NbtAddress.UNKNOWN_MAC_ADDRESS );
-                TAB.put( name, addr );
-            }
-        }
     }
 }
