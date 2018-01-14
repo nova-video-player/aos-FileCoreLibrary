@@ -16,7 +16,7 @@ package com.archos.filecorelibrary;
 
 import android.util.Log;
 
-import jcifs2.smb.SmbFile;
+import jcifs.smb.SmbFile;
 
 public class SmbItemData implements Comparable<SmbItemData>{
     private final static String TAG = "SmbItemData";
