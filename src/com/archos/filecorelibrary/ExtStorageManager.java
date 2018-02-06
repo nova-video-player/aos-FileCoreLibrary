@@ -66,6 +66,7 @@ public class ExtStorageManager {
                                     Intent intent = new Intent();
                                     intent.setData(Uri.parse(ExtStorageReceiver.ARCHOS_FILE_SCHEME+"://none"));
                                     intent.setAction(ExtStorageReceiver.ACTION_MEDIA_CHANGED);
+                                    intent.setPackage(ArchosUtils.getGlobalContext().getPackageName());
                                     ArchosUtils.getGlobalContext().sendBroadcast(intent);
                                     return 1;
                                 }

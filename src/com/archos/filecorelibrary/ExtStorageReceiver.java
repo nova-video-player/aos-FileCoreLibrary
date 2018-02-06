@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 
+import com.archos.environment.ArchosUtils;
+
 public class ExtStorageReceiver extends BroadcastReceiver {
     private static final String TAG = "ExtStorageReceiver";
     public static final String ACTION_MEDIA_MOUNTED  = "com.archos.action.MEDIA_MOUNTED";
@@ -42,13 +44,16 @@ public class ExtStorageReceiver extends BroadcastReceiver {
         if (Environment.getExternalStorageDirectory().getPath().equalsIgnoreCase(path))
             return;
         if (action.equals(Intent.ACTION_MEDIA_MOUNTED)){
-            context.sendBroadcast(new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(uri)));
+            Intent intent1 = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(uri));
+            intent1.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+            context.sendBroadcast(intent1);
 
         } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED) || action.equals(Intent.ACTION_MEDIA_EJECT) || action.equals(Intent.ACTION_MEDIA_BAD_REMOVAL)){
             if (path == null || path.isEmpty())
                 return;
-            context.sendBroadcast(new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(uri)));
-
+            Intent intent1 = new Intent(new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(uri)));
+            intent1.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+            context.sendBroadcast(intent1);
         }
     }
 
