@@ -18,6 +18,7 @@ package com.archos.filecorelibrary.wifidirect;
 
 import com.archos.filecorelibrary.wifidirect.WiFiDirectBroadcastReceiver.WiFiDirectBroadcastListener;
 import com.archos.filecorelibrary.R;
+import com.archos.environment.ArchosUtils;
 
 import android.app.Notification;
 import android.app.Notification.Builder;
@@ -364,8 +365,10 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
 
         //write the file, and update medialib in case of success
         bis = new BufferedInputStream(inputstream);
-        if (copyFile(bis, fos, fileReceived.getSize())){
-            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://".concat(path).concat("/").concat(fileReceived.getName()))));
+        if (copyFile(bis, fos, fileReceived.getSize())) {
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://".concat(path).concat("/").concat(fileReceived.getName())));
+            intent.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+            sendBroadcast(intent);
         } else {
             file.delete();
         }

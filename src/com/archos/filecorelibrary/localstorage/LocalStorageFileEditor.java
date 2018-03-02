@@ -24,6 +24,7 @@ import android.provider.MediaStore;
 import com.archos.filecorelibrary.ExtStorageManager;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
+import com.archos.environment.ArchosUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -131,6 +132,7 @@ public class LocalStorageFileEditor extends FileEditor {
             toIndex = Uri.parse("file://" + toIndex.toString());
         }
         Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        scanIntent.setPackage(ArchosUtils.getGlobalContext().getPackageName());
         scanIntent.setData(toIndex);
         mContext.sendBroadcast(scanIntent);
     }

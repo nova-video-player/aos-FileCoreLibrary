@@ -18,6 +18,7 @@ package com.archos.filecorelibrary;
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.MetaFile.FileType;
 import com.archos.filecorelibrary.samba.SambaConfiguration;
+import com.archos.environment.ArchosUtils;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -1470,7 +1471,9 @@ public class FileManagerCore extends Observable {
 
     private void scanFile(File file) {
         // Ask mediascanner to scan the provided file/folder
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
+        intent.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+        context.sendBroadcast(intent);
     }
 
     /**
