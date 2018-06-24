@@ -22,6 +22,7 @@ import com.archos.environment.ArchosUtils;
 
 import android.app.Notification;
 import android.app.Notification.Builder;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -45,10 +46,12 @@ import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
@@ -88,7 +91,8 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
     public static final String REMOTE_DEVICE_ADDRESS = "remote_address";
     public static final int OWNER_PORT = 8988;
     Handler mHandler;
-    volatile Builder notificationBuilder;
+    //volatile Builder notificationBuilder;
+    private NotificationCompat.Builder notificationBuilder = null;
     NotificationManager notificationManager;
     private long mProgress = 0;
     private int percent = 0;
@@ -144,10 +148,23 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
 //        mManager.enableP2p(mChannel);
     }
 
+    private static final String notifChannelId = "FileTransferService_id";
+    private static final String notifChannelName = "FileTransferService";
+    private static final String notifChannelDescr = "FileTransferService";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-     // configure the notification
-        notificationBuilder = new Notification.Builder(this);
+        notificationManager = (NotificationManager) getApplicationContext().getSystemService(
+                Context.NOTIFICATION_SERVICE);
+        // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel mNotifChannel = new NotificationChannel(notifChannelId, notifChannelName,
+                    notificationManager.IMPORTANCE_LOW);
+            mNotifChannel.setDescription(notifChannelDescr);
+            if (notificationManager != null)
+                notificationManager.createNotificationChannel(mNotifChannel);
+        }
+        // configure the notification
+        notificationBuilder = new NotificationCompat.Builder(this, notifChannelId);
         contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.notification_progress);
         contentView.setImageViewResource(R.id.image, R.drawable.ic_wifip2p);
         contentView.setTextViewText(R.id.title, "Waiting for connection to download");
@@ -169,8 +186,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
                 client ? "com.archos.wifidirect.WiFiDirectSenderActivity" : "com.archos.wifidirect.WiFiDirectReceiverActivity"));
         PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilder.setContentIntent(pi);
-        notificationManager = (NotificationManager) getApplicationContext().getSystemService(
-                Context.NOTIFICATION_SERVICE);
+
         //To not be killed
         startForeground(NOTIFICATION_ID, notificationBuilder.getNotification());
         return START_STICKY;
