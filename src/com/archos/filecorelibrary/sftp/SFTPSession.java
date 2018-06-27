@@ -23,16 +23,16 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import java.util.Map.Entry;
+import java.util.HashSet;
 import java.util.HashMap;
 
 public class SFTPSession {
     private static SFTPSession sshSession = null;
     //Keep a cached Session ( = connection) per server
-    private HashMap<Credential, Session> sessions;
-    private HashMap<Session, Integer> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
+    private HashMap<Credential, Session> currentSessions;
+    private HashMap<Session, HashSet<Channel>> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
     public SFTPSession(){
-        sessions = new HashMap<Credential, Session>();
+        currentSessions = new HashMap<>();
         usedSessions = new HashMap<>();
     }
 	
@@ -50,25 +50,24 @@ public class SFTPSession {
             try {
                 Channel channel = session.openChannel("sftp");
                 channel.connect();
-                keepSessionConnected(channel);
+                acquireSession(channel);
                 return channel;
             } catch (JSchException e) {
                 //channel isn't openable, we have to reset the session !
                 removeSession(cred);
                 Session session2 = getSession(cred);
-                if(session2 !=null){
+                if (session2 != null) {
                     try {
 
                         Channel channel;
                         channel = session2.openChannel("sftp");
                         channel.connect();
-                        keepSessionConnected(channel);
+                        acquireSession(channel);
                         return channel;
-                        } catch (JSchException e1) {
-                            // TODO Auto-generated catch block
-                            throw e1;
-                        }
-
+                    } catch (JSchException e1) {
+                        // TODO Auto-generated catch block
+                        throw e1;
+                    }
                 }
             }
         }
@@ -77,39 +76,32 @@ public class SFTPSession {
 
     }
 
-    //issue there when a session is disconnnected when a channel is being used :|
-    private synchronized void keepSessionConnected(Channel channel){
+    private synchronized void acquireSession(Channel channel){
         try {
             Session session = channel.getSession();
-            Integer nSessions = usedSessions.get(session);
-            if(nSessions == null) nSessions = 0;
-
-            usedSessions.put(session, nSessions + 1);
+            HashSet<Channel> channels = usedSessions.get(session);
+            if(channels == null) {
+                channels = new HashSet<>();
+                usedSessions.put(session, channels);
+            }
+            channels.add(channel);
         } catch (JSchException e) {
-            e.printStackTrace();
         }
 
     }
 
     public synchronized void releaseSession(Channel channel) {
         try {
-
             Session session = channel.getSession();
-            boolean contains = usedSessions.get(session) != null;
-            //TODO: What do we do when it isn't there?
-            //This should be an error case
-            if(contains){
-                if(usedSessions.get(session)<=1){
-                    usedSessions.remove(session);
-		    //If the session is no longer used, and this isn't our cached session for this server
-		    //It means it won't ever be used again, so clear it.
-		    //This means that we usually keep always one connection open
-                    if(!sessions.values().contains(session))
-                        channel.getSession().disconnect();
-                }
-                else{
-                    usedSessions.put(session, usedSessions.get(session) - 1);
-                }
+            HashSet<Channel> channels = usedSessions.get(session);
+            boolean deleted = channels.remove(channel);
+            //We already deleted this channel before
+            if(!deleted) return;
+            if(channels.isEmpty()) {
+                //If this is our current session for this credential, keep it
+                if(currentSessions.values().contains(session)) return;
+                session.disconnect();
+                usedSessions.remove(session);
             }
         } catch (JSchException e) {
             e.printStackTrace();
@@ -117,20 +109,29 @@ public class SFTPSession {
 
     }
 
-    public synchronized void removeSession(Uri cred){
+    /*
+    This is called by long-standing calls which open/close many channels
+    To keep the session alive.
+    For instance, scraping will ls / then ls /data, which would normally close the sftp connection
+    on every request
+     */
+    public synchronized void removeSession(Uri cred) {
+        for(Credential c : currentSessions.keySet()){
+            Uri uri = Uri.parse(c.getUriString());
+            if(!uri.getHost().equals(cred.getHost()) || uri.getPort()!=cred.getPort())
+                continue;
 
-        for(Entry<Credential, Session> e : sessions.entrySet()){
-            Uri uri = Uri.parse(e.getKey().getUriString());
-            if(uri.getHost().equals(cred.getHost())&&uri.getPort()==cred.getPort()){
-                boolean doNotDisconnect = usedSessions.get(e.getValue()) != null;
-                if(!doNotDisconnect) {
-                    e.getValue().disconnect();
-                }
-                sessions.remove(e.getKey());
+            Session s = currentSessions.get(c);
+            boolean doNotDisconnect = usedSessions.get(s) != null;
+            //If doNotDisconnect is true, it means there are still channels opened
+            //Since we are removing this session from currentSessions
+            //The session will be disconnected in releaseChannel
+            if(!doNotDisconnect) {
+                s.disconnect();
             }
+
+            currentSessions.remove(c);
         }
-
-
     }
 
 
@@ -150,12 +151,11 @@ public class SFTPSession {
             cred = new Credential("anonymous","",buildKeyFromUri(path).toString(), true);
 
         }
-        if(cred!=null){
-            password= cred.getPassword();
-            username = cred.getUsername();
-        }
 
-        Session session = sessions.get(cred);
+        password= cred.getPassword();
+        username = cred.getUsername();
+
+        Session session = currentSessions.get(cred);
         if(session!=null){
             if(!session.isConnected())
                 try {
@@ -175,7 +175,7 @@ public class SFTPSession {
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.connect();
-            sessions.put(cred, session);
+            currentSessions.put(cred, session);
             return session;
         } catch (JSchException e) {
             // TODO Auto-generated catch block
