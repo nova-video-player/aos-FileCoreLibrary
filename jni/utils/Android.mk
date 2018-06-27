@@ -29,7 +29,7 @@ LOCAL_SRC_FILES:= \
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_ARM_MODE := arm
 LOCAL_SRC_FILES += sendfile64.S
-LOCAL_CFLAGS += -DCONFIG_ARM
+LOCAL_CFLAGS += -DCONFIG_ARM -no-integrated-as
 endif
 
 LOCAL_STATIC_LIBRARIES := libnativehelper
