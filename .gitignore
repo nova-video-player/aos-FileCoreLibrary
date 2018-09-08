@@ -10,4 +10,4 @@ libs/armeabi/
 libs/x86/
 libs/mips/
 obj/
-crowdin.properties
+crowdin.yml
