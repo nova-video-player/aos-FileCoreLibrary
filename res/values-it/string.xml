@@ -27,8 +27,8 @@
     <string name="samba_add_server">Aggiungi un server</string>
     <string name="samba_server">Definisci un server</string>
     <string name="samba_share">Definisci una condivisione</string>
-    <string name="samba_loading">Attendere caricamento cartella condivisa...</string>
-    <string name="samba_reloading">Attendere ricaricamento cartella condivisa...</string>
+    <string name="samba_loading">Attendere caricamento cartella condivisa…</string>
+    <string name="samba_reloading">Attendere ricaricamento cartella condivisa…</string>
     <string name="samba_password_request_title">Richiesta password cartella condivisa</string>
     <string name="samba_username">Nome utente</string>
     <string name="samba_password">Password</string>
@@ -41,7 +41,7 @@
     <string name="internal_storage">Memoria interna</string>
     <string name="directory_empty">La cartella è vuota</string>
     <string name="no_server">Non è stato trovato nessun server</string>
-    <string name="loading">Attendere il caricamento...</string>
+    <string name="loading">Attendere il caricamento…</string>
     <string name="cannot_list">Impossibile elencare il contenuto</string>
     <string name="error_listing">Si è verificato un errore</string>
     <string name="deleting">Eliminazione&#8230;</string>

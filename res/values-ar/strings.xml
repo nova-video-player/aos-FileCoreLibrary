@@ -27,8 +27,8 @@
     <string name="samba_add_server">أضف خادم</string>
     <string name="samba_server">عرف خادم</string>
     <string name="samba_share">عرف مشاركة</string>
-    <string name="samba_loading"> الرجاء الانتظار حتى يتم تحميل الحافظات...</string>
-    <string name="samba_reloading"> برجاء الانتظار حتى يتم اعادة تحميل الحافظات...</string>
+    <string name="samba_loading"> الرجاء الانتظار حتى يتم تحميل الحافظات…</string>
+    <string name="samba_reloading"> برجاء الانتظار حتى يتم اعادة تحميل الحافظات…</string>
     <string name="samba_password_request_title">Shared folder password request</string><!--TODO-->
     <string name="samba_username">Username</string><!--TODO-->
     <string name="samba_password">Password</string><!--TODO-->
@@ -44,7 +44,7 @@
     <string name="usb_ptp_storage">PTP</string>
     <string name="directory_empty">المجلد فارغ</string>
     <string name="no_server">لا يوجد خادم وسائط متعددة</string>
-    <string name="loading">برجاء الإنتظار لحين التحميل ...</string>
+    <string name="loading">برجاء الإنتظار لحين التحميل …</string>
     <string name="cannot_list">لا يمكن عرض المحتويات</string>
     <string name="error_listing">حدث خطأ</string>
     <string name="delete">حذف</string>

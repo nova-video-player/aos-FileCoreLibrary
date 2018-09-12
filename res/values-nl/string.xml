@@ -27,8 +27,8 @@
     <string name="samba_add_server">Voeg een server toe</string>
     <string name="samba_server">Definieer een server</string>
     <string name="samba_share">Definieer een deling</string>
-    <string name="samba_loading">Een ogenblik geduld. De gedeelde map wordt geladen...</string>
-    <string name="samba_reloading">Een ogenblik geduld. De gedeelde map wordt opnieuw geladen...</string>
+    <string name="samba_loading">Een ogenblik geduld. De gedeelde map wordt geladen…</string>
+    <string name="samba_reloading">Een ogenblik geduld. De gedeelde map wordt opnieuw geladen…</string>
     <string name="samba_password_request_title">Wachtwoordverzoek gedeelde map</string>
     <string name="samba_username">Gebruikersnaam</string>
     <string name="samba_password">Wachtwoord</string>
@@ -41,7 +41,7 @@
     <string name="internal_storage">Interne opslag</string>
     <string name="directory_empty">Map is leeg</string>
     <string name="no_server">Geen server gevonden</string>
-    <string name="loading">Bezig met laden...</string>
+    <string name="loading">Bezig met laden…</string>
     <string name="cannot_list">Kan de inhoud niet weergeven</string>
     <string name="deleting">Verwijderen&#8230;</string>
     <string name="delete">Verwijderen</string>

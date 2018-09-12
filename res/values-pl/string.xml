@@ -27,9 +27,9 @@
     <string name="internal_storage">Wewnętrzna</string>
     <string name="directory_empty">Folder jest pusty</string>
     <string name="no_server">Nie znaleziono serwera</string>
-    <string name="loading">Ładowanie...</string>
-    <string name="samba_loading">Proszę czekać, trwa ładowanie foldera współdzielonego...</string>
-    <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego...</string>
+    <string name="loading">Ładowanie…</string>
+    <string name="samba_loading">Proszę czekać, trwa ładowanie foldera współdzielonego…</string>
+    <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego…</string>
     <string name="cannot_list">Nie można wyświetlić zawartości</string>
     <string name="deleting">Usuwanie&#8230;</string>
     <string name="delete">Usuń</string>

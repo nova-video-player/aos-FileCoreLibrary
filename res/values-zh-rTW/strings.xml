@@ -6,7 +6,7 @@
     <string name="internal_storage">內部存儲</string>
     <string name="directory_empty">文件夾是空的</string>
     <string name="no_server">沒有發現伺服器</string>
-    <string name="loading">載入中，請稍候...</string>
+    <string name="loading">載入中，請稍候…</string>
     <string name="cannot_list">不能列出內容</string>
     <string name="pasting_copy_one">Copying one file (%1$s/%2$s)</string><!-- TODO -->
     <string name="pasting_copy_many">Copying: %1$d/%2$d files (%3$s/%4$s)</string><!-- TODO -->
@@ -50,8 +50,8 @@
     <string name="delete_still_ongoing">Delete is still proceeding in background</string><!-- TODO -->
     <string name="yes">"是"</string>
     <string name="no">"否"</string>
-    <string name="samba_loading">Please wait while loading shared folder...</string><!--TODO-->
-    <string name="samba_reloading">Please wait while reloading shared folder...</string><!--TODO-->
+    <string name="samba_loading">Please wait while loading shared folder…</string><!--TODO-->
+    <string name="samba_reloading">Please wait while reloading shared folder…</string><!--TODO-->
     <string name="go_top">Go back to top</string><!--TODO-->
     <string name="files_deleted">The files were deleted</string><!--TODO-->
     <string name="share">Share</string><!--TODO-->

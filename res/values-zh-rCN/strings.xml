@@ -6,7 +6,7 @@
     <string name="internal_storage">内部存储</string>
     <string name="directory_empty">文件夹是空的</string>
     <string name="no_server">没有发现服务器</string>
-    <string name="loading">载入中，请稍候...</string>
+    <string name="loading">载入中，请稍候…</string>
     <string name="cannot_list">不能列出内容</string>
     <string name="delete">删除</string>
     <string name="rename">重命名</string>
@@ -28,8 +28,8 @@
     <string name="delete_still_ongoing">Delete is still proceeding in background</string><!-- TODO -->
     <string name="yes">"是"</string>
     <string name="no">"否"</string>
-    <string name="samba_loading">Please wait while loading shared folder...</string><!--TODO-->
-    <string name="samba_reloading">Please wait while reloading shared folder...</string><!--TODO-->
+    <string name="samba_loading">Please wait while loading shared folder…</string><!--TODO-->
+    <string name="samba_reloading">Please wait while reloading shared folder…</string><!--TODO-->
     <string name="go_top">Go back to top</string><!--TODO-->
     <string name="files_deleted">The files were deleted</string><!--TODO-->
     <string name="share">Share</string><!--TODO-->

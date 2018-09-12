@@ -63,7 +63,7 @@
     <string name="usb_ptp_storage">PTP</string>
     <string name="directory_empty">Verzeichnis ist leer</string>
     <string name="no_server">Kein server gefunden</string>
-    <string name="loading">Inhalt wird geladen...</string>
+    <string name="loading">Inhalt wird geladen…</string>
     <string name="cannot_list">Der Inhalt kann nicht aufgelistet werden</string>
     <string name="error_listing">Ein Fehler ist aufgetreten</string>
     <string name="deleting">Löschen&#8230;</string>

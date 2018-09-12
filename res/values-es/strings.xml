@@ -31,8 +31,8 @@
     <string name="samba_username">Nombre de usuario</string>
     <string name="samba_password">Contraseña</string>
     <string name="samba_show_password">Mostrar contraseña</string>
-    <string name="samba_loading">Espere mientras se carga la carpeta compartida...</string>
-    <string name="samba_reloading">Espere mientras se vuelve a cargar la carpeta compartida...</string>
+    <string name="samba_loading">Espere mientras se carga la carpeta compartida…</string>
+    <string name="samba_reloading">Espere mientras se vuelve a cargar la carpeta compartida…</string>
     <string name="samba_wrong_password">Nombre de usuario o contraseña incorrecta</string>
 
     <string name="storage_busy_message">No puede utilizar el almacenamiento interno mientras esta conectado y montado como USB.</string>
@@ -41,7 +41,7 @@
     <string name="internal_storage">Almacenamiento interno</string>
     <string name="directory_empty">La carpeta está vacía</string>
     <string name="no_server">No se ha hallado servidor</string>
-    <string name="loading">Espere mientras se carga...</string>
+    <string name="loading">Espere mientras se carga…</string>
     <string name="cannot_list">No se puede listar contenido</string>
     <string name="error_listing">Ha producido un error</string>
     <string name="deleting">Elimina&#8230;</string>

@@ -27,8 +27,8 @@
     <string name="samba_add_server">הוסף שרת</string>
     <string name="samba_server">ציין שרת</string>
     <string name="samba_share">ציין שיתוף</string>
-    <string name="samba_loading">נא המתן בעת טעינת תיקיה משותפת...</string>
-    <string name="samba_reloading">נא המתן בעת טעינת תיקיה משותפת מחדש...</string>
+    <string name="samba_loading">נא המתן בעת טעינת תיקיה משותפת…</string>
+    <string name="samba_reloading">נא המתן בעת טעינת תיקיה משותפת מחדש…</string>
     <string name="samba_password_request_title">דרושה ססמא לתיקיה משותפת</string>
     <string name="samba_username">שם משתמש</string>
     <string name="samba_password">ססמא</string>
@@ -44,7 +44,7 @@
     <string name="usb_ptp_storage">PTP</string>
     <string name="directory_empty">התיקיה ריקה</string>
     <string name="no_server">לא נמצא שרת מדיה</string>
-    <string name="loading">אנא המתן בזמן הטעינה...</string>
+    <string name="loading">אנא המתן בזמן הטעינה…</string>
     <string name="cannot_list">לא ניתן להציג תוכן</string>
     <string name="error_listing">אירעה שגיאה</string>
     <string name="delete">מחק</string>
@@ -98,7 +98,7 @@
     <string name="share_types">סוגי_שיתוף</string>
     <string name="zip_extract_action">פרוס לכאן</string>
     <string name="zip_compress_action">כווץ לארכיון ZIP</string>
-    <string name="zip_extracting_message">פורס קבצים מארכיון ZIP...</string>
+    <string name="zip_extracting_message">פורס קבצים מארכיון ZIP…</string>
     <string name="zip_compressing_message">מכווץ קבצים לארכיון ZIP</string>
     <string name="zip_extract_error_message">שגיאה בעת יצירת ארכיון. \nישנה אפשרות כי הארכיון פגום או אין מספיק מקום פנוי בהתקן האחסון.</string>
     <string name="zip_compress_error_message">שגיאה בעת יצירת ארכיון. \nישנה אפשרות כי אין מספיק מקום פנוי בהתקן האחסון.</string>
