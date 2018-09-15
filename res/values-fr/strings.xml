@@ -45,6 +45,7 @@
   <string name="shared_folder_credentials">Mots de passe</string>
   <string name="no_saved_passwords">Pas de mot de passe sauvegardé</string>
   <!-- WiFi Direct strings-->
+  <string name="wifi_direct">Wi-Fi Direct</string>
   <string name="receive_p2p_here">Recevoir ici par WiFi Direct</string>
   <string name="empty_message">Recherche des appareils destinataires disponibles&#8230;&lt;br/&gt;L\'appareil destinataire doit activer l\'option &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
   <string name="wifip2p_waiting">Le téléchargement en WiFi Direct va bientôt commencer</string>
@@ -245,4 +246,5 @@
   <string name="listing_sort_by_date">Trier par date</string>
   <string name="listing_ascending">Ascendant</string>
   <string name="listing_descending">Descendant</string>
+  <string name="acquire_external_usb_permission">Nova Vidéo requiert une permission spéciale pour accéder au stockage externe. Sélectionnez votre stockage sur l\'écran suivant</string>
 </resources>
