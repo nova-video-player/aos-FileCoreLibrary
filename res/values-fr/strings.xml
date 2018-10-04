@@ -35,7 +35,7 @@
   <string name="network_timeout">Désolé, le dossier distant est inaccessible.\nVérifiez votre connexion réseau et réessayez.</string>
   <string name="samba_loading">Veuillez attendre pendant le chargement du dossier partagé&#8230;</string>
   <string name="samba_reloading">Veuillez attendre que le dossier partagé soit rechargé&#8230;</string>
-  <string name="samba_password_request_title">Mot de passe pour ce partage</string>
+  <string name="samba_password_request_title">Mot de passe requis pour ce dossier partagé</string>
   <string name="samba_domain">Domaine</string>
   <string name="samba_username">Utilisateur</string>
   <string name="samba_password">Mot de passe</string>
@@ -46,9 +46,9 @@
   <string name="no_saved_passwords">Pas de mot de passe sauvegardé</string>
   <!-- WiFi Direct strings-->
   <string name="wifi_direct">Wi-Fi Direct</string>
-  <string name="receive_p2p_here">Recevoir ici par WiFi Direct</string>
+  <string name="receive_p2p_here">Recevoir ici par Wi-Fi Direct</string>
   <string name="empty_message">Recherche des appareils destinataires disponibles&#8230;&lt;br/&gt;L\'appareil destinataire doit activer l\'option &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
-  <string name="wifip2p_waiting">Le téléchargement en WiFi Direct va bientôt commencer</string>
+  <string name="wifip2p_waiting">Le téléchargement en Wi-Fi Direct va bientôt commencer</string>
   <string name="connect_to_target">Connexion au destinataire</string>
   <string name="upload_in_progress">Envoi en cours&#8230;</string>
   <string name="file_uploading">Votre fichier est en cours d\'envoi</string>
@@ -57,17 +57,21 @@
   <string name="download_in_progress">Téléchargement en cours&#8230;</string>
   <string name="file_downloading">Votre fichier est en cours de téléchargement</string>
   <string name="server_ready">Prêt à recevoir un fichier</string>
-  <string name="nonetwork_title" comment="deprecated">Pas de connexion WiFi</string>
+  <string name="nonetwork_title" comment="deprecated">Pas de connexion Wi-Fi</string>
   <string name="no_network_title">Pas de connexion réseau</string>
-  <string name="nonetwork_message">Vous devez activer le WiFi pour utiliser cette fonctionnalité</string>
+  <string name="nonetwork_message">Vous devez activer le Wi-Fi pour utiliser cette fonctionnalité</string>
   <!-- FileManager strings -->
   <string name="storage_busy_message">Vous ne pouvez pas utiliser le stockage interne de l\'appareil pendant qu\'il est connecté et monté par USB.</string>
+  <string name="ssh_storage">FTP</string>
   <string name="network_storage">Réseau</string>
   <string name="external_storage">Externe</string>
   <string name="internal_storage">Interne</string>
   <string name="internal_storage_unified">Stockage</string>
   <string name="sd_card_storage">Carte SD</string>
+  <string name="usb_host_storage">USB</string>
   <string name="other_storage">Disque dur</string>
+  <string name="usb_ptp_storage">PTP</string>
+  <string name="cloud_storage">Cloud</string>
   <string name="directory_empty">Dossier vide</string>
   <string name="no_server">Aucun serveur trouvé</string>
   <string name="loading">Chargement&#8230;</string>
@@ -121,7 +125,7 @@
   <string name="confirm_delete_one">Voulez-vous réellement le supprimer ?</string>
   <string name="confirm_delete_parent_folder">Il semble que le répertoire parent ne contient pas d\'autre vidéo, devons-nous le supprimer?</string>
   <string name="confirm_delete_many">Voulez-vous réellement les supprimer ?</string>
-  <string name="enter_new_name">Nom</string>
+  <string name="enter_new_name">Nom :</string>
   <string name="file_name">Nom du fichier</string>
   <string name="folder_name">Nom du dossier</string>
   <string name="run_in_background">Réduire</string>
@@ -179,6 +183,7 @@
   <string name="no_way_to_share_file">Aucune application disponible pour partager le fichier</string>
   <string name="upnp_not_allowed">Vous n\'avez pas les droits d\'accès à ce serveur UPNP. Veuillez modifier les droits sur ce serveur puis essayer à nouveau.</string>
   <string name="single_mode">Simple</string>
+  <string name="double_mode">Double</string>
   <string name="swap_panel">Échanger</string>
   <string name="move">Déplacer</string>
   <!-- Shortcuts -->
@@ -191,7 +196,7 @@
   <string name="one_shortcut_removed">Un raccourci supprimé</string>
   <string name="n_shortcut_removed">%1$d raccourcis supprimés</string>
   <string name="server_not_available" comment="deprecated">Le serveur n\'est pas disponible actuellement</string>
-  <string name="server_not_available_2" comment="deprecated">%1$s  n\'est pas disponible actuellement</string>
+  <string name="server_not_available_2" comment="deprecated">%1$s n\'est pas disponible actuellement</string>
   <string name="cannot_open_shortcut">Le contenu de ce dossier n\'est pas disponible actuellement.\nVérifiez que vous avez bien les droits d\'accès.</string>
   <string name="network_shortcuts">Raccourcis réseau</string>
   <string name="media_servers">Serveurs de média</string>
@@ -199,6 +204,7 @@
   <!-- DLNA -->
   <string name="dlna_share">Partage multimédia</string>
   <string name="video">Vidéo</string>
+  <string name="audio">Audio</string>
   <string name="picture">Images</string>
   <string name="share_types">Types de partage</string>
   <!-- ZIP -->
@@ -229,7 +235,7 @@
   <!-- Hiding from media scanning -->
   <string name="nomedia_create">Retirer de la bibliothèque multimédia</string>
   <string name="nomedia_remove">Ajouter à la bibliothèque multimédia</string>
-  <string name="nomedia_fail">Échec, ce dossier ne peut être exclus de la bibliothèque multimédia.</string>
+  <string name="nomedia_fail">Échec, ce dossier ne peut être exclus de la bibliothèque multimédia</string>
   <string name="nomedia_warning">Le contenu multimédia de ce dossier n\'apparaitra plus dans les applications multimédia.\nÊtes-vous sûr de vouloir continuer ?</string>
   <!-- Folder Picker -->
   <string name="choose_a_folder">Choisissez un dossier</string>
@@ -237,6 +243,8 @@
   <string name="current_choice">Choix actuel:</string>
   <string name="no_selection">pas de sélection</string>
   <string name="external_storage_fake_name">Stockage interne</string>
+  <string name="sdcard_fake_name">Carte SD</string>
+  <string name="usb_host_fake_name">USB</string>
   <string name="no_directory">(pas de dossier)</string>
   <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
   <string name="navigation_drawer_close">Fermer navigation drawer</string>
