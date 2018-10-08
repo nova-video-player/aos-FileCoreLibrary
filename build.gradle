@@ -67,6 +67,6 @@ android {
 
 dependencies {
     implementation 'oro:oro:2.0.8'
-    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.linkedin.dexmaker:dexmaker:2.12.1'
 }
