@@ -10,6 +10,14 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
 android {
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
