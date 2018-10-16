@@ -97,7 +97,7 @@ public class StreamOverHttp{
 	}
     public StreamOverHttp(final Uri uri, final String forceMimeType) throws IOException{
 		mUri = uri;
-		mName = Utils.getName(mUri);
+		mName = FileUtils.getName(mUri);
         fileMimeType = forceMimeType!=null ? forceMimeType : "*/*";
         serverSocket = new ServerSocket(0);
         mainThread = new Thread(new Runnable(){
@@ -126,7 +126,7 @@ public class StreamOverHttp{
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
 		if(mSubList!=null)
 			return mSubList;
-		final Uri parentUri = com.archos.filecorelibrary.Utils.getParentUrl(video);
+		final Uri parentUri = FileUtils.getParentUrl(video);
 		final String videoFileName = video.getLastPathSegment();
 		final String videoExtension = MimeUtils.getExtension(videoFileName);
 		String filenameWithoutExtension;
@@ -297,8 +297,8 @@ public class StreamOverHttp{
 					name.eng.srt
 				 */
 				if(path!=null){
-					String name = Utils.getName(Uri.parse(path));
-					if(mPosterLocalUri!=null&&name!=null&&name.equals(Utils.getName(mPosterLocalUri))){//if asking for poster
+					String name = FileUtils.getName(Uri.parse(path));
+					if(mPosterLocalUri!=null&&name!=null&&name.equals(FileUtils.getName(mPosterLocalUri))){//if asking for poster
 						isAskingPoster = true;
 						if(!isResourcePoster(mPosterLocalUri))
 							metaFile2 = MetaFile2Factory.getMetaFileForUrl(mPosterLocalUri);

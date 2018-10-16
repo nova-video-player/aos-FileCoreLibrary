@@ -20,7 +20,7 @@ import android.net.Uri;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
-import com.archos.filecorelibrary.Utils;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.localstorage.JavaFile2;
 import com.archos.filecorelibrary.localstorage.LocalStorageFileEditor;
 import com.archos.filecorelibrary.localstorage.LocalStorageRawLister;
@@ -87,7 +87,7 @@ public class ZipFile2 extends MetaFile2 {
 
     @Override
     public String getName() {
-        return Utils.getName(getUri());
+        return FileUtils.getName(getUri());
     }
 
     @Override

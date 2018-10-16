@@ -131,7 +131,7 @@ public class CopyCutEngine {
                 fullName = mTargetFilePrefix+fullName;
             }
             if(mOverwrite)
-                return Utils.buildChildUri(directory, fullName);
+                return FileUtils.buildChildUri(directory, fullName);
             String name; // myvideo
             String extension; // avi
             // Unused.
@@ -145,7 +145,7 @@ public class CopyCutEngine {
                 }
             }
             if(!isInTarget){
-                return Utils.buildChildUri(directory, fullName);
+                return FileUtils.buildChildUri(directory, fullName);
             }
             int extensionPos = fullName.lastIndexOf('.');
             if (extensionPos >= 0) {
@@ -188,10 +188,10 @@ public class CopyCutEngine {
                 suffix = mCopyPatternLeft + copyIndex + mCopyPatternRight;
             }
             if (extension.isEmpty()) {
-                return Utils.buildChildUri(directory, baseName + suffix);
+                return FileUtils.buildChildUri(directory, baseName + suffix);
             }
 
-            return Utils.buildChildUri(directory,baseName + suffix + "." + extension);
+            return FileUtils.buildChildUri(directory,baseName + suffix + "." + extension);
         }
 
         private int getNextCopyIndex(List<MetaFile2> inTargetDirectory, String originalName,
@@ -305,7 +305,7 @@ public class CopyCutEngine {
                 if (in != null && out != null) {
                     long position = 0;
                     long startTime = System.currentTimeMillis();
-                    boolean isNetworkFileCopy = !Utils.isLocal(target) || !Utils.isLocal(source.getUri());
+                    boolean isNetworkFileCopy = !FileUtils.isLocal(target) || !FileUtils.isLocal(source.getUri());
                     byte buf[] = new byte[MAX_COUNT];
                     int len;
                     while ((len = in.read(buf)) != -1) {
@@ -334,7 +334,7 @@ public class CopyCutEngine {
                     if(mHasToStop){
                         targetEditor.delete();
                     }else{
-                        if(Utils.isLocal(target)) {
+                        if(FileUtils.isLocal(target)) {
                             Uri toIndex = target;
                             if (toIndex.getScheme() == null)
                                 toIndex = Uri.parse("file://" + toIndex.toString());

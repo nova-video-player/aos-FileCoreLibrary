@@ -43,7 +43,7 @@ public class RawListerFactory {
         else if ("content".equals(uri.getScheme())) {
             return new ContentStorageRawLister(uri);
         }
-        else if (Utils.isLocal(uri)) {
+        else if (FileUtils.isLocal(uri)) {
             return new LocalStorageRawLister(uri);
         }
         else {

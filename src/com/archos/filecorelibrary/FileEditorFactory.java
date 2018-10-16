@@ -46,7 +46,7 @@ public class FileEditorFactory {
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
             return new ContentStorageFileEditor(uri, ct);
         }
-        else if (Utils.isLocal(uri)) {
+        else if (FileUtils.isLocal(uri)) {
             return new LocalStorageFileEditor(uri, ct);
         }
         else {

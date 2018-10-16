@@ -28,7 +28,7 @@ public class ListingEngineFactory {
 
     public static ListingEngine getListingEngineForUrl(Context context, Uri uri) {
 
-        if (Utils.isLocal(uri)&&(uri.getScheme()==null||!uri.getScheme().equals("content"))) {
+        if (FileUtils.isLocal(uri)&&(uri.getScheme()==null||!uri.getScheme().equals("content"))) {
             return new LocalStorageListingEngine(context, uri);
         }else if(uri.getScheme().equals("content")){
             return new ContentProviderListingEngine(context, uri);
