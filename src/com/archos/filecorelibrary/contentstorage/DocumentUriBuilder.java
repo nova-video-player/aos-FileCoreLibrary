@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.ExtStorageManager;
-import com.archos.filecorelibrary.Utils;
+import com.archos.filecorelibrary.FileUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -136,7 +136,7 @@ public class DocumentUriBuilder {
         }
         else
             filename = parts[0] ;
-        Uri withoutLastPath = Utils.removeLastSegment(uri);
+        Uri withoutLastPath = FileUtils.removeLastSegment(uri);
         return new Pair<>(Uri.withAppendedPath(withoutLastPath, parentLastPart).toString(),filename);
 
     }

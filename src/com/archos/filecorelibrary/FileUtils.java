@@ -24,7 +24,7 @@ import com.archos.filecorelibrary.contentstorage.DocumentUriBuilder;
 
 import java.util.Locale;
 
-public class Utils {
+public class FileUtils {
     
     final static char SEP = '/';
     final static String SEPARATOR = "/";

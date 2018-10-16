@@ -21,7 +21,7 @@ import android.os.Looper;
 import com.archos.filecorelibrary.FileEditorFactory;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.OperationEngineListener;
-import com.archos.filecorelibrary.Utils;
+import com.archos.filecorelibrary.FileUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -103,7 +103,7 @@ public class ZipCompressionEngine {
                         mListener.onStart();
                     }
                 });
-                mRootPath = Utils.getParentUrl(mToCompress.get(0).getUri().toString());
+                mRootPath = FileUtils.getParentUrl(mToCompress.get(0).getUri().toString());
                 mRootOffset = mRootPath.length();
                 //retrieving full list
                 List <MetaFile2> toCompressTmp = new ArrayList<>(mToCompress);

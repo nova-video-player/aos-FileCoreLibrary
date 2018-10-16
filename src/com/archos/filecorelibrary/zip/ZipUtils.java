@@ -18,7 +18,7 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditorFactory;
 import com.archos.filecorelibrary.MetaFile2;
-import com.archos.filecorelibrary.Utils;
+import com.archos.filecorelibrary.FileUtils;
 
 import java.io.Closeable;
 import java.io.File;
@@ -59,7 +59,7 @@ public class ZipUtils {
         }
         try {
             final Uri uri = Uri.fromFile(toCompress);
-            final String rootPath = Utils.getParentUrl(uri.toString());
+            final String rootPath = FileUtils.getParentUrl(uri.toString());
             final int rootOffset = rootPath.length();
 
             ZipOutputStream zos = new ZipOutputStream(FileEditorFactory.getFileEditorForUrl(Uri.fromFile(target), null).getOutputStream());

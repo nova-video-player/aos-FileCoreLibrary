@@ -41,7 +41,7 @@ public class MetaFile2Factory {
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
             return ContentFile2.fromUri(uri);
         }
-        else if (Utils.isLocal(uri)) {
+        else if (FileUtils.isLocal(uri)) {
             return JavaFile2.fromUri(uri);
         }
         else {

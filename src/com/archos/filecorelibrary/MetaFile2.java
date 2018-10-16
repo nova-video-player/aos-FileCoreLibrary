@@ -84,7 +84,7 @@ public abstract class MetaFile2 implements Serializable {
     public abstract boolean isRemote();
 
     public String getNameWithoutExtension(){
-        return Utils.stripExtensionFromName(getName());
+        return FileUtils.stripExtensionFromName(getName());
     }
 
     /**
