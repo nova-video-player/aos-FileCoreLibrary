@@ -22,10 +22,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,16 +36,17 @@ import android.widget.EditText;
 
 import java.util.LinkedList;
 
-public class SambaPreferencesFragment extends PreferenceFragment  implements 
-AdapterView.OnItemLongClickListener{
+public class SambaPreferencesFragment extends PreferenceFragmentCompat implements AdapterView.OnItemLongClickListener {
 
     static final private String KEY_PROFILE_LIST = "profile_list";
 
     static private LinkedList<String> mSingleSettings;
     private PreferenceCategory mProfiles;
 
+    //@Override
+    //public void onCreate(Bundle savedInstanceState) {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.samba_settings);
 
@@ -109,7 +110,7 @@ AdapterView.OnItemLongClickListener{
         }
     }
 
-    @Override
+    //@Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         int index = preference.getOrder();
         String section = mSingleSettings.get(index);
