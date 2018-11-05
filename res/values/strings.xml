@@ -68,7 +68,7 @@
     <string name="nonetwork_message">You need to activate WiFi for this feature</string>
 
     <!-- FileManager strings -->
-    <string name="storage_busy_message">You can not use the internal storage while it is connected and mounted through USB.</string>
+    <string name="storage_busy_message">You cannot use the internal storage while it is connected and mounted through USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Network</string>
     <string name="external_storage">External</string>
