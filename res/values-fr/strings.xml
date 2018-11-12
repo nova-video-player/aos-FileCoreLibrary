@@ -22,7 +22,7 @@
     <string name="network_shared_folders">Dossiers partagés (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">copie</string>
-    <string name="fast_scroll_numeric_alphabet">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="fast_scroll_numeric_alphabet"> 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
     <string name="samba_settings_title">Paramètres des dossiers partagés</string>
     <string name="samba_settings_summary">Configurer les noms d\'utilisateurs et les mots de passe pour accéder aux dossiers partagés sur votre réseau privé</string>
