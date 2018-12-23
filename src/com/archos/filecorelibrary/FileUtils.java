@@ -15,14 +15,21 @@
 package com.archos.filecorelibrary;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.storage.StorageVolume;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 
 import com.archos.filecorelibrary.contentstorage.DocumentUriBuilder;
 
 import java.util.Locale;
+import java.util.Set;
 
 public class FileUtils {
     
@@ -232,5 +239,40 @@ public class FileUtils {
             return Uri.parse(DocumentUriBuilder.buildDocumentUriUsingTree(parent).toString()+Uri.encode("/")+childName);
         }
         return Uri.withAppendedPath(parent, childName);
+    }
+
+    // dump intent into string for debug purposes
+    public static String intentToString(Intent intent) {
+        if (intent == null)
+            return "";
+        StringBuilder stringBuilder = new StringBuilder("Package: ")
+                .append(intent.getPackage())
+                .append("; action: ")
+                .append(intent.getAction())
+                .append("; type: ")
+                .append(intent.getType())
+                .append("; component: ")
+                .append(intent.getComponent())
+                .append("; data string: ")
+                .append(intent.getDataString())
+                .append("; extras: ");
+        Bundle extras = intent.getExtras();
+        if (extras == null)
+            stringBuilder.append(" null");
+        else if (extras.isEmpty())
+            stringBuilder.append(" not null but empty");
+        else
+            for (String key : intent.getExtras().keySet())
+                stringBuilder.append(key).append("=").append(intent.getExtras().get(key)).append(", ");
+        stringBuilder.append( " categories: ");
+        Set<String> categories = intent.getCategories();
+        if (categories == null)
+            stringBuilder.append(" null");
+        else if (categories.isEmpty())
+            stringBuilder.append(" not null but empty");
+        else
+            for (String category : categories)
+                stringBuilder.append(category).append(", ");
+        return stringBuilder.toString();
     }
 }
