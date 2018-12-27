@@ -14,22 +14,18 @@
 
 package com.archos.filecorelibrary;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.util.Log;
 
-import com.android.dx.stock.ProxyBuilder;
 import com.archos.environment.ArchosUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -43,50 +39,12 @@ import java.util.Map;
 public class ExtStorageManager {
 
     private static final String TAG = "ExtStorageManager";
-    private static final    int TYPE_PRIVATE = 1;
-    private  StorageManager mStorageManager;
+    private static final int TYPE_PRIVATE = 1;
+    private static boolean DBG = false;
 
-    private ExtStorageManager() {
-        ClassLoader cl = ClassLoader.getSystemClassLoader();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // when M, register listener to storage manager
-            mStorageManager = (StorageManager)ArchosUtils.getGlobalContext().getSystemService(StorageManager.class);
-            try {
-
-                Class StorageEventListener = cl.loadClass("android.os.storage.StorageEventListener");
-                Class[]classes = new Class[1];
-                classes[0] = StorageEventListener;
-
-                Object instance = ProxyBuilder.forClass(StorageEventListener).handler(
-                        new InvocationHandler() {
-
-                            @Override
-                            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                                //Handle the invocations
-                                if(method.getName().equals("onVolumeStateChanged")){
-                                    Intent intent = new Intent();
-                                    intent.setData(Uri.parse(ExtStorageReceiver.ARCHOS_FILE_SCHEME+"://none"));
-                                    intent.setAction(ExtStorageReceiver.ACTION_MEDIA_CHANGED);
-                                    intent.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                                    ArchosUtils.getGlobalContext().sendBroadcast(intent);
-                                    return 1;
-                                }
-                                else return -1;
-                            }
-                        }
-                ).dexCache(ArchosUtils.getGlobalContext().getCacheDir()).build();
-
-                Method method = mStorageManager.getClass().getMethod("registerListener",   classes);
-                method.setAccessible(true);
-                method.invoke(mStorageManager, instance);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
     private static ExtStorageManager mExtStorageManager = new ExtStorageManager();
     public static ExtStorageManager getExtStorageManager() {
+        if (DBG) Log.d(TAG,"updateAllVolumes via getExtStorageManager");
         mExtStorageManager.updateAllVolumes();
         return mExtStorageManager;
     }
@@ -133,7 +91,7 @@ public class ExtStorageManager {
             Class ServiceManager = cl.loadClass("android.os.ServiceManager");
             Class IMountService;
             Class Stub;
-             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 IMountService = cl.loadClass("android.os.storage.IStorageManager");
                 Stub = cl.loadClass("android.os.storage.IStorageManager$Stub");
             }else{
@@ -153,7 +111,7 @@ public class ExtStorageManager {
             Class[] paramTypes = new Class[1];
             paramTypes[0] = String.class;
 
-            Class noparams[] = {};
+            final Class noparams[] = {};
 
             @SuppressWarnings("unchecked")
             Method getService = ServiceManager.getMethod("getService", paramTypes);
@@ -168,6 +126,8 @@ public class ExtStorageManager {
             Method isPrimary = null;
             Method getStorageId = null;
             Method getUuid = null;
+            Method findVolumeByUuid = null;
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 isPrimary = StorageVolume.getMethod("isPrimary", noparams);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
@@ -176,13 +136,18 @@ public class ExtStorageManager {
                 getStorageId = StorageVolume.getMethod("getStorageId", noparams);
             }
 
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                findVolumeByUuid = StorageManager.class.getMethod("findVolumeByUuid", new Class[]{String.class});
+            }
+
             Method isMountedReadable = null;
             Method getDisk = null;
             Method isSd = null;
             Method isUsb = null;
             Method getPathfromInfo = null;
             Method getFsUuid = null;
-            Field type= null;
+            Method getDescription = null;
+            Field type = null;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 getFsUuid = VolumeInfo.getMethod("getFsUuid", noparams);
@@ -192,6 +157,7 @@ public class ExtStorageManager {
                 isSd = DiskInfo.getMethod("isSd", noparams);
                 isUsb = DiskInfo.getMethod("isUsb", noparams);
                 type = VolumeInfo.getDeclaredField("type");
+                getDescription = DiskInfo.getMethod("getDescription", noparams);
             }
 
             //Parameters
@@ -200,62 +166,56 @@ public class ExtStorageManager {
 
             Object mountService = asInterface.invoke(Stub, getService.invoke(ServiceManager, params));
 
-            Method getVolumeList;
-            Object[] volumes = null;
-            Object[] volumesInfo = null;
+            Context context = ArchosUtils.getGlobalContext();
+            StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                getVolumeList = IMountService.getMethod("getVolumeList", noparams);
-                volumes = (Object[]) getVolumeList.invoke(mountService, noparams);
-            }
-            else {
-                Class[] paramsType2 = new Class[1];
-                paramsType2[0] = int.class;
-                Method getVolumes = IMountService.getMethod("getVolumes", paramsType2);
-                Object[] params2 = new Object[1];
-                params2[0] = 0;
-                volumesInfo = (Object[]) getVolumes.invoke(mountService, params2);
-            }
-            if (volumes != null)
-                for (int i = 0 ; i < volumes.length; i++) {
-                    if ((isPrimary != null) && (boolean) isPrimary.invoke(volumes[i], noparams)) {
-                        continue;
-                    }
-                    if ((getStorageId != null) && (int) getStorageId.invoke(volumes[i], noparams) == 0x00010001) {
-                        continue;
-                    }
-
-                    String volumeName = (String) getPath.invoke(volumes[i], noparams);
-
-                    String volumeState = getVolumeState(volumeName);
-                    Log.d(TAG, volumeName + " " + volumeState);
-                    if ((Environment.MEDIA_MOUNTED.equals(volumeState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(volumeState))) {
-                        ExtStorageType volumeType = getVolumeType(volumeName);
-                        volumesMap.get(volumeType).add(volumeName);
-                        if(getUuid!=null)
-                            volumesIdMap.put(volumeName,(String) getUuid.invoke(volumes[i], noparams));
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) { // >=4.2 StorageVolume returned from getVolumeList
+                // retrieve StorageVolume[]
+                Object[] storageVolumesArray = (StorageVolume[]) IMountService.getMethod("getVolumeList", noparams).invoke(mountService, noparams);
+                // getVolumeList present for <O in MountService but @removed from StorageManger >=P
+                for (int i = 0; i < storageVolumesArray.length; i++) {
+                    if ((isPrimary != null) && (boolean) isPrimary.invoke(storageVolumesArray[i], noparams)) continue;
+                    // storage ID is 0x00010001 for primary storage now StorageVolume.STORAGE_ID_PRIMARY
+                    if ((getStorageId != null) && (int) getStorageId.invoke(storageVolumesArray[i], noparams) == 0x00010001) continue;
+                    String volName = (String) getPath.invoke(storageVolumesArray[i], noparams);
+                    String volState = getVolumeState(volName);
+                    if ((Environment.MEDIA_MOUNTED.equals(volState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(volState))) {
+                        ExtStorageType volumeType = getVolumeType(volName);
+                        volumesMap.get(volumeType).add(volName);
+                        if(getUuid != null) {
+                            volumesIdMap.put(volName, (String) getUuid.invoke(storageVolumesArray[i], noparams));
+                            Log.d(TAG, "Volumes scan result (<N): " + volName + " " + volState);
+                        }
                     }
                 }
-            else if (volumesInfo != null) {
-                for (int i = 0 ; i < volumesInfo.length; i++) {
-
-                    if ((isMountedReadable != null) && (getPathfromInfo != null) && (boolean) isMountedReadable.invoke(volumesInfo[i], noparams)) {
-                        String volumeName = ((File) getPathfromInfo.invoke(volumesInfo[i], noparams)).getAbsolutePath();
-
-                        Object disk = getDisk.invoke(volumesInfo[i], noparams);
-                        ExtStorageType volumeType = null;
-                        if (disk != null) {
-                            volumeType = ((boolean) isSd.invoke(disk, noparams)) ?
-                                    ExtStorageType.SDCARD
-                                    : ((boolean) isUsb.invoke(disk, noparams)) ?
-                                    ExtStorageType.USBHOST : ExtStorageType.OTHER;
-                            Log.d(TAG, volumeName + " " + volumeType);
-                            if(type!=null&&(int)type.get(volumesInfo[i])!=TYPE_PRIVATE){
-                                volumesMap.get(volumeType).add(volumeName);
-
-                                if (getFsUuid != null)
-                                    volumesIdMap.put(volumeName, (String) getFsUuid.invoke(volumesInfo[i], noparams));
-
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // TODO: check if 24
+                List<StorageVolume> storageVolumesList = storageManager.getStorageVolumes(); // >=7.0.0/N/24
+                for (StorageVolume storageVolume : storageVolumesList) {
+                    if (!storageVolume.isPrimary()) { // >=4.2
+                        // retrieve volInfo via uuid and then disk via volInfo
+                        String uuid = storageVolume.getUuid(); // >=4.4
+                        if (uuid != null) {
+                            Object volInfo = findVolumeByUuid.invoke(storageManager, uuid); // >=6.0
+                            if ((isMountedReadable != null) && (getPathfromInfo != null) && (boolean) isMountedReadable.invoke(volInfo, noparams)) {
+                                String volName = ((File) getPathfromInfo.invoke(volInfo, noparams)).getAbsolutePath(); // >=4.1 (getPath)
+                                Object disk = getDisk.invoke(volInfo, noparams); // getDisks is dark greylist but not getDisk >=4.4
+                                if (disk != null) {
+                                    ExtStorageType volType = null;
+                                    String volDescr = (String) getDescription.invoke(disk, noparams); // getDescription is public >=4.4
+                                    volType = ((boolean) isSd.invoke(disk, noparams)) ?
+                                            ExtStorageType.SDCARD
+                                            : ((boolean) isUsb.invoke(disk, noparams)) ?
+                                            ExtStorageType.USBHOST : ExtStorageType.OTHER; // isSd and isUsb are public >=4.4
+                                    // avoid private type VolumeInfo
+                                    if (volType != null && (int) type.get(volInfo) != TYPE_PRIVATE) {
+                                        volumesMap.get(volType).add(volName);
+                                        if (getFsUuid != null) {
+                                            volumesIdMap.put(volName, (String) getFsUuid.invoke(volInfo, noparams));
+                                            Log.d(TAG, "Volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -266,6 +226,9 @@ public class ExtStorageManager {
         }
     }
 
+    /**
+     * Poor's man solution for before N identification of SDCard or USB storage based on volumeName parsing
+     */
     private ExtStorageType getVolumeType(String volumeName) {
         if (volumeName.toLowerCase().contains("sd") && !volumeName.toLowerCase().contains("usb"))
             return ExtStorageType.SDCARD;
