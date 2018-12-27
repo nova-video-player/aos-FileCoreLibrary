@@ -41,6 +41,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
     public static final String VALUE_PATH_NONE = "none";
     public static final String ARCHOS_FILE_SCHEME = "archosfile";
     public static final String ACTION_MEDIA_CHANGED = "com.archos.action.MEDIA_CHANGED";
+    private static final int WAIT_FOR_MOUNT_MS = 3000;
 
     static final List<String> mediaActions = Arrays.asList(Intent.ACTION_MEDIA_MOUNTED, Intent.ACTION_MEDIA_UNMOUNTED,
             Intent.ACTION_MEDIA_EJECT, Intent.ACTION_MEDIA_BAD_REMOVAL);
@@ -93,7 +94,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                         Log.d(TAG, "USB mass storage " + path + " attached");
                         intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
                         intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                        SystemClock.sleep(3000); // wait 3s in order to get the device mounted (for sdcard on pixel you do not get MEDIA_MOUNTED intent)
+                        SystemClock.sleep(WAIT_FOR_MOUNT_MS); // wait in order to get the device mounted (for sdcard on pixel you do not get MEDIA_MOUNTED intent)
                         context.sendBroadcast(intentManager);
                         break;
                     }
