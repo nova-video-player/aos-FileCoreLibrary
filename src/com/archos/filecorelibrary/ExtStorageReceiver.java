@@ -24,6 +24,7 @@ import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.os.storage.StorageVolume;
 import android.util.Log;
 
 import com.archos.environment.ArchosUtils;
@@ -61,8 +62,8 @@ public class ExtStorageReceiver extends BroadcastReceiver {
             return;
 
         if (mediaActions.contains(action)) {
-            path = uri.substring(7);
             uri = intent.getDataString();
+            path = uri.substring(7);
             //file:// will throw exception from android N
             if(uri.startsWith("file://")) uri = ARCHOS_FILE_SCHEME+"://"+path;
             if (DBG) Log.d(TAG,"uri is " + uri);
@@ -71,6 +72,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
         switch (action) {
             case Intent.ACTION_MEDIA_MOUNTED:
                 if (DBG) Log.d(TAG,"media mounted " + uri);
+                //StorageVolume volume = (StorageVolume) intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
                 intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(uri));
                 intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
                 context.sendBroadcast(intentManager);
