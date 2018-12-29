@@ -24,7 +24,6 @@ import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.SystemClock;
-import android.os.storage.StorageVolume;
 import android.util.Log;
 
 import com.archos.environment.ArchosUtils;
@@ -88,6 +87,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                 break;
             // more clever stuff could be done when detecting USB device attached but for now we only throw logs
             case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                // TODO: find which StorageVolume from UsbDevice to simplify. Not sure it is possible
                 if (intent.hasExtra(UsbManager.EXTRA_DEVICE)) {
                     final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                     UsbInterface usbInterface = device.getInterface(0);

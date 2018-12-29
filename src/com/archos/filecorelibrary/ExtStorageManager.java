@@ -18,6 +18,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.util.Log;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -189,13 +191,22 @@ public class ExtStorageManager {
                     }
                 }
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // TODO: check if 24
+            final List<String> mediaNotReady = Arrays.asList(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY, Environment.MEDIA_UNMOUNTED);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 List<StorageVolume> storageVolumesList = storageManager.getStorageVolumes(); // >=7.0.0/N/24
                 for (StorageVolume storageVolume : storageVolumesList) {
                     if (!storageVolume.isPrimary()) { // >=4.2
                         // retrieve volInfo via uuid and then disk via volInfo
                         String uuid = storageVolume.getUuid(); // >=4.4
                         if (uuid != null) {
+                            // wait for media to be ready
+                            int count = 0;
+                            final int maxTries = 10;
+                            while (!mediaNotReady.contains(storageVolume.getState()) && count < maxTries) {
+                                Log.d(TAG,"Media not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
+                                SystemClock.sleep(1000);
+                                count++;
+                            }
                             Object volInfo = findVolumeByUuid.invoke(storageManager, uuid); // >=6.0
                             if ((isMountedReadable != null) && (getPathfromInfo != null) && (boolean) isMountedReadable.invoke(volInfo, noparams)) {
                                 String volName = ((File) getPathfromInfo.invoke(volInfo, noparams)).getAbsolutePath(); // >=4.1 (getPath)
