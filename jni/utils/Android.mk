@@ -5,9 +5,9 @@ include $(CLEAR_VARS)
 LIBNATIVEHELPER_DIR := libnativehelper
 include $(CLEAR_VARS)
 LOCAL_MODULE    := libnativehelper
-LOCAL_SRC_FILES := ../../../native/$(LIBNATIVEHELPER_DIR)/obj/local/$(TARGET_ARCH_ABI)/libnativehelper.a
+LOCAL_SRC_FILES := ../../../native/$(LIBNATIVEHELPER_DIR)/obj/local/$(TARGET_ARCH_ABI)/libnativehelper.so
 LOCAL_EXPORT_C_INCLUDES :=  ../native/$(LIBNATIVEHELPER_DIR)/include/nativehelper
-include $(PREBUILT_STATIC_LIBRARY)
+include $(PREBUILT_SHARED_LIBRARY)
 
 
 include $(CLEAR_VARS)
@@ -32,7 +32,7 @@ LOCAL_SRC_FILES += sendfile64.S
 LOCAL_CFLAGS += -DCONFIG_ARM
 endif
 
-LOCAL_STATIC_LIBRARIES := libnativehelper
+LOCAL_SHARED_LIBRARIES := libnativehelper
 
 include $(BUILD_ANDROID_LIBS)
 include $(BUILD_SHARED_LIBRARY)
