@@ -57,9 +57,9 @@
     <string name="download_in_progress">Téléchargement en cours&#8230;</string>
     <string name="file_downloading">Votre fichier est en cours de téléchargement</string>
     <string name="server_ready">Prêt à recevoir un fichier</string>
-    <string name="nonetwork_title" comment="deprecated">Pas de connexion Wi-Fi</string>
+    <string name="nonetwork_title" comment="deprecated">Pas de connexion WiFi</string>
     <string name="no_network_title">Pas de connexion réseau</string>
-    <string name="nonetwork_message">Vous devez activer le Wi-Fi pour utiliser cette fonctionnalité</string>
+    <string name="nonetwork_message">Vous devez activer le WiFi pour utiliser cette fonctionnalité</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">Vous ne pouvez pas utiliser le stockage interne de l\'appareil pendant qu\'il est connecté et monté par USB.</string>
     <string name="ssh_storage">FTP</string>
