@@ -20,7 +20,6 @@ allprojects {
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
 
     sourceSets {
         main {
@@ -39,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 27
     }
 
