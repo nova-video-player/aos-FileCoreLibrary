@@ -39,6 +39,32 @@
     <string name="cloud_storage">Nuvem</string>
     <string name="directory_empty">Pasta vazia</string>
     <string name="no_server">Nenhum servidor encontrado</string>
+    <string name="ssh_password">Senha</string>
+    <string name="ssh_username">Usuário</string>
+    <string name="ssh_port">Porta (Opcional)</string>
+    <string name="ssh_path">Caminho (Opcional)</string>
+    <string name="save_password">Salvar senha</string>
+    <string name="ssh_prompt">Tipo do FTP</string>
+    <string name="download_prompt">Baixe o arquivo para a pasta:</string>
+    <string name="browse_ftp_server">Servidor</string>
+    <string name="cannot_list">Não é possível listar o conteúdo</string>
+    <string name="error_listing">Ocorreu um erro</string>
+    <string name="error_host_not_found">Host não encontrado</string>
+    <string name="open_file">Abrir arquivo</string>
+    <string name="open_file_after_download">Abrir arquivo após completar a cópia</string>
+    <string name="pasting_copy_one">Copiando um arquivo (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Copiando: %1$d/%2$d files (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Movendo um arquivo (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Movendo: %1$d/%2$d arquivos (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Apagar</string>
+    <string name="rename">Renomear</string>
+    <string name="details">Detalhes</string>
+    <string name="refresh_directory">Atualizar pasta</string>
+    <string-array name="folder_or_file">
+        <item>Criar uma pasta</item>
+        <item>Create an empty file</item>
+    </string-array>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <!-- Shortcuts -->

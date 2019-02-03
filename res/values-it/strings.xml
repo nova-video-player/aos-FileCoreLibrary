@@ -26,15 +26,15 @@
     <!-- Samba share settings -->
     <string name="samba_settings_title">Impostazioni cartelle condivise</string>
     <string name="samba_settings_summary">Configura username e password per accedere alle cartelle condivise sulla rete privata</string>
-    <string name="samba_profiles">Profili cartelle condivise</string>
+    <string name="samba_profiles">Profili delle cartelle condivise</string>
     <string name="samba_delete_settings">Eliminare questa impostazione?</string>
     <string name="samba_add_server">Aggiungi un server</string>
     <string name="samba_server">Definisci un server</string>
     <string name="samba_share">Definisci una condivisione</string>
     <string name="refresh">Ricarica</string>
     <string name="network_timeout">Spiacente, la cartella remota non è accessibile.\nControlla la tua connessione di rete e prova ancora</string>
-    <string name="samba_loading">Attendere caricamento cartella condivisa…</string>
-    <string name="samba_reloading">Attendere ricaricamento cartella condivisa…</string>
+    <string name="samba_loading">Attendere il caricamento della cartella condivisa&#8230;</string>
+    <string name="samba_reloading">Attendere il ricaricamento della cartella condivisa&#8230;</string>
     <string name="samba_password_request_title">Richiesta password cartella condivisa</string>
     <string name="samba_domain">Dominio</string>
     <string name="samba_username">Username</string>
@@ -52,7 +52,7 @@
     <string name="connect_to_target">Connessione al dispositivo-target</string>
     <string name="upload_in_progress">Caricamento in corso&#8230;</string>
     <string name="file_uploading">Il tuo file è in caricamento</string>
-    <string name="back_cancel">Premi indietro per cancellare</string>
+    <string name="back_cancel">Premi indietro per annullare</string>
     <string name="server_wait">In attesa del client per connettersi e inviare un file</string>
     <string name="download_in_progress">Download in corso&#8230;</string>
     <string name="file_downloading">Il tuo file è in download</string>
@@ -61,7 +61,7 @@
     <string name="no_network_title">Nessuna connessione di rete</string>
     <string name="nonetwork_message">Devi attivare il WiFi per questa funzione</string>
     <!-- FileManager strings -->
-    <string name="storage_busy_message">Impossibile usare la memoria interna quando è connessa e montata tramite USB</string>
+    <string name="storage_busy_message">Impossibile usare la memoria interna mentre è connessa e montata tramite USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Rete</string>
     <string name="external_storage">Memoria esterna</string>
@@ -123,7 +123,7 @@
     <string name="go_top">Torna all\'inizio</string>
     <string name="uncheck_impossible">Impossibile cambiare la selezione mentre la cartella padre è selezionata</string>
     <string name="confirm_delete_one">Vuoi davvero eliminarlo?</string>
-    <string name="confirm_delete_parent_folder">Pare che la cartella padre non contenga alcun altro video, vuoi cancellarla?</string>
+    <string name="confirm_delete_parent_folder">Pare che la cartella padre non contenga alcun video, vuoi cancellarla?</string>
     <string name="confirm_delete_many">Vuoi davvero eliminarli?</string>
     <string name="enter_new_name">Nome:</string>
     <string name="file_name">Nome del file</string>
