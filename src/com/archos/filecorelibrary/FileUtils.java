@@ -28,6 +28,10 @@ import android.provider.MediaStore;
 
 import com.archos.filecorelibrary.contentstorage.DocumentUriBuilder;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.Locale;
 import java.util.Set;
 
@@ -274,5 +278,33 @@ public class FileUtils {
             for (String category : categories)
                 stringBuilder.append(category).append(", ");
         return stringBuilder.toString();
+    }
+
+    // dump database to storage
+    public static void backupDatabase(Context context, String dbFileName) {
+        try {
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dataDir = Environment.getDataDirectory();
+
+            String packageName = context.getApplicationInfo().packageName;
+
+            if (sdCard.canWrite()) {
+                String currentDbPath = String.format("//data//%s//databases//%s",
+                        packageName, dbFileName);
+                String backupDbPath = String.format("%s-%s", packageName, dbFileName);
+                File currentDb = new File(dataDir, currentDbPath);
+                File backupDb = new File(sdCard, backupDbPath);
+
+                if (currentDb.exists()) {
+                    FileChannel src = new FileInputStream(currentDb).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDb).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                }
+            }
+        } catch (Exception e) {
+            throw new Error(e);
+        }
     }
 }
