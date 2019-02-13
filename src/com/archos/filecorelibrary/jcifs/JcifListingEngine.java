@@ -201,7 +201,7 @@ public class JcifListingEngine extends ListingEngine {
             }
             catch (final SmbException e) {
                 ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
-                if (e.getRootCause() instanceof UnknownHostException) {
+                if (e.getCause() instanceof UnknownHostException) {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
