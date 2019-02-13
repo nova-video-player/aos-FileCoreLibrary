@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,14 +21,12 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
-import jcifs.SmbRandomAccess;
 import jcifs.context.SingletonContext;
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
-import jcifs.smb.SmbRandomAccessFile;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
@@ -111,14 +110,13 @@ public class JcifsFileEditor extends FileEditor{
 
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile smbfile;
-        if(cred!=null){
-            SingletonContext context = SingletonContext.getInstance();
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "",cred.getUsername(), cred.getPassword());
-            smbfile= new SmbFile(uri.toString(), context.withCredentials(auth));
-        }
-        else {
-            smbfile= new SmbFile(uri.toString());
-        }
+        SingletonContext context = SingletonContext.getInstance();
+        NtlmPasswordAuthenticator auth = null;
+        if(cred!=null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+        else
+            auth = new NtlmPasswordAuthenticator("","GUEST", "");
+        smbfile= new SmbFile(uri.toString(), context.withCredentials(auth));
         return smbfile;
 
     }
