@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +26,7 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import java.net.MalformedURLException;
 
 import jcifs.context.SingletonContext;
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -77,13 +78,15 @@ public class JcifsFile2 extends MetaFile2 {
         // Create the SmbFile instance
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile file;
-        if(cred!=null) {
-            SingletonContext context = SingletonContext.getInstance();
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "",cred.getUsername(), cred.getPassword());
-            file = new SmbFile(uri.toString(), context.withCredentials(auth));
-        }
+
+        SingletonContext context = SingletonContext.getInstance();
+        NtlmPasswordAuthenticator auth = null;
+        if(cred!=null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
         else
-            file = new SmbFile(uri.toString());
+            auth = new NtlmPasswordAuthenticator("","GUEST", "");
+        file = new SmbFile(uri.toString(), context.withCredentials(auth));
+
         // Using the methods doing network access to get the actual data
         mUriString = file.getCanonicalPath();
         String name  = file.getName();
