@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,14 +25,12 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import jcifs.EmptyIterator;
 import jcifs.context.SingletonContext;
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -114,14 +113,13 @@ public class JcifListingEngine extends ListingEngine {
                 Log.d(TAG, "listFiles for:"+mUri.toString());
                 NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
                 SmbFile[] listFiles;
-                if (cred != null) {
-                    SingletonContext context = SingletonContext.getInstance();
-                    NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(context, "", cred.getUsername(), cred.getPassword());
-                    listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles(mFileFilter);
-                }
-                else {
-                    listFiles = new SmbFile(mUri.toString()).listFiles(mFileFilter);
-                }
+                SingletonContext context = SingletonContext.getInstance();
+                NtlmPasswordAuthenticator auth = null;
+                if(cred!=null)
+                    auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+                else
+                    auth = new NtlmPasswordAuthenticator("","GUEST", "");
+                listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles(mFileFilter);
 
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
