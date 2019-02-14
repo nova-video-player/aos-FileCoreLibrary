@@ -14,14 +14,18 @@
 
 package com.archos.filecorelibrary.jcifs;
 
+import android.util.Log;
+
 import jcifs.CIFSException;
 import jcifs.context.BaseContext;
 import jcifs.CIFSContext;
 import jcifs.config.PropertyConfiguration;
 import java.util.Properties;
 
+
 public class JcifsUtils {
 
+    private final static String TAG = "JcifsUtils";
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1 = createContext(false);
     private static CIFSContext baseContextSmb2 = createContext(true);
@@ -34,11 +38,6 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disableSMB1", "false");
         prop.put("jcifs.traceResources", "true");
 
-        //prop.put("jcifs.resolveOrder", "DNS");
-        //prop.put("jcifs.netbios.wins", "xxx.xxx.xxx.xxx" );
-        //prop.put("jcifs.smb.client.signingPreferred", false);
-        //prop.put("jcifs.smb.client.signingEnforced", false);
-
         // get around https://github.com/AgNO3/jcifs-ng/issues/40
         prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
         // allow plaintext password fallback
@@ -50,7 +49,7 @@ public class JcifsUtils {
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
         } catch (CIFSException e) {
-            e.printStackTrace();
+            Log.d(TAG, "CIFSException: ", e);
         }
         return new BaseContext(propertyConfiguration);
     }
