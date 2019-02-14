@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import jcifs.context.SingletonContext;
+import jcifs.CIFSContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
@@ -113,7 +113,7 @@ public class JcifListingEngine extends ListingEngine {
                 Log.d(TAG, "listFiles for:"+mUri.toString());
                 NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
                 SmbFile[] listFiles;
-                SingletonContext context = SingletonContext.getInstance();
+                CIFSContext context = JcifsUtils.getBaseContext(false);
                 NtlmPasswordAuthenticator auth = null;
                 if(cred!=null)
                     auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
