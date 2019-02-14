@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
-import jcifs.context.SingletonContext;
+import jcifs.CIFSContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -110,7 +110,7 @@ public class JcifsFileEditor extends FileEditor{
 
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile smbfile;
-        SingletonContext context = SingletonContext.getInstance();
+        CIFSContext context = JcifsUtils.getBaseContext(false);
         NtlmPasswordAuthenticator auth = null;
         if(cred!=null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
