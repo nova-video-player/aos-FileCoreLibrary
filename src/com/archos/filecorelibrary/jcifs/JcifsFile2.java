@@ -25,7 +25,7 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import java.net.MalformedURLException;
 
-import jcifs.context.SingletonContext;
+import jcifs.CIFSContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -79,7 +79,7 @@ public class JcifsFile2 extends MetaFile2 {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile file;
 
-        SingletonContext context = SingletonContext.getInstance();
+        CIFSContext context = JcifsUtils.getBaseContext(false);
         NtlmPasswordAuthenticator auth = null;
         if(cred!=null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
