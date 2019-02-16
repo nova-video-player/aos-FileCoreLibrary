@@ -191,7 +191,8 @@ public class ExtStorageManager {
                     }
                 }
             }
-            final List<String> mediaNotReady = Arrays.asList(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY, Environment.MEDIA_UNMOUNTED);
+            //final List<String> mediaReady = Arrays.asList(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY, Environment.MEDIA_UNMOUNTED);
+            //final List<String> mediaBorked = Arrays.asList(Environment.MEDIA_UNMOUNTABLE, Environment.MEDIA_BAD_REMOVAL, Environment.MEDIA_NOFS, Environment.MEDIA_UNKNOWN, Environment.MEDIA_REMOVED, Environment.MEDIA_EJECTING);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 List<StorageVolume> storageVolumesList = storageManager.getStorageVolumes(); // >=7.0.0/N/24
                 for (StorageVolume storageVolume : storageVolumesList) {
@@ -202,9 +203,12 @@ public class ExtStorageManager {
                             // wait for media to be ready
                             int count = 0;
                             final int maxTries = 10;
-                            while (!mediaNotReady.contains(storageVolume.getState()) && count < maxTries) {
-                                Log.d(TAG,"Media not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
-                                SystemClock.sleep(1000);
+                            Log.d(TAG,"Media state " + storageVolume.getState());
+                            // Only retry if media is checking
+                            //while (!mediaReady.contains(storageVolume.getState()) && !mediaBorked.contains(storageVolume.getState()) && count < maxTries) {
+                            while (storageVolume.getState().equals(Environment.MEDIA_CHECKING) && count < maxTries) {
+                                Log.d(TAG,"Media checking and not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
+                                SystemClock.sleep(100);
                                 count++;
                             }
                             Object volInfo = findVolumeByUuid.invoke(storageManager, uuid); // >=6.0
