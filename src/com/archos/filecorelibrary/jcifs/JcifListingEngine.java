@@ -45,7 +45,7 @@ import jcifs.smb.SmbFileFilter;
 public class JcifListingEngine extends ListingEngine {
 
     private final static String TAG = "JcifListingEngine";
-    private static boolean DBG = false;
+    private static final boolean DBG = true;
 
     final private Uri mUri;
     final private JcifListingThread mListingThread;
@@ -96,7 +96,7 @@ public class JcifListingEngine extends ListingEngine {
                     return keepDirectory(filename);
                 }
                 else {
-                    Log.d(TAG, "neither file nor directory: "+filename);
+                    if (DBG) Log.d(TAG, "neither file nor directory: "+filename);
                     return false;
                 }
             } catch (SmbException e) {
