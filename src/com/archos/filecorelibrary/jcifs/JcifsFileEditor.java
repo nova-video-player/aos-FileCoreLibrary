@@ -35,6 +35,10 @@ import android.net.Uri;
 
 public class JcifsFileEditor extends FileEditor{
 
+    private static final String TAG = "JcifsFileEditor";
+    private static final boolean DBG = true;
+
+
     public JcifsFileEditor(Uri uri) {
         super(uri);
     }
