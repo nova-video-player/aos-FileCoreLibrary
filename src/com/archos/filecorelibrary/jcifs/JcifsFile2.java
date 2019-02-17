@@ -17,6 +17,7 @@ package com.archos.filecorelibrary.jcifs;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
@@ -33,6 +34,8 @@ import jcifs.smb.SmbFile;
 public class JcifsFile2 extends MetaFile2 {
 
     private static final long serialVersionUID = 2L;
+    private static final String TAG = "JcifsFile2";
+    private static final boolean DBG = true;
 
     private String mName;
     private boolean mIsDirectory;
@@ -57,6 +60,7 @@ public class JcifsFile2 extends MetaFile2 {
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
+        if (DBG) Log.d(TAG,file.getPath());
         mCanRead = file.canRead();
         mCanWrite = file.canWrite();
         mLength = file.length();
