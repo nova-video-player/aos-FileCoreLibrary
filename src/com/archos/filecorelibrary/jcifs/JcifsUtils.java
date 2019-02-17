@@ -26,6 +26,7 @@ import java.util.Properties;
 public class JcifsUtils {
 
     private final static String TAG = "JcifsUtils";
+    
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1 = createContext(false);
     private static CIFSContext baseContextSmb2 = createContext(true);
