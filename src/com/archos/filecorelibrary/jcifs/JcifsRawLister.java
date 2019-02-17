@@ -16,6 +16,7 @@
 package com.archos.filecorelibrary.jcifs;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
@@ -37,6 +38,10 @@ import jcifs.smb.SmbFile;
  *
  */
 public class JcifsRawLister extends RawLister {
+
+    private final static String TAG = "JcifsRawLister";
+    private final static boolean DBG = true;
+
     public JcifsRawLister(Uri uri) {
         super(uri);
     }
@@ -54,6 +59,7 @@ public class JcifsRawLister extends RawLister {
         if(listFiles!=null){
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
+                if (DBG) Log.d(TAG,f.getPath());
                 files.add(new JcifsFile2(f));
             }
             return files;
