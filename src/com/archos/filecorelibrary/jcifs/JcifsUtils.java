@@ -26,6 +26,7 @@ import java.util.Properties;
 public class JcifsUtils {
 
     private final static String TAG = "JcifsUtils";
+    public final static boolean SMB2 = true;
     
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1 = createContext(false);
@@ -50,7 +51,7 @@ public class JcifsUtils {
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
         } catch (CIFSException e) {
-            Log.d(TAG, "CIFSException: ", e);
+            Log.e(TAG, "CIFSException: ", e);
         }
         return new BaseContext(propertyConfiguration);
     }
@@ -58,4 +59,5 @@ public class JcifsUtils {
     public static CIFSContext getBaseContext(boolean isSmb2) {
         return isSmb2 ? baseContextSmb2 : baseContextSmb1;
     }
+
 }
