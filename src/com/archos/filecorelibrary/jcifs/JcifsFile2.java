@@ -83,7 +83,7 @@ public class JcifsFile2 extends MetaFile2 {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile file;
 
-        CIFSContext context = JcifsUtils.getBaseContext(false);
+        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
         NtlmPasswordAuthenticator auth = null;
         if(cred!=null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());

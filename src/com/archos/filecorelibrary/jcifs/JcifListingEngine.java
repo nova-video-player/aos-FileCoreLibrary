@@ -100,7 +100,7 @@ public class JcifListingEngine extends ListingEngine {
                     return false;
                 }
             } catch (SmbException e) {
-                e.printStackTrace();
+                Log.e(TAG, "SmbException: ", e);
             }
             return false;
         }
@@ -113,7 +113,7 @@ public class JcifListingEngine extends ListingEngine {
                 Log.d(TAG, "listFiles for:"+mUri.toString());
                 NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
                 SmbFile[] listFiles;
-                CIFSContext context = JcifsUtils.getBaseContext(false);
+                CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
                 NtlmPasswordAuthenticator auth = null;
                 if(cred!=null)
                     auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
