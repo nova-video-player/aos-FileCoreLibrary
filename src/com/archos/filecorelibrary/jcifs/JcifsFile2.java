@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 
 import jcifs.CIFSContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -61,9 +62,19 @@ public class JcifsFile2 extends MetaFile2 {
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
         if (DBG) Log.d(TAG,file.getPath());
-        mCanRead = file.canRead();
-        mCanWrite = file.canWrite();
-        mLength = file.length();
+
+        mCanRead = false;
+        mCanWrite = false;
+        mLength = 0;
+        try {
+            mCanRead = file.canRead();
+            mCanWrite = file.canWrite();
+            mLength = file.length();
+        } catch ( SmbAuthException e ) {
+            Log.e(TAG," SmbAuthException on " + file.getPath(), e);
+        } catch ( SmbException e ) {
+            Log.e(TAG," SmbException on " + file.getPath(), e);
+        }
 
         // remove the '/' at the end of directory name (Jcifs adds it)
         if (mIsDirectory && name.endsWith("/")) {
