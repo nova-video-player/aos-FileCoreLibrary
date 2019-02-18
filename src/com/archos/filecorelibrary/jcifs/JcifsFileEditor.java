@@ -109,8 +109,8 @@ public class JcifsFileEditor extends FileEditor{
     private SmbFile getSmbFile(Uri uri) throws MalformedURLException {
 
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        SmbFile smbfile;
-        CIFSContext context = JcifsUtils.getBaseContext(false);
+        SmbFile smbfile = null;
+        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
         NtlmPasswordAuthenticator auth = null;
         if(cred!=null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
