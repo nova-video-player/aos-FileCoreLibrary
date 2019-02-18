@@ -49,7 +49,7 @@ public class JcifsRawLister extends RawLister {
     public List<MetaFile2> getFileList() throws SmbException, MalformedURLException{
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
         SmbFile[] listFiles;
-        CIFSContext context = JcifsUtils.getBaseContext(false);
+        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
         NtlmPasswordAuthenticator auth = null;
         if(cred!=null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
@@ -59,7 +59,7 @@ public class JcifsRawLister extends RawLister {
         if(listFiles!=null){
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
-                if (DBG) Log.d(TAG,f.getPath());
+                if (DBG) Log.d(TAG," found " + f.getPath());
                 files.add(new JcifsFile2(f));
             }
             return files;
