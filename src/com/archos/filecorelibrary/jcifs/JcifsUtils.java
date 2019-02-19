@@ -51,7 +51,8 @@ public class JcifsUtils {
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
         } catch (CIFSException e) {
-            Log.e(TAG, "CIFSException: ", e);
+            //Log.e(TAG, "CIFSException: ", e);
+            Log.d(TAG, "CIFSException caught PropertyConfiguration");
         }
         return new BaseContext(propertyConfiguration);
     }
