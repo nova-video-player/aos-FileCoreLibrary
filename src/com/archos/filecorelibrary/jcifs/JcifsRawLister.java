@@ -59,8 +59,11 @@ public class JcifsRawLister extends RawLister {
         if(listFiles!=null){
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
-                if (DBG) Log.d(TAG," found " + f.getPath());
-                files.add(new JcifsFile2(f));
+                // better verify that it is a file or directory before adding
+                if(f.isFile() || f.isDirectory()) {
+                    if (DBG) Log.d(TAG, " found " + f.getPath());
+                    files.add(new JcifsFile2(f));
+                }
             }
             return files;
         }
