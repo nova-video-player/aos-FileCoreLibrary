@@ -189,7 +189,7 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final SmbAuthException e) {
-                Log.d(TAG, "JcifListingThread: SmbAuthException", e);
+                Log.e(TAG, "JcifListingThread: SmbAuthException", e);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
