@@ -38,10 +38,9 @@ public class JcifsUtils {
 
         prop.put("jcifs.smb.client.enableSMB2", String.valueOf(isSmb2));
         prop.put("jcifs.smb.client.disableSMB1", "false");
-        prop.put("jcifs.traceResources", "true");
-        prop.put("jcifs.traceResources", "true");
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
-        prop.put("jcifs.resolveOrder", "BCAST,LMHOSTS,DNS");
+        // do not change resolveOrder for now
+        //prop.put("jcifs.resolveOrder", "BCAST,LMHOSTS,DNS");
 
         // get around https://github.com/AgNO3/jcifs-ng/issues/40
         prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
