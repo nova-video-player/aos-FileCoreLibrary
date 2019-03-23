@@ -35,6 +35,7 @@ import com.archos.filecorelibrary.R;
 
 public class SharedPasswordRequest extends Activity implements OnClickListener {
 
+    private static final boolean DBG = false;
     static final public int SAMBA_PASSWORD          = 17;
     static final public int SAMBA_PASSWORD_CANCELED = 18;
 
@@ -109,7 +110,7 @@ public class SharedPasswordRequest extends Activity implements OnClickListener {
         passwordET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-                Log.d("XXX", "onEditorAction " + actionId);
+                if (DBG) Log.d("XXX", "onEditorAction " + actionId);
                 if (actionId == EditorInfo.IME_ACTION_GO) {
                     dialogGo(usernameET, passwordET);
                     return true;
@@ -127,20 +128,20 @@ public class SharedPasswordRequest extends Activity implements OnClickListener {
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        Log.d("XXX", "setPositiveButton onClick");
+                        if (DBG) Log.d("XXX", "setPositiveButton onClick");
                         dialogGo(usernameET, passwordET);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Log.d("XXX", "setNegativeButton onClick");
+                        if (DBG) Log.d("XXX", "setNegativeButton onClick");
                         sendNotification(SAMBA_PASSWORD_CANCELED);
                     }
                 })
                 .create();
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             public void onCancel(DialogInterface dialog) {
-                Log.d("XXX", "OnCancelListener ");
+                if (DBG) Log.d("XXX", "OnCancelListener ");
                 sendNotification(SAMBA_PASSWORD_CANCELED);
             }
         });
