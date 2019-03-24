@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import jcifs.netbios.UdpDiscovery;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -52,8 +54,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     private final static String TAG = "SambaDiscovery";
     private static boolean DBG = false;
 
-    static final int SMB_NS_PORT = 137;
-    static final int SOCKET_TIMEOUT = 150;
+    public static final int SOCKET_TIMEOUT = 150;
 
     final private Context mContext;
 
