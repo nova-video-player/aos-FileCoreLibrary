@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.archos.filecorelibrary.samba;
+package jcifs.netbios;
 
 import android.os.SystemClock;
 import android.util.Log;
+
+import com.archos.filecorelibrary.jcifs.JcifsUtils;
+import com.archos.filecorelibrary.samba.InternalDiscovery;
+import com.archos.filecorelibrary.samba.InternalDiscoveryListener;
+import com.archos.filecorelibrary.samba.SambaDiscovery;
+import com.archos.filecorelibrary.samba.Workgroup;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -28,15 +34,16 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import jcifs2.netbios.Lmhosts;
-import jcifs2.netbios.Name;
-import jcifs2.netbios.NbtAddress;
-import jcifs2.netbios.NodeStatusRequest;
-import jcifs2.netbios.NodeStatusResponse;
+import jcifs.CIFSContext;
+import jcifs.Configuration;
+
+import static jcifs.netbios.NbtAddress.UNKNOWN_MAC_ADDRESS;
 
 public class UdpDiscovery implements InternalDiscovery {
     private static final String TAG = "UdpDiscovery";
     private static final boolean DBG = false;
+
+    private static final int SMB_NS_PORT = 137;
 
     private final Thread mThread;
     private final InternalDiscoveryListener mListener;
@@ -75,9 +82,6 @@ public class UdpDiscovery implements InternalDiscovery {
     private class UdpDiscoveryThread extends Thread {
         public void run() {
 
-            // Reset the JCIFS cache
-            Lmhosts.reset();
-
             NbtAddress[] addrs;
             LinkedList<InetAddress> addresses = new LinkedList<>();
             LinkedList<DatagramChannel> datagrams = new LinkedList<>();
@@ -93,7 +97,11 @@ public class UdpDiscovery implements InternalDiscovery {
             ByteBuffer rcv_buf = ByteBuffer.allocate(576);
             final String netRange = mIpAddress.substring(0, mIpAddress.lastIndexOf(".") + 1);
             // Send node status request to each IP
-            final NodeStatusRequest request = new NodeStatusRequest(new Name(NbtAddress.ANY_HOSTS_NAME, 0x00, null));
+            CIFSContext cifsContext = JcifsUtils.getBaseContext(true);
+            Configuration configuration = cifsContext.getConfig();
+            final NodeStatusRequest request = new NodeStatusRequest(configuration,
+                    new Name(configuration,
+                            NbtAddress.ANY_HOSTS_NAME, 0x00, null));
             request.nameTrnId = 1; //fixed to 1, no retry.
 
             int nbSent = 0;
@@ -154,7 +162,7 @@ public class UdpDiscovery implements InternalDiscovery {
                             try {
                                 request.addr = addresses.get(nbSent);
                                 int size = request.writeWireFormat(snd_buf, 0);
-                                if (currentChannel.send(ByteBuffer.wrap(snd_buf, 0, size), new InetSocketAddress(request.addr, SambaDiscovery.SMB_NS_PORT)) != 0) {
+                                if (currentChannel.send(ByteBuffer.wrap(snd_buf, 0, size), new InetSocketAddress(request.addr, SMB_NS_PORT)) != 0) {
                                     nbSent++;
                                     //Log.d(TAG, "sent " + nbSent + " with "+ currentChannel);
                                 }
@@ -173,7 +181,9 @@ public class UdpDiscovery implements InternalDiscovery {
                         if (remoteAddress != null) {
                             NodeStatusResponse response = null;
                             try {
-                                response = new NodeStatusResponse(NbtAddress.getByName(remoteAddress.getAddress().getHostAddress()));
+                                response = new NodeStatusResponse(configuration,
+                                        cifsContext.getNameServiceClient().getByName(
+                                                remoteAddress.getAddress().getHostAddress()).unwrap(NbtAddress.class));
                             } catch (UnknownHostException e) {
                                 continue;
                             }
@@ -210,7 +220,7 @@ public class UdpDiscovery implements InternalDiscovery {
             // First loop to find workgroups
             for (NbtAddress addr : addrs) {
                 try {
-                    if (addr.isGroupAddress() && !addr.getHostName().equalsIgnoreCase(NbtAddress.MASTER_BROWSER_NAME)) {
+                    if (addr.isGroupAddress(JcifsUtils.getBaseContext(true)) && !addr.getHostName().equalsIgnoreCase(NbtAddress.MASTER_BROWSER_NAME)) {
                         workgroupName = addr.getHostName();
                         break;
                     }
@@ -223,7 +233,7 @@ public class UdpDiscovery implements InternalDiscovery {
                     break;
                 }
                 try {
-                    if (!addr.isGroupAddress()) {
+                    if (!addr.isGroupAddress(JcifsUtils.getBaseContext(true))) {
                         final String shareName = addr.getHostName();
                         final String shareAddress = "smb://" + remoteAddr.getHostAddress() + '/';
 
@@ -248,7 +258,16 @@ public class UdpDiscovery implements InternalDiscovery {
             for (int i = 0; i < 4; i++) {
                 ipv4Address = (ipv4Address << 8) + (ipAddress[i] & 0xFF);
             }
-            Lmhosts.addHost(shareName, ipv4Address);
+            CIFSContext context = JcifsUtils.getBaseContext(true);
+            Name name = new Name(context.getConfig(), shareName, 0x20, null );
+            NbtAddress addr = new NbtAddress(name, ipv4Address, false, NbtAddress.B_NODE,
+                    false, false, true, true,
+                    UNKNOWN_MAC_ADDRESS );
+            //we need to fake the broadcast hashcode for hitting cache
+            addr.hostName.srcHashCode = context.getConfig().getBroadcastAddress().hashCode();
+            NameServiceClientImpl impl = (NameServiceClientImpl) context.getNameServiceClient();
+            impl.cacheAddress(name, addr);
+            Log.d(TAG, "Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
         }
     }
 }
