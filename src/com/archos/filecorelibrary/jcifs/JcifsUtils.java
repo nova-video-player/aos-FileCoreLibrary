@@ -40,7 +40,7 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disableSMB1", "false");
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
-        //prop.put("jcifs.resolveOrder", "BCAST,LMHOSTS,DNS");
+        prop.put("jcifs.resolveOrder", "BCAST,DNS");
 
         // get around https://github.com/AgNO3/jcifs-ng/issues/40
         prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
