@@ -90,7 +90,11 @@ public class JcifsFile2 extends MetaFile2 {
         mLastModified = file.lastModified();
         mCanRead = file.canRead();
         mCanWrite = file.canWrite();
-        mLength = file.length();
+        try {
+            mLength = file.length();
+        } catch (SmbException e) {
+            mLength = 0;
+        }
         // remove the '/' at the end of directory name (Jcifs adds it)
         if (mIsDirectory && name.endsWith("/")) {
             mName = name.substring(0, name.length()-1);
