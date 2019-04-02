@@ -15,6 +15,7 @@
 package com.archos.filecorelibrary.sftp;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.ftp.AuthenticationException;
@@ -31,6 +32,9 @@ import java.io.OutputStream;
 import java.net.UnknownHostException;
 
 public class SftpFileEditor  extends FileEditor{
+
+    private static final String TAG = "SftpFileEditor";
+    private static final boolean DBG = false;
 
     public SftpFileEditor(Uri uri) {
         super(uri);
@@ -151,7 +155,9 @@ public class SftpFileEditor  extends FileEditor{
         } catch (Exception e) {
             if(channel!=null&&channel.isConnected())
                 channel.disconnect();
-            e.printStackTrace();
+            if (DBG) Log.d(TAG, mUri + " not found");
+            //generating an exception is the way to check if the file/dir exists thus silence the stacktrace
+            //e.printStackTrace();
         }finally {
             if(channel!=null&&channel.isConnected())
                 channel.disconnect();
