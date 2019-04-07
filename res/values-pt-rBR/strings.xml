@@ -6,7 +6,12 @@
     <string name="file_info_label_size_internal">Tamanho (interno):</string>
     <string name="file_info_label_size_sd">Tamanho (SD):</string>
     <string name="file_info_label_permission">Permissão:</string>
+    <string name="file_info_label_can_read">ler</string>
+    <string name="file_info_label_cannot_read">não é possível ler</string>
+    <string name="file_info_label_can_write">gravar</string>
+    <string name="file_info_label_cannot_write">não é possível gravar</string>
     <string name="file_info_label_last_modified">Última modificação:</string>
+    <string name="file_info_label_mime_type">Tipo do Arquivo (MIME):</string>
     <string name="file_info_directory_empty">Pasta vazia</string>
     <string name="file_info_one_directory">1 pasta</string>
     <string name="file_info_directories">pastas</string>
@@ -16,8 +21,21 @@
     <string name="network_media_servers">Servidores de mídia (UPnP)</string>
     <string name="network_shared_folders">Pastas compartilhadas (SMB)</string>
     <!-- Archos file manager core -->
+    <string name="file_copy_pattern">copiar</string>
     <string name="fast_scroll_numeric_alphabet">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
+    <string name="samba_settings_title">Ajustes de pastas compartilhadas</string>
+    <string name="samba_settings_summary">Configurar nomes de usuário e senhas para acessar pastas compartilhadas na sua rede privada</string>
+    <string name="samba_profiles">Perfis de pastas compartilhadas</string>
+    <string name="samba_delete_settings">Você realmente quer apagar esse ajuste?</string>
+    <string name="samba_add_server">Adicionar um servidor</string>
+    <string name="samba_server">Definir um servidor</string>
+    <string name="samba_share">Definir um compartilhamento</string>
+    <string name="refresh">Atualizar</string>
+    <string name="network_timeout">Desculpe, a pasta remota não está acessível.\nVerifique sua conexão de rede e tente novamente.</string>
+    <string name="samba_loading">Por favor, aguarde enquanto carrega a pasta compartilhada&#8230;</string>
+    <string name="samba_reloading">Por favor, aguarde enquanto recarrega a pasta compartilhada&#8230;</string>
+    <string name="samba_password_request_title">Solicitação de senha da pasta compartilhada</string>
     <string name="samba_domain">Domínio</string>
     <string name="samba_username">Nome de usuário</string>
     <string name="samba_password">Senha</string>
@@ -27,7 +45,23 @@
     <string name="shared_folder_credentials">Senhas</string>
     <string name="no_saved_passwords">Nenhuma senha salva</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">Wi-Fi Direct</string>
+    <string name="receive_p2p_here">receber aqui via WiFi Direct</string>
+    <string name="empty_message">Descobrir dispositivos de destino disponíveis&#8230;&lt;br/&gt;O dispositivo de destino deve ativar &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; opção</string>
+    <string name="wifip2p_waiting">A transferência por WiFi Direct começará em breve</string>
+    <string name="connect_to_target">Conectando ao alvo</string>
+    <string name="upload_in_progress">Upload em andamento&#8230;</string>
+    <string name="file_uploading">Seu arquivo está carregando</string>
+    <string name="back_cancel">Pressione voltar para cancelar</string>
+    <string name="server_wait">À espera do cliente se conectar e enviar um arquivo</string>
+    <string name="download_in_progress">Download em andamento&#8230;</string>
+    <string name="file_downloading">Seu arquivo está baixando</string>
+    <string name="server_ready">Pronto para receber</string>
+    <string name="nonetwork_title" comment="deprecated">Sem conexão WiFi</string>
+    <string name="no_network_title">Nenhuma conexão de rede</string>
+    <string name="nonetwork_message">Você precisa ativar o Wi-Fi para este recurso</string>
     <!-- FileManager strings -->
+    <string name="storage_busy_message">Você não pode usar o armazenamento interno enquanto ele está conectado e montado através do USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Rede</string>
     <string name="external_storage">Externo</string>
@@ -35,10 +69,15 @@
     <string name="internal_storage_unified">Armazenamento</string>
     <string name="sd_card_storage">Cartão SD</string>
     <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Unidade</string>
     <string name="usb_ptp_storage">PTP</string>
     <string name="cloud_storage">Nuvem</string>
     <string name="directory_empty">Pasta vazia</string>
     <string name="no_server">Nenhum servidor encontrado</string>
+    <string name="loading">Carregando&#8230;</string>
+    <string name="ssh_error">Não é possível conectar: por favor, verifique sua conexão e credenciais</string>
+    <string name="ssh_remote_address">Endereço remoto</string>
+    <string name="ssh_remote_address_error">Você deve especificar um endereço remoto</string>
     <string name="ssh_password">Senha</string>
     <string name="ssh_username">Usuário</string>
     <string name="ssh_port">Porta (Opcional)</string>
@@ -50,6 +89,17 @@
     <string name="cannot_list">Não é possível listar o conteúdo</string>
     <string name="error_listing">Ocorreu um erro</string>
     <string name="error_host_not_found">Host não encontrado</string>
+    <string name="error_unknown_host">Host desconhecido</string>
+    <string name="error_no_connection">Não é possível conectar ao host</string>
+    <string name="error_credentials">Não foi possível listar as pastas: verifique suas credenciais</string>
+    <string name="error_no_permission">Esta conta não pode listar este diretório</string>
+    <string name="error_file_not_found">Arquivo não encontrado</string>
+    <string name="error_time_out">Tempo esgotado</string>
+    <string name="deleting">Excluindo</string>
+    <string name="deleting_many">%1$d/%2$d arquivos excluídos</string>
+    <string name="deleting_one">Apagando um arquivo</string>
+    <string name="copying">Copiando&#8230;</string>
+    <string name="moving">Movendo&#8230;</string>
     <string name="open_file">Abrir arquivo</string>
     <string name="open_file_after_download">Abrir arquivo após completar a cópia</string>
     <string name="pasting_copy_one">Copiando um arquivo (%1$s/%2$s)</string>
@@ -63,20 +113,146 @@
     <string name="refresh_directory">Atualizar pasta</string>
     <string-array name="folder_or_file">
         <item>Criar uma pasta</item>
-        <item>Create an empty file</item>
+        <item>Criar um arquivo vazio</item>
     </string-array>
+    <string name="new_directory">Nova pasta</string>
+    <string name="new_file">Novo arquivo</string>
+    <string name="new_folder_or_file">Nova pasta ou arquivo</string>
+    <string name="refresh_servers_list">Atualizar lista de servidores</string>
+    <string name="enable_network_shares">Habilitar compartilhamento de rede</string>
+    <string name="go_top">Voltar ao Topo</string>
+    <string name="uncheck_impossible">Impossível alterar a seleção quando a pasta principal for selecionada</string>
+    <string name="confirm_delete_one">Deseja realmente excluir?</string>
+    <string name="confirm_delete_parent_folder">Parece que a pasta principal não contém nenhum outro vídeo, deletar?</string>
+    <string name="confirm_delete_many">Deseja realmente excluir?</string>
+    <string name="enter_new_name">Nome:</string>
+    <string name="file_name">Nome do arquivo</string>
+    <string name="folder_name">Nome da pasta</string>
+    <string name="run_in_background">Minimizar</string>
+    <string name="confirm_deleting_cancellation">Você realmente deseja cancelar a exclusão?</string>
+    <string name="confirm_copying_cancellation">Você realmente quer cancelar a cópia?</string>
+    <string name="confirm_moving_cancellation">Você realmente quer cancelar a transferência?</string>
+    <string name="cannot_create_directory">Não é possível criar nova pasta</string>
+    <string name="cannot_create_file">Não é possível criar novo arquivo</string>
+    <string name="cannot_delete_directory">Não é possível excluir a pasta</string>
+    <string name="cannot_delete_file">Não é possível excluir o arquivo</string>
+    <string name="cannot_delete_files">Não é possível excluir os arquivos</string>
+    <string name="directory_deleted">A pasta foi excluída</string>
+    <string name="file_deleted">O arquivo foi excluído</string>
+    <string name="files_deleted">Os arquivos foram excluídos</string>
+    <string name="cannot_rename">Não é possível renomear</string>
+    <string name="cannot_paste_folder_into_itself">Não é possível copiar ou mover pastas para si mesmo ou para uma das suas subpastas</string>
+    <string name="cannot_paste_file_same_location">Não é possível colar arquivos para sua localização original</string>
+    <string name="cannot_paste_over_network">Não é possível colar arquivos na rede</string>
+    <string name="copy_directory_success_one">Pasta copiada</string>
+    <string name="copy_directory_success_many">Pastas copiadas</string>
+    <string name="copy_file_success_one">Arquivo copiado</string>
+    <string name="copy_file_success_many">Arquivos copiados</string>
+    <string name="copy_directory_failed_one">A pasta não foi copiada</string>
+    <string name="copy_directory_failed_many">As pastas não foram copiadas</string>
+    <string name="copy_file_failed_one">O arquivo não foi copiado</string>
+    <string name="copy_file_failed_many">Os arquivos não foram copiados</string>
+    <string name="cut_directory_success_one">Pasta movida</string>
+    <string name="cut_directory_success_many">Pastas movidas</string>
+    <string name="cut_file_success_one">Arquivo movido</string>
+    <string name="cut_file_success_many">Arquivos movidos</string>
+    <string name="cut_directory_failed_one">A pasta não foi movida</string>
+    <string name="cut_directory_failed_many">As pastas não foram movidas</string>
+    <string name="cut_file_failed_one">Arquivo não foi movido</string>
+    <string name="cut_file_failed_many">Os arquivos não foram movidos</string>
+    <string name="pasting_done">Colagem concluída</string>
+    <string name="copy_done">Cópia com sucesso</string>
+    <string name="copy_canceled">Cópia cancelada</string>
+    <string name="cut_done">Cortar com sucesso</string>
+    <string name="cut_canceled">Corte cancelado</string>
+    <string name="delete_done">Excluído com sucesso</string>
+    <string name="delete_canceled">Excluir cancelado</string>
+    <string name="cannot_open_file">Não é possível abrir o arquivo</string>
+    <string name="no_application_to_open_file">Nenhum aplicativo neste dispositivo pode abrir este arquivo</string>
+    <string name="delete_still_ongoing">Excluindo em segundo plano</string>
+    <string name="copy_on_device">Baixar vídeo no dispositivo</string>
+    <string name="copy_on_device_multi">Download no dispositivo</string>
+    <string name="storage_swapped_primary">principal</string>
+    <string name="storage_swapped_secondary">secundário</string>
+    <string name="yes">"Sim"</string>
+    <string name="no">"Não"</string>
+    <string name="share">Compartilhar</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Compartilhar arquivo via</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Nenhum aplicativo disponível para compartilhar o arquivo</string>
+    <string name="upnp_not_allowed">Você não tem permissão para acessar este servidor UPNP. Por favor, altere sua configuração de acesso primeiro.</string>
+    <string name="single_mode">Único</string>
+    <string name="double_mode">Duplo</string>
+    <string name="swap_panel">Trocar</string>
+    <string name="move">Mover</string>
     <!-- Shortcuts -->
+    <string name="shortcuts">Atalhos</string>
+    <string name="add_to_shortcuts">Criar um atalho</string>
+    <string name="remove_from_shortcuts">Remover o atalho</string>
+    <string name="shortcut_added" comment="deprecated">Atalho \"%s\" criado</string>
+    <string name="shortcut_removed" comment="deprecated">Atalho \"%s\" removido</string>
+    <string name="shortcut_created">Atalho \"%1$s\" criado</string>
+    <string name="one_shortcut_removed">Um atalho excluído</string>
     <string name="n_shortcut_removed">%1$d atalhos deletados</string>
     <string name="server_not_available" comment="deprecated">O servidor não está disponível no momento</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s não está disponível</string>
+    <string name="cannot_open_shortcut">O conteúdo deste atalho não está disponível.\nPor favor, verifique se você tem as permissões necessárias.</string>
+    <string name="network_shortcuts">Atalhos de rede</string>
+    <string name="media_servers">Servidores de Mídia</string>
+    <string name="shortcut_list_empty">Para criar atalhos para as pastas remotas favoritas, clique nas pastas de destino e selecione \"%s\" na barra de ação superior.</string>
     <!-- DLNA -->
+    <string name="dlna_share">Compartilhamento de mídia</string>
+    <string name="video">Vídeo</string>
+    <string name="audio">Áudio</string>
+    <string name="picture">Imagem</string>
+    <string name="share_types">Tipo de Compartilhamento</string>
     <!-- ZIP -->
+    <string name="zip_extract_action">Extrair aqui</string>
+    <string name="zip_extract_success_message">Extração bem sucedida</string>
+    <string name="zip_compress_action">Compactar em Arquivo ZIP</string>
+    <string name="zip_extracting_message">Extraindo arquivos do arquivo ZIP..</string>
+    <string name="zip_compressing_message">Comprimindo arquivos para o arquivo Zip</string>
+    <string name="zip_compressing_many">%1$d/%2$d arquivos comprimidos</string>
+    <string name="zip_compressing_one">Comprimindo um arquivo</string>
+    <string name="zip_compressing_success">Compressão bem sucedida</string>
+    <string name="zip_compressing_canceled">Compressão cancelada</string>
+    <string name="zip_extracting_many">%1$d/%2$d arquivos extraídos</string>
+    <string name="zip_extracting_one">Extraindo um arquivo (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Ocorreu um erro ao extrair seu arquivo.\nTalvez seu arquivo esteja danificado ou seu espaço livre não é suficiente.</string>
+    <string name="zip_extract_canceled">Extração cancelada</string>
+    <string name="zip_compress_error_message">Ocorreu um erro ao criar seu arquivo.\nTalvez seu espaço livre não seja suficiente.</string>
+    <string name="zip_cannot_open_inner_entry">Não é possível abrir o arquivo dentro de um arquivo. Extraí-lo primeiro.</string>
+    <string name="zip_size_limit">Navegação em arquivos ZIP é limitada a arquivos menores que 20 MB</string>
     <!-- Notifications -->
+    <string name="copy_error">Falha ao copiar</string>
+    <string name="cut_error">Recortar falhou</string>
+    <string name="delete_error">Falha ao excluir</string>
     <!-- Network Scanning -->
+    <string name="scan_network_index">Indexar arquivos de mídia</string>
+    <string name="scan_network_remove">Remover mídia do índice</string>
+    <string name="debug_browse_to_root">Navegar para a raiz do dispositivo (somente depuração)</string>
     <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Remover da biblioteca</string>
+    <string name="nomedia_remove">Adicionar à biblioteca de mídia</string>
+    <string name="nomedia_fail">Falha, não foi possível remover esta pasta da biblioteca de mídia</string>
+    <string name="nomedia_warning">O conteúdo multimídia desta pasta não aparecerá mais nos aplicativos multimídia.\nTem certeza que deseja continuar?</string>
     <!-- Folder Picker -->
+    <string name="choose_a_folder">Escolha uma pasta</string>
+    <string name="choose_a_folder_help">Navegue até a pasta que você deseja selecionar e pressione OK. Use o botão VOLTAR para subir um nível.</string>
+    <string name="current_choice">Escolha atual:</string>
+    <string name="no_selection">nenhuma seleção</string>
+    <string name="external_storage_fake_name">Armazenamento do dispositivo</string>
+    <string name="sdcard_fake_name">Cartão SD</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(nenhuma pasta)</string>
+    <string name="navigation_drawer_open">Abrir gaveta de navegação</string>
+    <string name="navigation_drawer_close">Feche o painel de navegação</string>
+    <string name="listing_sort_mode">Modo de ordenação</string>
+    <string name="listing_sort_by_name">Organizar por nome</string>
     <string name="listing_sort_by_size">Ordenar por tamanho</string>
     <string name="listing_sort_by_date">Ordenar por data</string>
+    <string name="listing_ascending">Ordem Crescente</string>
+    <string name="listing_descending">Ordem Decrescente</string>
     <string name="acquire_external_usb_permission">O gerenciador de arquivos precisa de permissão especial para acessar o armazenamento externo. Selecione o seu armazenamento na próxima tela</string>
 </resources>
