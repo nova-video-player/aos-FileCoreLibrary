@@ -38,8 +38,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SambaConfiguration {
 
-	protected static final String configFile = Environment.getExternalStorageDirectory()+"/Android/data/com.archos.mediacenter/smb/credentials.conf";
-    protected static final String oldConfigFile = "/data/misc/smb/fusesmb.conf";
+	protected static final String configFile = Environment.getExternalStorageDirectory()+"/Android/data/org.courville.nova/files/smb/credentials.conf";
+    protected static final String oldConfigFile = Environment.getExternalStorageDirectory()+"/Android/data/com.archos.mediacenter/smb/credentials.conf";
 	static{
 	    checkNewConfigFile();
 	}
