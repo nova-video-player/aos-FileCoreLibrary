@@ -20,8 +20,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
-import android.support.v4.provider.DocumentFile;
-import android.support.v4.util.Pair;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.core.util.Pair;
 import android.util.Log;
 
 import com.archos.environment.ArchosUtils;

@@ -15,7 +15,7 @@
 package com.archos.filecorelibrary.contentstorage;
 
 import android.net.Uri;
-import android.support.v4.provider.DocumentFile;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.MetaFile2;

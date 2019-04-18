@@ -22,9 +22,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
-import android.support.v4.provider.DocumentFile;
-import android.support.v4.util.Pair;
-import android.util.Log;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.core.util.Pair;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.ExtStorageManager;
