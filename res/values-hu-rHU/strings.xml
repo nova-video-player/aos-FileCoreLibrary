@@ -182,6 +182,9 @@
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <string name="no_way_to_share_file">Nem található alkalmazás a fájl megosztásához</string>
     <string name="upnp_not_allowed">Nincs feljogosítva az UPNP szerver elérésére. Kérjük, előbb változtassa meg a hozzáférési beállításait.</string>
+    <string name="single_mode">Egyszerű</string>
+    <string name="double_mode">Dupla</string>
+    <string name="swap_panel">Csere</string>
     <string name="move">Áthelyezés</string>
     <!-- Shortcuts -->
     <string name="shortcuts">Parancsikonok</string>
