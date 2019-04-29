@@ -186,7 +186,7 @@ public class ExtStorageManager {
                         volumesMap.get(volumeType).add(volName);
                         if(getUuid != null) {
                             volumesIdMap.put(volName, (String) getUuid.invoke(storageVolumesArray[i], noparams));
-                            Log.d(TAG, "Volumes scan result (<N): " + volName + " " + volState);
+                            if (DBG) Log.d(TAG, "Volumes scan result (<N): " + volName + " " + volState);
                         }
                     }
                 }
@@ -203,11 +203,11 @@ public class ExtStorageManager {
                             // wait for media to be ready
                             int count = 0;
                             final int maxTries = 10;
-                            Log.d(TAG,"Media state " + storageVolume.getState());
+                            if (DBG) Log.d(TAG,"Media state " + storageVolume.getState());
                             // Only retry if media is checking
                             //while (!mediaReady.contains(storageVolume.getState()) && !mediaBorked.contains(storageVolume.getState()) && count < maxTries) {
                             while (storageVolume.getState().equals(Environment.MEDIA_CHECKING) && count < maxTries) {
-                                Log.d(TAG,"Media checking and not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
+                                if (DBG) Log.d(TAG,"Media checking and not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
                                 SystemClock.sleep(100);
                                 count++;
                             }
@@ -227,7 +227,7 @@ public class ExtStorageManager {
                                         volumesMap.get(volType).add(volName);
                                         if (getFsUuid != null) {
                                             volumesIdMap.put(volName, (String) getFsUuid.invoke(volInfo, noparams));
-                                            Log.d(TAG, "Volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr);
+                                            if (DBG) Log.d(TAG, "Volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr);
                                         }
                                     }
                                 }
