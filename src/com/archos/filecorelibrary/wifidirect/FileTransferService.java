@@ -168,7 +168,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
         contentView.setProgressBar(R.id.status_progress, 100, 0, false);
         notificationBuilder.setContent(contentView);
         notificationBuilder.setSmallIcon(R.drawable.ic_wifip2p);
-        notificationBuilder.setOngoing(true);
+        notificationBuilder.setOngoing(true).setPriority(NotificationCompat.PRIORITY_LOW);
         notificationBuilder.setTicker("WiFi Direct service started");
         notificationBuilder.setOnlyAlertOnce(true);
 
@@ -185,13 +185,14 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
         notificationBuilder.setContentIntent(pi);
 
         //To not be killed
-        startForeground(NOTIFICATION_ID, notificationBuilder.getNotification());
+        startForeground(NOTIFICATION_ID, notificationBuilder.build());
         return START_STICKY;
     }
 
     /* unregister the broadcast receiver */
     @Override
     public void onDestroy() {
+        notificationManager.cancel(NOTIFICATION_ID);
         super.onDestroy();
         mManager.removeGroup(mChannel, this);
         mManager.cancelConnect(mChannel, this);
@@ -424,7 +425,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
                 public void run() {
                     long oldId = Binder.clearCallingIdentity();
                     contentView.setProgressBar(R.id.status_progress, 100, percent, false);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.getNotification());
+                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
                     Binder.restoreCallingIdentity(oldId);
                     //Remote progressDialog update
                     final int N = mCallbacks.beginBroadcast();
@@ -455,7 +456,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
             public void run() {
                 long oldId = Binder.clearCallingIdentity();
                 contentView.setTextViewText(R.id.title, "Download in progress");
-                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.getNotification());
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
                 Binder.restoreCallingIdentity(oldId);
                 }
         });
