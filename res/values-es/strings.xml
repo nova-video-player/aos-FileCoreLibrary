@@ -61,7 +61,7 @@
     <string name="no_network_title">Sin conexión de red</string>
     <string name="nonetwork_message">Necesitas activar el WiFi para esta función</string>
     <!-- FileManager strings -->
-    <string name="storage_busy_message">No puede utilizar el almacenamiento interno mientras esta conectado y montado como USB.</string>
+    <string name="storage_busy_message">No puede utilizar el almacenamiento interno mientras está conectado y montado como USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Red</string>
     <string name="external_storage">Almacenamiento externo</string>
@@ -71,13 +71,13 @@
     <string name="usb_host_storage">USB</string>
     <string name="other_storage">Disco</string>
     <string name="usb_ptp_storage">PTP</string>
-    <string name="cloud_storage">Nube</string>
+    <string name="cloud_storage">En la nube</string>
     <string name="directory_empty">La carpeta está vacía</string>
-    <string name="no_server">No se ha hallado servidor</string>
+    <string name="no_server">Servidor no encontrado</string>
     <string name="loading">Espere mientras se carga…</string>
     <string name="ssh_error">Imposible conectar. Por favor, revisa tu conexión y credenciales</string>
     <string name="ssh_remote_address">Acceso remoto</string>
-    <string name="ssh_remote_address_error">Debes especificar una dirección remota</string>
+    <string name="ssh_remote_address_error">Debe especificar una dirección remota</string>
     <string name="ssh_password">Contraseña</string>
     <string name="ssh_username">Usuario</string>
     <string name="ssh_port">Puerto (opcional)</string>
@@ -134,7 +134,7 @@
     <string name="confirm_moving_cancellation">¿Realmente desea cancelar?</string>
     <string name="cannot_create_directory">No se puede crear la carpeta</string>
     <string name="cannot_create_file">No se puede crear el archivo</string>
-    <string name="cannot_delete_directory">No se puede borrar la carpeta</string>
+    <string name="cannot_delete_directory">No se puede eliminar la carpeta</string>
     <string name="cannot_delete_file">No se puede eliminar el archivo</string>
     <string name="cannot_delete_files">No se pueden eliminar los archivos</string>
     <string name="directory_deleted">La carpeta ha sido eliminada</string>
@@ -248,7 +248,7 @@
     <string name="no_directory">(sin carpeta)</string>
     <string name="navigation_drawer_open">Abrir cajón de navegación</string>
     <string name="navigation_drawer_close">Cerrar cajón de navegación</string>
-    <string name="listing_sort_mode">Modo de orden</string>
+    <string name="listing_sort_mode">Modo de ordenación</string>
     <string name="listing_sort_by_name">Ordenar por nombre</string>
     <string name="listing_sort_by_size">Ordenar por tamaño</string>
     <string name="listing_sort_by_date">Ordenar por fecha</string>
