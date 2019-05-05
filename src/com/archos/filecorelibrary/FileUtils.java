@@ -332,7 +332,7 @@ public class FileUtils {
                 .setContentText(notifMsg)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setTicker(null).setOnlyAlertOnce(true).setContentIntent(contentIntent).setOngoing(true).setAutoCancel(true);
-        if (notifMsg != "")
+        if (! notifMsg.equals(""))
             n.setContentText(notifMsg);
         nm.notify(notificationId, n.build());
     }
