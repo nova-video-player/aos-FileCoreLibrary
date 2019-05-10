@@ -206,11 +206,14 @@ public class ExtStorageManager {
                             if (DBG) Log.d(TAG,"Media state " + storageVolume.getState());
                             // Only retry if media is checking
                             //while (!mediaReady.contains(storageVolume.getState()) && !mediaBorked.contains(storageVolume.getState()) && count < maxTries) {
+                            // to avoid ANR needs to be based on handlers in UI thread
+                            /*
                             while (storageVolume.getState().equals(Environment.MEDIA_CHECKING) && count < maxTries) {
                                 if (DBG) Log.d(TAG,"Media checking and not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
                                 SystemClock.sleep(100);
                                 count++;
                             }
+                            */
                             Object volInfo = findVolumeByUuid.invoke(storageManager, uuid); // >=6.0
                             if ((isMountedReadable != null) && (getPathfromInfo != null) && (boolean) isMountedReadable.invoke(volInfo, noparams)) {
                                 String volName = ((File) getPathfromInfo.invoke(volInfo, noparams)).getAbsolutePath(); // >=4.1 (getPath)
