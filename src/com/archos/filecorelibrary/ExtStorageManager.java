@@ -130,13 +130,8 @@ public class ExtStorageManager {
             Method getUuid = null;
             Method findVolumeByUuid = null;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                isPrimary = StorageVolume.getMethod("isPrimary", noparams);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                    getUuid = StorageVolume.getMethod("getUuid", noparams);
-            } else {
-                getStorageId = StorageVolume.getMethod("getStorageId", noparams);
-            }
+            isPrimary = StorageVolume.getMethod("isPrimary", noparams);
+            getUuid = StorageVolume.getMethod("getUuid", noparams);
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 findVolumeByUuid = StorageManager.class.getMethod("findVolumeByUuid", new Class[]{String.class});
