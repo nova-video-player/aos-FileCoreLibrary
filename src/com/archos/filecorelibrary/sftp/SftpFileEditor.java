@@ -26,6 +26,7 @@ import com.jcraft.jsch.SftpException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.UnknownHostException;
@@ -62,22 +63,101 @@ public class SftpFileEditor  extends FileEditor{
         return false;
     }
 
+    private InputStream wrapInputStream(final InputStream is, final Channel channel) {
+        return new InputStream() {
+            @Override
+            public void close() throws IOException {
+                is.close();
+                channel.disconnect();
+            }
+
+            @Override
+            public int read() throws IOException {
+                return is.read();
+            }
+
+            @Override
+            public int read(byte[] b) throws IOException {
+                return is.read(b);
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return is.read(b, off, len);
+            }
+
+            @Override
+            public long skip(long n) throws IOException {
+                return is.skip(n);
+            }
+
+            @Override
+            public int available() throws IOException {
+                return is.available();
+            }
+
+            @Override
+            public void mark(int readlimit) {
+                is.mark(readlimit);
+            }
+
+            @Override
+            public void reset() throws IOException {
+                is.reset();
+            }
+
+            @Override
+            public boolean markSupported() {
+                return is.markSupported();
+            }
+        };
+    }
+
     @Override
     public InputStream getInputStream() throws FileNotFoundException, JSchException, SftpException {
         Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
-        return ((ChannelSftp)channel).get(mUri.getPath());
+        InputStream is = ((ChannelSftp)channel).get(mUri.getPath());
+        return wrapInputStream(is, channel);
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
-        return ((ChannelSftp)channel).get(mUri.getPath(), null, from);
+        final Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
+        InputStream is = ((ChannelSftp)channel).get(mUri.getPath(), null, from);
+        return wrapInputStream(is, channel);
     }
 
     @Override
     public OutputStream getOutputStream() throws FileNotFoundException, JSchException, SftpException {
-        Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
-        return ((ChannelSftp)channel).put(mUri.getPath());
+        final Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
+        final OutputStream sftpOS = ((ChannelSftp)channel).put(mUri.getPath());
+        return new OutputStream() {
+            @Override
+            public void close() throws IOException {
+                sftpOS.close();
+                channel.disconnect();
+            }
+
+            @Override
+            public void write(int b) throws IOException {
+                sftpOS.write(b);
+            }
+
+            @Override
+            public void write(byte[] b) throws IOException {
+                sftpOS.write(b);
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                sftpOS.write(b, off, len);
+            }
+
+            @Override
+            public void flush() throws IOException {
+                sftpOS.flush();
+            }
+        };
     }
 
     @Override
