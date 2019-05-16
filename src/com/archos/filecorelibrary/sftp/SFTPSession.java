@@ -24,16 +24,17 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 
 public class SFTPSession {
     private static SFTPSession sshSession = null;
     //Keep a cached Session ( = connection) per server
-    private HashMap<Credential, Session> currentSessions;
-    private HashMap<Session, HashSet<Channel>> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
+    private ConcurrentHashMap<Credential, Session> currentSessions;
+    private ConcurrentHashMap<Session, HashMap<Channel,Exception>> usedSessions; // keep used session to avoid deconnection while, for example, a sftp channel is being used
     public SFTPSession(){
-        currentSessions = new HashMap<>();
-        usedSessions = new HashMap<>();
+        currentSessions = new ConcurrentHashMap<>();
+        usedSessions = new ConcurrentHashMap<>();
     }
 	
 	
@@ -47,19 +48,22 @@ public class SFTPSession {
 	public synchronized Channel getSFTPChannel(Uri cred) throws JSchException{
         Session session = getSession(cred);
         if(session !=null){
+            Channel channel = null;
             try {
-                Channel channel = session.openChannel("sftp");
+                channel = session.openChannel("sftp");
                 channel.connect();
                 acquireSession(channel);
                 return channel;
             } catch (JSchException e) {
                 //channel isn't openable, we have to reset the session !
+                if(channel != null) {
+                    android.util.Log.d("PHH", "FIX TRIAL 1 TRIGGERED");
+                    releaseSession(channel);
+                }
                 removeSession(cred);
                 Session session2 = getSession(cred);
                 if (session2 != null) {
                     try {
-
-                        Channel channel;
                         channel = session2.openChannel("sftp");
                         channel.connect();
                         acquireSession(channel);
@@ -79,13 +83,26 @@ public class SFTPSession {
     private synchronized void acquireSession(Channel channel){
         try {
             Session session = channel.getSession();
-            HashSet<Channel> channels = usedSessions.get(session);
+            HashMap<Channel,Exception> channels = usedSessions.get(session);
             if(channels == null) {
-                channels = new HashSet<>();
+                channels = new HashMap<>();
                 usedSessions.put(session, channels);
+                android.util.Log.d("PHH", "Acquiring session " + System.identityHashCode(session));
             }
-            channels.add(channel);
+            channels.put(channel, new Exception());
+            if(usedSessions.size() >= 4) {
+                android.util.Log.d("PHH", "Many sessions open");
+                for(Session s : usedSessions.keySet()) {
+                    HashMap<Channel, Exception> cs = usedSessions.get(s);
+                    android.util.Log.d("PHH", "\t" + System.identityHashCode(s));
+                    for(Channel c : cs.keySet()) {
+                        Exception e = cs.get(c);
+                        android.util.Log.i("PHH", "\t\t" + System.identityHashCode(c), e);
+                    }
+                }
+            }
         } catch (JSchException e) {
+            android.util.Log.d("PHH", "Failed acquiring session", e);
         }
 
     }
@@ -93,8 +110,8 @@ public class SFTPSession {
     public synchronized void releaseSession(Channel channel) {
         try {
             Session session = channel.getSession();
-            HashSet<Channel> channels = usedSessions.get(session);
-            boolean deleted = channels.remove(channel);
+            HashMap<Channel, Exception> channels = usedSessions.get(session);
+            boolean deleted = channels.remove(channel) != null;
             //We already deleted this channel before
             if(!deleted) return;
             if(channels.isEmpty()) {
@@ -102,9 +119,10 @@ public class SFTPSession {
                 if(currentSessions.values().contains(session)) return;
                 session.disconnect();
                 usedSessions.remove(session);
+                android.util.Log.d("PHH", "Removed session " + System.identityHashCode(session));
             }
         } catch (JSchException e) {
-            e.printStackTrace();
+            android.util.Log.d("PHH", "Failed releasing session", e);
         }
 
     }
