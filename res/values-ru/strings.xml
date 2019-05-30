@@ -26,14 +26,19 @@
     <string name="samba_loading">Дождитесь загрузки общей папки…</string>
     <string name="samba_reloading">Дождитесь перезагрузки общей папки…</string>
     <string name="samba_password_request_title">Запрос на пароль общей папки</string>
+    <string name="samba_domain">Домен</string>
     <string name="samba_username">Имя пользователя</string>
     <string name="samba_password">Пароль</string>
     <string name="samba_show_password">Показать пароль</string>
     <string name="preferences">Настройки</string>
     <string name="shared_folder_credentials">Пароли</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
     <string name="back_cancel">Нажмите назад для отмены</string>
     <string name="file_downloading">Ваш файл загружается</string>
+    <string name="nonetwork_title" comment="deprecated">Нет WiFi соединения</string>
+    <string name="no_network_title">Нет сетевого соединения</string>
+    <string name="nonetwork_message">Вам нужно активировать WiFi для этой функции</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">Внутренняя память недоступна при подключении через USB.</string>
     <string name="ssh_storage">FTP</string>
@@ -49,10 +54,12 @@
     <string name="no_server">Cервер не обнаружен</string>
     <string name="loading">Подождите, идет загрузка…</string>
     <string name="ssh_error">Не удается подключиться: пожалуйста, проверьте подключение и повторите попытку</string>
+    <string name="ssh_remote_address">Удаленный адрес</string>
     <string name="ssh_password">Пароль</string>
     <string name="ssh_username">Имя пользователя</string>
     <string name="ssh_port">Порт (необязательно)</string>
     <string name="ssh_path">Путь (необязательно)</string>
+    <string name="save_password">Сохранить пароль</string>
     <string name="ssh_prompt">Тип FTP</string>
     <string name="download_prompt">Скачать файл в папку:</string>
     <string name="browse_ftp_server">Сервер</string>
@@ -73,6 +80,10 @@
     <string name="rename">Переименовать</string>
     <string name="details">Дополнительно</string>
     <string name="refresh_directory">Обновить папку</string>
+    <string-array name="folder_or_file">
+        <item>Создать папку</item>
+        <item>Create an empty file</item>
+    </string-array>
     <string name="new_directory">Создать новую папку</string>
     <string name="new_file">Создать файл</string>
     <string name="new_folder_or_file">Новая папка или файл</string>
@@ -112,7 +123,9 @@
     <string name="cut_directory_failed_many">Папки не перемещены</string>
     <string name="cut_file_failed_one">Файл не перемещен</string>
     <string name="cut_file_failed_many">Файлы не перемещены</string>
+    <string name="pasting_done">Вставка завершена</string>
     <string name="copy_done">Копирование завершено</string>
+    <string name="copy_canceled">Копирование отменено</string>
     <string name="delete_done">Успешно удалено</string>
     <string name="cannot_open_file">Невозможно открыть файл</string>
     <string name="delete_still_ongoing">Удаление еще не завершено</string>
@@ -142,4 +155,12 @@
     <!-- Network Scanning -->
     <!-- Hiding from media scanning -->
     <!-- Folder Picker -->
+    <string name="sdcard_fake_name">Карта SD</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="listing_sort_mode">Тип сортировки</string>
+    <string name="listing_sort_by_name">Сортировать по имени</string>
+    <string name="listing_sort_by_size">Сортировать по размеру</string>
+    <string name="listing_sort_by_date">Сортировать по дате</string>
+    <string name="listing_ascending">По возрастанию</string>
+    <string name="listing_descending">По убыванию</string>
 </resources>
