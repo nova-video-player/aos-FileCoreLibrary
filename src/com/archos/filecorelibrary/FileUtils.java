@@ -324,17 +324,20 @@ public class FileUtils {
             if (nm != null)
                 nm.createNotificationChannel(mNotifChannel);
         }
-        Intent notificationIntent = new Intent(context, classe);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        NotificationCompat.Builder n = new NotificationCompat.Builder(context, notifChannelId)
-                .setSmallIcon(android.R.drawable.stat_notify_sync)
-                .setContentTitle(context.getString(titleId))
-                .setContentText(notifMsg)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setTicker(null).setOnlyAlertOnce(true).setContentIntent(contentIntent).setOngoing(true).setAutoCancel(true);
-        if (! notifMsg.equals(""))
-            n.setContentText(notifMsg);
-        nm.notify(notificationId, n.build());
+        // for some reason context might be null https://github.com/nova-video-player/aos-AVP/issues/133
+        if (context != null) {
+            Intent notificationIntent = new Intent(context, classe);
+            PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+            NotificationCompat.Builder n = new NotificationCompat.Builder(context, notifChannelId)
+                    .setSmallIcon(android.R.drawable.stat_notify_sync)
+                    .setContentTitle(context.getString(titleId))
+                    .setContentText(notifMsg)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setTicker(null).setOnlyAlertOnce(true).setContentIntent(contentIntent).setOngoing(true).setAutoCancel(true);
+            if (!notifMsg.equals(""))
+                n.setContentText(notifMsg);
+            nm.notify(notificationId, n.build());
+        }
     }
     // cancel notification
     public static void hideNotification(NotificationManager nm, int notificationId) {
