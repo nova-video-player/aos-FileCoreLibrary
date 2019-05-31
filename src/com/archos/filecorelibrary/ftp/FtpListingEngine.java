@@ -92,18 +92,20 @@ public class FtpListingEngine extends ListingEngine {
          */
         @Override
         public boolean accept(org.apache.commons.net.ftp.FTPFile f) {
-            final String filename = f.getName();
-            if (filename.equals(".") || filename.equals("..")) {
-                return false;
-            }
-            if (f.isFile()) {
-                return keepFile(filename);
-            }
-            else if (f.isDirectory()) {
-                return keepDirectory(filename);
-            }
-            else {
-                Log.d(TAG, "neither file nor directory: "+filename);
+            if (f != null) {
+                final String filename = f.getName();
+                if (filename.equals(".") || filename.equals("..")) {
+                    return false;
+                }
+                if (f.isFile()) {
+                    return keepFile(filename);
+                } else if (f.isDirectory()) {
+                    return keepDirectory(filename);
+                } else {
+                    Log.d(TAG, "neither file nor directory: " + filename);
+                    return false;
+                }
+            } else {
                 return false;
             }
         }
