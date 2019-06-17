@@ -51,13 +51,108 @@
     <string name="back_cancel">Druk terug om te annuleren</string>
     <string name="server_wait">Wachten op clients kunnen alleen verbinding maken en een bestand verzenden</string>
     <!-- FileManager strings -->
+    <string name="open_file">Open Bestand</string>
+    <string name="pasting_copy_one">Kopieert een bestand (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Kopieert: %1$d/%2$d bestanden (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Verplaatst een bestand (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Verplaatst: %1$d/%2$d bestanden (%3$s/%4$s)</string>
+    <string name="delete">Verwijderen</string>
+    <string name="rename">Naam wijzigen</string>
+    <string name="details">Details</string>
+    <string name="refresh_directory">Map vernieuwen</string>
+    <string-array name="folder_or_file">
+        <item>Nieuwe map aanmaken</item>
+        <item>Maak een leeg bestand</item>
+    </string-array>
+    <string name="new_directory">Nieuwe map</string>
+    <string name="new_file">Nieuw bestand</string>
+    <string name="new_folder_or_file">Nieuwe map of bestand</string>
+    <string name="refresh_servers_list">Serverlijst opnieuw laden</string>
+    <string name="enable_network_shares">Delen via het netwerk inschakelen</string>
+    <string name="go_top">Terug naar boven</string>
+    <string name="uncheck_impossible">Niet mogelijk om selectie te wijzigen wanneer de bovenliggende map is geselecteerd</string>
+    <string name="confirm_delete_one">Wilt u dit werkelijk verwijderen?</string>
+    <string name="confirm_delete_parent_folder">Het lijkt erop dat de bovenliggende map geen andere video bevat, moeten we deze verwijderen?</string>
+    <string name="confirm_delete_many">Wilt u deze werkelijk verwijderen?</string>
+    <string name="enter_new_name">Naam:</string>
+    <string name="file_name">Bestandsnaam</string>
+    <string name="folder_name">Mapnaam</string>
+    <string name="run_in_background">Minimaliseer</string>
+    <string name="confirm_deleting_cancellation">Wilt u dit werkelijk het verwijderen annuleren?</string>
+    <string name="confirm_copying_cancellation">Wilt u werkelijk het kopiëren annuleren?</string>
+    <string name="confirm_moving_cancellation">Wilt u werkelijk het verplaatsen annuleren?</string>
+    <string name="cannot_create_directory">Kan geen nieuwe map aanmaken</string>
+    <string name="cannot_create_file">Kan geen nieuw bestand aanmaken</string>
+    <string name="cannot_delete_directory">Kan de map niet verwijderen</string>
+    <string name="cannot_delete_file">Kan het bestand niet verwijderen</string>
+    <string name="cannot_delete_files">Kan de bestanden niet verwijderen</string>
+    <string name="directory_deleted">De map is verwijderd</string>
+    <string name="file_deleted">Het bestand is verwijderd</string>
+    <string name="files_deleted">De bestanden zijn verwijderd</string>
+    <string name="cannot_rename">Kan naam niet wijzigen</string>
+    <string name="cannot_paste_folder_into_itself">Kan mappen niet naar zichzelf of een van hun submappen kopiëren of verplaatsen</string>
+    <string name="cannot_paste_file_same_location">Bestanden kunnen niet op de oorspronkelijke locatie worden geplakt</string>
+    <string name="cannot_paste_over_network">Bestanden kunnen niet via het netwerk worden geplakt</string>
+    <string name="copy_directory_success_one">Map gekopieerd</string>
+    <string name="copy_directory_success_many">Mappen gekopieerd</string>
+    <string name="copy_file_success_one">Bestand gekopieerd</string>
+    <string name="copy_file_success_many">Bestanden gekopieerd</string>
+    <string name="copy_directory_failed_one">Map is niet gekopieerd</string>
+    <string name="copy_directory_failed_many">Mappen niet gekopieerd</string>
+    <string name="copy_file_failed_one">Bestand is niet gekopieerd</string>
+    <string name="copy_file_failed_many">Bestanden niet gekopieerd</string>
+    <string name="cut_directory_success_one">Map verplaatst</string>
+    <string name="cut_directory_success_many">Mappen verplaatst</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <!-- Shortcuts -->
     <!-- DLNA -->
     <!-- ZIP -->
+    <string name="zip_extract_action">Hier uitpakken</string>
+    <string name="zip_extract_success_message">Uitpakken gelukt</string>
+    <string name="zip_compress_action">Inpakken als Zip-bestand</string>
+    <string name="zip_extracting_message">Bestanden uit ZIP archief uitpakken..</string>
+    <string name="zip_compressing_message">Bestanden comprimeren naar zip-archief</string>
+    <string name="zip_compressing_many">%1$d/%2$d gecomprimeerde bestanden</string>
+    <string name="zip_compressing_one">Comprimeren naar zip-bestand</string>
+    <string name="zip_compressing_success">Compressie succesvol</string>
+    <string name="zip_compressing_canceled">Compressie geannuleerd</string>
+    <string name="zip_extracting_many">%1$d/%2$d geëxtracteerde bestanden</string>
+    <string name="zip_extracting_one">Een bestand uitpakken (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Tijdens het uitpakken van het bestand is een fout opgetreden.\nMogelijk is het bestand beschadigd of is er onvoldoende vrije schijfruimte.</string>
+    <string name="zip_extract_canceled">Het uitpakken is geannuleerd</string>
+    <string name="zip_compress_error_message">Er is een fout opgetreden tijdens het maken van uw archief.\nMisschien is uw vrije opslagruimte niet genoeg.</string>
+    <string name="zip_cannot_open_inner_entry">Openen van bestand in Zip-bestand niet mogelijk. Bestand eerst uitpakken.</string>
+    <string name="zip_size_limit">Het doorzoeken van Zip-bestanden is alleen mogelijk voor bestanden kleiner dan 20 MB</string>
     <!-- Notifications -->
+    <string name="copy_error">Kopiëren mislukt</string>
+    <string name="cut_error">Knippen mislukt</string>
+    <string name="delete_error">Verwijderen mislukt</string>
     <!-- Network Scanning -->
+    <string name="scan_network_index">Mediabestanden indexeren</string>
+    <string name="scan_network_remove">Media uit index verwijderen</string>
+    <string name="debug_browse_to_root">Blader naar apparaat root (alleen debug)</string>
     <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Uit mediabibliotheek verwijderen</string>
+    <string name="nomedia_remove">Aan mediabibliotheek toevoegen</string>
+    <string name="nomedia_fail">Mislukt, kan deze map niet uit de mediabibliotheek verwijderen</string>
+    <string name="nomedia_warning">Multimedia inhoud van deze map zal niet meer verschijnen in de multimedia toepassingen.\nWeet u zeker dat u wilt doorgaan?</string>
     <!-- Folder Picker -->
+    <string name="choose_a_folder">Kies een map</string>
+    <string name="choose_a_folder_help">Navigeer naar de map die u wilt selecteren en druk op OK. Gebruik BACK knop om één niveau hoger te gaan.</string>
+    <string name="current_choice">Huidige keuze:</string>
+    <string name="no_selection">geen selectie</string>
+    <string name="external_storage_fake_name">Apparaat opslag</string>
+    <string name="sdcard_fake_name">SD kaart</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(geen map)</string>
+    <string name="navigation_drawer_open">Open navigatiescherm</string>
+    <string name="navigation_drawer_close">Sluit navigatie</string>
+    <string name="listing_sort_mode">Sorteer Mode</string>
+    <string name="listing_sort_by_name">Sorteer op naam</string>
+    <string name="listing_sort_by_size">Sorteer op grootte</string>
+    <string name="listing_sort_by_date">Sorteer op datum</string>
+    <string name="listing_ascending">Oplopend</string>
+    <string name="listing_descending">Aflopend</string>
+    <string name="acquire_external_usb_permission">Bestandsbeheer heeft speciale toestemming nodig om externe opslag te kunnen gebruiken. Selecteer uw opslag op het volgende scherm</string>
 </resources>

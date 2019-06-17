@@ -3,7 +3,7 @@
 <resources>
     <string name="file_info_label_name">Nombre:</string>
     <string name="file_info_label_size">Tamaño:</string>
-    <string name="file_info_label_size_internal">Tamano (interno):</string>
+    <string name="file_info_label_size_internal">Tamaño (interno):</string>
     <string name="file_info_label_size_sd">Tamaño (SD):</string>
     <string name="file_info_label_permission">Acceso:</string>
     <string name="file_info_label_can_read">puede leer</string>
@@ -24,8 +24,8 @@
     <string name="file_copy_pattern">copia</string>
     <string name="fast_scroll_numeric_alphabet"> 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
-    <string name="samba_settings_title">Ajustes de carpetas compartidas</string>
-    <string name="samba_settings_summary">Configurar nombres de usuario y contraseñas para acceder a carpetas compartidas de su red privada</string>
+    <string name="samba_settings_title">Configuración de carpetas compartidas</string>
+    <string name="samba_settings_summary">Configura nombres de usuario y contraseñas para acceder a carpetas compartidas de su red privada</string>
     <string name="samba_profiles">Perfiles de carpetas compartidas</string>
     <string name="samba_delete_settings">¿Realmente desea eliminar esta configuración?</string>
     <string name="samba_add_server">Añadir un servidor</string>
@@ -42,17 +42,17 @@
     <string name="samba_show_password">Mostrar contraseña</string>
     <string name="samba_wrong_password">Nombre de usuario o contraseña incorrectos</string>
     <string name="preferences">Preferencias</string>
-    <string name="shared_folder_credentials">\"Credenciales de compartición\"</string>
-    <string name="no_saved_passwords">\"No guardar contraseñas\"</string>
+    <string name="shared_folder_credentials">Contraseñas</string>
+    <string name="no_saved_passwords">No guardar contraseñas</string>
     <!-- WiFi Direct strings-->
-    <string name="wifi_direct">\"Ajustes de Wifi Directo\"</string>
+    <string name="wifi_direct">Wifi Direct\"</string>
     <string name="receive_p2p_here">recibir aquí por WiFi Direct</string>
-    <string name="empty_message">Descubrir dispositivos destino disponibles /br El dispositivo destino debe activar la opción %s</string>
+    <string name="empty_message">Descubriendo dispositivos destinos disponibles/brEl dispositivo destino debe activar la opción %s</string>
     <string name="wifip2p_waiting">La transferencia WiFi Direct comenzará en breve</string>
     <string name="connect_to_target">Conectando al destino</string>
     <string name="upload_in_progress">Carga en progreso&#8230;</string>
     <string name="file_uploading">Tu archivo está subiéndose</string>
-    <string name="back_cancel">Presiona Atras para cancelar</string>
+    <string name="back_cancel">Presiona Atrás para cancelar</string>
     <string name="server_wait">Esperando al cliente para conectar y enviar un archivo</string>
     <string name="download_in_progress">Descargando&#8230;</string>
     <string name="file_downloading">Tu archivo se está descargando</string>
@@ -71,7 +71,7 @@
     <string name="usb_host_storage">USB</string>
     <string name="other_storage">Disco</string>
     <string name="usb_ptp_storage">PTP</string>
-    <string name="cloud_storage">En la nube</string>
+    <string name="cloud_storage">En la Nube</string>
     <string name="directory_empty">La carpeta está vacía</string>
     <string name="no_server">Servidor no encontrado</string>
     <string name="loading">Espere mientras se carga…</string>
@@ -122,7 +122,7 @@
     <string name="enable_network_shares">Habilitar recursos compartidos de red</string>
     <string name="go_top">Volver a la parte superior</string>
     <string name="uncheck_impossible">Imposible cambiar la selección cuando está selecciona la carpeta padre</string>
-    <string name="confirm_delete_one">¿Realmente quieres eliminarlo?</string>
+    <string name="confirm_delete_one">¿Realmente quiere eliminarlo?</string>
     <string name="confirm_delete_parent_folder">Parece que la carpeta padre no contiene ningún otro vídeo, ¿deberíamos eliminarlo?</string>
     <string name="confirm_delete_many">¿Realmente quieres eliminarlos?</string>
     <string name="enter_new_name">Introduzca un nombre nuevo:</string>
@@ -162,7 +162,7 @@
     <string name="cut_file_failed_many">Archivos no movidos</string>
     <string name="pasting_done">Pegado</string>
     <string name="copy_done">Copiado</string>
-    <string name="copy_canceled">Copia cancelada</string>
+    <string name="copy_canceled">Copiar cancelado</string>
     <string name="cut_done">Cortado</string>
     <string name="cut_canceled">Cortar cancelado</string>
     <string name="delete_done">Eliminado correctamente</string>
@@ -195,7 +195,7 @@
     <string name="shortcut_created">Se ha creado el acceso directo %1$s</string>
     <string name="one_shortcut_removed">Acceso directo eliminado</string>
     <string name="n_shortcut_removed">%1$d accesos directos eliminados</string>
-    <string name="server_not_available" comment="deprecated">El servidor no está disponible actualmente</string>
+    <string name="server_not_available" comment="deprecated">Servidor no disponible actualmente</string>
     <string name="server_not_available_2" comment="deprecated">%1$s no está disponible actualmente</string>
     <string name="cannot_open_shortcut">El contenido de este acceso directo no está disponible actualmente.\nCompruebe que tiene los permisos requeridos.</string>
     <string name="network_shortcuts">Accesos directos de red</string>
@@ -219,7 +219,7 @@
     <string name="zip_compressing_canceled">Compresión cancelada</string>
     <string name="zip_extracting_many">%1$d/%2$d archivos extraídos</string>
     <string name="zip_extracting_one">Extrayendo un archivo (%1$s/%2$s)</string>
-    <string name="zip_extract_error_message">Se ha producido un error mientras se extraía el archivo.\nPuede que el archivo esté dañado o que no haya espacio suficiente en el disco.</string>
+    <string name="zip_extract_error_message">Se ha producido un error mientras se extraía el archivo.\nPuede que el archivo esté dañado o que no haya espacio suficiente en disco.</string>
     <string name="zip_extract_canceled">Extracción cancelada</string>
     <string name="zip_compress_error_message">Se ha producido un error mientras se creaba el archivo.\nPuede que no haya espacio suficiente en el disco.</string>
     <string name="zip_cannot_open_inner_entry">No se puede abrir un archivo dentro de otro comprimido. Extraígalo primero.</string>
