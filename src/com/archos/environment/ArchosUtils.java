@@ -36,29 +36,6 @@ public final class ArchosUtils {
 
     private static Context globalContext;
 
-    @SuppressWarnings("unused")
-    public static void ArchosRKDeviceOnlyBarrier(final Activity activity) {
-    	if (!Build.MANUFACTURER.equals("archos") ||
-    			(!Build.MODEL.equals("ARCHOS 80XSK") &&
-    					!Build.MODEL.equals("A70GT")))  {
-    		AlertDialog alertDialog = new AlertDialog.Builder(activity).setTitle("Error")
-    				.setMessage("This application in not authorized on this device.")
-    				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-    					public void onClick(DialogInterface dialog, int which) {
-    						activity.finish();
-    					}
-    				}).create();
-    		alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-    			public void onDismiss(DialogInterface dialog) {
-    				activity.finish();
-    			}
-    		});
-    		alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
-    		alertDialog.setCancelable(false);
-    		alertDialog.show();
-    	}
-    }
-
     public static boolean isNetworkConnected(Context context) {
         // Check network status
         boolean networkEnabled = false;
