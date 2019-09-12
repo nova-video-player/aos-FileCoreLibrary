@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@ package com.archos.filecorelibrary.jcifs;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
@@ -24,13 +26,17 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import java.net.MalformedURLException;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
+import jcifs.CIFSContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbAuthException;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
 
 public class JcifsFile2 extends MetaFile2 {
 
     private static final long serialVersionUID = 2L;
+    private static final String TAG = "JcifsFile2";
+    private static final boolean DBG = true;
 
     private String mName;
     private boolean mIsDirectory;
@@ -45,19 +51,31 @@ public class JcifsFile2 extends MetaFile2 {
      * SmbFile argument must contain already valid data (name, size, etc.)
      * because this method won't make any network call
      */
-    public JcifsFile2(SmbFile file) {
+    public JcifsFile2(SmbFile file) throws SmbException {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null");
         }
         // Only use methods doing no network access here
         mUriString = file.getCanonicalPath();
         String name  = file.getName();
-        mIsDirectory = file.isDirectory_noquery();
-        mIsFile = file.isFile_noquery();
-        mLastModified = file.lastModified_noquery();
-        mCanRead = file.canRead_nonetwork();
-        mCanWrite = file.canWrite_nonetwork();
-        mLength = file.length_noNetwork();
+        mIsDirectory = file.isDirectory();
+        mIsFile = file.isFile();
+        mLastModified = file.lastModified();
+        if (DBG) Log.d(TAG,file.getPath());
+
+        mCanRead = false;
+        mCanWrite = false;
+        mLength = 0;
+        try {
+            mCanRead = file.canRead();
+            mCanWrite = file.canWrite();
+            mLength = file.length();
+        } catch ( SmbAuthException e ) {
+            //Log.e(TAG," SmbAuthException on " + file.getPath(), e);
+            Log.d(TAG," SmbAuthException on " + file.getPath());
+        } catch ( SmbException e ) {
+            Log.d(TAG," SmbException on " + file.getPath());
+        }
 
         // remove the '/' at the end of directory name (Jcifs adds it)
         if (mIsDirectory && name.endsWith("/")) {
@@ -76,12 +94,15 @@ public class JcifsFile2 extends MetaFile2 {
         // Create the SmbFile instance
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         SmbFile file;
-        if(cred!=null) {
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",cred.getUsername(), cred.getPassword());
-            file = new SmbFile(uri.toString(), auth);
-        }
+
+        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
+        NtlmPasswordAuthenticator auth = null;
+        if(cred!=null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
         else
-            file = new SmbFile(uri.toString());
+            auth = new NtlmPasswordAuthenticator("","GUEST", "");
+        file = new SmbFile(uri.toString(), context.withCredentials(auth));
+
         // Using the methods doing network access to get the actual data
         mUriString = file.getCanonicalPath();
         String name  = file.getName();

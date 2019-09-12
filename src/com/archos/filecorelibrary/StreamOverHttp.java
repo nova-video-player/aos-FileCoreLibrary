@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import jcifs2.util.transport.TransportException;
+import jcifs.util.transport.TransportException;
 
 /**
  * This is simple HTTP local server for streaming InputStream to apps which are capable to read data from url.

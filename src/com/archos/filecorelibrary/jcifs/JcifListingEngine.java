@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +29,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbAuthException;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
-import jcifs2.smb.SmbFileFilter;
+import jcifs.CIFSContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbAuthException;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileFilter;
 
 
 /**
@@ -43,6 +45,7 @@ import jcifs2.smb.SmbFileFilter;
 public class JcifListingEngine extends ListingEngine {
 
     private final static String TAG = "JcifListingEngine";
+    private static final boolean DBG = true;
 
     final private Uri mUri;
     final private JcifListingThread mListingThread;
@@ -55,6 +58,7 @@ public class JcifListingEngine extends ListingEngine {
         else mUri = uri;
         mListingThread = new JcifListingThread();
     }
+
 
     @Override
     public void start() {
@@ -84,16 +88,21 @@ public class JcifListingEngine extends ListingEngine {
         @Override
         public boolean accept(SmbFile f) {
             final String filename = f.getName();
-            if (f.isFile_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
-                return keepFile(filename);
+            try {
+                if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
+                    return keepFile(filename);
+                }
+                else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
+                    return keepDirectory(filename);
+                }
+                else {
+                    if (DBG) Log.d(TAG, "neither file nor directory: "+filename);
+                    return false;
+                }
+            } catch (SmbException e) {
+                Log.e(TAG, "SmbException: ", e);
             }
-            else if (f.isDirectory_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
-                return keepDirectory(filename);
-            }
-            else {
-                Log.d(TAG, "neither file nor directory: "+filename);
-                return false;
-            }
+            return false;
         }
     };
 
@@ -104,13 +113,13 @@ public class JcifListingEngine extends ListingEngine {
                 Log.d(TAG, "listFiles for:"+mUri.toString());
                 NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
                 SmbFile[] listFiles;
-                if (cred != null) {
-                    NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("", cred.getUsername(), cred.getPassword());
-                    listFiles = new SmbFile(mUri.toString(), auth).listFiles(mFileFilter);
-                }
-                else {
-                    listFiles = new SmbFile(mUri.toString()).listFiles(mFileFilter);
-                }
+                CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
+                NtlmPasswordAuthenticator auth = null;
+                if(cred!=null)
+                    auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+                else
+                    auth = new NtlmPasswordAuthenticator("","GUEST", "");
+                listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles(mFileFilter);
 
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
@@ -142,10 +151,10 @@ public class JcifListingEngine extends ListingEngine {
                 final ArrayList<JcifsFile2> directories = new ArrayList<>();
                 final ArrayList<JcifsFile2> files = new ArrayList<>();
                 for (SmbFile f : listFiles) {
-                    if (f.isFile_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
+                    if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
                         files.add(new JcifsFile2(f));
                     }
-                    else if (f.isDirectory_noquery()) { // IMPORTANT: call the _noquery version to avoid network access
+                    else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
                         directories.add(new JcifsFile2(f));
                     }
                 }
@@ -180,7 +189,7 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final SmbAuthException e) {
-                Log.d(TAG, "JcifListingThread: SmbAuthException", e);
+                Log.e(TAG, "JcifListingThread: SmbAuthException", e);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -191,7 +200,7 @@ public class JcifListingEngine extends ListingEngine {
             }
             catch (final SmbException e) {
                 ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
-                if (e.getRootCause() instanceof UnknownHostException) {
+                if (e.getCause() instanceof UnknownHostException) {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;

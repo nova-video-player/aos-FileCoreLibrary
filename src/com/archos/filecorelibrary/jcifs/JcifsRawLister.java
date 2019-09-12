@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +16,7 @@
 package com.archos.filecorelibrary.jcifs;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
@@ -24,9 +26,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
+import jcifs.CIFSContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
 
 
 /**
@@ -35,6 +38,10 @@ import jcifs2.smb.SmbFile;
  *
  */
 public class JcifsRawLister extends RawLister {
+
+    private final static String TAG = "JcifsRawLister";
+    private final static boolean DBG = true;
+
     public JcifsRawLister(Uri uri) {
         super(uri);
     }
@@ -42,16 +49,21 @@ public class JcifsRawLister extends RawLister {
     public List<MetaFile2> getFileList() throws SmbException, MalformedURLException{
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
         SmbFile[] listFiles;
-        if(cred!=null){
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",cred.getUsername(), cred.getPassword());
-            listFiles = new SmbFile(mUri.toString(), auth).listFiles();
-        }
+        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
+        NtlmPasswordAuthenticator auth = null;
+        if(cred!=null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
         else
-            listFiles = new SmbFile(mUri.toString()).listFiles();
+            auth = new NtlmPasswordAuthenticator("", "GUEST", "");
+        listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles();
         if(listFiles!=null){
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
-                files.add(new JcifsFile2(f));
+                // better verify that it is a file or directory before adding
+                if(f.isFile() || f.isDirectory()) {
+                    if (DBG) Log.d(TAG, " found " + f.getPath());
+                    files.add(new JcifsFile2(f));
+                }
             }
             return files;
         }

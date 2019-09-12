@@ -1,4 +1,5 @@
 // Copyright 2017 Archos SA
+// Copyright 2019 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,19 +21,24 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
-import jcifs2.smb.NtlmPasswordAuthentication;
-import jcifs2.smb.SmbException;
-import jcifs2.smb.SmbFile;
-import jcifs2.smb.SmbFileInputStream;
-import jcifs2.smb.SmbFileOutputStream;
-import jcifs2.smb.SmbRandomAccessFile;
+import jcifs.CIFSContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbFileOutputStream;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import android.net.Uri;
+import android.util.Log;
 
 public class JcifsFileEditor extends FileEditor{
+
+    private static final String TAG = "JcifsFileEditor";
+    private static final boolean DBG = true;
+
 
     public JcifsFileEditor(Uri uri) {
         super(uri);
@@ -48,10 +54,8 @@ public class JcifsFileEditor extends FileEditor{
         try {
             getSmbFile(mUri).mkdir();
             return true;
-        } catch (SmbException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        } catch (SmbException | MalformedURLException e) {
+            Log.e(TAG, "SmbException or MalformedURLException: ", e);
         }
         return false;
     }
@@ -64,9 +68,8 @@ public class JcifsFileEditor extends FileEditor{
     @Override
     public InputStream getInputStream(long from) throws Exception {
 
-
-        InputStream is = new SmbRandomAccessFile(getSmbFile(mUri), "r");
-        ((SmbRandomAccessFile)is).seek(from);
+        InputStream is = new SmbFileInputStream(getSmbFile(mUri));
+        is.skip(from);
         return is;
     }
 
@@ -94,10 +97,8 @@ public class JcifsFileEditor extends FileEditor{
                 }
             }
         }
-        catch (SmbException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        catch (SmbException | MalformedURLException e) {
+            Log.e(TAG, "SmbException or MalformedURLException: ", e);
         }
         return false;
     }
@@ -105,14 +106,14 @@ public class JcifsFileEditor extends FileEditor{
     private SmbFile getSmbFile(Uri uri) throws MalformedURLException {
 
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        SmbFile smbfile;
-        if(cred!=null){
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",cred.getUsername(), cred.getPassword());
-            smbfile= new SmbFile(uri.toString(),auth);
-        }
-        else {
-            smbfile= new SmbFile(uri.toString());
-        }
+        SmbFile smbfile = null;
+        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
+        NtlmPasswordAuthenticator auth = null;
+        if(cred!=null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+        else
+            auth = new NtlmPasswordAuthenticator("","GUEST", "");
+        smbfile= new SmbFile(uri.toString(), context.withCredentials(auth));
         return smbfile;
 
     }
@@ -128,10 +129,8 @@ public class JcifsFileEditor extends FileEditor{
             SmbFile sf = getSmbFile(mUri);
             if(sf!=null)
                 return sf.exists();
-        } catch (SmbException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        } catch (SmbException | MalformedURLException e) {
+            Log.e(TAG, "SmbException or MalformedURLException: ", e);
         }
         return false;
     }
