@@ -74,7 +74,7 @@ android {
 }
 
 dependencies {
-    api files('libs/jcifs-ng-2.1.3-SNAPSHOT.jar')
+    api files('libs/jcifs-ng.jar')
     // jcifs-ng depends on bouncycastle (automated when using maven repo)
     api  'org.bouncycastle:bcprov-jdk15on:1.61'
     //api 'eu.agno3.jcifs:jcifs-ng:2.0.4'
