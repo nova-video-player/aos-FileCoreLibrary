@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -82,7 +83,10 @@ public class WiFiDirectSenderActivity extends ListActivity {
         }
         TextView tv = (TextView) (findViewById(android.R.id.empty));
         String text = String.format(getString(R.string.empty_message), getString(R.string.receive_p2p_here));
-        tv.setText(Html.fromHtml(text));
+        if (Build.VERSION.SDK_INT >= 24)
+            tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
+        else
+            tv.setText(Html.fromHtml(text));
         progressDialog = null;
     }
 
