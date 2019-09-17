@@ -27,7 +27,7 @@
     <string name="samba_settings_title">Ajustes de pastas compartilhadas</string>
     <string name="samba_settings_summary">Configurar nomes de usuário e senhas para acessar pastas compartilhadas na sua rede privada</string>
     <string name="samba_profiles">Perfis de pastas compartilhadas</string>
-    <string name="samba_delete_settings">Você realmente quer apagar esse ajuste?</string>
+    <string name="samba_delete_settings">Você deseja realmente apagar esse ajuste?</string>
     <string name="samba_add_server">Adicionar um servidor</string>
     <string name="samba_server">Definir um servidor</string>
     <string name="samba_share">Definir um compartilhamento</string>
