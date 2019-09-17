@@ -20,6 +20,7 @@ import com.archos.filecorelibrary.MetaFile.FileType;
 import com.archos.filecorelibrary.samba.SambaConfiguration;
 import com.archos.environment.ArchosUtils;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -31,11 +32,11 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.NetworkOnMainThreadException;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
+import android.view.WindowManager;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -741,10 +742,7 @@ public class FileManagerCore extends Observable {
             mCopyPatternLeft = " (" + mFileCopyString + " ";
             mCopyPatternRight = ")";
 
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
-                    | PowerManager.ON_AFTER_RELEASE, "FileManagerCore");
-            wl.acquire();
+            ((Activity) context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             if (cleanRelatives){
                 addRelatives();
             }
@@ -815,7 +813,7 @@ public class FileManagerCore extends Observable {
                 else
                     mHandler.sendEmptyMessage(PASTING_CANCELLED);
             }
-            wl.release();
+            ((Activity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
         private void addRelatives() {
             MetaFile[] allDir = null;
