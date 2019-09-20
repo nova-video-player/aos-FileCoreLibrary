@@ -17,8 +17,8 @@ allprojects {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     sourceSets {
         main {
@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
     }
 
     task ndkBuild(type:Exec) {
@@ -79,7 +79,7 @@ dependencies {
     api  'org.bouncycastle:bcprov-jdk15on:1.61'
     //api 'eu.agno3.jcifs:jcifs-ng:2.0.4'
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.preference:preference:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.preference:preference:1.1.0'
     implementation 'com.linkedin.dexmaker:dexmaker:2.12.1'
 }
