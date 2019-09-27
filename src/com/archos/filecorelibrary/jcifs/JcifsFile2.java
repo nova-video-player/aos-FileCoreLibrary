@@ -36,7 +36,7 @@ public class JcifsFile2 extends MetaFile2 {
 
     private static final long serialVersionUID = 2L;
     private static final String TAG = "JcifsFile2";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private String mName;
     private boolean mIsDirectory;
