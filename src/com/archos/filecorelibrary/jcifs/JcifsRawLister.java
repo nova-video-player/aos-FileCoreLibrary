@@ -40,7 +40,7 @@ import jcifs.smb.SmbFile;
 public class JcifsRawLister extends RawLister {
 
     private final static String TAG = "JcifsRawLister";
-    private final static boolean DBG = true;
+    private final static boolean DBG = false;
 
     public JcifsRawLister(Uri uri) {
         super(uri);
