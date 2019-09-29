@@ -48,6 +48,8 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
         // disable dfs makes win10 shares with ms account work
         prop.put("jcifs.smb.client.dfs.disabled", "true");
+        // make Guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186
+        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "false");
 
         PropertyConfiguration propertyConfiguration = null;
         try {
