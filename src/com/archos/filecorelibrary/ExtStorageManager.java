@@ -256,15 +256,15 @@ public class ExtStorageManager {
     }
 
     public List<String> getExtSdcards() {
-        return volumesMap.get(ExtStorageType.SDCARD);
+        return copyOf(volumesMap.get(ExtStorageType.SDCARD));
     }
 
     public List<String> getExtUsbStorages() {
-        return volumesMap.get(ExtStorageType.USBHOST);
+        return copyOf(volumesMap.get(ExtStorageType.USBHOST));
     }
 
     public List<String> getExtOtherStorages() {
-        return volumesMap.get(ExtStorageType.OTHER);
+        return copyOf(volumesMap.get(ExtStorageType.OTHER));
     }
 
     /**
@@ -304,5 +304,12 @@ public class ExtStorageManager {
         } catch (Exception e) {
             return Environment.MEDIA_REMOVED;
         }
+    }
+
+    /** Creates a copy of a list */
+    private static List<String> copyOf(List<String> list) {
+        if (list == null)
+            return null;
+        return new ArrayList<>(list);
     }
 }
