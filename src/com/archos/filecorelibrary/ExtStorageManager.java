@@ -34,6 +34,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by noury on 22/06/15.
@@ -60,9 +61,9 @@ public class ExtStorageManager {
     private static Map<String, String> volumesIdMap = new HashMap<>();
 
     static {
-        volumesMap.put(ExtStorageType.SDCARD, new ArrayList<String>(1));
-        volumesMap.put(ExtStorageType.USBHOST, new ArrayList<String>(4));
-        volumesMap.put(ExtStorageType.OTHER, new ArrayList<String>(2));
+        volumesMap.put(ExtStorageType.SDCARD, new CopyOnWriteArrayList<String>());
+        volumesMap.put(ExtStorageType.USBHOST, new CopyOnWriteArrayList<String>());
+        volumesMap.put(ExtStorageType.OTHER, new CopyOnWriteArrayList<String>());
     }
 
     private static final File EXTERNAL_STORAGE_USBHOST_PTP_DIRECTORY = new File("/mnt/ext_camera");
