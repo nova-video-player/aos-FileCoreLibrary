@@ -39,6 +39,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +81,7 @@ public class WiFiDirectSenderActivity extends ListActivity {
         if (getIntent().hasExtra(Intent.EXTRA_STREAM)){
             filePath = Utils.getPathFromUri(getIntent(), this);
             serviceIntent.putExtra("path", filePath);
-            startService(serviceIntent);
+            ContextCompat.startForegroundService(this, serviceIntent);
         }
         TextView tv = (TextView) (findViewById(android.R.id.empty));
         String text = String.format(getString(R.string.empty_message), getString(R.string.receive_p2p_here));
