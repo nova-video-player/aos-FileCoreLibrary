@@ -31,8 +31,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
 import java.util.List;
 
 public class WiFiDirectReceiverActivity extends Activity{
@@ -55,7 +53,7 @@ public class WiFiDirectReceiverActivity extends Activity{
             path = Environment.getExternalStorageDirectory().getPath().concat("/").concat(Environment.DIRECTORY_DOWNLOADS);
         serviceIntent.putExtra("client", false);
         serviceIntent.putExtra("path", path);
-        ContextCompat.startForegroundService(this, serviceIntent);
+        startService(serviceIntent);
         progressDialog = null;
     }
 
