@@ -78,7 +78,6 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
     public static final String TAG = "wifidirect";
     private static final int SOCKET_TIMEOUT = 5000;
     public static final int BUFFER_SIZE = 300;
-    public static final int NOTIFICATION_ID = 42;
     WifiLock mWiFiLock;
     public static final String ACTION_CONNECT = "com.archos.wifidirect.CONNECT";
     public static final String ACTION_SEND_FILE = "com.archos.wifidirect.SEND_FILE";
@@ -89,8 +88,6 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
     public static final int OWNER_PORT = 8988;
     Handler mHandler;
     //volatile Builder notificationBuilder;
-    private NotificationCompat.Builder notificationBuilder = null;
-    NotificationManager notificationManager;
     private long mProgress = 0;
     private int percent = 0;
     private boolean uploading = false;
@@ -108,11 +105,34 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
     static ServerSocket serverSocket = null;
     private String path;
 
+    public static final int NOTIFICATION_ID = 42;
+    private NotificationManager nm;
+    private NotificationCompat.Builder nb;
+    private static final String notifChannelId = "FileTransferService_id";
+    private static final String notifChannelName = "FileTransferService";
+    private static final String notifChannelDescr = "FileTransferService";
+
     final RemoteCallbackList<IFileTransferServiceCallback> mCallbacks
             = new RemoteCallbackList<IFileTransferServiceCallback>();
 
     public void onCreate(){
         super.onCreate();
+
+        // need to do that early to avoid ANR on Android 26+
+        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel nc = new NotificationChannel(notifChannelId, notifChannelName,
+                    nm.IMPORTANCE_LOW);
+            nc.setDescription(notifChannelDescr);
+            if (nm != null)
+                nm.createNotificationChannel(nc);
+        }
+        nb = new NotificationCompat.Builder(this, notifChannelId)
+                .setSmallIcon(R.drawable.ic_wifip2p)
+                .setContentText("")
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setTicker(null).setOnlyAlertOnce(true).setOngoing(true).setAutoCancel(true);
+        startForeground(NOTIFICATION_ID, nb.build());
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
@@ -125,8 +145,6 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
 
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWiFiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL , "WiFiDirectLock");
-
-
 
         mHandler = new Handler();
         registerReceiver(mReceiver, mIntentFilter);
@@ -145,32 +163,16 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
 //        mManager.enableP2p(mChannel);
     }
 
-    private static final String notifChannelId = "FileTransferService_id";
-    private static final String notifChannelName = "FileTransferService";
-    private static final String notifChannelDescr = "FileTransferService";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        notificationManager = (NotificationManager) getApplicationContext().getSystemService(
-                Context.NOTIFICATION_SERVICE);
-        // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel mNotifChannel = new NotificationChannel(notifChannelId, notifChannelName,
-                    notificationManager.IMPORTANCE_LOW);
-            mNotifChannel.setDescription(notifChannelDescr);
-            if (notificationManager != null)
-                notificationManager.createNotificationChannel(mNotifChannel);
-        }
+
         // configure the notification
-        notificationBuilder = new NotificationCompat.Builder(this, notifChannelId);
         contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.notification_progress);
         contentView.setImageViewResource(R.id.image, R.drawable.ic_wifip2p);
         contentView.setTextViewText(R.id.title, "Waiting for connection to download");
         contentView.setProgressBar(R.id.status_progress, 100, 0, false);
-        notificationBuilder.setContent(contentView);
-        notificationBuilder.setSmallIcon(R.drawable.ic_wifip2p);
-        notificationBuilder.setOngoing(true).setPriority(NotificationCompat.PRIORITY_LOW);
-        notificationBuilder.setTicker("WiFi Direct service started");
-        notificationBuilder.setOnlyAlertOnce(true);
+        nb.setContent(contentView);
+        nb.setTicker("WiFi Direct service started");
 
         Intent i = new Intent(Intent.ACTION_MAIN);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -182,17 +184,17 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
         i.setComponent(new ComponentName("com.archos.wifidirect",
                 client ? "com.archos.wifidirect.WiFiDirectSenderActivity" : "com.archos.wifidirect.WiFiDirectReceiverActivity"));
         PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(pi);
+        nb.setContentIntent(pi);
 
         //To not be killed
-        startForeground(NOTIFICATION_ID, notificationBuilder.build());
+        //startForeground(NOTIFICATION_ID, nb.build());
         return START_STICKY;
     }
 
     /* unregister the broadcast receiver */
     @Override
     public void onDestroy() {
-        notificationManager.cancel(NOTIFICATION_ID);
+        nm.cancel(NOTIFICATION_ID);
         super.onDestroy();
         mManager.removeGroup(mChannel, this);
         mManager.cancelConnect(mChannel, this);
@@ -425,7 +427,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
                 public void run() {
                     long oldId = Binder.clearCallingIdentity();
                     contentView.setProgressBar(R.id.status_progress, 100, percent, false);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                    nm.notify(NOTIFICATION_ID, nb.build());
                     Binder.restoreCallingIdentity(oldId);
                     //Remote progressDialog update
                     final int N = mCallbacks.beginBroadcast();
@@ -445,7 +447,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
         mHandler.post(new Runnable() {
             public void run() {
                 long oldId = Binder.clearCallingIdentity();
-                notificationManager.cancel(NOTIFICATION_ID);
+                nm.cancel(NOTIFICATION_ID);
                 Binder.restoreCallingIdentity(oldId);
                 }
         });
@@ -456,7 +458,7 @@ public class FileTransferService extends Service implements WiFiDirectBroadcastL
             public void run() {
                 long oldId = Binder.clearCallingIdentity();
                 contentView.setTextViewText(R.id.title, "Download in progress");
-                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                nm.notify(NOTIFICATION_ID, nb.build());
                 Binder.restoreCallingIdentity(oldId);
                 }
         });
