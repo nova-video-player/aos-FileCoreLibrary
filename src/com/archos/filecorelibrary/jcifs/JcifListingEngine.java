@@ -45,7 +45,7 @@ import jcifs.smb.SmbFileFilter;
 public class JcifListingEngine extends ListingEngine {
 
     private final static String TAG = "JcifListingEngine";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     final private Uri mUri;
     final private JcifListingThread mListingThread;
