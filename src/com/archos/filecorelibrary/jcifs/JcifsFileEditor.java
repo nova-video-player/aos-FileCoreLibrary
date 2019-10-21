@@ -37,7 +37,7 @@ import android.util.Log;
 public class JcifsFileEditor extends FileEditor{
 
     private static final String TAG = "JcifsFileEditor";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
 
     public JcifsFileEditor(Uri uri) {
