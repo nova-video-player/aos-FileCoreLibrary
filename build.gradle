@@ -78,4 +78,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'com.linkedin.dexmaker:dexmaker:2.12.1'
+    implementation 'commons-net:commons-net:3.6'
 }
