@@ -20,6 +20,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import com.archos.filecorelibrary.ExtStorageManager;
 import com.archos.filecorelibrary.FileEditor;
@@ -41,6 +44,9 @@ import java.util.List;
 
 public class LocalStorageFileEditor extends FileEditor {
     private final Context mContext;
+
+    private static final String TAG = "LocalStorageFileEditor";
+    private static final boolean DBG = false;
 
     private static final String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath();
     private static final String USBHOST_PTP_PATH = ExtStorageManager.getExternalStorageUsbHostPtpDirectory().getPath();
@@ -159,10 +165,13 @@ public class LocalStorageFileEditor extends FileEditor {
             // when some folders are protected
             throw new DeleteFailException();
         }
+        // TODO: does not work on usb external storage on recent Android
         File fileToDelete = new File(mUri.getPath());
         if (fileToDelete.isDirectory()) {
+            if (DBG) Log.d(TAG, "delete: folder " + mUri.getPath());
             deleteFolder(mUri);
         } else {
+            if (DBG) Log.d(TAG, "delete: file " + mUri.getPath());
             deleteFile(fileToDelete);
         }
     }
@@ -221,9 +230,11 @@ public class LocalStorageFileEditor extends FileEditor {
         Uri uri = MediaStore.Files.getContentUri("external");
         String where = MediaStore.MediaColumns.DATA + "=?";
         String[] selectionArgs = { mUri.getPath() };
+        if (DBG) Log.d(TAG, "deleteFileAndDatabase: where " + where + ", selectionArgs " + selectionArgs);
         cr.delete(uri, where, selectionArgs);
         boolean delete = false;
         try {
+            // TODO: does not work on external usb storage on recent Android
             delete();
             delete = true;
         } catch (Exception e) {}

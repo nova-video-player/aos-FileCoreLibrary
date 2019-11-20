@@ -82,6 +82,7 @@ public class ExternalSDFileWriter {
             // though it is not.
             ContentValues values = new ContentValues();
             values.put(MediaStore.Files.FileColumns.DATA, file.getAbsolutePath());
+            // TODO: leads to a crash on external usb storage on recent Android
             contentResolver.insert(imagesUri, values);
 
             // Delete the created entry, such that content provider will delete the file.
