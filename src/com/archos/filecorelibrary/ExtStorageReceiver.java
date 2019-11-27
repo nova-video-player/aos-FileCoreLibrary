@@ -105,14 +105,10 @@ public class ExtStorageReceiver extends BroadcastReceiver {
             case UsbManager.ACTION_USB_DEVICE_DETACHED:
                 if (intent.hasExtra(UsbManager.EXTRA_DEVICE)) {
                     final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    UsbInterface usbInterface = device.getInterface(0);
-                    path = device.getDeviceName();
-                    if(usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
-                        Log.d(TAG, "USB mass storage " + path + " removed");
-                        intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
-                        intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                        context.sendBroadcast(intentManager);
-                    }
+                    Log.d(TAG, "USB device " + device + " detached");
+                    intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
+                    intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+                    context.sendBroadcast(intentManager);
                 }
                 break;
         }
