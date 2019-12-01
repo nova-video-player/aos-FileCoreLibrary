@@ -35,7 +35,7 @@ import static com.archos.filecorelibrary.FileUtils.intentToString;
 
 public class ExtStorageReceiver extends BroadcastReceiver {
     private static final String TAG = "ExtStorageReceiver";
-    private static boolean DBG = false;
+    private static boolean DBG = true;
     public static final String ACTION_MEDIA_MOUNTED  = "com.archos.action.MEDIA_MOUNTED";
     public static final String ACTION_MEDIA_UNMOUNTED = "com.archos.action.MEDIA_UNMOUNTED";
     public static final String VALUE_PATH_NONE = "none";
@@ -87,28 +87,43 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                 break;
             // more clever stuff could be done when detecting USB device attached but for now we only throw logs
             case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                // TODO: find which StorageVolume from UsbDevice to simplify. Not sure it is possible
                 if (intent.hasExtra(UsbManager.EXTRA_DEVICE)) {
                     final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    UsbInterface usbInterface = device.getInterface(0);
-                    path = device.getDeviceName();
-                    if(usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
-                        Log.d(TAG, "USB mass storage " + path + " attached");
-                        intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
+                    boolean isMassStorage = false;
+                    // sometimes there device.getInterfaceCount() = 0 causing an error
+                    for (int i = 0; i < device.getInterfaceCount(); i++) {
+                        final UsbInterface usbInterface = device.getInterface(i);
+                        path = device.getDeviceName();
+                        if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
+                            if (DBG) Log.d(TAG, "USB mass storage " + path + " attached");
+                            isMassStorage = true;
+                        }
+                    }
+                    if (isMassStorage) {
+                        intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(ARCHOS_FILE_SCHEME + "://none"));
                         intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
                         //SystemClock.sleep(WAIT_FOR_MOUNT_MS); // wait in order to get the device mounted (for sdcard on pixel you do not get MEDIA_MOUNTED intent)
                         context.sendBroadcast(intentManager);
-                        break;
                     }
                 }
                 break;
             case UsbManager.ACTION_USB_DEVICE_DETACHED:
                 if (intent.hasExtra(UsbManager.EXTRA_DEVICE)) {
                     final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    Log.d(TAG, "USB device " + device + " detached");
-                    intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
-                    intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                    context.sendBroadcast(intentManager);
+                    boolean isMassStorage = false;
+                    for (int i = 0; i < device.getInterfaceCount(); i++) {
+                        final UsbInterface usbInterface = device.getInterface(i);
+                        path = device.getDeviceName();
+                        if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
+                            if (DBG) Log.d(TAG, "USB mass storage " + path + " detached");
+                            isMassStorage = true;
+                        }
+                    }
+                    if (isMassStorage) {
+                        intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
+                        intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+                        context.sendBroadcast(intentManager);
+                    }
                 }
                 break;
         }
