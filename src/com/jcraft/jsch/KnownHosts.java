@@ -1,6 +1,6 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /*
-Copyright (c) 2002-2018 ymnk, JCraft,Inc. All rights reserved.
+Copyright (c) 2002-2014 ymnk, JCraft,Inc. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,12 @@ public
 class KnownHosts implements HostKeyRepository{
   private static final String _known_hosts="known_hosts";
 
+  /*
+  static final int SSHDSS=0;
+  static final int SSHRSA=1;
+  static final int UNKNOWN=2;
+  */
+
   private JSch jsch=null;
   private String known_hosts=null;
   private java.util.Vector pool=null;
@@ -44,7 +50,6 @@ class KnownHosts implements HostKeyRepository{
   KnownHosts(JSch jsch){
     super();
     this.jsch=jsch;
-    this.hmacsha1 = getHMACSHA1();
     pool=new java.util.Vector();
   }
 
@@ -55,7 +60,7 @@ class KnownHosts implements HostKeyRepository{
       setKnownHosts(fis);
     }
     catch(FileNotFoundException e){
-      // The non-existing file should be allowed.
+      throw new JSchException(e.toString(), (Throwable)e);
     } 
   }
   void setKnownHosts(InputStream input) throws JSchException{
@@ -154,10 +159,8 @@ loop:
           if(i==0x20 || i=='\t'){ break; }
           sb.append((char)i);
 	}
-	String tmp = sb.toString();
-	if(HostKey.name2type(tmp)!=HostKey.UNKNOWN){
-	  type=HostKey.name2type(tmp);
-	}
+	if(sb.toString().equals("ssh-dss")){ type=HostKey.SSHDSS; }
+	else if(sb.toString().equals("ssh-rsa")){ type=HostKey.SSHRSA; }
 	else { j=bufl; }
 	if(j>=bufl){
 	  addInvalidLine(Util.byte2str(buf, 0, bufl));
@@ -252,19 +255,14 @@ loop:
       return result;
     }
 
-    HostKey hk = null;
-    try {
-      hk = new HostKey(host, HostKey.GUESS, key);
-    }
-    catch(JSchException e){  // unsupported key
-      return result;
-    }
+    int type=getType(key);
+    HostKey hk;
 
     synchronized(pool){
       for(int i=0; i<pool.size(); i++){
-        HostKey _hk=(HostKey)(pool.elementAt(i));
-        if(_hk.isMatched(host) && _hk.type==hk.type){
-          if(Util.array_equals(_hk.key, key)){
+        hk=(HostKey)(pool.elementAt(i));
+        if(hk.isMatched(host) && hk.type==type){
+          if(Util.array_equals(hk.key, key)){
             return OK;
           }
           else{
@@ -462,7 +460,11 @@ loop:
       System.err.println(e);
     }
   }
-
+  private int getType(byte[] key){
+    if(key[8]=='d') return HostKey.SSHDSS;
+    if(key[8]=='r') return HostKey.SSHRSA;
+    return HostKey.UNKNOWN;
+  }
   private String deleteSubString(String hosts, String host){
     int i=0;
     int hostlen=host.length();
@@ -483,7 +485,7 @@ loop:
     return hosts;
   }
 
-  private MAC getHMACSHA1(){
+  private synchronized MAC getHMACSHA1(){
     if(hmacsha1==null){
       try{
         Class c=Class.forName(jsch.getConfig("hmac-sha1"));
@@ -508,6 +510,7 @@ loop:
     private boolean hashed=false;
     byte[] salt=null;
     byte[] hash=null;
+
 
     HashedHostKey(String host, byte[] key) throws JSchException {
       this(host, GUESS, key);
