@@ -103,7 +103,7 @@ public class SFTPSession {
                 session.disconnect();
                 usedSessions.remove(session);
             }
-        } catch (JSchException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
