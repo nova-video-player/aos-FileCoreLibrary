@@ -3,8 +3,8 @@
 <resources>
     <string name="file_info_label_name">Imię i nazwisko:</string>
     <string name="file_info_label_size">Rozmiar:</string>
-    <string name="file_info_label_size_internal">Wielkość (wewnętrzna):</string>
-    <string name="file_info_label_size_sd">Wielkość (SD):</string>
+    <string name="file_info_label_size_internal">Rozmiar (wewnętrzny):</string>
+    <string name="file_info_label_size_sd">Rozmiar (SD):</string>
     <string name="file_info_label_permission">Uprawnienia:</string>
     <string name="file_info_label_can_read">odczyt</string>
     <string name="file_info_label_cannot_read">brak możliwości odczytu</string>
@@ -12,25 +12,25 @@
     <string name="file_info_label_cannot_write">brak możliwości zapisu</string>
     <string name="file_info_label_last_modified">Ostatnia modyfikacja:</string>
     <string name="file_info_label_mime_type">Typ Mime:</string>
-    <string name="file_info_directory_empty">Folder jest pusty</string>
+    <string name="file_info_directory_empty">Pusty folder</string>
     <string name="file_info_one_directory">1 folder</string>
     <string name="file_info_directories">foldery</string>
     <string name="file_info_one_file">1 plik</string>
     <string name="file_info_files">pliki</string>
     <string name="usbhost_ptp_storage">Zewnętrzna kamera</string>
     <string name="network_media_servers">Serwery mediów (UPnP)</string>
-    <string name="network_shared_folders">Foldery współużytkowane (SMB)</string>
+    <string name="network_shared_folders">Udostępnione foldery (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">kopiuj</string>
     <string name="fast_scroll_numeric_alphabet"> 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
-    <string name="samba_settings_title">Ustawienia folderów współdzielonych</string>
-    <string name="samba_settings_summary">Skonfiguruj nazwy użytkowników i hasła dostępu do folderów współdzielonych w sieci prywatnej</string>
-    <string name="samba_profiles">Profile folderów współdzielonych</string>
+    <string name="samba_settings_title">Ustawienia folderów udostępnionych</string>
+    <string name="samba_settings_summary">Skonfiguruj nazwy użytkowników i hasła dostępu do folderów udostępnionych w sieci prywatnej</string>
+    <string name="samba_profiles">Profile folderów udostępnionych</string>
     <string name="samba_delete_settings">Czy na pewno chcesz usunąć te ustawienia?</string>
     <string name="samba_add_server">Dodaj serwer</string>
-    <string name="samba_server">Określ serwer</string>
-    <string name="samba_share">Określ obszar współdzielony</string>
+    <string name="samba_server">Zdefiniuj serwer</string>
+    <string name="samba_share">Zdefiniuj udostępnianie</string>
     <string name="refresh">Odśwież</string>
     <string name="network_timeout">Przepraszamy, zdalny folder jest niedostępny.\nSprawdź połączenie z internetem i spróbuj ponownie.</string>
     <string name="samba_loading">Proszę czekać, trwa ładowanie foldera współdzielonego…</string>
