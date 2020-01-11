@@ -50,7 +50,7 @@ import com.archos.environment.ArchosUtils;
 public class SambaDiscovery implements InternalDiscoveryListener {
 
     private final static String TAG = "SambaDiscovery";
-    private static boolean DBG = true;
+    private static boolean DBG = false;
 
     static final int SMB_NS_PORT = 137;
     static final int SOCKET_TIMEOUT = 150;
