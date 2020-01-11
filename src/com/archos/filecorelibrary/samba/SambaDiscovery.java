@@ -50,7 +50,7 @@ import com.archos.environment.ArchosUtils;
 public class SambaDiscovery implements InternalDiscoveryListener {
 
     private final static String TAG = "SambaDiscovery";
-    private static boolean DBG = false;
+    private static boolean DBG = true;
 
     static final int SMB_NS_PORT = 137;
     static final int SOCKET_TIMEOUT = 150;
@@ -253,6 +253,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         //reset abort variable
         mIsAborted = false;
         mWorkgroups.clear(); // reset previous results
+
+        if (!ArchosUtils.isLocalNetworkConnected(mContext)) {
+            if (DBG) Log.d(TAG, "start: no localNetworkConnected (eth/wifi), do not start discovery!");
+            return;
+        }
 
         // Tell the listener we are starting discovery
         this.getmUiHandler().post(new Runnable() {
