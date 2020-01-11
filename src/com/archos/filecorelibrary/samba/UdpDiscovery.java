@@ -125,7 +125,8 @@ public class UdpDiscovery implements InternalDiscovery {
                     datagramChannel.socket().bind(null);
                     datagramChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    if (DBG) Log.e(TAG, "doTcpDiscovery: caught IOException", e);
+                    else Log.w(TAG, "doTcpDiscovery: caught IOException");
                 }
             }
 
@@ -136,7 +137,8 @@ public class UdpDiscovery implements InternalDiscovery {
                     try {
                         readyChannels = selector.select(SambaDiscovery.SOCKET_TIMEOUT);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        if (DBG) Log.e(TAG, "doTcpDiscovery: caught IOException", e);
+                        else Log.w(TAG, "doTcpDiscovery: caught IOException");
                     }
                 }
                 if (readyChannels == 0) continue;

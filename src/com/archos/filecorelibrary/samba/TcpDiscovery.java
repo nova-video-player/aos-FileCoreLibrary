@@ -115,7 +115,8 @@ public class TcpDiscovery implements InternalDiscovery {
                 socketChannel.register(selector, SelectionKey.OP_CONNECT);
                 socketChannel.connect(new InetSocketAddress(ip, 445));
             } catch (IOException e) {
-                e.printStackTrace();
+                if (DBG) Log.e(TAG, "doTcpDiscovery: caught IOException", e);
+                else Log.w(TAG, "doTcpDiscovery: caught IOException");
             }
         }
 
