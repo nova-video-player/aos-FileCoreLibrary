@@ -31,8 +31,12 @@ import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import android.net.Uri;
+import android.util.Log;
 
 public class JcifsFileEditor extends FileEditor{
+
+    private final static String TAG = "JcifsFileEditor";
+    private static boolean DBG = false;
 
     public JcifsFileEditor(Uri uri) {
         super(uri);
@@ -49,9 +53,9 @@ public class JcifsFileEditor extends FileEditor{
             getSmbFile(mUri).mkdir();
             return true;
         } catch (SmbException e) {
-            e.printStackTrace();
+            caughtException(e, "SmbException in mkdir");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            caughtException(e, "MalformedURLException in mkdir");
         }
         return false;
     }
@@ -95,9 +99,9 @@ public class JcifsFileEditor extends FileEditor{
             }
         }
         catch (SmbException e) {
-            e.printStackTrace();
+            caughtException(e, "SmbException in rename");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            caughtException(e, "MalformedURLException in rename");
         }
         return false;
     }
@@ -129,11 +133,15 @@ public class JcifsFileEditor extends FileEditor{
             if(sf!=null)
                 return sf.exists();
         } catch (SmbException e) {
-            e.printStackTrace();
+            caughtException(e, "SmbException in exists");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            caughtException(e, "MalformedURLException in exists");
         }
         return false;
     }
 
+    private void caughtException(Throwable e, String exceptionType) {
+        if (DBG) Log.e(TAG, "exists: caught" + exceptionType, e);
+        else Log.w(TAG, "exists: caught "+ exceptionType);
+    }
 }

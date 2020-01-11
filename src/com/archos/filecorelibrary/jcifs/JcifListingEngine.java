@@ -43,6 +43,7 @@ import jcifs2.smb.SmbFileFilter;
 public class JcifListingEngine extends ListingEngine {
 
     private final static String TAG = "JcifListingEngine";
+    private static boolean DBG = false;
 
     final private Uri mUri;
     final private JcifListingThread mListingThread;
@@ -180,7 +181,8 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final SmbAuthException e) {
-                Log.d(TAG, "JcifListingThread: SmbAuthException", e);
+                if (DBG) Log.e(TAG, "JcifListingThread: SmbAuthException", e);
+                else Log.w(TAG, "JcifListingThread: SmbAuthException");
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
