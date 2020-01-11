@@ -50,6 +50,7 @@ import com.archos.environment.ArchosUtils;
 public class SambaDiscovery implements InternalDiscoveryListener {
 
     private final static String TAG = "SambaDiscovery";
+    private static boolean DBG = false;
 
     static final int SMB_NS_PORT = 137;
     static final int SOCKET_TIMEOUT = 150;
@@ -141,7 +142,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                     // When shareName is not null and not empty, we must remove a previous instance
                     // with the same address (but no name because from TCP discovery) to replace it
                     if (shareName != null && !shareName.isEmpty()) {
-                        //Log.d(TAG, "addIfNeeded: removing " + shareAddress);
+                        if (DBG) Log.d(TAG, "addIfNeeded: removing " + shareAddress);
                         shIter.remove();
                     }
                 }
@@ -162,19 +163,19 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         if (workgroup == null) {
             workgroup = new Workgroup(workgroupName);
             mWorkgroups.put(workgroupName, workgroup);
-            //Log.d(TAG, "new workgroup "+workgroup.getName()+" added");
+            if (DBG) Log.d(TAG, "new workgroup "+workgroup.getName()+" added");
         }
 
         // Add the new share
         workgroup.addShare(shareName, shareAddress);
-        //Log.d(TAG, "added share " + shareName + " ; "+shareAddress);
+        if (DBG) Log.d(TAG, "added share " + shareName + " ; "+shareAddress);
         mThereIsAnUpdate = true;
         informListener(false);
     }
 
     @Override
     public void onInternalDiscoveryEnd(InternalDiscovery discovery, boolean aborted) {
-        //Log.d(TAG, "onInternalDiscoveryEnd "+discovery.getClass().getSimpleName()+" aborted="+aborted);
+        if (DBG) Log.d(TAG, "onInternalDiscoveryEnd "+discovery.getClass().getSimpleName()+" aborted="+aborted);
         mInternalDiscoveries.remove(discovery);
 
         // Tell the discovery is over when all the internal discoveries are over
@@ -399,7 +400,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         for(LinkAddress la: las) {
             InetAddress inetAddress = la.getAddress();
             if (inetAddress instanceof Inet4Address) {
-                //Log.d(TAG, lp.getInterfaceName() + ": " + inetAddress.getHostAddress());
+                if (DBG) Log.d(TAG, lp.getInterfaceName() + ": " + inetAddress.getHostAddress());
                 return inetAddress.getHostAddress();
             }
         }
@@ -414,7 +415,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
             NetworkCapabilities np = connMgr.getNetworkCapabilities(n);
             String iname =  lp.getInterfaceName();
             if (iname != null && np != null) {
-                //Log.d(TAG, ">>> " + iname + ": " + np.hasTransport(cap));
+                if (DBG) Log.d(TAG, ">>> " + iname + ": " + np.hasTransport(cap));
                 if (np.hasTransport(cap))
                     return lp;
             }
