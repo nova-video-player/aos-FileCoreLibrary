@@ -69,7 +69,7 @@
     <string name="internal_storage_unified">存储空间</string>
     <string name="sd_card_storage">SD 卡</string>
     <string name="usb_host_storage">USB</string>
-    <string name="other_storage">云端硬盘</string>
+    <string name="other_storage">驱动器</string>
     <string name="usb_ptp_storage">PTP</string>
     <string name="cloud_storage">云端</string>
     <string name="directory_empty">空文件夹</string>
@@ -96,14 +96,14 @@
     <string name="error_file_not_found">找不到文件</string>
     <string name="error_time_out">超时</string>
     <string name="deleting">删除中</string>
-    <string name="deleting_many">%1$d/%2$d 已删除的文件</string>
+    <string name="deleting_many">已删除文件：%1$d/%2$d</string>
     <string name="deleting_one">删除一个文件</string>
     <string name="copying">正在复制&#8230;</string>
-    <string name="moving">移动中&#8230;</string>
+    <string name="moving">正在移动&#8230;</string>
     <string name="open_file">打开文件</string>
     <string name="open_file_after_download">复制完成后打开文件</string>
     <string name="pasting_copy_one">正在复制一个文件 (%1$s/%2$s)</string>
-    <string name="pasting_copy_many">正在复制： %1$d/%2$d 文件 (%3$s/%4$s)</string>
+    <string name="pasting_copy_many">正在复制： %1$d/%2$d 个文件 (%3$s/%4$s)</string>
     <string name="pasting_cut_one">移动一个文件 (%1$s/%2$s)</string>
     <string name="pasting_cut_many">移动： %1$d/%2$d 个文件 (%3$s/%4$s)</string>
     <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
@@ -138,7 +138,7 @@
     <string name="cannot_delete_file">无法删除该文件</string>
     <string name="cannot_delete_files">无法删除文件</string>
     <string name="directory_deleted">文件夹已删除</string>
-    <string name="file_deleted">此文件已删除</string>
+    <string name="file_deleted">文件已删除</string>
     <string name="files_deleted">文件已删除</string>
     <string name="cannot_rename">无法重命名</string>
     <string name="cannot_paste_folder_into_itself">无法复制或移动文件夹到其本身或其本身一个子文件夹</string>
@@ -178,23 +178,23 @@
     <string name="no">"否"</string>
     <string name="share">共享</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
-    <string name="send_file">通过以下方式分享文件：</string>
+    <string name="send_file">通过以下方式共享文件：</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <string name="no_way_to_share_file">没有可用的应用程序来共享文件</string>
     <string name="upnp_not_allowed">您无权访问此 UPNP 服务器。请先更改您的访问配置。</string>
-    <string name="single_mode">单个</string>
-    <string name="double_mode">双面</string>
+    <string name="single_mode">单个模式</string>
+    <string name="double_mode">双面模式</string>
     <string name="swap_panel">交换</string>
     <string name="move">移动</string>
     <!-- Shortcuts -->
-    <string name="shortcuts">快捷键</string>
+    <string name="shortcuts">快捷方式</string>
     <string name="add_to_shortcuts">创建快捷方式</string>
     <string name="remove_from_shortcuts">删除快捷方式</string>
     <string name="shortcut_added" comment="deprecated">快捷方式 \"%s\" 已创建</string>
     <string name="shortcut_removed" comment="deprecated">快捷方式 %s 已删除</string>
     <string name="shortcut_created">快捷方式 \"%1$s\" 已创建</string>
-    <string name="one_shortcut_removed">一个快捷方式已删除</string>
-    <string name="n_shortcut_removed">%1$d 个快捷方式已删除</string>
+    <string name="one_shortcut_removed">已删除 1 个快捷方式</string>
+    <string name="n_shortcut_removed">已删除 %1$d 个快捷方式</string>
     <string name="server_not_available" comment="deprecated">服务器目前不可用</string>
     <string name="server_not_available_2" comment="deprecated">%1$s 目前不可用</string>
     <string name="cannot_open_shortcut">此快捷方式的内容目前不可用。\n请检查您是否拥有所需的权限。</string>
@@ -210,11 +210,11 @@
     <!-- ZIP -->
     <string name="zip_extract_action">解压到这里</string>
     <string name="zip_extract_success_message">解压缩成功</string>
-    <string name="zip_compress_action">压缩为 Zip 存档</string>
-    <string name="zip_extracting_message">正在从 ZIP 归档中提取文件...</string>
-    <string name="zip_compressing_message">压缩文件到 Zip 存档</string>
-    <string name="zip_compressing_many">%1$d/%2$d 压缩文件</string>
-    <string name="zip_compressing_one">压缩一个文件</string>
+    <string name="zip_compress_action">压缩为 Zip 压缩包</string>
+    <string name="zip_extracting_message">正在从 ZIP 压缩包中提取文件...</string>
+    <string name="zip_compressing_message">压缩文件到 Zip 压缩包</string>
+    <string name="zip_compressing_many">已压缩文件：%1$d/%2$d</string>
+    <string name="zip_compressing_one">正在压缩 1 个文件</string>
     <string name="zip_compressing_success">压缩成功</string>
     <string name="zip_compressing_canceled">压缩已取消</string>
     <string name="zip_extracting_many">%1$d/%2$d 提取的文件</string>
