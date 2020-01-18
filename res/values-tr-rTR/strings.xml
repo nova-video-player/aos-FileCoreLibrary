@@ -85,6 +85,26 @@
     <string name="browse_ftp_server">Sunucu</string>
     <string name="cannot_list">İçerik listelenemiyor</string>
     <string name="error_listing">Hata oluştu</string>
+    <string name="deleting_one">Bir dosya silme</string>
+    <string name="copying">Kopyalama&#8230;</string>
+    <string name="moving">Taşınıyor&#8230;</string>
+    <string name="open_file">Dosyayı aç</string>
+    <string name="open_file_after_download">Kopyalama tamamlandıktan sonra dosyayı aç</string>
+    <string name="pasting_copy_one">Bir dosya kopyalanıyor (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Kopyalama: %1$d/%2$d dosyalar (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Bir dosya taşınıyor (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Taşınıyor: %1$d/%2$d dosyalar (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Sil</string>
+    <string name="rename">Yeniden Adlandır</string>
+    <string name="details">Ayrıntılar</string>
+    <string name="refresh_directory">Klasörü yenile</string>
+    <string-array name="folder_or_file">
+        <item>Klasör oluştur</item>
+        <item>Boş bir dosya oluştur</item>
+    </string-array>
+    <string name="new_directory">Yeni klasör</string>
+    <string name="new_file">Yeni dosya</string>
     <string name="enable_network_shares">Ağ paylaşımlarını etkinleştir</string>
     <string name="pasting_done">Yapıştırma bitti</string>
     <string name="copy_done">Kopyalama başarılı</string>

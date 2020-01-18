@@ -13,10 +13,10 @@
     <string name="file_info_label_last_modified">最后修改时间：</string>
     <string name="file_info_label_mime_type">Mime类型：</string>
     <string name="file_info_directory_empty">空文件夹</string>
-    <string name="file_info_one_directory">1个文件夹</string>
-    <string name="file_info_directories">个文件夹</string>
+    <string name="file_info_one_directory">1 个文件夹</string>
+    <string name="file_info_directories"> 个文件夹</string>
     <string name="file_info_one_file">1 个文件</string>
-    <string name="file_info_files">个文件</string>
+    <string name="file_info_files"> 个文件</string>
     <string name="usbhost_ptp_storage">外部摄像头</string>
     <string name="network_media_servers">媒体服务器 (UPnP)</string>
     <string name="network_shared_folders">共享文件夹 (SMB)</string>
