@@ -126,7 +126,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
      */
     @Override
     synchronized public void onShareFound(String workgroupName, String shareName, String shareAddress) {
-        Log.d(TAG, "onShareFound "+workgroupName+" \""+shareName+"\" "+shareAddress);
+        if (DBG) Log.d(TAG, "onShareFound "+workgroupName+" \""+shareName+"\" "+shareAddress);
 
         boolean alreadyFound = false;
 
@@ -182,7 +182,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         // We do not tell that the discovery is over when it is aborted because some new discovery threads may already be started
         if (mInternalDiscoveries.isEmpty() && !aborted) {
             informListener(true);
-            Log.d(TAG, "onInternalDiscoveryEnd calls discoveryFinished");
+            if (DBG) Log.d(TAG, "onInternalDiscoveryEnd calls discoveryFinished");
             discoveryFinished();
         }
     }
@@ -291,7 +291,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         mInternalDiscoveries.add(new TcpDiscovery(this, ipAddress, mSocketReadDurationMs, 1000));
 
         // Start all the discoveries
-        Log.d(TAG, "Start discovery");
+        if (DBG) Log.d(TAG, "Start discovery");
         for (InternalDiscovery discovery : mInternalDiscoveries) {
             discovery.start();
         }
@@ -306,11 +306,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         if (ipAddress == null)
             return;
 
-        Log.d(TAG, "Start UDP only discovery");
+        if (DBG) Log.d(TAG, "Start UDP only discovery");
         UdpDiscovery udpDiscovery = new UdpDiscovery(this, ipAddress, socketReadDurationMs);
         mInternalDiscoveries.add(udpDiscovery); // this list will probably not be used in "blocking" mode be better be consistant
         udpDiscovery.run_blocking(); // running in the current thread
-        Log.d(TAG, "UDP only discovery finished");
+        if (DBG) Log.d(TAG, "UDP only discovery finished");
     }
 
     /**
