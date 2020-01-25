@@ -66,15 +66,17 @@ public class JcifsFile2 extends MetaFile2 {
         mCanRead = false;
         mCanWrite = false;
         mLength = 0;
-        try {
-            mCanRead = file.canRead();
-            mCanWrite = file.canWrite();
-            mLength = file.length();
-        } catch (SmbAuthException e) {
-            //Log.e(TAG," SmbAuthException on " + file.getPath(), e);
-            Log.w(TAG,"SmbAuthException on " + file.getPath());
-        } catch (SmbException e) {
-            Log.w(TAG,"SmbException on " + file.getPath());
+        if (mIsDirectory || mIsFile) {
+            // generates an exception in case of a directory not accessible but need this information for deletion
+            try {
+                mCanRead = file.canRead();
+                mCanWrite = file.canWrite();
+                if (mIsFile) mLength = file.length();
+            } catch (SmbAuthException e) {
+                caughtException(e, "JfisFile2 " + file.getPath(), "SmbAuthException");
+            } catch (SmbException e) {
+                caughtException(e, "JfisFile2 " + file.getPath(), "SmbException");
+            }
         }
 
         // remove the '/' at the end of directory name (Jcifs adds it)
@@ -109,12 +111,20 @@ public class JcifsFile2 extends MetaFile2 {
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
-        mCanRead = file.canRead();
-        mCanWrite = file.canWrite();
-        try {
-            mLength = file.length();
-        } catch (SmbException e) {
-            mLength = 0;
+        mCanRead = false;
+        mCanWrite = false;
+        mLength = 0;
+        if (mIsDirectory || mIsFile) {
+            // generates an exception in case of a directory not accessible but need this information for deletion
+            try {
+                mCanRead = file.canRead();
+                mCanWrite = file.canWrite();
+                if (mIsFile) mLength = file.length();
+            } catch (SmbAuthException e) {
+                caughtException(e, "JfisFile2 " + file.getCanonicalPath(), "SmbAuthException");
+            } catch (SmbException e) {
+                caughtException(e, "JfisFile2 " + file.getCanonicalPath(), "SmbException");
+            }
         }
         // remove the '/' at the end of directory name (Jcifs adds it)
         if (mIsDirectory && name.endsWith("/")) {
@@ -122,6 +132,11 @@ public class JcifsFile2 extends MetaFile2 {
         } else {
             mName = name;
         }
+    }
+
+    private void caughtException(Throwable e, String method, String exceptionType) {
+        if (DBG) Log.e(TAG, method + ": caught" + exceptionType, e);
+        else Log.w(TAG, method + ": caught "+ exceptionType);
     }
 
     /**
