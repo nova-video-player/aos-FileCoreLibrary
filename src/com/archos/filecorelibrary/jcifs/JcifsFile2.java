@@ -70,11 +70,11 @@ public class JcifsFile2 extends MetaFile2 {
             mCanRead = file.canRead();
             mCanWrite = file.canWrite();
             mLength = file.length();
-        } catch ( SmbAuthException e ) {
+        } catch (SmbAuthException e) {
             //Log.e(TAG," SmbAuthException on " + file.getPath(), e);
-            Log.d(TAG," SmbAuthException on " + file.getPath());
-        } catch ( SmbException e ) {
-            Log.d(TAG," SmbException on " + file.getPath());
+            Log.w(TAG,"SmbAuthException on " + file.getPath());
+        } catch (SmbException e) {
+            Log.w(TAG,"SmbException on " + file.getPath());
         }
 
         // remove the '/' at the end of directory name (Jcifs adds it)
