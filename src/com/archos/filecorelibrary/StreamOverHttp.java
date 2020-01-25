@@ -448,8 +448,7 @@ public class StreamOverHttp{
 				}
 				headers.put("Access-Control-Allow-Origin", "*");
 				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null);
-				if(debug)
-					Log.d(TAG,"Http stream finished");
+				if(debug) Log.d(TAG,"Http stream finished");
 			}catch(IOException ioe){
 				if(debug)
 					Log.w(TAG, ioe);
@@ -528,7 +527,7 @@ public class StreamOverHttp{
 	}
 
 	public void close(){
-		Log.d(TAG,"Closing stream over http");
+		if (debug) Log.d(TAG,"Closing stream over http");
 		try{
 			serverSocket.close();
 		}catch(Exception e){
@@ -548,7 +547,7 @@ public class StreamOverHttp{
 	}
 
 	private void copyStream(InputStream in, OutputStream out, byte[] tmpBuf, long maxSize) throws IOException{
-		Log.d(TAG, "copyStream");
+		if (debug) Log.d(TAG, "copyStream");
 		int count;
 
 		while(maxSize>0){
@@ -565,7 +564,7 @@ public class StreamOverHttp{
 	 * Sends given response to the socket, and closes the socket.
 	 */
 	private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg) throws IOException {
-		Log.d(TAG, "sendResponse");
+		if (debug) Log.d(TAG, "sendResponse");
 		BufferedInputStream bin = null;
 		try{
 			OutputStream out = socket.getOutputStream();
