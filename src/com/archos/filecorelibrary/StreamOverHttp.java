@@ -196,7 +196,7 @@ public class StreamOverHttp{
 		HttpSession(Socket s, String fileMimeType){
 			this.fileMimeType = fileMimeType;
 			socket = s;
-			Log.i(TAG,"Stream over localhost: serving request on "+s.getInetAddress());
+			if (debug) Log.i(TAG,"Stream over localhost: serving request on "+s.getInetAddress());
 			Thread t = new Thread(this, "Http response");
 			t.setDaemon(true);
 			t.start();
