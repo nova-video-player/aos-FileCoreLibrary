@@ -54,9 +54,9 @@ public class JcifsFileEditor extends FileEditor{
             getSmbFile(mUri).mkdir();
             return true;
         } catch (SmbException e) {
-            caughtException(e, "SmbException in mkdir");
+            caughtException(e, "mkdir", "SmbException in mkdir");
         } catch (MalformedURLException e) {
-            caughtException(e, "MalformedURLException in mkdir");
+            caughtException(e, "mkdir", "MalformedURLException in mkdir");
         }
         return false;
     }
@@ -82,7 +82,9 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public void delete() throws Exception {
-        getSmbFile(mUri).delete();
+        SmbFile smbFile = getSmbFile(mUri);
+        if (smbFile.isFile() || smbFile.isDirectory())
+            getSmbFile(mUri).delete();
     }
 
     @Override
@@ -99,9 +101,9 @@ public class JcifsFileEditor extends FileEditor{
             }
         }
         catch (SmbException e) {
-            caughtException(e, "SmbException in rename");
+            caughtException(e, "rename", "SmbException in rename");
         } catch (MalformedURLException e) {
-            caughtException(e, "MalformedURLException in rename");
+            caughtException(e, "rename", "MalformedURLException in rename");
         }
         return false;
     }
@@ -133,15 +135,14 @@ public class JcifsFileEditor extends FileEditor{
             if(sf!=null)
                 return sf.exists();
         } catch (SmbException e) {
-            caughtException(e, "SmbException in exists");
+            caughtException(e, "exists", "SmbException in exists");
         } catch (MalformedURLException e) {
-            caughtException(e, "MalformedURLException in exists");
+            caughtException(e, "exists", "MalformedURLException in exists");
         }
         return false;
     }
-
-    private void caughtException(Throwable e, String exceptionType) {
-        if (DBG) Log.e(TAG, "exists: caught" + exceptionType, e);
-        else Log.w(TAG, "exists: caught "+ exceptionType);
+    private void caughtException(Throwable e, String method, String exceptionType) {
+        if (DBG) Log.e(TAG, method + ": caught" + exceptionType, e);
+        else Log.w(TAG, method + ": caught "+ exceptionType);
     }
 }
