@@ -267,7 +267,7 @@ public class UdpDiscovery implements InternalDiscovery {
             addr.hostName.srcHashCode = context.getConfig().getBroadcastAddress().hashCode();
             NameServiceClientImpl impl = (NameServiceClientImpl) context.getNameServiceClient();
             impl.cacheAddress(name, addr);
-            Log.d(TAG, "Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
+            if (DBG) Log.d(TAG, "Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
         }
     }
 }
