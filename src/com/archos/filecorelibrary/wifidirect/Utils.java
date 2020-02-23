@@ -15,7 +15,6 @@
 package com.archos.filecorelibrary.wifidirect;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -25,6 +24,8 @@ import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -74,7 +75,7 @@ public class Utils {
         }
     }
 
-    static String getPathFromUri(Intent intent, Activity activity){
+    static String getPathFromUri(Intent intent, AppCompatActivity activity){
         Uri uri = intent.getExtras().getParcelable(Intent.EXTRA_STREAM);
         if (uri.getScheme().equalsIgnoreCase("content")){
             String[] proj = { MediaStore.Images.Media.DATA };

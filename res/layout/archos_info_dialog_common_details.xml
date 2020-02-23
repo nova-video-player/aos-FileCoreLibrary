@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/archos_info_common_details"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/archos_info_common_details"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:paddingLeft="11dip"
@@ -137,7 +138,7 @@
      android:gravity="fill_horizontal"
      android:paddingTop="7dip"
      android:paddingBottom="2dip"
-     android:src="@drawable/divider_horizontal_dark"/>
+     app:srcCompat="@drawable/divider_horizontal_dark"/>
 
   <TextView android:id="@+id/archos_info_fullpath"
      style="@style/InfoDialogText"

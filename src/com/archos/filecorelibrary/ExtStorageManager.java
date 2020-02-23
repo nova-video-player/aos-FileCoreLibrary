@@ -43,7 +43,7 @@ public class ExtStorageManager {
 
     private static final String TAG = "ExtStorageManager";
     private static final int TYPE_PRIVATE = 1;
-    private static boolean DBG = false;
+    private static boolean DBG = true;
 
     private static ExtStorageManager mExtStorageManager = new ExtStorageManager();
     public static ExtStorageManager getExtStorageManager() {

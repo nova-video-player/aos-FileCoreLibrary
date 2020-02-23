@@ -35,7 +35,7 @@ import static com.archos.filecorelibrary.FileUtils.intentToString;
 
 public class ExtStorageReceiver extends BroadcastReceiver {
     private static final String TAG = "ExtStorageReceiver";
-    private static boolean DBG = false;
+    private static boolean DBG = true;
     public static final String ACTION_MEDIA_MOUNTED  = "com.archos.action.MEDIA_MOUNTED";
     public static final String ACTION_MEDIA_UNMOUNTED = "com.archos.action.MEDIA_UNMOUNTED";
     public static final String VALUE_PATH_NONE = "none";

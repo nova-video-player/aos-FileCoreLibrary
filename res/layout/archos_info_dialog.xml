@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/dialog_root_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_root_layout"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:minWidth="400dip"
@@ -13,7 +14,7 @@
 			android:orientation="horizontal">
 	
 		<ImageView android:id="@+id/archos_info_icon"
-				android:src="@drawable/filetype_generic2"
+				app:srcCompat="@drawable/filetype_generic2"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:scaleType="center"/>

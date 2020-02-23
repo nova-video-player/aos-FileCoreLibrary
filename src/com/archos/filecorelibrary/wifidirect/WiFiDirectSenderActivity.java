@@ -14,10 +14,6 @@
 
 package com.archos.filecorelibrary.wifidirect;
 
-import com.archos.filecorelibrary.R;
-
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -38,6 +34,11 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog.Builder;
+
+import com.archos.filecorelibrary.R;
 
 import java.util.ArrayList;
 import java.util.List;

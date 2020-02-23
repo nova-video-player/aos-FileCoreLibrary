@@ -13,10 +13,7 @@
 // limitations under the License.
 
 package com.archos.filecorelibrary.wifidirect;
-import com.archos.filecorelibrary.R;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
+
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,9 +28,15 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog.Builder;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.archos.filecorelibrary.R;
+
 import java.util.List;
 
-public class WiFiDirectReceiverActivity extends Activity{
+public class WiFiDirectReceiverActivity extends AppCompatActivity {
     private static String path;
     Intent serviceIntent;
     IFileTransferService mService;

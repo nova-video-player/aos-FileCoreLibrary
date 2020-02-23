@@ -14,13 +14,13 @@
 
 package com.archos.filecorelibrary.samba;
 
-import com.archos.filecorelibrary.R;
-import com.archos.filecorelibrary.R.layout;
-
-import android.app.Activity;
 import android.os.Bundle;
 
-public class SambaPreferenceActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.archos.filecorelibrary.R;
+
+public class SambaPreferenceActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
