@@ -93,7 +93,7 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
 
         mSingleSettings = SambaConfiguration.getSingleSettingList();
         int length = mSingleSettings.size();
-        AppCompatActivity activity = getActivity();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
         for (int index = 0; index < length; index++) {
             String section = mSingleSettings.get(index);
             SambaSingleSetting sss = SambaConfiguration.getSingleSetting(section);
