@@ -138,8 +138,10 @@ public class FileUtils {
 
     //useful for uris in content://
     public static Uri getRealUriFromVideoURI(Context context, Uri contentUri) {
-        if(!contentUri.getScheme().equals("content"))
-            return contentUri;
+
+        //if(!contentUri.getScheme().equals("content"))
+        return contentUri;
+        /*
         Cursor cursor = null;
         try {
             String[] proj = { MediaStore.Video.Media.DATA };
@@ -158,7 +160,7 @@ public class FileUtils {
             return Uri.parse(uri);
         } finally {
 
-        }
+        }*/
     }
 
     public static Uri getContentUriFromFileURI(Context context, Uri dataUri) {
