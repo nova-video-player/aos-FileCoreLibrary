@@ -101,7 +101,7 @@ public class DocumentUriBuilder {
     }
 
     public static DocumentFile getDocumentFileForUri(Context context, Uri uri) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        Class<?> c = Class.forName("android.support.v4.provider.TreeDocumentFile");
+        Class<?> c = Class.forName("androidx.documentfile.provider.TreeDocumentFile");
         Constructor<?> constructor = c.getDeclaredConstructor(DocumentFile.class, Context.class, Uri.class);
         constructor.setAccessible(true);
         Uri docUri;
