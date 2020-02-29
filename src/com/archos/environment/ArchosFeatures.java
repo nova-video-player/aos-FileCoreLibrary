@@ -18,50 +18,19 @@ import android.app.UiModeManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import androidx.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
-
+import android.os.Build;
 
 public final class ArchosFeatures {
 
-    /**
-     * Returns whether board has a builtin GSM
-     * @param context
-     */
-    public static boolean hasGsm(Context context) {
-        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        int phoneType = manager.getPhoneType();
-        if (phoneType != TelephonyManager.PHONE_TYPE_NONE)
-            return true;
-        String value = SystemPropertiesProxy.get("ro.board.has_gsm", "no");
-        return value.equals("yes");
-    }
-
-    /**
-     * Returns whether board is emulator
-     */
-    public static boolean isEmulator() {
-        String value = SystemPropertiesProxy.get("ro.board.emulator", "no");
-        return value.equals("yes");
-    }
-
-    /**
-     * Returns whether the device has a HDD
-     */
-    public static boolean hasHDD() {
-        String value = SystemPropertiesProxy.get("ro.board.has_hdd", "no");
-        return value.equals("yes");
-    }
-
     //returns whereas device is a TV or not
     public static boolean isTV(Context ct) {
-        if (hasNoTouchScreen())
-            return true;
         return isAndroidTV(ct);
     }
 
+    // tokeep: sentimental LUDO was Archos TV connect, first Android on TV before AndroidTV in 2012
     public static boolean isLUDO() {
-        return getProductName().equals("LUDO")|| getProductName().equals("A101XS");
+        if (Build.MODEL.equals("LUDO") || Build.MODEL.equals("A101XS")) return true;
+        return false;
     }
 
     public static boolean isAndroidTV(Context ct) {
@@ -72,27 +41,5 @@ public final class ArchosFeatures {
     public static boolean isChromeOS(Context context) {
         PackageManager pm = context.getPackageManager();
         return pm.hasSystemFeature("org.chromium.arc");
-    }
-
-    /**
-     * Returns the product name
-     */
-    public static String getProductName() {
-        return SystemPropertiesProxy.get("ro.hardware_product", "unknown");
-    }
-    /**
-     * Returns whether board has a battery
-     */
-    public static boolean hasBattery() {
-        String value = SystemPropertiesProxy.get("ro.board.has_battery", "yes");
-        return value.equals("yes");
-    }
-    
-    /**
-     * Returns whether board has a touchscreen or not
-     */
-    public static boolean hasNoTouchScreen() {
-        String value = SystemPropertiesProxy.get("ro.board.notouchscreen", "no");
-        return value.equals("yes");
     }
 }
