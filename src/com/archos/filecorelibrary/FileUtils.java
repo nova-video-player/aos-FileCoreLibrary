@@ -29,6 +29,7 @@ import android.os.Environment;
 import android.os.storage.StorageVolume;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -42,6 +43,9 @@ import java.util.Locale;
 import java.util.Set;
 
 public class FileUtils {
+
+    private static final String TAG = FileUtils.class.getSimpleName();
+    private static final boolean DBG = true;
     
     final static char SEP = '/';
     final static String SEPARATOR = "/";
@@ -138,27 +142,41 @@ public class FileUtils {
 
     //useful for uris in content://
     public static Uri getRealUriFromVideoURI(Context context, Uri contentUri) {
+        // Issues this function addresses:
+        // - We would like to use content:// URIs everywhere, because that's the modern thing to do
+        //     We might not have access to simple files even /sdcard/xxxx.mkv because of storage restrictions
+        // - However, not all devices provide content:// access on all files
+        // For instance, on some Huawei devices running Lollipop, the media store contains
+        //   samples in /system. But Huawei's MediaProvider doesn't allow access to /system through
+        //   their DocumentProvider. So we must resort to good old file:/// access
+        // To handle this, we try to access to file:/// URI, and we use this one if we can read it.
+        // Otherwise we use original content:// uri
+
         if(!contentUri.getScheme().equals("content"))
             return contentUri;
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Video.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            if(cursor==null)
-                return contentUri;
-            int column_index = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
-            cursor.moveToFirst();
-            if(cursor.getCount()==0
-                    ||column_index<0||cursor.getString(column_index)==null) {
-                cursor.close();
-                return contentUri;
-            }
-            String uri = cursor.getString(column_index);
-            cursor.close();
-            return Uri.parse(uri);
-        } finally {
 
+        // log contentUri.getHost() to whitelist only MediaProvider for this file:/// access
+        if (DBG) Log.d(TAG, "getRealUriFromVideoURI: contentUri.getHost()=" + contentUri.getHost());
+        Cursor cursor = null;
+
+        String[] proj = { MediaStore.Video.Media.DATA };
+        cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+        if(cursor==null)
+            return contentUri;
+        int column_index = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
+        cursor.moveToFirst();
+        if(cursor.getCount()==0
+                ||column_index<0||cursor.getString(column_index)==null) {
+            cursor.close();
+            return contentUri;
         }
+        String uri = cursor.getString(column_index);
+        Uri parsed = Uri.parse(uri);
+        cursor.close();
+        if (parsed.getPath() != null)
+            if(!(new File(parsed.getPath()).canRead())) // if not openable do not try
+                return contentUri;
+        return parsed;
     }
 
     public static Uri getContentUriFromFileURI(Context context, Uri dataUri) {
