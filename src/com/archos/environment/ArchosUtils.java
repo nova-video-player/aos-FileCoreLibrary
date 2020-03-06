@@ -15,14 +15,6 @@
 package com.archos.environment;
 
 import android.content.Context;
-import android.util.Log;
-
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
-
 
 public final class ArchosUtils {
     private static final String TAG = "ArchosUtils";
