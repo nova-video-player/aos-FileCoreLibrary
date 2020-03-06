@@ -16,6 +16,8 @@ package com.archos.environment;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.Log;
@@ -30,45 +32,68 @@ import java.util.Enumeration;
 
 public final class ArchosUtils {
     private static final String TAG = "ArchosUtils";
+    private static final boolean DBG = true;
 
     private static Context globalContext;
 
     public static boolean isNetworkConnected(Context context) {
         // Check network status
-        boolean networkEnabled = false;
-        ConnectivityManager connectivity = (ConnectivityManager)(context.getSystemService(Context.CONNECTIVITY_SERVICE));
-        if (connectivity != null) {
-            NetworkInfo networkInfo = connectivity.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                networkEnabled = true;
+        if (context == null) return false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null)
+                    if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                        // to test hasInternet capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                        if (DBG) Log.d(TAG, "isNetworkConnected: true");
+                        return true;
+                    }
+            } else {
+                try {
+                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        if (DBG) Log.d(TAG, "isNetworkConnected: true");
+                        return true;
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "isNetworkConnected: caught exception" + e.getMessage());
+                }
             }
         }
-
-        return networkEnabled;
+        if (DBG) Log.d(TAG, "isNetworkConnected false");
+        return false;
     }
 
     public static boolean isLocalNetworkConnected(Context context) {
-        // Check network status
-        boolean networkEnabled = false;
-        ConnectivityManager connectivity = (ConnectivityManager)(context.getSystemService(Context.CONNECTIVITY_SERVICE));
-        if (connectivity != null) {
-            NetworkInfo networkInfo = connectivity.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected() &&
-                    (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET)) {
-                networkEnabled = true;
+        // Check if LAN i.e. WIFI or ETHERNET
+        if (context == null) return false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null)
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        if (DBG) Log.d(TAG, "isLocalNetworkConnected: true (WIFI)");
+                        return true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                        if (DBG) Log.d(TAG, "isLocalNetworkConnected: true (ETHERNET)");
+                        return true;
+                    }
+            } else {
+                try {
+                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected() &&
+                            (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET)) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "isLocalNetworkConnected: caught exception" + e.getMessage());
+                }
             }
         }
-
-        return networkEnabled;
-    }
-
-    public static boolean isArchosDevice(@SuppressWarnings("UnusedParameters") Context context) {
-        File file = new File("/system/framework/com.archos.frameworks.jar");
-        return (file.exists() && Build.MANUFACTURER.equalsIgnoreCase("archos"));
-    }
-
-    public static boolean isFreeVersion(Context context) {
-        return context.getPackageName().endsWith("free") && !isArchosDevice(context);
+        if (DBG) Log.d(TAG, "isLocalNetworkConnected: false");
+        return false;
     }
 
     public static boolean isAmazonApk() {
@@ -120,7 +145,4 @@ public final class ArchosUtils {
         return globalContext;
     }
 
-    public static boolean shouldAnimate() {
-        return !(Build.MANUFACTURER.equalsIgnoreCase("samsung")&&Build.VERSION.SDK_INT==Build.VERSION_CODES.JELLY_BEAN_MR2); //do not animate fragments on samsung with 4.3
-    }
 }
