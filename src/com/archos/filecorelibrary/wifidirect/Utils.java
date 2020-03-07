@@ -16,11 +16,8 @@ package com.archos.filecorelibrary.wifidirect;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.provider.MediaStore;
@@ -85,14 +82,4 @@ public class Utils {
         } else return uri.getPath();
     }
 
-    public static boolean isWifiAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-            context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = null;
-        if (connectivityManager != null) {
-            networkInfo =
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        }
-        return networkInfo == null ? false : networkInfo.isAvailable();
-    }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 package com.archos.filecorelibrary.wifidirect;
+import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -63,7 +64,7 @@ public class WiFiDirectReceiverActivity extends Activity{
         super.onStart();
         bindService(serviceIntent,
                 mConnection, Context.BIND_AUTO_CREATE);
-        if (!Utils.isWifiAvailable(this))
+        if (!ArchosUtils.isWifiAvailable(this))
             noNetworkDialog();
     }
 

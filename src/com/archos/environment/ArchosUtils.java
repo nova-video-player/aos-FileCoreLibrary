@@ -16,13 +16,11 @@ package com.archos.environment;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.Log;
 
-import java.io.File;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -32,7 +30,7 @@ import java.util.Enumeration;
 
 public final class ArchosUtils {
     private static final String TAG = "ArchosUtils";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static Context globalContext;
 
@@ -93,6 +91,30 @@ public final class ArchosUtils {
             }
         }
         if (DBG) Log.d(TAG, "isLocalNetworkConnected: false");
+        return false;
+    }
+
+    public static boolean isWifiAvailable(Context context) {
+        // Check if WIFI available
+        if (context == null) return false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null)
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
+                        return true;
+            } else {
+                try {
+                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected() &&
+                            (networkInfo.getType() == ConnectivityManager.TYPE_WIFI))
+                        return true;
+                } catch (Exception e) {
+                    Log.w(TAG, "isWiFiAvailable: caught exception" + e.getMessage());
+                }
+            }
+        }
         return false;
     }
 
