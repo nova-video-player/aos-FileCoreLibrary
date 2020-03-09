@@ -16,6 +16,7 @@ package com.archos.filecorelibrary.wifidirect;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.R;
+import com.archos.environment.NetworkState;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -94,7 +95,7 @@ public class WiFiDirectSenderActivity extends ListActivity {
         super.onStart();
         bindService(serviceIntent,
                 mConnection, Context.BIND_IMPORTANT);
-        if (!ArchosUtils.isWifiAvailable(this))
+        if (!NetworkState.isWifiAvailable(this))
             noNetworkDialog();
     }
 

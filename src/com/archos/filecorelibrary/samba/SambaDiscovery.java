@@ -45,6 +45,7 @@ import android.util.Log;
 
 import com.archos.environment.ArchosFeatures;
 import com.archos.environment.ArchosUtils;
+import com.archos.environment.NetworkState;
 
 
 public class SambaDiscovery implements InternalDiscoveryListener {
@@ -254,7 +255,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         mIsAborted = false;
         mWorkgroups.clear(); // reset previous results
 
-        if (!ArchosUtils.isLocalNetworkConnected(mContext)) {
+        if (!NetworkState.isLocalNetworkConnected(mContext)) {
             if (DBG) Log.d(TAG, "start: no localNetworkConnected (eth/wifi), do not start discovery!");
             return;
         }
