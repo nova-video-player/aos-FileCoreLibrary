@@ -1,4 +1,4 @@
-// Copyright 2017 Archos SA
+// Copyright 2020 Courville Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,44 @@ package com.archos.environment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.util.Log;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.WeakHashMap;
 
 /** network state updated from NetworkStateReceiver, should always represent the current state */
 public class NetworkState {
     private static final String TAG = NetworkState.class.getSimpleName();
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private boolean mConnected;
     private boolean mHasLocalConnection;
-    // abusing WeakHashMap to have a list of WeakReferences to Observers
-    private final WeakHashMap<Observer, Void> mObservers = new WeakHashMap<Observer, Void>();
+    public static boolean isNetworkConnected;
     private Context mContext;
+    private static ConnectivityManager mConnectivityManager;
+    private static ConnectivityManager.NetworkCallback mNetworkCallback = null;
+
+    // support to notify Observers
+    private static PropertyChangeSupport propertyChangeSupport;
+    // two states to communicate with Observers
+    public static final String LAN_STATE = "lan_state";
+    public static final String WAN_STATE = "wan_state";
 
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile NetworkState sInstance;
@@ -66,28 +78,33 @@ public class NetworkState {
 
     protected NetworkState(Context context) {
         mContext = context;
-        updateFrom(context);
+        // set initial state
+        mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        mConnected = isNetworkConnected(context);
+        mHasLocalConnection = isLocalNetworkConnected(mContext);
+        propertyChangeSupport = new PropertyChangeSupport(context);
     }
-    
+
     public boolean hasLocalConnection() { return mHasLocalConnection; }
 
     public boolean isConnected() { return mConnected; }
 
-    public boolean updateFrom(Context context) {
+    public boolean updateFrom() {
         // returns true when that changes hasLocalConnection
         boolean returnBoolean = false;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean connected = isNetworkConnected(context);
-        if (connected != mConnected) {
-            if (DBG) Log.d(TAG, "updateFrom: connected changed " + mConnected + "->" +  connected);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        boolean connected = isNetworkConnected(mContext);
+        if (connected != mConnected) { // only fire change if there is a change
+            if (DBG) Log.d(TAG, "updateFrom: connected changed notifying, " + mConnected + "->" +  connected);
+            propertyChangeSupport.firePropertyChange(WAN_STATE, mConnected, connected);
             mConnected = connected;
         }
         boolean hasLocalConnection = isLocalNetworkConnected(mContext) || preferences.getBoolean("vpn_mobile", false);
-        if (hasLocalConnection != mHasLocalConnection) {
-            if (DBG) Log.d(TAG, "updateFrom: connected changed " + mHasLocalConnection + "->" +  hasLocalConnection);
-            mHasLocalConnection = hasLocalConnection;
+        if (hasLocalConnection != mHasLocalConnection) { // only fire change if there is a change
+            if (DBG) Log.d(TAG, "updateFrom: hasLocalConnection changed notifying, " + mHasLocalConnection + "->" +  hasLocalConnection);
             returnBoolean = true;
-            handleChange();
+            propertyChangeSupport.firePropertyChange(LAN_STATE, mHasLocalConnection, hasLocalConnection);
+            mHasLocalConnection = hasLocalConnection;
         }
         return returnBoolean;
     }
@@ -193,31 +210,103 @@ public class NetworkState {
         return null;
     }
 
-    /** implement & register for observing hasLocalConnection() */
-    public interface Observer {
-        // TODO nobody uses it!!!
-        public void onLocalNetworkState(boolean available);
-    }
-
-    public void addObserver(Observer observer) {
-        if (observer == null) {
-            throw new NullPointerException();
+    public int getAvailableNetworksCount() {
+        int count = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Network[] allNetworks = mConnectivityManager.getAllNetworks(); // added in API 21 (Lollipop)
+            for (Network network : allNetworks) {
+                NetworkCapabilities networkCapabilities = mConnectivityManager.getNetworkCapabilities(network);
+                if (networkCapabilities != null)
+                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                        count++;
+            }
         }
-        synchronized (this) {
-            if (!mObservers.containsKey(observer))
-                mObservers.put(observer, null);
+        return count;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        if (DBG) Log.d(TAG, "addPropertyChangeListener");
+        propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+        if (DBG) Log.d(TAG, "addPropertyChangeListener: number of Listeners=" + propertyChangeSupport.getPropertyChangeListeners().length);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        if (DBG) Log.d(TAG, "removePropertyChangeListener");
+        propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+        if (DBG) Log.d(TAG, "removePropertyChangeListener: number of Listeners=" + propertyChangeSupport.getPropertyChangeListeners().length);
+    }
+
+    public void removeAllPropertyChangeListener() {
+        if (DBG) Log.d(TAG, "removeAllPropertyChangeListener");
+        for (PropertyChangeListener propertyChangeListener : propertyChangeSupport.getPropertyChangeListeners())
+            propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+    }
+
+    public void registerNetworkCallback() { // for API21+
+        try {
+            if (mNetworkCallback == null) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkRequest.Builder builder = new NetworkRequest.Builder();
+                assert connectivityManager != null;
+                mNetworkCallback = new ConnectivityManager.NetworkCallback() {
+                    @Override
+                    public void onAvailable(@NonNull android.net.Network network) {
+                        super.onAvailable(network);
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onAvailable");
+                        isNetworkConnected = true;
+                        updateFrom();
+                    }
+                    @Override
+                    public void onLost(@NonNull android.net.Network network) {
+                        // note that onLost is not sent when loosing wifi and 4G is connected
+                        super.onLost(network);
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onLost");
+                        updateFrom();
+                        if (getAvailableNetworksCount() == 0) { // need to be sure that there is really no interface working
+                            isNetworkConnected = false;
+                        }
+                    }
+                    @Override
+                    public void onBlockedStatusChanged(@NonNull Network network, boolean blocked) {
+                        super.onBlockedStatusChanged(network, blocked);
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onBlockedStatusChanged");
+                    }
+                    @Override
+                    public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
+                        super.onCapabilitiesChanged(network, networkCapabilities);
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onCapabilitiesChanged");
+                        updateFrom();
+                    }
+                    @Override
+                    public void onLinkPropertiesChanged(@NonNull Network network, @NonNull LinkProperties linkProperties) {
+                        super.onLinkPropertiesChanged(network, linkProperties);
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onLinkPropertiesChanged");
+                    }
+                    @Override
+                    public void onLosing(@NonNull Network network, int maxMsToLive) {
+                        super.onLosing(network, maxMsToLive);
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onLosing");
+                    }
+                    @Override
+                    public void onUnavailable() {
+                        super.onUnavailable();
+                        if (DBG) Log.d(TAG, "registerNetworkCallback: onUnavailable");
+                    }
+                };
+                connectivityManager.registerNetworkCallback(builder.build(), mNetworkCallback);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "registerNetworkCallback: caught exception");
+            updateFrom();
+            isNetworkConnected = false;
         }
     }
 
-    public synchronized void removeObserver(Observer observer) {
-        mObservers.remove(observer);
+    public void unRegisterNetworkCallback() { // for API21+
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert connectivityManager != null;
+        connectivityManager.unregisterNetworkCallback(mNetworkCallback);
     }
-
-    private synchronized void handleChange() {
-        for(Observer observer : mObservers.keySet()) {
-            if (observer != null)
-                observer.onLocalNetworkState(mHasLocalConnection);
-        }
-    }
-
 }
