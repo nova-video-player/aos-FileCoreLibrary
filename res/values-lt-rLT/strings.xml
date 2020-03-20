@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Pavadinimas:</string>
+    <string name="file_info_label_size">Dydis:</string>
+    <string name="file_info_label_size_internal">Didis (vidinė):</string>
+    <string name="file_info_label_size_sd">Dydis (SD):</string>
+    <string name="file_info_label_permission">Leidimai:</string>
+    <string name="file_info_label_can_read">skaityti</string>
+    <string name="file_info_label_cannot_read">nepavyksta nuskaityti</string>
+    <string name="file_info_label_can_write">įrašyti</string>
+    <string name="file_info_label_cannot_write">nepavyksta įrašyti</string>
+    <string name="file_info_label_last_modified">Pakeista:</string>
+    <string name="file_info_label_mime_type">Mime tipas:</string>
+    <string name="file_info_directory_empty">Tuščias aplankas</string>
+    <string name="file_info_one_directory">1 aplankas</string>
+    <string name="file_info_directories">aplankai</string>
+    <string name="file_info_one_file">1 failas</string>
+    <string name="file_info_files">failai</string>
+    <string name="usbhost_ptp_storage">Išorinė kamera</string>
+    <string name="network_media_servers">Media serveriai (UPnP)</string>
+    <string name="network_shared_folders">Aplankai tinkle (SMB)</string>
+    <!-- Archos file manager core -->
+    <string name="file_copy_pattern">kopijuoti</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <!-- Samba share settings -->
+    <string name="samba_settings_title">Tinklo aplankų nustatymai</string>
+    <string name="samba_settings_summary">Nustatykite naudotojų vardus ir slaptažodžius savo tinklo aplankų naršymui</string>
+    <string name="samba_profiles">Tinklo aplankų profiliai</string>
+    <string name="samba_delete_settings">Ar tikrai norite trinti nustatymus?</string>
+    <string name="samba_add_server">Pridėti serverį</string>
+    <string name="samba_server">Apibrėžti serverį</string>
+    <string name="samba_share">Apibrėžti aplanką</string>
+    <string name="refresh">Atnaujinti</string>
+    <string name="network_timeout">Deja nuotolinis aplankas nepasiekiamas.\nPatikrinkite tinklo ryšį ir pabandykite dar kartą.</string>
+    <string name="samba_loading">Luktelėkite kol įkeliamas aplankas&#8230;</string>
+    <string name="samba_reloading">Luktelėkite kol pakartotinai įkeliamas aplankas&#8230;</string>
+    <string name="samba_password_request_title">Aplanko pasiekimo slaptažodžio užklausa</string>
+    <string name="samba_domain">Domenas</string>
+    <string name="samba_username">Naudotojo vardas</string>
+    <string name="samba_password">Slaptažodis</string>
+    <string name="samba_show_password">Rodyti slaptažodį</string>
+    <string name="samba_wrong_password">Naudotojo vardas arba slaptažodis neteisingi</string>
+    <string name="preferences">Nustatymai</string>
+    <string name="shared_folder_credentials">Slaptažodžiai</string>
+    <string name="no_saved_passwords">Nėra išsaugotų slaptažodžių</string>
+    <!-- WiFi Direct strings-->
+    <string name="wifi_direct">Tiesioginis WiFi</string>
+    <string name="receive_p2p_here">gauti per tiesioginį WiFi</string>
+    <string name="empty_message">Ieškomi galimi įrenginiai&#8230;&lt;br/&gt;Gavėjo įrenginyje turi būti įjungta &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
+    <string name="wifip2p_waiting">Netrukus bus pradėtas tiesioginis WiFi perdavimas</string>
+    <string name="connect_to_target">Prisijungiama</string>
+    <string name="upload_in_progress">Įkeliama&#8230;</string>
+    <string name="file_uploading">Failas įkeliamas</string>
+    <string name="back_cancel">Atšaukimui paspauskite mygtuką Atgal</string>
+    <string name="server_wait">Laukiama kol bus sujungta</string>
+    <string name="download_in_progress">Atsiunčiama&#8230;</string>
+    <string name="file_downloading">Failas atsiunčiamas</string>
+    <string name="server_ready">Pasiruošta gavimui</string>
+    <string name="nonetwork_title" comment="deprecated">Neprisijungta per WiFi</string>
+    <string name="no_network_title">Nėra tinklo</string>
+    <string name="nonetwork_message">Šiame įrenginyje turite įjungti WiFi</string>
+    <!-- FileManager strings -->
+    <string name="storage_busy_message">Negalite naudoti vidinės atminties kol sujungta per USB.</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Tinklas</string>
+    <string name="external_storage">Išorinė</string>
+    <string name="internal_storage">Vidinė</string>
+    <string name="internal_storage_unified">Saugykla</string>
+    <string name="sd_card_storage">SD kortelė</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Diskas</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Debesis</string>
+    <string name="directory_empty">Tuščias aplankas</string>
+    <string name="no_server">Nerastas serveris</string>
+    <string name="loading">Įkeliama&#8230;</string>
+    <string name="ssh_error">Nepavyko prisijungti : patikrinkite tinklo ryšį</string>
+    <string name="ssh_remote_address">Nuotolinis adresas</string>
+    <string name="ssh_remote_address_error">Nurodykite nuotolinį adresą</string>
+    <string name="ssh_password">Slaptažodis</string>
+    <string name="ssh_username">Naudotojo vardas</string>
+    <string name="ssh_port">Port (pasirinktinai)</string>
+    <string name="ssh_path">Kelias (pasirinktinai)</string>
+    <string name="save_password">Išsaugoti slaptažodį</string>
+    <string name="ssh_prompt">FTP tipas</string>
+    <string name="download_prompt">Atsiuntimo aplankas:</string>
+    <string name="browse_ftp_server">Serveris</string>
+    <string name="cannot_list">Neįmanoma parodyti turinio</string>
+    <string name="error_listing">Įvyko klaida</string>
+    <string name="error_host_not_found">Serveris nerastas</string>
+    <string name="error_unknown_host">Nežinomas serveris</string>
+    <string name="error_no_connection">Nepavyksta prisijungti prie serverio</string>
+    <string name="error_credentials">Neįmanoma parodyti aplanko : patikrinkite prisijungimo duomenis</string>
+    <string name="error_no_permission">Šiai paskyrai neleidžiama žiūrėti šio aplanko</string>
+    <string name="error_file_not_found">Failas nerastas</string>
+    <string name="error_time_out">Baigėsi laikas</string>
+    <string name="deleting">Trinama</string>
+    <string name="deleting_many">%1$d/%2$d ištrinti failai</string>
+    <string name="deleting_one">Trinamas vienas failas</string>
+    <string name="copying">Kopijuojama&#8230;</string>
+    <string name="moving">Perkeliama&#8230;</string>
+    <string name="open_file">Atidaryti failą</string>
+    <string name="open_file_after_download">Atidaryti failą nukopijavus</string>
+    <string name="pasting_copy_one">Kopijuojamas vienas failas (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Kopijuojama: %1$d/%2$d failai (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Perkeliamas vienas failas (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Perkeliama: %1$d/%2$d failai (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Ištrinti</string>
+    <string name="rename">Pervadinti</string>
+    <string name="details">Išsamiai</string>
+    <string name="refresh_directory">Atnaujinti aplanką</string>
+    <string-array name="folder_or_file">
+        <item>Sukurti aplanką</item>
+        <item>Sukurti tuščią failą</item>
+    </string-array>
+    <string name="new_directory">Naujas aplankas</string>
+    <string name="new_file">Naujas failas</string>
+    <string name="new_folder_or_file">Naujas aplankas ar failas</string>
+    <string name="refresh_servers_list">Atnaujinti serverių sąrašą</string>
+    <string name="enable_network_shares">Įjungti dalinimąsi tinkle</string>
+    <string name="go_top">Grįžti į viršų</string>
+    <string name="uncheck_impossible">Negalima pakeisti pasirinkimo kai pasirinktas pagrindinis aplankas</string>
+    <string name="confirm_delete_one">Ar tikrai norite ištrinti?</string>
+    <string name="confirm_delete_parent_folder">Panašu, kad pagrindiniame aplanke nėra video. Ar ištrinti jį?</string>
+    <string name="confirm_delete_many">Ar tikrai norite ištrinti?</string>
+    <string name="enter_new_name">Pavadinimas:</string>
+    <string name="file_name">Failo pavadinimas</string>
+    <string name="folder_name">Aplanko pavadinimas</string>
+    <string name="run_in_background">Sumažinti</string>
+    <string name="confirm_deleting_cancellation">Ar tikrai norite atsisakyti trynimo?</string>
+    <string name="confirm_copying_cancellation">Ar tikrai norite atsisakyti kopijavimo?</string>
+    <string name="confirm_moving_cancellation">Ar tikrai norite atsisakyti perkėlimo?</string>
+    <string name="cannot_create_directory">Negalima kurti naujo aplanko</string>
+    <string name="cannot_create_file">Negalima kurti naujo failo</string>
+    <string name="cannot_delete_directory">Negalima trinti aplanko</string>
+    <string name="cannot_delete_file">Nepavyko ištrinti failo</string>
+    <string name="cannot_delete_files">Nepavyko ištrinti failų</string>
+    <string name="directory_deleted">Aplankas ištrintas</string>
+    <string name="file_deleted">Failas ištrintas</string>
+    <string name="files_deleted">Failai ištrinti</string>
+    <string name="cannot_rename">Nepavyko pervadinti</string>
+    <string name="cannot_paste_folder_into_itself">Negalima kopijuoti ar perkelti aplanko į jį patį</string>
+    <string name="cannot_paste_file_same_location">Negalima įkelti failų į jų esamą vietą</string>
+    <string name="cannot_paste_over_network">Negalima įkelti failų į tinklo saugyklą</string>
+    <string name="copy_directory_success_one">Aplankas nukopijuotas</string>
+    <string name="copy_directory_success_many">Aplankai nukopijuoti</string>
+    <string name="copy_file_success_one">Failas nukopijuotas</string>
+    <string name="copy_file_success_many">Failai nukopijuoti</string>
+    <string name="copy_directory_failed_one">Aplankas nenukopijuotas</string>
+    <string name="copy_directory_failed_many">Aplankai nenukopijuoti</string>
+    <string name="copy_file_failed_one">Failas nenukopijuotas</string>
+    <string name="copy_file_failed_many">Failai nenukopijuoti</string>
+    <string name="cut_directory_success_one">Aplankas perkeltas</string>
+    <string name="cut_directory_success_many">Aplankai perkelti</string>
+    <string name="cut_file_success_one">Failas perkeltas</string>
+    <string name="cut_file_success_many">Failai perkelti</string>
+    <string name="cut_directory_failed_one">Aplankas neperkeltas</string>
+    <string name="cut_directory_failed_many">Aplankai neperkelti</string>
+    <string name="cut_file_failed_one">Failas neperkeltas</string>
+    <string name="cut_file_failed_many">Failai neperkelti</string>
+    <string name="pasting_done">Įkėlimas baigtas</string>
+    <string name="copy_done">Kopijavimas baigtas</string>
+    <string name="copy_canceled">Kopijavimas atšauktas</string>
+    <string name="cut_done">Iškirpta</string>
+    <string name="cut_canceled">Iškirpimas atšauktas</string>
+    <string name="delete_done">Ištrinta</string>
+    <string name="delete_canceled">Ištrynimas atšauktas</string>
+    <string name="cannot_open_file">Nepavyksta atidaryti failo</string>
+    <string name="no_application_to_open_file">Nėra programos šiame įrenginyje, kuri galėtų atverti šį failą</string>
+    <string name="delete_still_ongoing">Trynimas vyksta fone</string>
+    <string name="copy_on_device">Atsiųsti video į įrenginį</string>
+    <string name="copy_on_device_multi">Atsiųsti į įrenginį</string>
+    <string name="storage_swapped_primary">pagrindinė</string>
+    <string name="storage_swapped_secondary">papildoma</string>
+    <string name="yes">"Taip"</string>
+    <string name="no">"Ne"</string>
+    <string name="share">Dalintis</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Dalintis per</string>
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Nėra programos per kurią būtų galima dalintis</string>
+    <string name="upnp_not_allowed">Neturite priėjimo prie UPNP serverio. Pakeiskite priėjimo nustatymus.</string>
+    <string name="single_mode">Vienas</string>
+    <string name="double_mode">Dvigubas</string>
+    <string name="swap_panel">Sukeisti</string>
+    <string name="move">Perkelti</string>
+    <!-- Shortcuts -->
+    <string name="shortcuts">Nuorodos</string>
+    <string name="add_to_shortcuts">Sukurti nuorodą</string>
+    <string name="remove_from_shortcuts">Pašalinti nuorodą</string>
+    <string name="shortcut_added" comment="deprecated">Nuoroda %s sukurta</string>
+    <string name="shortcut_removed" comment="deprecated">Nuoroda %s pašalinta</string>
+    <string name="shortcut_created">Nuoroda \"%1$s\" sukurta</string>
+    <string name="one_shortcut_removed">Viena nuoroda ištrinta</string>
+    <string name="n_shortcut_removed">%1$d nuorodos ištrintos</string>
+    <string name="server_not_available" comment="deprecated">Šiuo metu serveris nepasiekiamas</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s šiuo metu nepasiekimas</string>
+    <string name="cannot_open_shortcut">Šios nuorodos turinys šiuo metu nepasiekiamas.\nPatikrinkite ar turite reikiamus leidimus.</string>
+    <string name="network_shortcuts">Tinklo nuorodos</string>
+    <string name="media_servers">Media serveriai</string>
+    <string name="shortcut_list_empty">Norėdami sukurti nuorodas nuotoliniams aplankams ilgai palaikykite ant aplanko ir pasirinkite \"%s\" viršutinėje juostoje.</string>
+    <!-- DLNA -->
+    <string name="dlna_share">DLNA</string>
+    <string name="video">Video</string>
+    <string name="audio">Garsas</string>
+    <string name="picture">Paveikslėlis</string>
+    <string name="share_types">Bendrinamų aplankų tipai</string>
+    <!-- ZIP -->
+    <string name="zip_extract_action">Išskleisti čia</string>
+    <string name="zip_extract_success_message">Išskleista</string>
+    <string name="zip_compress_action">Suspausti kaip Zip archyvą</string>
+    <string name="zip_extracting_message">Išskleidžiami failai..</string>
+    <string name="zip_compressing_message">Suspaudžiami failai</string>
+    <string name="zip_compressing_many">%1$d/%2$d suspausti failai</string>
+    <string name="zip_compressing_one">Suspaudžiamas vienas failas</string>
+    <string name="zip_compressing_success">Suspausta</string>
+    <string name="zip_compressing_canceled">Suspaudimas atšauktas</string>
+    <string name="zip_extracting_many">%1$d/%2$d išskleisti failai</string>
+    <string name="zip_extracting_one">Išskleidžiamas vienas failas (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Klaida išskleidžiant archyvą.\nGalbūt archyvas sugadintas arba įrenginyje neužtenka laisvos vietos.</string>
+    <string name="zip_extract_canceled">Išskleidimas atšauktas</string>
+    <string name="zip_compress_error_message">Klaida kuriant archyvą.\nGalbūt įrenginyje neužtenka laisvos vietos.</string>
+    <string name="zip_cannot_open_inner_entry">Negalima atidaryti failo iš archyvo. Pirma išskleiskite.</string>
+    <string name="zip_size_limit">Naršymas Zip archyve apribotas iki failo dydžio 20 MB</string>
+    <!-- Notifications -->
+    <string name="copy_error">Kopijavimas nepavyko</string>
+    <string name="cut_error">Iškirpimas nepavyko</string>
+    <string name="delete_error">Trynimas nepavyko</string>
+    <!-- Network Scanning -->
+    <string name="scan_network_index">Media failų indeksavimas</string>
+    <string name="scan_network_remove">Pašalinti media iš indeksavimo</string>
+    <string name="debug_browse_to_root">Įrenginio šakninės kategorijos naršymas (tik derinimui)</string>
+    <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Pašalinti iš bibliotekos</string>
+    <string name="nomedia_remove">Pridėti į biblioteką</string>
+    <string name="nomedia_fail">Klaida, nepavyksta pašalinti aplanko iš bibliotekos</string>
+    <string name="nomedia_warning">Media turinys esantis šiame aplanke nebus matomas kitose programose.\nAr tikrai norite tęsti?</string>
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Pasirinkite aplanką</string>
+    <string name="choose_a_folder_help">Pereikite į aplanką, kurį norite pasirinkti ir paspauskite OK. Su mygtuku Atgal grįžkite į aukštesnį lygmenį.</string>
+    <string name="current_choice">Pasirinkta:</string>
+    <string name="no_selection">nepasirinkta</string>
+    <string name="external_storage_fake_name">Įrenginio saugykla</string>
+    <string name="sdcard_fake_name">SD kortelė</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(nėra aplanko)</string>
+    <string name="navigation_drawer_open">Atidaryti navigacijos panelę</string>
+    <string name="navigation_drawer_close">Uždaryti navigacijos panelę</string>
+    <string name="listing_sort_mode">Rūšiavimo režimas</string>
+    <string name="listing_sort_by_name">Rūšiuoti pagal pavadinimą</string>
+    <string name="listing_sort_by_size">Rūšiuoti pagal dydį</string>
+    <string name="listing_sort_by_date">Rūšiuoti pagal datą</string>
+    <string name="listing_ascending">Didėjančia tvarka</string>
+    <string name="listing_descending">Mažėjančia tvarka</string>
+    <string name="acquire_external_usb_permission">Failų naršyklei reikia priėjimo prie išorinės talpyklos. Kitame lange pasirinkite talpyklą</string>
+</resources>
