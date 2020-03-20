@@ -21,7 +21,7 @@
     <string name="network_shared_folders">Aplankai tinkle (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">kopijuoti</string>
-    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789AĄBCČDEĘĖFGHIĮYJKLMNOPQRSŠTUŲŪVWXZŽ</string>
     <!-- Samba share settings -->
     <string name="samba_settings_title">Tinklo aplankų nustatymai</string>
     <string name="samba_settings_summary">Nustatykite naudotojų vardus ir slaptažodžius savo tinklo aplankų naršymui</string>
