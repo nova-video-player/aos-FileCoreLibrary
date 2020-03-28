@@ -15,8 +15,6 @@
 
 package com.archos.filecorelibrary.samba;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -31,9 +29,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.archos.filecorelibrary.R;
 
-public class SharedPasswordRequest extends Activity implements OnClickListener {
+public class SharedPasswordRequest extends AppCompatActivity implements OnClickListener {
 
     private static final boolean DBG = false;
     static final public int SAMBA_PASSWORD          = 17;

@@ -14,20 +14,20 @@
 
 package com.archos.filecorelibrary.samba;
 
-import com.archos.filecorelibrary.R;
-
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
-import android.view.View;
-import android.widget.AdapterView;
+import com.archos.filecorelibrary.R;
 
 import java.util.LinkedList;
 
@@ -59,7 +59,7 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
 
     public boolean onItemLongClick(AdapterView<?> av, View v, int position, long id) {
         final String section = mSingleSettings.get(position - 1);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(section);
         builder.setIcon(android.R.drawable.ic_dialog_alert);
         builder.setMessage(R.string.samba_delete_settings);
@@ -93,11 +93,10 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
 
         mSingleSettings = SambaConfiguration.getSingleSettingList();
         int length = mSingleSettings.size();
-        Activity activity = getActivity();
         for (int index = 0; index < length; index++) {
             String section = mSingleSettings.get(index);
             SambaSingleSetting sss = SambaConfiguration.getSingleSetting(section);
-            Preference pref = new Preference(activity);
+            Preference pref = new Preference(getContext());
             pref.setTitle(section);
             pref.setSummary(sss.getUsername());
             pref.setOrder(index);
