@@ -4,8 +4,6 @@ repositories {
     google()
     mavenCentral()
     mavenLocal()
-    //maven { url 'https://mvnrepository.com/artifact' }
-    maven { url 'http://4thline.org/m2' }
 }
 
 allprojects {
