@@ -44,19 +44,19 @@
     <string name="shared_folder_credentials">Contraseñas</string>
     <string name="no_saved_passwords">No guardar contraseñas</string>
     <!-- WiFi Direct strings-->
-    <string name="wifi_direct">Wifi Direct\"</string>
+    <string name="wifi_direct">WiFi Direct</string>
     <string name="receive_p2p_here">recibir aquí por WiFi Direct</string>
     <string name="empty_message">Descubriendo dispositivos destinos disponibles/brEl dispositivo destino debe activar la opción %s</string>
     <string name="wifip2p_waiting">La transferencia WiFi Direct comenzará en breve</string>
-    <string name="connect_to_target">Conectando al destino</string>
+    <string name="connect_to_target">Conectando a destino</string>
     <string name="upload_in_progress">Carga en progreso&#8230;</string>
     <string name="file_uploading">Tu archivo está subiéndose</string>
-    <string name="back_cancel">Presiona Atrás para cancelar</string>
-    <string name="server_wait">Esperando al cliente para conectar y enviar un archivo</string>
+    <string name="back_cancel">Presione Atrás para cancelar</string>
+    <string name="server_wait">Esperando al cliente para conectar y enviar archivo</string>
     <string name="download_in_progress">Descargando&#8230;</string>
     <string name="file_downloading">Tu archivo se está descargando</string>
     <string name="server_ready">Listo para recibir</string>
-    <string name="nonetwork_title" comment="deprecated">Sin conexión Wi-Fi</string>
+    <string name="nonetwork_title" comment="deprecated">Sin conexión WiFi</string>
     <string name="no_network_title">Sin conexión de red</string>
     <string name="nonetwork_message">Necesitas activar el WiFi para esta función</string>
     <!-- FileManager strings -->
