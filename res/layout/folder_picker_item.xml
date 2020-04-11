@@ -24,7 +24,7 @@ for informations (duration for files, number of files for directories).
 
         <ImageView
             android:id="@+id/icon"
-            app:srcCompat="@drawable/filetype_music_folder"
+            android:src="@drawable/filetype_music_folder"
             android:layout_width="72dip"
             android:layout_height="72dip"
             android:scaleType="centerInside"
