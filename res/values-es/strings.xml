@@ -98,7 +98,7 @@
     <string name="deleting_many">%1$d/%2$d archivos eliminados</string>
     <string name="deleting_one">Eliminando un archivo</string>
     <string name="copying">Copiando&#8230;</string>
-    <string name="moving">Guardando&#8230;</string>
+    <string name="moving">Moviendo&#8230;</string>
     <string name="open_file">Abrir archivo</string>
     <string name="open_file_after_download">Abrir archivo después de completar la descarga</string>
     <string name="pasting_copy_one">Copiando un archivo (%1$s/%2$s)</string>
@@ -106,7 +106,7 @@
     <string name="pasting_cut_one">Moviendo un archivo (%1$s/%2$s)</string>
     <string name="pasting_cut_many">Moviendo: %1$d/%2$d archivos (%3$s/%4$s)</string>
     <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
-    <string name="delete">Borrar</string>
+    <string name="delete">Eliminar</string>
     <string name="rename">Cambiar nombre</string>
     <string name="details">Detalles</string>
     <string name="refresh_directory">Refrescar carpeta</string>
@@ -117,9 +117,9 @@
     <string name="new_directory">Nueva carpeta</string>
     <string name="new_file">Nuevo archivo</string>
     <string name="new_folder_or_file">Nueva carpeta o archivo</string>
-    <string name="refresh_servers_list">Actulizar lista de servidores</string>
+    <string name="refresh_servers_list">Actualizar lista de servidores</string>
     <string name="enable_network_shares">Habilitar recursos compartidos de red</string>
-    <string name="go_top">Volver a la parte superior</string>
+    <string name="go_top">Volver arriba</string>
     <string name="uncheck_impossible">Imposible cambiar la selección cuando está selecciona la carpeta padre</string>
     <string name="confirm_delete_one">¿Realmente quiere eliminarlo?</string>
     <string name="confirm_delete_parent_folder">Parece que la carpeta padre no contiene ningún otro vídeo, ¿deberíamos eliminarlo?</string>
@@ -137,7 +137,7 @@
     <string name="cannot_delete_file">No se puede eliminar el archivo</string>
     <string name="cannot_delete_files">No se pueden eliminar los archivos</string>
     <string name="directory_deleted">La carpeta ha sido eliminada</string>
-    <string name="file_deleted">El archivo se ha borrado</string>
+    <string name="file_deleted">El archivo se ha eliminado</string>
     <string name="files_deleted">Se eliminaron los archivos</string>
     <string name="cannot_rename">No se puede renombrar</string>
     <string name="cannot_paste_folder_into_itself">No se pueden copiar o mover carpetas dentro de sí mismas o a una de sus subcarpetas</string>
@@ -168,7 +168,7 @@
     <string name="delete_canceled">Eliminar cancelado</string>
     <string name="cannot_open_file">No se puede abrir el archivo</string>
     <string name="no_application_to_open_file">Ninguna aplicación en este dispositivo puede abrir este archivo</string>
-    <string name="delete_still_ongoing">Borrado en curso en segundo plano</string>
+    <string name="delete_still_ongoing">Eliminar aún continúa en segundo plano</string>
     <string name="copy_on_device">Descargar vídeo en el dispositivo</string>
     <string name="copy_on_device_multi">Descargar en el dispositivo</string>
     <string name="storage_swapped_primary">principal</string>
