@@ -45,7 +45,7 @@ import java.util.Set;
 public class FileUtils {
 
     private static final String TAG = FileUtils.class.getSimpleName();
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     
     final static char SEP = '/';
     final static String SEPARATOR = "/";
