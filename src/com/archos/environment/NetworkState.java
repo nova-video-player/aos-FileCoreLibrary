@@ -40,7 +40,7 @@ import java.util.Enumeration;
 /** network state updated from NetworkStateReceiver, should always represent the current state */
 public class NetworkState {
     private static final String TAG = NetworkState.class.getSimpleName();
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private boolean mConnected;
     private boolean mHasLocalConnection;

@@ -41,7 +41,7 @@ import java.util.List;
 
 public class NetUtils implements LifecycleObserver {
     private static final String TAG = NetUtils.class.getSimpleName();
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private ConnectivityManager mConnectivityMgr;
     private Context mContext;
