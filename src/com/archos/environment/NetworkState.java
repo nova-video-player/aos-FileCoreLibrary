@@ -247,6 +247,7 @@ public class NetworkState {
     public void registerNetworkCallback() { // for API21+
         try {
             if (mNetworkCallback == null) {
+                updateFrom(); // need to update initial state
                 ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkRequest.Builder builder = new NetworkRequest.Builder();
                 assert connectivityManager != null;
@@ -308,5 +309,6 @@ public class NetworkState {
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         assert connectivityManager != null;
         connectivityManager.unregisterNetworkCallback(mNetworkCallback);
+        mNetworkCallback = null;
     }
 }
