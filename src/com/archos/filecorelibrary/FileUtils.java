@@ -230,6 +230,18 @@ public class FileUtils {
         return "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
     }
 
+    public static boolean isNetworkShare(Uri uri) {
+        return "smb".equals(uri.getScheme())||
+                "upnp".equals(uri.getScheme())||
+                "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
+    }
+
+    public static boolean isNetworkShare(String path) {
+        return path.startsWith("smb://")||
+                path.startsWith("upnp://")||
+                path.startsWith("ftps://")||path.startsWith("ftp://")||path.startsWith("sftp://");
+    }
+
     /**
      * returns true if is really on a share (for example smb://quatro/sda(...) or ftp://bla.fr(...))
      * @param parent
