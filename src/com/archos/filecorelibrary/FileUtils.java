@@ -45,7 +45,7 @@ import java.util.Set;
 public class FileUtils {
 
     private static final String TAG = FileUtils.class.getSimpleName();
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     
     final static char SEP = '/';
     final static String SEPARATOR = "/";
@@ -67,31 +67,25 @@ public class FileUtils {
     }
 
     public static Uri getParentUrl(Uri uri) {
-
         if("content".equals(uri.getScheme())){
             return Uri.parse(DocumentUriBuilder.getParentUriStringAndFileName(uri).first);
         }
-
         return removeLastSegment(uri);
     }
 
     public static Uri removeLastSegment(Uri uri){
         int index;
-
         String str = uri.toString();
-
-        if (str.endsWith(SEPARATOR)) {
+        if (DBG) Log.d(TAG, "removeLastSegment input: " + str);
+        if (str.endsWith(SEPARATOR))
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
-        }
-        else {
-            index = str.lastIndexOf(SEPARATOR);
-        }
-
-        if (index<=0) {
-            return null;
-        }
-        return Uri.parse(str.substring(0, index + 1));
+        else index = str.lastIndexOf(SEPARATOR);
+        if (index <= 0) return null;
+        if (DBG) Log.d(TAG, "removeLastSegment output: " + str.substring(0, index));
+        // go to index only to avoid trailing "/"
+        return Uri.parse(str.substring(0, index));
     }
+
     /**
      * Computes the BUCKET_ID (See {@link android.provider.MediaStore.Video.VideoColumns#BUCKET_ID})
      * for this file. The id is used in our and Android's database to identify the
@@ -225,6 +219,11 @@ public class FileUtils {
             return name;
         }
         return null;
+    }
+    public static String getName(String file) {
+        if (DBG) Log.d(TAG, "getFileNameWithoutExtension input: " + file);
+        if (DBG) Log.d(TAG, "getFileNameWithoutExtension result: " + file.substring(file.lastIndexOf(SEPARATOR) + 1));
+        return file.substring(file.lastIndexOf(SEPARATOR) + 1);
     }
     public static boolean isSlowRemote(Uri uri) {
         return "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
