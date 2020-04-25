@@ -81,9 +81,9 @@ public class FileUtils {
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
         else index = str.lastIndexOf(SEPARATOR);
         if (index <= 0) return null;
-        if (DBG) Log.d(TAG, "removeLastSegment output: " + str.substring(0, index));
-        // go to index only to avoid trailing "/"
-        return Uri.parse(str.substring(0, index));
+        if (DBG) Log.d(TAG, "removeLastSegment output: " + str.substring(0, index + 1));
+        // MUST keep the trailing "/" for samba
+        return Uri.parse(str.substring(0, index + 1));
     }
 
     /**
@@ -220,11 +220,15 @@ public class FileUtils {
         }
         return null;
     }
+
     public static String getName(String file) {
-        if (DBG) Log.d(TAG, "getFileNameWithoutExtension input: " + file);
-        if (DBG) Log.d(TAG, "getFileNameWithoutExtension result: " + file.substring(file.lastIndexOf(SEPARATOR) + 1));
-        return file.substring(file.lastIndexOf(SEPARATOR) + 1);
+        if (DBG) Log.d(TAG, "getName input: " + file);
+        if (file.lastIndexOf(SEPARATOR) >= 0 && file.lastIndexOf(SEPARATOR) < (file.length() - 1))
+            file = file.substring(file.lastIndexOf(SEPARATOR) + 1);
+        if (DBG) Log.d(TAG, "getName result: " + file);
+        return file;
     }
+
     public static boolean isSlowRemote(Uri uri) {
         return "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
     }
