@@ -77,4 +77,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0-beta01'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'commons-net:commons-net:3.6'
+    implementation 'com.jcraft:jsch:0.1.55'
 }
