@@ -14,23 +14,39 @@
 
 package com.archos.filecorelibrary.jcifs;
 
+import android.net.Uri;
 import android.util.Log;
+
+import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import jcifs.CIFSException;
 import jcifs.context.BaseContext;
 import jcifs.CIFSContext;
 import jcifs.config.PropertyConfiguration;
+import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbAuthException;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.Properties;
 
 
 public class JcifsUtils {
 
     private final static String TAG = "JcifsUtils";
+    private final static boolean DBG = true;
+
     public final static boolean SMB2 = true;
     
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1 = createContext(false);
     private static CIFSContext baseContextSmb2 = createContext(true);
+
+    private static CIFSContext baseContextSmb1Only = createContextOnly(false);
+    private static CIFSContext baseContextSmb2Only = createContextOnly(true);
 
     private static CIFSContext createContext(boolean isSmb2) {
         prop = new Properties();
@@ -38,6 +54,44 @@ public class JcifsUtils {
 
         prop.put("jcifs.smb.client.enableSMB2", String.valueOf(isSmb2));
         prop.put("jcifs.smb.client.disableSMB1", "false");
+
+        // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
+        // do not change resolveOrder for now
+        prop.put("jcifs.resolveOrder", "BCAST,DNS");
+
+        // get around https://github.com/AgNO3/jcifs-ng/issues/40
+        prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
+        // allow plaintext password fallback
+        prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
+        // disable dfs makes win10 shares with ms account work
+        prop.put("jcifs.smb.client.dfs.disabled", "true");
+        // make Guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186
+        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "false");
+
+        PropertyConfiguration propertyConfiguration = null;
+        try {
+            propertyConfiguration = new PropertyConfiguration(prop);
+        } catch (CIFSException e) {
+            //Log.e(TAG, "CIFSException: ", e);
+            Log.d(TAG, "CIFSException caught PropertyConfiguration");
+        }
+        return new BaseContext(propertyConfiguration);
+    }
+
+    private static CIFSContext createContextOnly(boolean isSmb2) {
+        prop = new Properties();
+        prop.putAll(System.getProperties());
+
+        if (isSmb2) {
+            prop.put("jcifs.smb.client.disableSMB1", "true");
+            prop.put("jcifs.smb.client.enableSMB2", "false");
+            prop.put("jcifs.smb.client.useSMB2Negotiation", "true");
+        } else {
+            prop.put("jcifs.smb.client.disableSMB1", "false");
+            prop.put("jcifs.smb.client.enableSMB2", "true");
+            prop.put("jcifs.smb.client.useSMB2Negotiation", "false");
+        }
+
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
         prop.put("jcifs.resolveOrder", "BCAST,DNS");
@@ -63,6 +117,85 @@ public class JcifsUtils {
 
     public static CIFSContext getBaseContext(boolean isSmb2) {
         return isSmb2 ? baseContextSmb2 : baseContextSmb1;
+    }
+
+    public static CIFSContext getBaseContextOnly(boolean isSmb2) {
+        return isSmb2 ? baseContextSmb2Only : baseContextSmb1Only;
+    }
+
+    private static HashMap<String, Boolean> ListServers = new HashMap<>();
+
+    public static void declareServerSmbV2(String server, boolean isSmbV2) {
+        if (DBG) Log.d(TAG, "declareServerSmbV2 for " + server + " " + isSmbV2);
+        ListServers.put(server, isSmbV2);
+    }
+
+    // isServerSmbV2 returns true/false/null, null is do not know
+    public static Boolean isServerSmbV2(String server) throws MalformedURLException {
+        Boolean isSmbV2 = ListServers.get(server);
+        if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " " + isSmbV2);
+        if (isSmbV2 == null) { // let's probe server root
+            Uri uri = Uri.parse("smb://" + server + "/");
+            NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+            NtlmPasswordAuthenticator auth = null;
+            if (cred != null)
+                auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+            else auth = new NtlmPasswordAuthenticator("", "GUEST", "");
+            CIFSContext context = null;
+            SmbFile smbFile = null;
+            try {
+                if (DBG) Log.d(TAG, "isServerSmbV2: probing " + uri + " to check if smbV2");
+                context = getBaseContextOnly(true);
+                smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
+                smbFile.getType(); // should be SmbFile.TYPE_SERVER
+                declareServerSmbV2(server, true);
+                return true;
+            } catch (SmbAuthException authE) {
+                if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbAutException in probing");
+                return null;
+            } catch (SmbException smbE) {
+                if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbException " + smbE);
+                try {
+                    if (DBG) Log.d(TAG, "isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
+                    context = getBaseContextOnly(false);
+                    smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
+                    smbFile.getType(); // should be SmbFile.TYPE_SERVER
+                    declareServerSmbV2(server, false);
+                    return false;
+                } catch (SmbException ce2) {
+                    if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbAutException in probing");
+                    return null;
+                }
+            }
+        } else
+            return isSmbV2;
+    }
+
+    public static SmbFile getSmbFile(Uri uri) throws MalformedURLException {
+
+        // TODO MARC: when using SMBv2 only cannot list top of the shares -> need SMBv1 renego...
+
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        SmbFile smbfile = null;
+        NtlmPasswordAuthenticator auth = null;
+        if (cred != null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+        else
+            auth = new NtlmPasswordAuthenticator("","GUEST", "");
+        Boolean isSmbV2 = isServerSmbV2(uri.getHost());
+        CIFSContext context = null;
+        if (isSmbV2 == null) { // server type not identified, default to smbV2
+            context = getBaseContext(true);
+            if (DBG) Log.d(TAG, "getSmbFile: server NOT identified passing smbv2/smbv1 capable context for uri " + uri);
+        } else if (isSmbV2) { // provide smbV2 only
+            context = getBaseContextOnly(true);
+            if (DBG) Log.d(TAG, "getSmbFile: server already identified as smbv2 processing uri " + uri);
+        } else { // if dont't know (null) or smbV2 provide smbV2 only to try out. Fallback needs to be implemented in each calls
+            context = getBaseContextOnly(false);
+            if (DBG) Log.d(TAG, "getSmbFile: server already identified as smbv1 processing uri " + uri);
+        }
+        smbfile = new SmbFile(uri.toString(), context.withCredentials(auth));
+        return smbfile;
     }
 
 }

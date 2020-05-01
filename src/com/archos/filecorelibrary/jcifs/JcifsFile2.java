@@ -27,10 +27,16 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import java.net.MalformedURLException;
 
 import jcifs.CIFSContext;
+import jcifs.CIFSException;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
+
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.getBaseContext;
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.getBaseContextOnly;
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.isServerSmbV2;
 
 public class JcifsFile2 extends MetaFile2 {
 
@@ -92,19 +98,8 @@ public class JcifsFile2 extends MetaFile2 {
      * Private so that user has to use the static fromUri() instead (to make it more clear)
      */
     private JcifsFile2(Uri uri) throws MalformedURLException, SmbException {
-
         // Create the SmbFile instance
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        SmbFile file;
-
-        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
-        NtlmPasswordAuthenticator auth = null;
-        if(cred!=null)
-            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-        else
-            auth = new NtlmPasswordAuthenticator("","GUEST", "");
-        file = new SmbFile(uri.toString(), context.withCredentials(auth));
-
+        SmbFile file = getSmbFile(uri);
         // Using the methods doing network access to get the actual data
         mUriString = file.getCanonicalPath();
         String name  = file.getName();
@@ -188,7 +183,6 @@ public class JcifsFile2 extends MetaFile2 {
     @Override
     public boolean isRemote() {
         return true;
-
     }
 
     @Override
