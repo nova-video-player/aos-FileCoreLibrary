@@ -30,11 +30,14 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import jcifs.CIFSContext;
+import jcifs.CIFSException;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileFilter;
+
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 
 /**
@@ -45,7 +48,7 @@ import jcifs.smb.SmbFileFilter;
 public class JcifListingEngine extends ListingEngine {
 
     private final static String TAG = "JcifListingEngine";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     final private Uri mUri;
     final private JcifListingThread mListingThread;
@@ -59,7 +62,6 @@ public class JcifListingEngine extends ListingEngine {
         mListingThread = new JcifListingThread();
     }
 
-
     @Override
     public void start() {
         // Tell ASAP the listener that we are starting discovery
@@ -70,9 +72,7 @@ public class JcifListingEngine extends ListingEngine {
                 }
             }
         });
-
         mListingThread.start();
-
         preLaunchTimeOut();
     }
 
@@ -111,16 +111,7 @@ public class JcifListingEngine extends ListingEngine {
         public void run(){
             try {
                 Log.d(TAG, "listFiles for:"+mUri.toString());
-                NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
-                SmbFile[] listFiles;
-                CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
-                NtlmPasswordAuthenticator auth = null;
-                if(cred!=null)
-                    auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-                else
-                    auth = new NtlmPasswordAuthenticator("","GUEST", "");
-                listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles(mFileFilter);
-
+                SmbFile[] listFiles = getSmbFile(mUri).listFiles(mFileFilter);
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
                     mUiHandler.post(new Runnable() {

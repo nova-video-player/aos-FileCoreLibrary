@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jcifs.CIFSContext;
+import jcifs.CIFSException;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
+
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 
 /**
@@ -47,15 +50,7 @@ public class JcifsRawLister extends RawLister {
     }
 
     public List<MetaFile2> getFileList() throws SmbException, MalformedURLException{
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
-        SmbFile[] listFiles;
-        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
-        NtlmPasswordAuthenticator auth = null;
-        if(cred!=null)
-            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-        else
-            auth = new NtlmPasswordAuthenticator("", "GUEST", "");
-        listFiles = new SmbFile(mUri.toString(), context.withCredentials(auth)).listFiles();
+        SmbFile[] listFiles = getSmbFile(mUri).listFiles();
         if(listFiles!=null){
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){

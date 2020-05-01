@@ -216,7 +216,6 @@ public class FileUtils {
                     name = uri.toString().substring(uri.toString().lastIndexOf("/") + 1);
                 else
                     name = uri.toString();
-
             }
             if(name!=null&&"content".equals(uri.getScheme())){
                 String[] parts = name.split(":");

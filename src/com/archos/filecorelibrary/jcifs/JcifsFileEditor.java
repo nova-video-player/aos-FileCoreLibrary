@@ -21,18 +21,17 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 
-import jcifs.CIFSContext;
-import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
 
 import com.archos.filecorelibrary.FileEditor;
-import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import android.net.Uri;
 import android.util.Log;
+
+import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 public class JcifsFileEditor extends FileEditor{
 
@@ -68,7 +67,6 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-
         InputStream is = new SmbFileInputStream(getSmbFile(mUri));
         is.skip(from);
         return is;
@@ -78,7 +76,6 @@ public class JcifsFileEditor extends FileEditor{
     public OutputStream getOutputStream() throws SmbException, MalformedURLException, UnknownHostException {
         return  new SmbFileOutputStream(getSmbFile(mUri));
     }
-
 
     @Override
     public void delete() throws Exception {
@@ -91,36 +88,19 @@ public class JcifsFileEditor extends FileEditor{
     public boolean rename(String newName) {
         try {
             SmbFile from = getSmbFile(mUri);
-            if(from!=null) {
+            if (from != null) {
                 SmbFile to = getSmbFile(Uri.parse(from.getParent() + "/" + newName));
-                if(to!=null){
-
+                if (to != null) {
                     from.renameTo(to);
                     return true;
                 }
             }
-        }
-        catch (SmbException e) {
+        } catch (SmbException e) {
             caughtException(e, "rename", "SmbException in rename");
         } catch (MalformedURLException e) {
             caughtException(e, "rename", "MalformedURLException in rename");
         }
         return false;
-    }
-
-    private SmbFile getSmbFile(Uri uri) throws MalformedURLException {
-
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        SmbFile smbfile = null;
-        CIFSContext context = JcifsUtils.getBaseContext(JcifsUtils.SMB2);
-        NtlmPasswordAuthenticator auth = null;
-        if(cred!=null)
-            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-        else
-            auth = new NtlmPasswordAuthenticator("","GUEST", "");
-        smbfile= new SmbFile(uri.toString(), context.withCredentials(auth));
-        return smbfile;
-
     }
 
     @Override
@@ -132,8 +112,7 @@ public class JcifsFileEditor extends FileEditor{
     public boolean exists() {
         try {
             SmbFile sf = getSmbFile(mUri);
-            if(sf!=null)
-                return sf.exists();
+            if (sf != null) return sf.exists();
         } catch (SmbException e) {
             caughtException(e, "exists", "SmbException in exists");
         } catch (MalformedURLException e) {
@@ -141,6 +120,7 @@ public class JcifsFileEditor extends FileEditor{
         }
         return false;
     }
+
     private void caughtException(Throwable e, String method, String exceptionType) {
         if (DBG) Log.e(TAG, method + ": caught" + exceptionType, e);
         else Log.w(TAG, method + ": caught "+ exceptionType);
