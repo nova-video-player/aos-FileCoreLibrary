@@ -22,21 +22,13 @@ import android.util.Log;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
-import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
-
 import java.net.MalformedURLException;
 
-import jcifs.CIFSContext;
-import jcifs.CIFSException;
-import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
-import static com.archos.filecorelibrary.jcifs.JcifsUtils.getBaseContext;
-import static com.archos.filecorelibrary.jcifs.JcifsUtils.getBaseContextOnly;
 import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
-import static com.archos.filecorelibrary.jcifs.JcifsUtils.isServerSmbV2;
 
 public class JcifsFile2 extends MetaFile2 {
 

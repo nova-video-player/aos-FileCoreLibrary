@@ -21,7 +21,6 @@ import android.util.Log;
 
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
-import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -29,16 +28,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import jcifs.CIFSContext;
-import jcifs.CIFSException;
-import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileFilter;
 
 import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
-
 
 /**
  * This class handles the threading of the Jcifs (Samba) file listing

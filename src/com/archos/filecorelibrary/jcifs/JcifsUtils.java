@@ -14,9 +14,14 @@
 
 package com.archos.filecorelibrary.jcifs;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
+import com.archos.environment.NetworkState;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import jcifs.CIFSException;
@@ -39,8 +44,6 @@ public class JcifsUtils {
     private final static String TAG = "JcifsUtils";
     private final static boolean DBG = true;
 
-    // when enabling SMB2 it will enable SMBv2 protocol
-    public final static boolean SMB2 = false;
     // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
     // this is a hack to get around some issues seen with jcifs-ng
     public final static boolean LIMIT_PROTOCOL_NEGO = false;
@@ -51,6 +54,30 @@ public class JcifsUtils {
 
     private static CIFSContext baseContextSmb1Only = createContextOnly(false);
     private static CIFSContext baseContextSmb2Only = createContextOnly(true);
+
+    private static Context mContext;
+
+    // singleton, volatile to make double-checked-locking work correctly
+    private static volatile JcifsUtils sInstance;
+
+    // get the instance, context is used for initial context injection
+    public static JcifsUtils getInstance(Context context) {
+        if (sInstance == null) {
+            synchronized(JcifsUtils.class) {
+                if (sInstance == null) sInstance = new JcifsUtils(context.getApplicationContext());
+            }
+        }
+        return sInstance;
+    }
+
+    /** may return null but no Context required */
+    public static JcifsUtils peekInstance() {
+        return sInstance;
+    }
+
+    private JcifsUtils(Context context) {
+        mContext = context;
+    }
 
     private static CIFSContext createContext(boolean isSmb2) {
         prop = new Properties();
@@ -175,10 +202,10 @@ public class JcifsUtils {
     }
 
     public static SmbFile getSmbFile(Uri uri) throws MalformedURLException {
-        if (LIMIT_PROTOCOL_NEGO)
+        if (isSMBv2Enabled() && LIMIT_PROTOCOL_NEGO)
             return getSmbFileStrictNego(uri);
         else
-            return getSmbFileAllProtocols(uri);
+            return getSmbFileAllProtocols(uri, isSMBv2Enabled());
     }
 
     public static SmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
@@ -203,15 +230,20 @@ public class JcifsUtils {
         return new SmbFile(uri.toString(), context.withCredentials(auth));
     }
 
-    public static SmbFile getSmbFileAllProtocols(Uri uri) throws MalformedURLException {
+    public static SmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         NtlmPasswordAuthenticator auth = null;
         if (cred != null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
         else
             auth = new NtlmPasswordAuthenticator("","GUEST", "");
-        CIFSContext context = getBaseContext(SMB2);
+        CIFSContext context = getBaseContext(isSMBv2);
         return new SmbFile(uri.toString(), context.withCredentials(auth));
+    }
+
+    public static boolean isSMBv2Enabled() {
+        if (DBG) Log.d(TAG, "isSMBv2Enabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", false));
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", false);
     }
 
 }
