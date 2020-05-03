@@ -40,7 +40,7 @@ public class JcifsUtils {
     private final static boolean DBG = true;
 
     // when enabling SMB2 it will enable SMBv2 protocol
-    public final static boolean SMB2 = true;
+    public final static boolean SMB2 = false;
     // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
     // this is a hack to get around some issues seen with jcifs-ng
     public final static boolean LIMIT_PROTOCOL_NEGO = false;
