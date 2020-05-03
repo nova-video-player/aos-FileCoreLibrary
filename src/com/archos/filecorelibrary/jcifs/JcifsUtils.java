@@ -84,7 +84,7 @@ public class JcifsUtils {
         prop.putAll(System.getProperties());
 
         prop.put("jcifs.smb.client.enableSMB2", String.valueOf(isSmb2));
-        prop.put("jcifs.smb.client.useSMB2Negotiation", String.valueOf(!isSmb2));
+        prop.put("jcifs.smb.client.useSMB2Negotiation", String.valueOf(isSmb2));
         prop.put("jcifs.smb.client.disableSMB1", "false");
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
