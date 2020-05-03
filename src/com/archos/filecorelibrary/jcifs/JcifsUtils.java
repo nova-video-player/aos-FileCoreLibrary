@@ -39,8 +39,12 @@ public class JcifsUtils {
     private final static String TAG = "JcifsUtils";
     private final static boolean DBG = true;
 
+    // when enabling SMB2 it will enable SMBv2 protocol
     public final static boolean SMB2 = true;
-    
+    // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
+    // this is a hack to get around some issues seen with jcifs-ng
+    public final static boolean LIMIT_PROTOCOL_NEGO = false;
+
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1 = createContext(false);
     private static CIFSContext baseContextSmb2 = createContext(true);
@@ -172,11 +176,14 @@ public class JcifsUtils {
     }
 
     public static SmbFile getSmbFile(Uri uri) throws MalformedURLException {
+        if (LIMIT_PROTOCOL_NEGO)
+            return getSmbFileStrictNego(uri);
+        else
+            return getSmbFileAllProtocols(uri);
+    }
 
-        // TODO MARC: when using SMBv2 only cannot list top of the shares -> need SMBv1 renego...
-
+    public static SmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        SmbFile smbfile = null;
         NtlmPasswordAuthenticator auth = null;
         if (cred != null)
             auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
@@ -194,8 +201,18 @@ public class JcifsUtils {
             context = getBaseContextOnly(false);
             if (DBG) Log.d(TAG, "getSmbFile: server already identified as smbv1 processing uri " + uri);
         }
-        smbfile = new SmbFile(uri.toString(), context.withCredentials(auth));
-        return smbfile;
+        return new SmbFile(uri.toString(), context.withCredentials(auth));
+    }
+
+    public static SmbFile getSmbFileAllProtocols(Uri uri) throws MalformedURLException {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        NtlmPasswordAuthenticator auth = null;
+        if (cred != null)
+            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+        else
+            auth = new NtlmPasswordAuthenticator("","GUEST", "");
+        CIFSContext context = getBaseContext(SMB2);
+        return new SmbFile(uri.toString(), context.withCredentials(auth));
     }
 
 }
