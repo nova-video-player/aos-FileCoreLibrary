@@ -82,17 +82,20 @@ public class SambaConfiguration {
 		LinkedList<String> result = new LinkedList<String>();
 		BufferedReader in = null;
 		try{
-		in = new BufferedReader(new FileReader(configFile));
-		String current_line ;
-		do{
-			current_line=cleanLine(in.readLine());
-			if (current_line !=null && current_line.startsWith("[/")) {
-				result.add(current_line.substring(1,current_line.length() -1));
+			File fileConfig = new File(configFile);
+			if (fileConfig.exists()) {
+				in = new BufferedReader(new FileReader(configFile));
+				String current_line;
+				do {
+					current_line = cleanLine(in.readLine());
+					if (current_line != null && current_line.startsWith("[/")) {
+						result.add(current_line.substring(1, current_line.length() - 1));
 
+					}
+				}
+				while (current_line != null);
+				in.close();
 			}
-		}
-		while( current_line!=null);
-		in.close();
 		}catch(java.io.IOException e){
 			e.printStackTrace();
 		} finally {
