@@ -46,7 +46,7 @@ android {
         myCmd.add("make")
         myCmd.add("native_libnativehelper")
         myCmd.add("native_build_FileCoreLibrary")
-        myCmd.add("jcifs-ng")
+        //myCmd.add("jcifs-ng")
         commandLine myCmd
     }
 
@@ -55,7 +55,7 @@ android {
         List<String> myCmd = new ArrayList<String>()
         myCmd.add("make")
         myCmd.add("native_clean")
-        myCmd.add("external_clean_jcifs-ng")
+        //myCmd.add("external_clean_jcifs-ng")
         commandLine myCmd
     }
 
