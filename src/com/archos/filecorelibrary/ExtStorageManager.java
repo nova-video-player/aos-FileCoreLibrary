@@ -94,10 +94,10 @@ public class ExtStorageManager {
             Class ServiceManager = cl.loadClass("android.os.ServiceManager");
             Class IMountService;
             Class Stub;
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 IMountService = cl.loadClass("android.os.storage.IStorageManager");
                 Stub = cl.loadClass("android.os.storage.IStorageManager$Stub");
-            }else{
+            } else {
                 IMountService = cl.loadClass("android.os.storage.IMountService");
                 Stub = cl.loadClass("android.os.storage.IMountService$Stub");
             }
@@ -123,9 +123,6 @@ public class ExtStorageManager {
             @SuppressWarnings("unchecked")
             Method asInterface = Stub.getMethod("asInterface", paramTypes);
 
-            @SuppressWarnings("unchecked")
-            Method getPath = StorageVolume.getMethod("getPath", noparams);
-
             Method isPrimary = null;
             Method getStorageId = null;
             Method getUuid = null;
@@ -138,6 +135,7 @@ public class ExtStorageManager {
                 findVolumeByUuid = StorageManager.class.getMethod("findVolumeByUuid", new Class[]{String.class});
             }
 
+            Method getPath = null;
             Method isMountedReadable = null;
             Method getDisk = null;
             Method isSd = null;
@@ -156,6 +154,10 @@ public class ExtStorageManager {
                 isUsb = DiskInfo.getMethod("isUsb", noparams);
                 type = VolumeInfo.getDeclaredField("type");
                 getDescription = DiskInfo.getMethod("getDescription", noparams);
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                getPath = StorageVolume.getMethod("getPath", noparams);
             }
 
             //Parameters
