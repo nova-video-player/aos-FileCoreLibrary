@@ -42,7 +42,7 @@ import java.util.Properties;
 public class JcifsUtils {
 
     private final static String TAG = "JcifsUtils";
-    private final static boolean DBG = false;
+    private final static boolean DBG = true;
 
     // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
     // this is a hack to get around some issues seen with jcifs-ng
@@ -84,7 +84,8 @@ public class JcifsUtils {
         prop.putAll(System.getProperties());
 
         prop.put("jcifs.smb.client.enableSMB2", String.valueOf(isSmb2));
-        prop.put("jcifs.smb.client.useSMB2Negotiation", String.valueOf(isSmb2));
+        // must remain false to be able to talk to smbV1 only
+        prop.put("jcifs.smb.client.useSMB2Negotiation", "false");
         prop.put("jcifs.smb.client.disableSMB1", "false");
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
@@ -115,6 +116,7 @@ public class JcifsUtils {
         if (isSmb2) {
             prop.put("jcifs.smb.client.disableSMB1", "true");
             prop.put("jcifs.smb.client.enableSMB2", "true");
+            // note that connectivity with smbV1 will not be working
             prop.put("jcifs.smb.client.useSMB2Negotiation", "true");
         } else {
             prop.put("jcifs.smb.client.disableSMB1", "false");
@@ -177,7 +179,7 @@ public class JcifsUtils {
                 if (DBG) Log.d(TAG, "isServerSmbV2: probing " + uri + " to check if smbV2");
                 context = getBaseContextOnly(true);
                 smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
-                smbFile.getType(); // should be SmbFile.TYPE_SERVER
+                smbFile.list(); // getType is pure smbV1, only list provides a result
                 declareServerSmbV2(server, true);
                 return true;
             } catch (SmbAuthException authE) {
@@ -189,7 +191,7 @@ public class JcifsUtils {
                     if (DBG) Log.d(TAG, "isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
                     context = getBaseContextOnly(false);
                     smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
-                    smbFile.getType(); // should be SmbFile.TYPE_SERVER
+                    smbFile.list(); // getType is pure smbV1, only list provides a result
                     declareServerSmbV2(server, false);
                     return false;
                 } catch (SmbException ce2) {
