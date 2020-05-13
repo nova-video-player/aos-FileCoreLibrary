@@ -11,6 +11,8 @@ allprojects {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         }
+        // to generate the required jar dependencies e.g. cling seamless
+        preBuild.dependsOn(ndkBuild)
     }
 }
 
@@ -40,25 +42,6 @@ android {
         multiDexEnabled true
     }
 
-    task ndkBuild(type:Exec) {
-        workingDir = "../"
-        List<String> myCmd = new ArrayList<String>()
-        myCmd.add("make")
-        myCmd.add("native_libnativehelper")
-        myCmd.add("native_build_FileCoreLibrary")
-        //myCmd.add("jcifs-ng")
-        commandLine myCmd
-    }
-
-    task ndkClean(type:Exec) {
-        workingDir = "../"
-        List<String> myCmd = new ArrayList<String>()
-        myCmd.add("make")
-        myCmd.add("native_clean")
-        myCmd.add("external_clean_jcifs-ng")
-        commandLine myCmd
-    }
-
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn ndkBuild
     }
@@ -70,6 +53,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+}
+
+task ndkBuild(type:Exec) {
+    workingDir = "../"
+    List<String> myCmd = new ArrayList<String>()
+    myCmd.add("make")
+    myCmd.add("native_libnativehelper")
+    myCmd.add("native_build_FileCoreLibrary")
+    //myCmd.add("jcifs-ng")
+    commandLine myCmd
+}
+
+task ndkClean(type:Exec) {
+    workingDir = "../"
+    List<String> myCmd = new ArrayList<String>()
+    myCmd.add("make")
+    myCmd.add("native_clean")
+    //myCmd.add("external_clean_jcifs-ng")
+    commandLine myCmd
 }
 
 dependencies {
