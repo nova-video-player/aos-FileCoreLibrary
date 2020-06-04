@@ -57,6 +57,14 @@ android {
 
 task ndkBuild(type:Exec) {
     workingDir = "../"
+
+    outputs.upToDateWhen {
+        file("libs/arm64-v8a/libc++_shared.so").exists()
+        file("libs/armeabi-v7a/libc++_shared.so").exists()
+        file("libs/x86/libc++_shared.so").exists()
+        file("libs/x86_64/libc++_shared.so").exists()
+    }
+    //OutputFiles/OutputDirectories
     List<String> myCmd = new ArrayList<String>()
     myCmd.add("make")
     myCmd.add("native_libnativehelper")
@@ -76,7 +84,7 @@ task ndkClean(type:Exec) {
 
 dependencies {
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.2.0-beta01'
+    implementation 'androidx.appcompat:appcompat:1.2.0-rc01'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'commons-net:commons-net:3.6'
 }
