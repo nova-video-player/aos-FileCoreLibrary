@@ -126,6 +126,8 @@ public class JcifsUtils {
             prop.put("jcifs.smb.client.useSMB2Negotiation", "false");
             // get around https://github.com/AgNO3/jcifs-ng/issues/40
             prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
+            // see https://github.com/AgNO3/jcifs-ng/issues/226
+            prop.put("jcifs.smb.useRawNTLM", "true");
         }
 
         // makes Guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186 and must be true otherwise interferes with WD MyCloud cf. https://github.com/AgNO3/jcifs-ng/issues/225
