@@ -46,6 +46,7 @@
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">WiFi 直连</string>
     <string name="receive_p2p_here">通过 WiFi 直连接收到这里</string>
+    <string name="empty"></string>
     <string name="empty_message">发现可用的目标设备&#8230;&lt;br/&gt; 目标设备必须已启用 &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; 选项</string>
     <string name="wifip2p_waiting">WiFi 直连传输即将开始</string>
     <string name="connect_to_target">正在连接目标</string>
