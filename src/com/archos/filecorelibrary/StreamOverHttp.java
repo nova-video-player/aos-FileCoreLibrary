@@ -47,7 +47,7 @@ import jcifs2.util.transport.TransportException;
  * Random access input stream is optionally supported, depending if file can be opened in this mode. 
  */
 public class StreamOverHttp{
-	private static final boolean DBG = false;
+	private static final boolean DBG = true;
 	private static final String TAG = "StreamOverHttp";
 	private final Uri mUri;
 	private final String mName;
@@ -415,6 +415,7 @@ public class StreamOverHttp{
 					if(endAt < 0)
 						endAt = length - 1;
 					sendCount = (endAt - startFrom + 1);
+					if (DBG) Log.w(TAG, "handleResponse: startFrom = " + startFrom + " + endAt=" + endAt +" sendCount=" + sendCount + " (length = " + length + ")");
 					if(sendCount < 0)
 						sendCount = 0;
 					status = "206 Partial Content";
@@ -531,12 +532,16 @@ public class StreamOverHttp{
 		if (DBG) Log.d(TAG, "copyStream");
 		int count;
 
-		while(maxSize>0){
+		while(maxSize>0) {
+			if (DBG) Log.d(TAG, "copyStream: looping maxSize= " + maxSize);
 			count = (int) Math.min(maxSize, (long)tmpBuf.length);
+			if (DBG) Log.d(TAG, "copyStream: looping count= " + count);
 			count = in.read(tmpBuf, 0, count);
+			if (DBG) Log.d(TAG, "copyStream: looping count after in.read " + count);
 			if(count<0)
 				break;
-			out.write(tmpBuf, 0, count);
+			if (DBG) Log.d(TAG, "copyStream: looping tmpBuf is of length " + tmpBuf.length + " writing count " + count);
+			out.write(tmpBuf, 0, count); // TODO MARC CRASH HERE
 			out.flush();
 			maxSize -= count;
 		}
@@ -571,9 +576,8 @@ public class StreamOverHttp{
 			}
 			pw.print("\r\n");
 			pw.flush();
-			if(isInput != null){
+			if(isInput != null)
 				copyStream(bin, out, buf, sendCount);
-			}
 			else if(errMsg!=null) {
 				pw.print(errMsg);
 				pw.flush();
