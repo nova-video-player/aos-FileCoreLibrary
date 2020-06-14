@@ -47,7 +47,7 @@ import jcifs2.util.transport.TransportException;
  * Random access input stream is optionally supported, depending if file can be opened in this mode. 
  */
 public class StreamOverHttp{
-	private static final boolean debug = false;
+	private static final boolean DBG = false;
 	private static final String TAG = "StreamOverHttp";
 	private final Uri mUri;
 	private final String mName;
@@ -70,7 +70,6 @@ public class StreamOverHttp{
 	private String mSubfolder;
 	private int mPosterGenericResource;
 
-
 	public StreamOverHttp(MetaFile2 f, String forceMimeType) throws IOException{
 		mMetaFile = f;
 		mUri= f.getUri();
@@ -79,14 +78,13 @@ public class StreamOverHttp{
         serverSocket = new ServerSocket(0);
 		mainThread = new Thread(new Runnable(){
 			public void run(){
-				try{
+				try {
 					while(true) {
 						Socket accept = serverSocket.accept();
 						new HttpSession(accept,fileMimeType);
 					}
-				}catch(IOException e){
-					if (debug)
-						Log.w(TAG, e);
+				} catch(IOException e) {
+					if (DBG) Log.w(TAG, "StreamOverHttp: caught IOException ", e);
 				}
 			}
 
@@ -102,16 +100,13 @@ public class StreamOverHttp{
         serverSocket = new ServerSocket(0);
         mainThread = new Thread(new Runnable(){
             public void run(){
-
-                try{
+                try {
                     while(true) {
                         Socket accept = serverSocket.accept();
                         new HttpSession(accept,fileMimeType);
                     }
-                }catch(IOException e){
-
-                    if (debug)
-                        Log.w(TAG, e);
+                } catch(IOException e) {
+                    if (DBG) Log.w(TAG, "StreamOverHttp: caught IOException ", e);
                 }
             }
 
@@ -119,8 +114,6 @@ public class StreamOverHttp{
         mainThread.setName("Stream over HTTP");
         mainThread.setDaemon(true);
         mainThread.start();
-
-
     }
 	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml"};
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
@@ -156,9 +149,8 @@ public class StreamOverHttp{
 				if (!name.startsWith(filenameWithoutExtension) || name.lastIndexOf('.') == -1)
 					continue;
 				extension = item.getExtension();
-				if (subtitlesExtensions.contains(extension)){
+				if (subtitlesExtensions.contains(extension))
 					subs.add(item);
-				}
 			}
 		mSubList = subs;
 		return subs;
@@ -182,8 +174,7 @@ public class StreamOverHttp{
 		return getUri(posterLocalUri.getLastPathSegment());
 	}
 
-
-	private class HttpSession implements Runnable{
+	private class HttpSession implements Runnable {
 		private boolean canSeek;
 		private InputStream is;
 		private final Socket socket;
@@ -196,37 +187,35 @@ public class StreamOverHttp{
 		HttpSession(Socket s, String fileMimeType){
 			this.fileMimeType = fileMimeType;
 			socket = s;
-			if (debug) Log.i(TAG,"Stream over localhost: serving request on "+s.getInetAddress());
+			if (DBG) Log.i(TAG,"Stream over localhost: serving request on " + s.getInetAddress());
 			Thread t = new Thread(this, "Http response");
 			t.setDaemon(true);
 			t.start();
 		}
 
 		public void run(){
-
-			try{
+			try {
 				openInputStream();
 				handleResponse(socket);
-			}catch(IOException e){
-				if (debug)
-					Log.w(TAG, e);
-			}finally {
+			} catch(IOException e) {
+				if (DBG) Log.w(TAG, "HttpSession: caught IOException while running ", e);
+			} finally {
 				try {
 					socket.close();
-				} catch(Exception e) {}
+				} catch(Exception e) {
+					if (DBG) Log.w(TAG, "HttpSession: caught Exception closing socket ", e);
+				}
 				if(is!=null) {
-					try{
+					try {
 						is.close();
-					}catch(IOException e){
-						if (debug)
-							Log.w(TAG, e);
+					} catch(IOException e) {
+						if (DBG) Log.w(TAG, "HttpSession: caught IOException closing input stream ",e);
 					}
 				}
 			}
 		}
 
 		private void openInputStream() throws IOException{
-
 			boolean isAskingPoster = false;
 			boolean needsToStream = false;
 			long startFrom = 0;
@@ -242,7 +231,7 @@ public class StreamOverHttp{
 					String encodedPath;
 					if((encodedPath=decodeHeader(socket, hin, mPre))!=null){
 						String range = mPre.getProperty("range");
-						if(range!=null){
+						if(range!=null) {
 							range = range.substring(6);
 
 							int minus = range.indexOf('-');
@@ -252,29 +241,25 @@ public class StreamOverHttp{
 						}
 						path = Uri.decode(encodedPath);
 					}
-				} catch (InterruptedException e) { }
+				} catch (InterruptedException e) {
+					if (DBG) Log.w(TAG, "openInputStream: caught InterruptedException ", e);
+				}
 			}
 
 			try {
 				canSeek = true;
-
 				/*
 				 * first, we retrieve main metafile
 				 */
-				if(mMetaFile==null&&mUri!=null){
+				if(mMetaFile==null&&mUri!=null) {
 					try {
 						mMetaFile = MetaFile2Factory.getMetaFileForUrl(mUri);
+					} catch(Exception e) {
+						if (DBG) Log.w(TAG, "openInputStream: caught InterruptedException retrieving metafile ",e);
 					}
-					catch(Exception e){
-
-					}
-
 				}
-
-
 				/*
 					some players like MXPlayer try to find subs associated with http urls
-
 				 */
 
 				MetaFile2 metaFile2=null;
@@ -302,27 +287,22 @@ public class StreamOverHttp{
 						isAskingPoster = true;
 						if(!isResourcePoster(mPosterLocalUri))
 							metaFile2 = MetaFile2Factory.getMetaFileForUrl(mPosterLocalUri);
-					}else {
+					} else {
 						if (!mName.equals(name)) {
 							List<MetaFile2> subs = getSubtitleList(mUri);
 							String extension = MimeUtils.getExtension(path);
 							for (MetaFile2 sub : subs) {
 								if (sub.getName().equals(name)) {
 									metaFile2 = sub;
-
 									break;
 								}
-								if (sub.getExtension().equals(extension)) {
+								if (sub.getExtension().equals(extension))
 									subFallback = sub;
-								}
 							}
 							if (metaFile2 == null)
 								metaFile2 = subFallback;
-							if (metaFile2 != null) {
-
+							if (metaFile2 != null)
 								canSeek = false;
-
-							}
 						}
 					}
 				}
@@ -332,9 +312,10 @@ public class StreamOverHttp{
 				if(metaFile2!=null) { //mMetafile can be null
 					if(metaFile2.length()!=0)
 						length = metaFile2.length();
-					try{
+					try {
 						is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream(startFrom);
-					}catch (IOException ioexception) {
+					 } catch (IOException ioexception) {
+						if (DBG) Log.w(TAG, "openInputStream: caught IOException ", ioexception);
 						if (ioexception.getMessage().equals("Illegal seek")){
 							is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream();
 							canSeek = false;
@@ -347,7 +328,8 @@ public class StreamOverHttp{
 					} else {
 						try {
 							is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream(startFrom);
-						}catch (IOException ioexception) {
+						} catch (IOException ioexception) {
+							if (DBG) Log.w(TAG, "openInputStream: caught IOException ", ioexception);
 							if (ioexception.getMessage().equals("Illegal seek")){
 								is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream();
 								canSeek = false;
@@ -361,14 +343,12 @@ public class StreamOverHttp{
 				if(length == 0 && "content".equalsIgnoreCase(mUri.getScheme()))
 					length = ((ContentStorageFileEditor)FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext())).getSize();
 
-			}  catch (Exception e) {
-				e.printStackTrace();
-
+			} catch (Exception e) {
+				Log.e(TAG, "openInputStream: caught Exception ", e);
 			}
-
 		}
 
-		private void handleResponse(Socket socket) throws TransportException{
+		private void handleResponse(Socket socket) throws TransportException {
 			try{
 				InputStream inS = socket.getInputStream();
 				if(inS == null&&mInS==null)
@@ -408,25 +388,25 @@ public class StreamOverHttp{
 				if(range==null || !canSeek) {
 					status = "200 OK";
 					sendCount = length;
-				}else {
+				} else {
 					if(!range.startsWith("bytes=")){
 						sendError(socket, HTTP_416, null);
 						return;
 					}
-					if(debug)
-						Log.d(TAG,"handleResponse : "+range);
+					if (DBG) Log.d(TAG,"handleResponse : "+range);
 					range = range.substring(6);
 					long startFrom = 0, endAt = -1;
 					int minus = range.indexOf('-');
-					if(minus > 0){
-						try{
+					if(minus > 0) {
+						try {
 							String startR = range.substring(0, minus);
 							startFrom = Long.parseLong(startR);
 							String endR = range.substring(minus + 1);
 							endAt = Long.parseLong(endR);
-						}catch(NumberFormatException nfe){}
+						} catch(NumberFormatException nfe) {
+							if (DBG) Log.w(TAG, "handleResponse: caught NumberFormatException ", nfe);
+						}
 					}
-
 					if(startFrom >= length){
 						sendError(socket, HTTP_416, null);
 						inS.close();
@@ -448,18 +428,17 @@ public class StreamOverHttp{
 				}
 				headers.put("Access-Control-Allow-Origin", "*");
 				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null);
-				if(debug) Log.d(TAG,"Http stream finished");
-			}catch(IOException ioe){
-				if(debug)
-					Log.w(TAG, ioe);
+				if (DBG) Log.d(TAG,"Http stream finished");
+			} catch(IOException ioe) {
+				if( DBG) Log.w(TAG, "handleResponse: caught IOException ", ioe);
 				try{
 					sendError(socket, HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-				}catch(Throwable t){
+				} catch(Throwable t) {
+					if( DBG) Log.w(TAG, "handleResponse: caught Throwable ", t);
 				}
-			}catch(InterruptedException ie){
+			} catch(InterruptedException ie) {
 				// thrown by sendError, ignore and exit the thread
-				if(debug)
-					Log.w(TAG, ie);
+				if (DBG) Log.w(TAG, "handleResponse: caught InterruptedException ", ie);
 			}
 		}
 
@@ -493,7 +472,7 @@ public class StreamOverHttp{
 					String line = in.readLine();
 					if(line==null)
 						break;
-					if(debug && line.length()>0)
+					if(DBG && line.length()>0)
 						Log.d(TAG, "decodeHeader "+line);
 					int p = line.indexOf(':');
 					if(p<0)
@@ -503,6 +482,7 @@ public class StreamOverHttp{
 					pre.put(atr, val);
 				}
 			}catch(IOException ioe){
+				if (DBG) Log.w(TAG, "decodeHeader: caught IOException ", ioe);
 				sendError(socket, HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
 			}
 			return path;
@@ -527,12 +507,11 @@ public class StreamOverHttp{
 	}
 
 	public void close(){
-		if (debug) Log.d(TAG,"Closing stream over http");
+		if (DBG) Log.d(TAG,"Closing stream over http");
 		try{
 			serverSocket.close();
-		}catch(Exception e){
-			if (debug)
-				Log.w(TAG, e);
+		} catch(Exception e) {
+			if (DBG) Log.w(TAG, "close: caught Exception ", e);
 		}
 	}
 
@@ -543,11 +522,13 @@ public class StreamOverHttp{
 	private void sendError(Socket socket, String status, String msg){
 		try {
 			sendResponse(socket, status, "text/plain", null, null, 0, null, msg);
-		} catch (IOException e) {}
+		} catch (IOException e) {
+			if (DBG) Log.w(TAG, "sendError: caught IOException ", e);
+		}
 	}
 
 	private void copyStream(InputStream in, OutputStream out, byte[] tmpBuf, long maxSize) throws IOException{
-		if (debug) Log.d(TAG, "copyStream");
+		if (DBG) Log.d(TAG, "copyStream");
 		int count;
 
 		while(maxSize>0){
@@ -564,9 +545,9 @@ public class StreamOverHttp{
 	 * Sends given response to the socket, and closes the socket.
 	 */
 	private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg) throws IOException {
-		if (debug) Log.d(TAG, "sendResponse");
+		if (DBG) Log.d(TAG, "sendResponse");
 		BufferedInputStream bin = null;
-		try{
+		try {
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out);
 			bin = new BufferedInputStream(isInput, BUFFER_SIZE*10);
@@ -584,7 +565,7 @@ public class StreamOverHttp{
 					String key = (String)e.nextElement();
 					String value = header.getProperty(key);
 					String l = key + ": " + value + "\r\n";
-					if(debug) Log.d(TAG, "sendResponse : " + l);
+					if(DBG) Log.d(TAG, "sendResponse : " + l);
 					pw.print(l);
 				}
 			}
@@ -599,18 +580,20 @@ public class StreamOverHttp{
 			}
 			out.flush();
 			out.close();
-		} catch(IOException e){
-			if(debug)
-				Log.d(TAG, "sendResponse ",e);
-		}finally {
-			try{
+		} catch(IOException e) {
+			if (DBG) Log.w(TAG, "sendResponse: caught IOException ", e);
+		} finally {
+			try {
 				socket.close();
-			}catch(Throwable t){}
+			} catch(Throwable t) {
+				if (DBG) Log.w(TAG, "sendResponse: caught Throwable closing socket ", t);
+			}
 			if (bin != null)
 				try{
 					bin.close();
-					
-				}catch(Throwable t){}
+				} catch(Throwable t) {
+					if (DBG) Log.w(TAG, "sendResponse: caught Throwable closing bin ", t);
+				}
 		}
 	}
 }
