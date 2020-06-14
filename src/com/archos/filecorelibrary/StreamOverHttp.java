@@ -349,7 +349,7 @@ public class StreamOverHttp{
 		}
 
 		private void handleResponse(Socket socket) throws TransportException {
-			try{
+			try {
 				InputStream inS = socket.getInputStream();
 				if(inS == null&&mInS==null)
 					return;
@@ -394,7 +394,7 @@ public class StreamOverHttp{
 						return;
 					}
 					if (DBG) Log.d(TAG,"handleResponse : "+range);
-					range = range.substring(6);
+					range = range.substring(6); // removes "bytes="
 					long startFrom = 0, endAt = -1;
 					int minus = range.indexOf('-');
 					if(minus > 0) {
@@ -402,7 +402,7 @@ public class StreamOverHttp{
 							String startR = range.substring(0, minus);
 							startFrom = Long.parseLong(startR);
 							String endR = range.substring(minus + 1);
-							endAt = Long.parseLong(endR);
+							if (endR.length() > 0) endAt = Long.parseLong(endR);
 						} catch(NumberFormatException nfe) {
 							if (DBG) Log.w(TAG, "handleResponse: caught NumberFormatException ", nfe);
 						}
