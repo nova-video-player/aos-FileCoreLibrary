@@ -47,7 +47,7 @@ import jcifs2.util.transport.TransportException;
  * Random access input stream is optionally supported, depending if file can be opened in this mode. 
  */
 public class StreamOverHttp{
-	private static final boolean DBG = true;
+	private static final boolean DBG = false;
 	private static final String TAG = "StreamOverHttp";
 	private final Uri mUri;
 	private final String mName;
