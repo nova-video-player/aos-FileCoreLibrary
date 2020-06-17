@@ -105,6 +105,7 @@ public class FileUtils {
     }
 
     public static boolean isLocal(Uri uri){
+        if (uri == null) return false;
         return uri.getScheme()==null||"file".equals(uri.getScheme())||"content".equalsIgnoreCase(uri.getScheme())||uri.toString().startsWith("/");
     }
     public static String getFileNameWithoutExtension(Uri uri){
