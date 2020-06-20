@@ -46,7 +46,6 @@
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">WiFi Direct</string>
     <string name="receive_p2p_here">přijmout zde přes WiFi Direct</string>
-    <string name="empty"></string>
     <string name="empty_message">Zjišťování dostupných cílových zařízení&#8230;&lt;br/&gt;Cílové zařízení musí aktivovat možnost &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
     <string name="wifip2p_waiting">Přenos přes WiFi Direct začne zanedlouho</string>
     <string name="connect_to_target">Připojování k cíli</string>

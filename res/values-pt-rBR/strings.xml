@@ -46,7 +46,6 @@
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">Wi-Fi Direct</string>
     <string name="receive_p2p_here">receber aqui via WiFi Direct</string>
-    <string name="empty"></string>
     <string name="empty_message">Descobrir dispositivos de destino disponíveis&#8230;&lt;br/&gt;O dispositivo de destino deve ativar &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; opção</string>
     <string name="wifip2p_waiting">A transferência por WiFi Direct começará em breve</string>
     <string name="connect_to_target">Conectando ao alvo</string>

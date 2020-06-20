@@ -46,7 +46,6 @@
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">Wifi Direct</string>
     <string name="receive_p2p_here">Wifi Direkt ile Alın</string>
-    <string name="empty"></string>
     <string name="empty_message">Kullanılabilir cihazlar&#8230;&lt;br/&gt; Hedef Cihaz &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; seçeneğini etkinleştirmeli.</string>
     <string name="wifip2p_waiting">WiFi Direct aktarımı kısa süre içinde başlayacak</string>
     <string name="connect_to_target">Hedefe bağlanılıyor</string>
