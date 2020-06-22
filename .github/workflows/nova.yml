@@ -1,9 +1,9 @@
 name: NOVA CI
 on:
   push:
-    branches: [ androidx ]
+    branches: [ v4 ]
   pull_request:
-    branches: [ androidx ]
+    branches: [ v4 ]
 jobs:
   build:
     runs-on: ubuntu-latest
