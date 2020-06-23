@@ -23,6 +23,10 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -46,86 +50,107 @@ public class ExtStorageReceiver extends BroadcastReceiver {
     static final List<String> mediaActions = Arrays.asList(Intent.ACTION_MEDIA_MOUNTED, Intent.ACTION_MEDIA_UNMOUNTED,
             Intent.ACTION_MEDIA_EJECT, Intent.ACTION_MEDIA_BAD_REMOVAL);
 
+
+    private HandlerThread handlerThread;
+    private Looper looper;
+    private Handler handler;
+
+    ExtStorageReceiver() {
+        handlerThread = new HandlerThread("ExtStorageReceiver");
+        handlerThread.start();
+        looper = handlerThread.getLooper();
+        handler = new Handler(looper);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (DBG) Log.d(TAG, "INTENT = " + intentToString(intent) );
-        String action = intent.getAction();
-        String uri = null;
-        String path = null;
-        Intent intentManager = null;
+        if (DBG) Log.d(TAG, "INTENT = " + intentToString(intent));
 
-        // Even if storageManager is not used, this triggers an updateAllVolumes() scan: keep it!
-        ExtStorageManager storageManager = ExtStorageManager.getExtStorageManager();
+        final Intent mIntent = intent;
+        final Context mContext = context;
 
-        if (Environment.getExternalStorageDirectory().getPath().equalsIgnoreCase(path))
-            return;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                String action = mIntent.getAction();
+                String uri = null;
+                String path = null;
+                Intent intentManager = null;
 
-        if (mediaActions.contains(action)) {
-            uri = intent.getDataString();
-            path = uri.substring(7);
-            //file:// will throw exception from android N
-            if(uri.startsWith("file://")) uri = ARCHOS_FILE_SCHEME+"://"+path;
-            if (DBG) Log.d(TAG,"uri is " + uri);
-        }
+                // Even if storageManager is not used, this triggers an updateAllVolumes() scan: keep it!
+                ExtStorageManager storageManager = ExtStorageManager.getExtStorageManager(); // this can create ANR with hdd spinup delay
 
-        switch (action) {
-            case Intent.ACTION_MEDIA_MOUNTED:
-                if (DBG) Log.d(TAG,"media mounted " + uri);
-                //StorageVolume volume = (StorageVolume) intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
-                intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(uri));
-                intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                context.sendBroadcast(intentManager);
-                break;
-            case Intent.ACTION_MEDIA_UNMOUNTED:
-            case Intent.ACTION_MEDIA_EJECT:
-            case Intent.ACTION_MEDIA_BAD_REMOVAL:
-                if (DBG) Log.d(TAG,"media removed " + uri);
-                if (path == null || path.isEmpty()) return;
-                intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(uri));
-                intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                context.sendBroadcast(intentManager);
-                break;
-            // more clever stuff could be done when detecting USB device attached but for now we only throw logs
-            case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                if (intent.hasExtra(UsbManager.EXTRA_DEVICE)) {
-                    final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    boolean isMassStorage = false;
-                    // sometimes there device.getInterfaceCount() = 0 causing an error
-                    for (int i = 0; i < device.getInterfaceCount(); i++) {
-                        final UsbInterface usbInterface = device.getInterface(i);
-                        path = device.getDeviceName();
-                        if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
-                            if (DBG) Log.d(TAG, "USB mass storage " + path + " attached");
-                            isMassStorage = true;
-                        }
-                    }
-                    if (isMassStorage) {
-                        intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(ARCHOS_FILE_SCHEME + "://none"));
-                        intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                        //SystemClock.sleep(WAIT_FOR_MOUNT_MS); // wait in order to get the device mounted (for sdcard on pixel you do not get MEDIA_MOUNTED intent)
-                        context.sendBroadcast(intentManager);
-                    }
+                if (Environment.getExternalStorageDirectory().getPath().equalsIgnoreCase(path))
+                    return;
+
+                if (mediaActions.contains(action)) {
+                    uri = mIntent.getDataString();
+                    path = uri.substring(7);
+                    //file:// will throw exception from android N
+                    if (uri.startsWith("file://")) uri = ARCHOS_FILE_SCHEME + "://" + path;
+                    if (DBG) Log.d(TAG, "uri is " + uri);
                 }
-                break;
-            case UsbManager.ACTION_USB_DEVICE_DETACHED:
-                if (intent.hasExtra(UsbManager.EXTRA_DEVICE)) {
-                    final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    boolean isMassStorage = false;
-                    for (int i = 0; i < device.getInterfaceCount(); i++) {
-                        final UsbInterface usbInterface = device.getInterface(i);
-                        path = device.getDeviceName();
-                        if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
-                            if (DBG) Log.d(TAG, "USB mass storage " + path + " detached");
-                            isMassStorage = true;
-                        }
-                    }
-                    if (isMassStorage) {
-                        intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(ARCHOS_FILE_SCHEME+"://none"));
+
+                switch (action) {
+                    case Intent.ACTION_MEDIA_MOUNTED:
+                        if (DBG) Log.d(TAG, "media mounted " + uri);
+                        //StorageVolume volume = (StorageVolume) intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
+                        intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(uri));
                         intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
-                        context.sendBroadcast(intentManager);
-                    }
+                        mContext.sendBroadcast(intentManager);
+                        break;
+                    case Intent.ACTION_MEDIA_UNMOUNTED:
+                    case Intent.ACTION_MEDIA_EJECT:
+                    case Intent.ACTION_MEDIA_BAD_REMOVAL:
+                        if (DBG) Log.d(TAG, "media removed " + uri);
+                        if (path == null || path.isEmpty()) return;
+                        intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(uri));
+                        intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+                        mContext.sendBroadcast(intentManager);
+                        break;
+                    // more clever stuff could be done when detecting USB device attached but for now we only throw logs
+                    case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                        if (mIntent.hasExtra(UsbManager.EXTRA_DEVICE)) {
+                            final UsbDevice device = mIntent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                            boolean isMassStorage = false;
+                            // sometimes there device.getInterfaceCount() = 0 causing an error
+                            for (int i = 0; i < device.getInterfaceCount(); i++) {
+                                final UsbInterface usbInterface = device.getInterface(i);
+                                path = device.getDeviceName();
+                                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
+                                    if (DBG) Log.d(TAG, "USB mass storage " + path + " attached");
+                                    isMassStorage = true;
+                                }
+                            }
+                            if (isMassStorage) {
+                                intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(ARCHOS_FILE_SCHEME + "://none"));
+                                intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+                                //SystemClock.sleep(WAIT_FOR_MOUNT_MS); // wait in order to get the device mounted (for sdcard on pixel you do not get MEDIA_MOUNTED intent)
+                                mContext.sendBroadcast(intentManager);
+                            }
+                        }
+                        break;
+                    case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                        if (mIntent.hasExtra(UsbManager.EXTRA_DEVICE)) {
+                            final UsbDevice device = mIntent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                            boolean isMassStorage = false;
+                            for (int i = 0; i < device.getInterfaceCount(); i++) {
+                                final UsbInterface usbInterface = device.getInterface(i);
+                                path = device.getDeviceName();
+                                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
+                                    if (DBG) Log.d(TAG, "USB mass storage " + path + " detached");
+                                    isMassStorage = true;
+                                }
+                            }
+                            if (isMassStorage) {
+                                intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(ARCHOS_FILE_SCHEME + "://none"));
+                                intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
+                                mContext.sendBroadcast(intentManager);
+                            }
+                        }
+                        break;
                 }
-                break;
-        }
+            }
+        });
     }
 }
