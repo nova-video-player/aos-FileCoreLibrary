@@ -17,11 +17,9 @@ package com.archos.environment;
 import android.content.Context;
 import android.util.Log;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public final class ArchosUtils {
@@ -32,6 +30,13 @@ public final class ArchosUtils {
 
     public static boolean isAmazonApk() {
        return android.os.Build.MANUFACTURER.toLowerCase().equals("amazon");
+    }
+
+    public static boolean isInstalledfromPlayStore(Context context) {
+        final List<String> playStoreInstallerPackageNames = new ArrayList<>(Arrays.asList("com.android.vending", "com.google.android.feedback"));
+        final String installerPackageName = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+        if (DBG) Log.d(TAG, "isInstalledfromPlayStore: installerPackageName = " + installerPackageName);
+        return installerPackageName != null && playStoreInstallerPackageNames.contains(installerPackageName);
     }
 
     public static String getNameWithoutExtension(String filenameWithExtension) {
