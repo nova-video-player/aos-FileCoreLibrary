@@ -51,15 +51,17 @@ public class ExtStorageReceiver extends BroadcastReceiver {
             Intent.ACTION_MEDIA_EJECT, Intent.ACTION_MEDIA_BAD_REMOVAL);
 
 
-    private HandlerThread handlerThread;
-    private Looper looper;
-    private Handler handler;
+    private static HandlerThread handlerThread = null;
+    private static Looper looper = null;
+    private static Handler handler = null;
 
     ExtStorageReceiver() {
-        handlerThread = new HandlerThread("ExtStorageReceiver");
-        handlerThread.start();
-        looper = handlerThread.getLooper();
-        handler = new Handler(looper);
+        if(handlerThread == null) {
+            handlerThread = new HandlerThread("ExtStorageReceiver");
+            handlerThread.start();
+            looper = handlerThread.getLooper();
+            handler = new Handler(looper);
+        }
     }
 
     @Override
