@@ -96,8 +96,6 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
         // disable dfs makes win10 shares with ms account work
         prop.put("jcifs.smb.client.dfs.disabled", "true");
-        // make Guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186
-        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "false");
 
         PropertyConfiguration propertyConfiguration = null;
         try {
@@ -129,9 +127,6 @@ public class JcifsUtils {
             // see https://github.com/AgNO3/jcifs-ng/issues/226
             prop.put("jcifs.smb.useRawNTLM", "true");
         }
-
-        // makes Guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186 and must be true otherwise interferes with WD MyCloud cf. https://github.com/AgNO3/jcifs-ng/issues/225
-        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "true");
 
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
