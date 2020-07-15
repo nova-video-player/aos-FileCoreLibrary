@@ -169,15 +169,14 @@ public class JcifsUtils {
             Uri uri = Uri.parse("smb://" + server + "/");
             NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
             NtlmPasswordAuthenticator auth = null;
-            if (cred != null)
-                auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-            else auth = new NtlmPasswordAuthenticator("", "GUEST", "");
+            if (cred != null) auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
             CIFSContext context = null;
             SmbFile smbFile = null;
             try {
                 if (DBG) Log.d(TAG, "isServerSmbV2: probing " + uri + " to check if smbV2");
                 context = getBaseContextOnly(true);
-                smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
+                if (cred != null) smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
+                else smbFile = new SmbFile(uri.toString(), context.withGuestCrendentials());
                 smbFile.list(); // getType is pure smbV1, only list provides a result
                 declareServerSmbV2(server, true);
                 return true;
@@ -189,7 +188,8 @@ public class JcifsUtils {
                 try {
                     if (DBG) Log.d(TAG, "isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
                     context = getBaseContextOnly(false);
-                    smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
+                    if (cred != null) smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
+                    else smbFile = new SmbFile(uri.toString(), context.withGuestCrendentials());
                     smbFile.list(); // getType is pure smbV1, only list provides a result
                     declareServerSmbV2(server, false);
                     return false;
