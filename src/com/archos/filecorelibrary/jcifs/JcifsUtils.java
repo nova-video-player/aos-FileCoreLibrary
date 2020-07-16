@@ -176,7 +176,7 @@ public class JcifsUtils {
                 if (DBG) Log.d(TAG, "isServerSmbV2: probing " + uri + " to check if smbV2");
                 context = getBaseContextOnly(true);
                 if (cred != null) smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
-                else smbFile = new SmbFile(uri.toString(), context.withGuestCrendentials());
+                else smbFile = new SmbFile(uri.toString(), context.withGuestCredentials());
                 smbFile.list(); // getType is pure smbV1, only list provides a result
                 declareServerSmbV2(server, true);
                 return true;
@@ -189,7 +189,7 @@ public class JcifsUtils {
                     if (DBG) Log.d(TAG, "isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
                     context = getBaseContextOnly(false);
                     if (cred != null) smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
-                    else smbFile = new SmbFile(uri.toString(), context.withGuestCrendentials());
+                    else smbFile = new SmbFile(uri.toString(), context.withGuestCredentials());
                     smbFile.list(); // getType is pure smbV1, only list provides a result
                     declareServerSmbV2(server, false);
                     return false;
