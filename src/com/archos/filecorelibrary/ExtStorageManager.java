@@ -59,6 +59,8 @@ public class ExtStorageManager {
     public enum ExtStorageType {SDCARD, USBHOST, OTHER};
     private static EnumMap<ExtStorageType, List<String>> volumesMap = new EnumMap<>(ExtStorageType.class);
     private static Map<String, String> volumesIdMap = new HashMap<>();
+    private static Map<String, String> volumesDescMap = new HashMap<>();
+    private static Map<String, String> volumesLabelMap = new HashMap<>();
 
     static {
         volumesMap.put(ExtStorageType.SDCARD, new CopyOnWriteArrayList<String>());
@@ -85,6 +87,8 @@ public class ExtStorageManager {
     private void updateAllVolumes() {
         try {
             volumesIdMap.clear();
+            volumesDescMap.clear();
+            volumesLabelMap.clear();
             for (List<String> vol : volumesMap.values()) {
                 vol.clear();
             }
@@ -146,6 +150,7 @@ public class ExtStorageManager {
             Method getFsUuid = null;
             Method getDescription = null;
             Field type = null;
+            Field fsLabel = null;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 getFsUuid = VolumeInfo.getMethod("getFsUuid", noparams);
@@ -155,6 +160,7 @@ public class ExtStorageManager {
                 isSd = DiskInfo.getMethod("isSd", noparams);
                 isUsb = DiskInfo.getMethod("isUsb", noparams);
                 type = VolumeInfo.getDeclaredField("type");
+                fsLabel = VolumeInfo.getDeclaredField("fsLabel");
                 getDescription = DiskInfo.getMethod("getDescription", noparams);
             }
 
@@ -166,7 +172,6 @@ public class ExtStorageManager {
 
             Context context = ArchosUtils.getGlobalContext();
             StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
-
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) { // >=4.2 StorageVolume returned from getVolumeList
                 // retrieve StorageVolume[]
                 Object[] storageVolumesArray = (StorageVolume[]) IMountService.getMethod("getVolumeList", noparams).invoke(mountService, noparams);
@@ -217,6 +222,7 @@ public class ExtStorageManager {
                                 if (disk != null) {
                                     ExtStorageType volType = null;
                                     String volDescr = (String) getDescription.invoke(disk, noparams); // getDescription is public >=4.4
+                                    String volLabel = (String) fsLabel.get(volInfo);
                                     volType = ((boolean) isSd.invoke(disk, noparams)) ?
                                             ExtStorageType.SDCARD
                                             : ((boolean) isUsb.invoke(disk, noparams)) ?
@@ -226,7 +232,9 @@ public class ExtStorageManager {
                                         volumesMap.get(volType).add(volName);
                                         if (getFsUuid != null) {
                                             volumesIdMap.put(volName, (String) getFsUuid.invoke(volInfo, noparams));
-                                            if (DBG) Log.d(TAG, "Volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr);
+                                            volumesDescMap.put(volName, volDescr);
+                                            volumesLabelMap.put(volName, volLabel);
+                                            if (DBG) Log.d(TAG, "Volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr + " label " + volLabel);
                                         }
                                     }
                                 }
@@ -266,6 +274,14 @@ public class ExtStorageManager {
 
     public List<String> getExtOtherStorages() {
         return copyOf(volumesMap.get(ExtStorageType.OTHER));
+    }
+
+    public String getVolumeDesc(String volName) {
+        return volumesDescMap.get(volName);
+    }
+
+    public String getVolumeLabel(String volName) {
+        return volumesLabelMap.get(volName);
     }
 
     /**
