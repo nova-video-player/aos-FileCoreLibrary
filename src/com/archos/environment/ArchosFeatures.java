@@ -16,7 +16,6 @@ package com.archos.environment;
 
 import android.app.UiModeManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 
@@ -39,7 +38,6 @@ public final class ArchosFeatures {
     }
 
     public static boolean isChromeOS(Context context) {
-        PackageManager pm = context.getPackageManager();
-        return pm.hasSystemFeature("org.chromium.arc");
+        return context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management");
     }
 }
