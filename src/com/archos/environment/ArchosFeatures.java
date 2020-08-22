@@ -18,13 +18,12 @@ import android.app.UiModeManager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.util.Log;
 
 public final class ArchosFeatures {
 
-    //returns whereas device is a TV or not
-    public static boolean isTV(Context ct) {
-        return isAndroidTV(ct);
-    }
+    private static final String TAG = "ArchosFeatures";
+    private static final boolean DBG = false;
 
     // tokeep: sentimental LUDO was Archos TV connect, first Android on TV before AndroidTV in 2012
     public static boolean isLUDO() {
@@ -33,11 +32,16 @@ public final class ArchosFeatures {
     }
 
     public static boolean isAndroidTV(Context ct) {
+        // false on chromeos
         UiModeManager uiModeManager = (UiModeManager) ct.getSystemService(Context.UI_MODE_SERVICE);
-        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+        boolean isATV = (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION);
+        if (DBG) Log.d(TAG, "isAndroidTV: " + isATV);
+        return isATV;
     }
 
     public static boolean isChromeOS(Context context) {
-        return context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management");
+        boolean isCOS = context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management");
+        if (DBG) Log.d(TAG, "isChromeOS: " + isCOS);
+        return isCOS;
     }
 }
