@@ -243,8 +243,8 @@ public class JcifsUtils {
     }
 
     public static boolean isSMBv2Enabled() {
-        if (DBG) Log.d(TAG, "isSMBv2Enabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", false));
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", false);
+        if (DBG) Log.d(TAG, "isSMBv2Enabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true));
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true);
     }
 
 }
