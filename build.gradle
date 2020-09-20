@@ -84,7 +84,7 @@ task ndkClean(type:Exec) {
 
 dependencies {
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.2.0-rc01'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'commons-net:commons-net:3.6'
 }
