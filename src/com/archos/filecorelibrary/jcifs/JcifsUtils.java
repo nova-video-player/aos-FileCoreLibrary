@@ -136,7 +136,6 @@ public class JcifsUtils {
         // allow plaintext password fallback
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
 
-
         PropertyConfiguration propertyConfiguration = null;
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
@@ -162,40 +161,47 @@ public class JcifsUtils {
         ListServers.put(server, isSmbV2);
     }
 
+    private static CIFSContext getCifsContext(Uri uri, Boolean isSmbV2) {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        CIFSContext context = null;
+        if (cred != null) {
+            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+            context = getBaseContextOnly(isSmbV2).withCredentials(auth);
+        } else
+            context = getBaseContextOnly(isSmbV2).withGuestCredentials();
+        return context;
+    }
+
     // isServerSmbV2 returns true/false/null, null is do not know
     public static Boolean isServerSmbV2(String server) throws MalformedURLException {
         Boolean isSmbV2 = ListServers.get(server);
-        if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " " + isSmbV2);
+        if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " previous state is " + isSmbV2);
         if (isSmbV2 == null) { // let's probe server root
             Uri uri = Uri.parse("smb://" + server + "/");
-            NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-            NtlmPasswordAuthenticator auth = null;
-            if (cred != null) auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-            CIFSContext context = null;
             SmbFile smbFile = null;
             try {
                 if (DBG) Log.d(TAG, "isServerSmbV2: probing " + uri + " to check if smbV2");
-                context = getBaseContextOnly(true);
-                if (cred != null) smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
-                else smbFile = new SmbFile(uri.toString(), context.withGuestCredentials());
+                CIFSContext ctx = getCifsContext(uri, true);
+                smbFile = new SmbFile(uri.toString(), ctx);
                 smbFile.list(); // getType is pure smbV1, only list provides a result
                 declareServerSmbV2(server, true);
+                if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " returning true");
                 return true;
             } catch (SmbAuthException authE) {
-                if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbAutException in probing");
+                if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbAutException in probing, state for " + server + "  returning null");
                 return null;
             } catch (SmbException smbE) {
                 if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbException " + smbE);
                 try {
                     if (DBG) Log.d(TAG, "isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
-                    context = getBaseContextOnly(false);
-                    if (cred != null) smbFile = new SmbFile(uri.toString(), context.withCredentials(auth));
-                    else smbFile = new SmbFile(uri.toString(), context.withGuestCredentials());
+                    CIFSContext ctx = getCifsContext(uri, false);
+                    smbFile = new SmbFile(uri.toString(), ctx);
                     smbFile.list(); // getType is pure smbV1, only list provides a result
                     declareServerSmbV2(server, false);
+                    if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " returning false");
                     return false;
                 } catch (SmbException ce2) {
-                    if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbAutException in probing");
+                    if (DBG) Log.d(TAG, "isServerSmbV2: caught SmbAutException in probing, returning null");
                     return null;
                 }
             }
@@ -211,12 +217,6 @@ public class JcifsUtils {
     }
 
     public static SmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        NtlmPasswordAuthenticator auth = null;
-        if (cred != null)
-            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-        else
-            auth = new NtlmPasswordAuthenticator("","GUEST", "");
         Boolean isSmbV2 = isServerSmbV2(uri.getHost());
         CIFSContext context = null;
         if (isSmbV2 == null) { // server type not identified, default to smbV2
@@ -229,18 +229,19 @@ public class JcifsUtils {
             context = getBaseContextOnly(false);
             if (DBG) Log.d(TAG, "getSmbFile: server already identified as smbv1 processing uri " + uri);
         }
-        return new SmbFile(uri.toString(), context.withCredentials(auth));
+        CIFSContext ctx = null;
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        if (cred != null) {
+            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+            ctx = context.withCredentials(auth);
+        } else
+            ctx = context.withGuestCredentials();
+        return new SmbFile(uri.toString(), ctx);
     }
 
     public static SmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException {
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        NtlmPasswordAuthenticator auth = null;
-        if (cred != null)
-            auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
-        else
-            auth = new NtlmPasswordAuthenticator("","GUEST", "");
-        CIFSContext context = getBaseContext(isSMBv2);
-        return new SmbFile(uri.toString(), context.withCredentials(auth));
+        CIFSContext context = getCifsContext(uri, isSMBv2);
+        return new SmbFile(uri.toString(), context);
     }
 
     public static boolean isSMBv2Enabled() {
