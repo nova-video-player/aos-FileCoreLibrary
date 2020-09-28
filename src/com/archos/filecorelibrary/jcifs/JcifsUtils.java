@@ -15,13 +15,11 @@
 package com.archos.filecorelibrary.jcifs;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
-import com.archos.environment.NetworkState;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import jcifs.CIFSException;
@@ -34,7 +32,6 @@ import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Properties;
 
