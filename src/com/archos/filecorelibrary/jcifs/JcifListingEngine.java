@@ -91,11 +91,11 @@ public class JcifListingEngine extends ListingEngine {
                     return keepDirectory(filename);
                 }
                 else {
-                    if (DBG) Log.d(TAG, "neither file nor directory: "+filename);
+                    if (DBG) Log.d(TAG, "SmbFileFilter: neither file nor directory: "+filename);
                     return false;
                 }
             } catch (SmbException e) {
-                Log.e(TAG, "SmbException: ", e);
+                Log.e(TAG, "SmbFileFilter: caught SmbException: ", e);
             }
             return false;
         }
@@ -105,7 +105,7 @@ public class JcifListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                Log.d(TAG, "listFiles for:"+mUri.toString());
+                if (DBG) Log.d(TAG, "JcifListingThread: listFiles for: " + mUri.toString());
                 SmbFile[] listFiles = getSmbFile(mUri).listFiles(mFileFilter);
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
@@ -138,9 +138,11 @@ public class JcifListingEngine extends ListingEngine {
                 final ArrayList<JcifsFile2> files = new ArrayList<>();
                 for (SmbFile f : listFiles) {
                     if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
+                        if (DBG) Log.d(TAG, "JcifListingThread: adding file " + f.getPath());
                         files.add(new JcifsFile2(f));
                     }
                     else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
+                        if (DBG) Log.d(TAG, "JcifListingThread: adding directory " + f.getPath());
                         directories.add(new JcifsFile2(f));
                     }
                 }
@@ -155,6 +157,7 @@ public class JcifListingEngine extends ListingEngine {
 
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
+                    if (DBG) Log.d(TAG, "JcifListingThread: abort");
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (mListener != null) { // always report end even when aborted

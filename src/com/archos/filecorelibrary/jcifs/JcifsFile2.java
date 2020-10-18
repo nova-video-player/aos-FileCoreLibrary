@@ -51,7 +51,7 @@ public class JcifsFile2 extends MetaFile2 {
      */
     public JcifsFile2(SmbFile file) throws SmbException {
         if (file == null) {
-            throw new IllegalArgumentException("file cannot be null");
+            throw new IllegalArgumentException("JcifsFile2: file cannot be null");
         }
         // Only use methods doing no network access here
         mUriString = file.getCanonicalPath();
@@ -59,8 +59,7 @@ public class JcifsFile2 extends MetaFile2 {
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
-        if (DBG) Log.d(TAG,file.getPath());
-
+        if (DBG) Log.d(TAG, "JcifsFile2: for file " + file.getPath());
         mCanRead = false;
         mCanWrite = false;
         mLength = 0;

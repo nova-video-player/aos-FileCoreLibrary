@@ -43,6 +43,7 @@ public class JcifsUtils {
 
     // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
     // this is a hack to get around some issues seen with jcifs-ng
+    // note to self: do not try to revert to false since it does not work (HP printer, livebox smbV1 broken with smbV2 enabled)
     public final static boolean LIMIT_PROTOCOL_NEGO = true;
 
     private static Properties prop = null;
@@ -93,7 +94,6 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
         // disable dfs makes win10 shares with ms account work
         prop.put("jcifs.smb.client.dfs.disabled", "true");
-
         PropertyConfiguration propertyConfiguration = null;
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
@@ -207,6 +207,7 @@ public class JcifsUtils {
     }
 
     public static SmbFile getSmbFile(Uri uri) throws MalformedURLException {
+        if (DBG) Log.d(TAG, "getSmbFile: for " + uri);
         if (isSMBv2Enabled() && LIMIT_PROTOCOL_NEGO)
             return getSmbFileStrictNego(uri);
         else
@@ -218,13 +219,13 @@ public class JcifsUtils {
         CIFSContext context = null;
         if (isSmbV2 == null) { // server type not identified, default to smbV2
             context = getBaseContext(true);
-            if (DBG) Log.d(TAG, "getSmbFile: server NOT identified passing smbv2/smbv1 capable context for uri " + uri);
+            if (DBG) Log.d(TAG, "getSmbFileStrictNego: server NOT identified passing smbv2/smbv1 capable context for uri " + uri);
         } else if (isSmbV2) { // provide smbV2 only
             context = getBaseContextOnly(true);
-            if (DBG) Log.d(TAG, "getSmbFile: server already identified as smbv2 processing uri " + uri);
+            if (DBG) Log.d(TAG, "getSmbFileStrictNego: server already identified as smbv2 processing uri " + uri);
         } else { // if dont't know (null) or smbV2 provide smbV2 only to try out. Fallback needs to be implemented in each calls
             context = getBaseContextOnly(false);
-            if (DBG) Log.d(TAG, "getSmbFile: server already identified as smbv1 processing uri " + uri);
+            if (DBG) Log.d(TAG, "getSmbFileStrictNego: server already identified as smbv1 processing uri " + uri);
         }
         CIFSContext ctx = null;
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());

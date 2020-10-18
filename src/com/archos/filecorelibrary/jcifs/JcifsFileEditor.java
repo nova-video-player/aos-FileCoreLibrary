@@ -53,9 +53,9 @@ public class JcifsFileEditor extends FileEditor{
             getSmbFile(mUri).mkdir();
             return true;
         } catch (SmbException e) {
-            caughtException(e, "mkdir", "SmbException in mkdir");
+            caughtException(e, "mkdir", "SmbException in mkdir " + mUri);
         } catch (MalformedURLException e) {
-            caughtException(e, "mkdir", "MalformedURLException in mkdir");
+            caughtException(e, "mkdir", "MalformedURLException in mkdir " + mUri);
         }
         return false;
     }
@@ -96,9 +96,9 @@ public class JcifsFileEditor extends FileEditor{
                 }
             }
         } catch (SmbException e) {
-            caughtException(e, "rename", "SmbException in rename");
+            caughtException(e, "rename", "SmbException in rename " + mUri + " into " + newName);
         } catch (MalformedURLException e) {
-            caughtException(e, "rename", "MalformedURLException in rename");
+            caughtException(e, "rename", "MalformedURLException in rename "  + mUri + " into " + newName);
         }
         return false;
     }
@@ -110,13 +110,14 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public boolean exists() {
+        if (DBG) Log.d(TAG, "exists: check " + mUri);
         try {
             SmbFile sf = getSmbFile(mUri);
             if (sf != null) return sf.exists();
         } catch (SmbException e) {
-            caughtException(e, "exists", "SmbException in exists");
+            caughtException(e, "exists", "SmbException in exists for " + mUri);
         } catch (MalformedURLException e) {
-            caughtException(e, "exists", "MalformedURLException in exists");
+            caughtException(e, "exists", "MalformedURLException in exists " + mUri);
         }
         return false;
     }
