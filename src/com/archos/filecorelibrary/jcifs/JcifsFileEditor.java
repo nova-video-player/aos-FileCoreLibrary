@@ -113,7 +113,17 @@ public class JcifsFileEditor extends FileEditor{
         if (DBG) Log.d(TAG, "exists: check " + mUri);
         try {
             SmbFile sf = getSmbFile(mUri);
-            if (sf != null) return sf.exists();
+            if (sf != null) {
+                boolean doesItExist = sf.exists();
+                if (DBG) {
+                    if (doesItExist) Log.d(TAG, "exists: " + mUri + " exists");
+                    else Log.d(TAG, "exists: " + mUri + " does not exist");
+                }
+                return doesItExist;
+                //return sf.exists();
+            } else {
+                Log.w(TAG, "exists: getSmbFile returned null!");
+            }
         } catch (SmbException e) {
             caughtException(e, "exists", "SmbException in exists for " + mUri);
         } catch (MalformedURLException e) {
