@@ -165,7 +165,7 @@ public class JcifsUtils {
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
             context = getBaseContextOnly(isSmbV2).withCredentials(auth);
         } else
-            context = getBaseContextOnly(isSmbV2).withGuestCredentials();
+            context = getBaseContextOnly(isSmbV2).withGuestCrendentials();
         return context;
     }
 
@@ -232,7 +232,7 @@ public class JcifsUtils {
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
             ctx = context.withCredentials(auth);
         } else
-            ctx = context.withGuestCredentials();
+            ctx = context.withGuestCrendentials();
         return new SmbFile(uri.toString(), ctx);
     }
 
