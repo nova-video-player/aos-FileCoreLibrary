@@ -180,7 +180,7 @@ public class JcifsUtils {
                 if (DBG) Log.d(TAG, "isServerSmbV2: probing " + uri + " to check if smbV2");
                 CIFSContext ctx = getCifsContext(uri, true);
                 smbFile = new SmbFile(uri.toString(), ctx);
-                smbFile.list(); // getType is pure smbV1, only list provides a result
+                smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                 declareServerSmbV2(server, true);
                 if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " returning true");
                 return true;
@@ -193,7 +193,7 @@ public class JcifsUtils {
                     if (DBG) Log.d(TAG, "isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
                     CIFSContext ctx = getCifsContext(uri, false);
                     smbFile = new SmbFile(uri.toString(), ctx);
-                    smbFile.list(); // getType is pure smbV1, only list provides a result
+                    smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                     declareServerSmbV2(server, false);
                     if (DBG) Log.d(TAG, "isServerSmbV2 for " + server + " returning false");
                     return false;
