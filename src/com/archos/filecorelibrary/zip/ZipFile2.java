@@ -29,6 +29,8 @@ import java.io.File;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static com.archos.filecorelibrary.FileUtils.removeFileSlashSlash;
+
 public class ZipFile2 extends MetaFile2 {
 
     private static final long serialVersionUID = 2L;
@@ -46,11 +48,7 @@ public class ZipFile2 extends MetaFile2 {
         if (file == null)
             throw new IllegalArgumentException("file must not be null");
 
-        //remove file://
-        if(file.getAbsolutePath().startsWith("file://"))
-            mPath = file.getAbsolutePath().substring("file://".length());
-        else
-            mPath = file.getAbsolutePath();
+        mPath = removeFileSlashSlash(file.getAbsolutePath());
         mLength = file.length();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
