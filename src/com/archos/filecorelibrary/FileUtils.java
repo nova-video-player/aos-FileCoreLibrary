@@ -73,6 +73,12 @@ public class FileUtils {
         return removeLastSegment(uri);
     }
 
+    public static String removeFileSlashSlash(String url) {  // remove "file://"
+        if(url.startsWith("file://"))
+            return url.substring("file://".length());
+        else return url;
+    }
+
     public static Uri removeLastSegment(Uri uri){
         int index;
         String str = uri.toString();
