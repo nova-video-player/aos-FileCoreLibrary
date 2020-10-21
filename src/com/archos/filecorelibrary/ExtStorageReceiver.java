@@ -54,7 +54,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
     private static Looper looper = null;
     private static Handler handler = null;
 
-    ExtStorageReceiver() {
+    public ExtStorageReceiver() {
         if (DBG) Log.d(TAG, "ExtStorageReceiver constructor");
         if(handlerThread == null) {
             if (DBG) Log.d(TAG, "ExtStorageReceiver: handlerThread null starting thread");
