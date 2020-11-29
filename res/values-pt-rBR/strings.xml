@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="file_info_label_name">Nome:</string>
+    <string name="file_info_label_name">Nome</string>
     <string name="file_info_label_size">Tamanho:</string>
     <string name="file_info_label_size_internal">Tamanho (interno):</string>
     <string name="file_info_label_size_sd">Tamanho (SD):</string>
