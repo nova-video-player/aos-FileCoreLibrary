@@ -87,6 +87,7 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disableSMB1", "false");
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
+        // TODO check if it has an impact: with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST
         prop.put("jcifs.resolveOrder", "BCAST,DNS");
         // get around https://github.com/AgNO3/jcifs-ng/issues/40 and this is required for guest login on win10 smb2
         prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
@@ -128,6 +129,7 @@ public class JcifsUtils {
 
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
+        // TODO check if it has an impact: with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST
         prop.put("jcifs.resolveOrder", "BCAST,DNS");
 
         // allow plaintext password fallback
