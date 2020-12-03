@@ -27,7 +27,7 @@ import java.util.LinkedList;
 
 public class TcpDiscovery implements InternalDiscovery {
     private static final String TAG = "TcpDiscovery";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private final Thread mThread;
     private final InternalDiscoveryListener mListener;
