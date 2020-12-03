@@ -53,7 +53,7 @@ import com.archos.environment.NetworkState;
 public class SambaDiscovery implements InternalDiscoveryListener {
 
     private final static String TAG = "SambaDiscovery";
-    private static boolean DBG = false;
+    private static boolean DBG = true;
 
     public static final int SOCKET_TIMEOUT = 150;
 
@@ -483,6 +483,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                 lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_WIFI);
             if (lp != null)
                 ipAddress =  getIp(lp);
+            if (DBG) Log.d(TAG, "initIpAddress: " + ipAddress);
             if (ipAddress != null)
                 return ipAddress;
         }
@@ -541,16 +542,20 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     public static String getDoubleNatIpAddress() {
         int intIpAddress = findDoubleNatIp();
         InetAddress address = inetFromInt(intIpAddress);
-        if (address != null)
+        if (address != null) {
+            if (DBG) Log.d(TAG, "getDoubleNatIpAddress: " + address.getHostAddress());
             return address.getHostAddress();
+        }
         return null;
     }
 
     public static String getLocalIpAddress() {
         int intIpAddress = findLocalIp();
         InetAddress address = inetFromInt(intIpAddress);
-        if (address != null)
+        if (address != null) {
+            if (DBG) Log.d(TAG, "getLocalIpAddress: " + address.getHostAddress());
             return address.getHostAddress();
+        }
         return null;
     }
 
