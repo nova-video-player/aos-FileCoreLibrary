@@ -97,7 +97,7 @@ public class UdpDiscovery implements InternalDiscovery {
             ByteBuffer rcv_buf = ByteBuffer.allocate(576);
             final String netRange = mIpAddress.substring(0, mIpAddress.lastIndexOf(".") + 1);
             // Send node status request to each IP
-            CIFSContext cifsContext = JcifsUtils.getBaseContext(false);
+            CIFSContext cifsContext = JcifsUtils.getBaseContextOnly(false);
             Configuration configuration = cifsContext.getConfig();
             final NodeStatusRequest request = new NodeStatusRequest(configuration,
                     new Name(configuration,
@@ -220,7 +220,7 @@ public class UdpDiscovery implements InternalDiscovery {
             // First loop to find workgroups
             for (NbtAddress addr : addrs) {
                 try {
-                    if (addr.isGroupAddress(JcifsUtils.getBaseContext(false)) && !addr.getHostName().equalsIgnoreCase(NbtAddress.MASTER_BROWSER_NAME)) {
+                    if (addr.isGroupAddress(JcifsUtils.getBaseContextOnly(false)) && !addr.getHostName().equalsIgnoreCase(NbtAddress.MASTER_BROWSER_NAME)) {
                         workgroupName = addr.getHostName();
                         break;
                     }
@@ -233,7 +233,7 @@ public class UdpDiscovery implements InternalDiscovery {
                     break;
                 }
                 try {
-                    if (!addr.isGroupAddress(JcifsUtils.getBaseContext(false))) {
+                    if (!addr.isGroupAddress(JcifsUtils.getBaseContextOnly(false))) {
                         final String shareName = addr.getHostName();
                         final String shareAddress = "smb://" + remoteAddr.getHostAddress() + '/';
 
@@ -258,7 +258,7 @@ public class UdpDiscovery implements InternalDiscovery {
             for (int i = 0; i < 4; i++) {
                 ipv4Address = (ipv4Address << 8) + (ipAddress[i] & 0xFF);
             }
-            CIFSContext context = JcifsUtils.getBaseContext(false);
+            CIFSContext context = JcifsUtils.getBaseContextOnly(false);
             Name name = new Name(context.getConfig(), shareName, 0x20, null );
             NbtAddress addr = new NbtAddress(name, ipv4Address, false, NbtAddress.B_NODE,
                     false, false, true, true,
