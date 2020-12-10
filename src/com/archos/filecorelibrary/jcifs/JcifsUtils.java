@@ -129,10 +129,6 @@ public class JcifsUtils {
         // allow plaintext password fallback
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
 
-        // Required to make WD MyCloud work cf. https://github.com/AgNO3/jcifs-ng/issues/225
-        // made guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186
-        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "true");
-
         PropertyConfiguration propertyConfiguration = null;
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
