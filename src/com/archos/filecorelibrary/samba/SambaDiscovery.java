@@ -53,7 +53,7 @@ import com.archos.environment.NetworkState;
 public class SambaDiscovery implements InternalDiscoveryListener {
 
     private final static String TAG = "SambaDiscovery";
-    private static boolean DBG = false;
+    private static boolean DBG = true;
 
     public static final int SOCKET_TIMEOUT = 150;
 

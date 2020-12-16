@@ -39,7 +39,7 @@ import java.util.Properties;
 public class JcifsUtils {
 
     private final static String TAG = "JcifsUtils";
-    private final static boolean DBG = false;
+    private final static boolean DBG = true;
 
     // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
     // this is a hack to get around some issues seen with jcifs-ng
