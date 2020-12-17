@@ -244,7 +244,7 @@ public class UdpDiscovery implements InternalDiscovery {
                         final String shareName = addr.getHostName();
                         final String shareAddress = "smb://" + remoteAddr.getHostAddress() + '/';
 
-                        log.debug("found share " + shareName + " at " + shareAddress);
+                        log.trace("found share " + shareName + " at " + shareAddress);
                         mListener.onShareFound(workgroupName, shareName, shareAddress);
 
                         // Update the JCIFS cache

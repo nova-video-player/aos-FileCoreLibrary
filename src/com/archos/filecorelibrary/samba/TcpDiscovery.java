@@ -17,6 +17,11 @@ package com.archos.filecorelibrary.samba;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.archos.filecorelibrary.jcifs.JcifsFileEditor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -26,8 +31,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class TcpDiscovery implements InternalDiscovery {
-    private static final String TAG = "TcpDiscovery";
     private static final boolean DBG = true;
+    private static final Logger log = LoggerFactory.getLogger(TcpDiscovery.class);
 
     private final Thread mThread;
     private final InternalDiscoveryListener mListener;
@@ -96,7 +101,7 @@ public class TcpDiscovery implements InternalDiscovery {
         try {
             selector = Selector.open();
         } catch (IOException e) {
-            Log.e(TAG, "abort TcpDiscovery: no selector");
+            log.error("abort TcpDiscovery: no selector");
             return;
         }
 
@@ -115,8 +120,8 @@ public class TcpDiscovery implements InternalDiscovery {
                 socketChannel.register(selector, SelectionKey.OP_CONNECT);
                 socketChannel.connect(new InetSocketAddress(ip, 445));
             } catch (IOException e) {
-                if (DBG) Log.e(TAG, "doTcpDiscovery: caught IOException", e);
-                else Log.w(TAG, "doTcpDiscovery: caught IOException");
+                if (DBG) log.error("doTcpDiscovery: caught IOException", e);
+                else log.warn("doTcpDiscovery: caught IOException");
             }
         }
 
@@ -151,7 +156,7 @@ public class TcpDiscovery implements InternalDiscovery {
                         int ipNumber = sockets.indexOf(currentChannel) + 1;
                         final String ip = netRange.concat(String.valueOf(ipNumber));
                         final String shareAddress = "smb://" + ip + '/';
-                        if(DBG) Log.d(TAG, "found share at " + ip);
+                        log.debug("found share at " + ip);
                         mListener.onShareFound(Workgroup.NOGROUP, "", shareAddress); // TCP discovery does not give the share name
                     }
                 }
