@@ -100,7 +100,7 @@ dependencies {
     implementation 'oro:oro:2.0.8'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
-    implementation 'commons-net:commons-net:3.6'
+    implementation 'commons-net:commons-net:3.7.2'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'com.github.tony19:logback-android:2.0.0'
 }
