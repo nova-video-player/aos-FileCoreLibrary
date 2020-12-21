@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.net.Uri;
 
@@ -32,6 +34,9 @@ import com.archos.filecorelibrary.RawLister;
  *
  */
 public class FTPRawLister extends RawLister {
+
+    private static final Logger log = LoggerFactory.getLogger(FTPRawLister.class);
+
     public FTPRawLister(Uri uri) {
         super(uri);
     }
@@ -47,6 +52,7 @@ public class FTPRawLister extends RawLister {
         for(org.apache.commons.net.ftp.FTPFile f : listFiles){
             if(!f.getName().equals("..")|| !f.getName().equals(".")){
                 FTPFile2 sf = new FTPFile2(f , Uri.withAppendedPath(mUri, f.getName()));
+                log.trace("FTPRawLister: add " + sf.getName());
                 list.add(sf);   
             }
         }

@@ -23,11 +23,15 @@ import java.net.SocketException;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.archos.filecorelibrary.FileEditor;
 import android.net.Uri;
 
 public class FtpFileEditor extends FileEditor {
+    private static final Logger log = LoggerFactory.getLogger(FtpFileEditor.class);
+
     public FtpFileEditor(Uri uri) {
         super(uri);
         // TODO Auto-generated constructor stub
@@ -49,13 +53,13 @@ public class FtpFileEditor extends FileEditor {
             return ftp.makeDirectory(mUri.getPath());
         } catch (AuthenticationException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Caught AuthenticationException: ",e);
         } catch (SocketException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Caught SocketException: ",e);
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Caught IOException: ",e);
         }
         return false;
     }
@@ -69,7 +73,6 @@ public class FtpFileEditor extends FileEditor {
             ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
         InputStream is = ftp.retrieveFileStream(mUri.getPath());
         return is;
-
     }
 
     @Override
@@ -116,7 +119,7 @@ public class FtpFileEditor extends FileEditor {
             ftp.rename(mUri.getPath(), new File(new File(mUri.getPath()).getParentFile(), newName).getAbsolutePath());
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Caught Exception: ",e);
         }
         return false;
     }
@@ -132,7 +135,7 @@ public class FtpFileEditor extends FileEditor {
             ftp.rename(mUri.getPath(), uri.getPath());
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Caught Exception: ",e);
         }
         return false;
     }
@@ -148,7 +151,7 @@ public class FtpFileEditor extends FileEditor {
             FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
             return ftpFile != null;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Caught Exception: ",e);
         }
         return false;
     }
