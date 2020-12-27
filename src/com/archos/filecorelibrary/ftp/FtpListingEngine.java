@@ -23,6 +23,8 @@ import com.archos.filecorelibrary.ListingEngine;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -38,8 +40,7 @@ import java.util.Comparator;
  */
 public class FtpListingEngine extends ListingEngine {
 
-    private final static String TAG = "FtpListingEngine";
-
+    private static final Logger log = LoggerFactory.getLogger(FtpListingEngine.class);
     final private Uri mUri;
     final private FtpListingThread mListingThread;
     private boolean mAbort = false;
@@ -102,7 +103,7 @@ public class FtpListingEngine extends ListingEngine {
                 } else if (f.isDirectory()) {
                     return keepDirectory(filename);
                 } else {
-                    Log.d(TAG, "neither file nor directory: " + filename);
+                    log.debug("neither file nor directory: " + filename);
                     return false;
                 }
             } else {
@@ -156,8 +157,10 @@ public class FtpListingEngine extends ListingEngine {
                 for(org.apache.commons.net.ftp.FTPFile f : listFiles){
                     FTPFile2 sf = new FTPFile2(f , Uri.withAppendedPath(mUri, f.getName()));
                     if (sf.isDirectory()) {
+                        log.trace("FtpListingThread: add directory " + sf.getName());
                         directories.add(sf);
                     } else {
+                        log.trace("FtpListingThread: add file " + sf.getName());
                         files.add(sf);
                     }
                 }
@@ -205,19 +208,19 @@ public class FtpListingEngine extends ListingEngine {
                 });
             }
             catch (UnknownHostException e) {
-                Log.e(TAG, "FtpListingThread",e);
+                log.error("FtpListingThread",e);
                 postFatalError(e);
             }
             catch (SocketException e) {
-                Log.e(TAG, "FtpListingThread",e);
+                log.error("FtpListingThread",e);
                 postFatalError(e);
             }
             catch (IOException e) {
-                Log.e(TAG, "FtpListingThread",e);
+                log.error("FtpListingThread",e);
                 postFatalError(e);
             }
             catch (final AuthenticationException e) {
-                Log.e(TAG, "FtpListingThread",e);
+                log.error("FtpListingThread",e);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not ask credentials if aborted

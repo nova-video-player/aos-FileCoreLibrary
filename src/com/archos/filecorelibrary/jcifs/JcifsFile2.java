@@ -22,6 +22,10 @@ import android.util.Log;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.MalformedURLException;
 
 import jcifs.smb.SmbAuthException;
@@ -33,8 +37,9 @@ import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 public class JcifsFile2 extends MetaFile2 {
 
     private static final long serialVersionUID = 2L;
-    private static final String TAG = "JcifsFile2";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
+
+    private static final Logger log = LoggerFactory.getLogger(JcifsFile2.class);
 
     private String mName;
     private boolean mIsDirectory;
@@ -59,7 +64,7 @@ public class JcifsFile2 extends MetaFile2 {
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
-        if (DBG) Log.d(TAG, "JcifsFile2: for file " + file.getPath());
+        log.debug("JcifsFile2: for file " + file.getPath());
         mCanRead = false;
         mCanWrite = false;
         mLength = 0;
@@ -121,8 +126,8 @@ public class JcifsFile2 extends MetaFile2 {
     }
 
     private void caughtException(Throwable e, String method, String exceptionType) {
-        if (DBG) Log.e(TAG, method + ": caught" + exceptionType, e);
-        else Log.w(TAG, method + ": caught "+ exceptionType);
+        if (DBG) log.error(method + ": caught" + exceptionType, e);
+        else log.warn(method + ": caught "+ exceptionType);
     }
 
     /**

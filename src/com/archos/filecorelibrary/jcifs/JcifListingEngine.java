@@ -22,6 +22,9 @@ import android.util.Log;
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -42,8 +45,8 @@ import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
  */
 public class JcifListingEngine extends ListingEngine {
 
-    private final static String TAG = "JcifListingEngine";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
+    private static final Logger log = LoggerFactory.getLogger(JcifListingEngine.class);
 
     final private Uri mUri;
     final private JcifListingThread mListingThread;
@@ -91,11 +94,11 @@ public class JcifListingEngine extends ListingEngine {
                     return keepDirectory(filename);
                 }
                 else {
-                    if (DBG) Log.d(TAG, "SmbFileFilter: neither file nor directory: "+filename);
+                    log.debug("SmbFileFilter: neither file nor directory: "+filename);
                     return false;
                 }
             } catch (SmbException e) {
-                Log.e(TAG, "SmbFileFilter: caught SmbException: ", e);
+                log.error("SmbFileFilter: caught SmbException: ", e);
             }
             return false;
         }
@@ -105,7 +108,7 @@ public class JcifListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                if (DBG) Log.d(TAG, "JcifListingThread: listFiles for: " + mUri.toString());
+                log.debug("JcifListingThread: listFiles for: " + mUri.toString());
                 SmbFile[] listFiles = getSmbFile(mUri).listFiles(mFileFilter);
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
@@ -138,11 +141,11 @@ public class JcifListingEngine extends ListingEngine {
                 final ArrayList<JcifsFile2> files = new ArrayList<>();
                 for (SmbFile f : listFiles) {
                     if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
-                        if (DBG) Log.d(TAG, "JcifListingThread: adding file " + f.getPath());
+                        log.trace("JcifListingThread: adding file " + f.getPath());
                         files.add(new JcifsFile2(f));
                     }
                     else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
-                        if (DBG) Log.d(TAG, "JcifListingThread: adding directory " + f.getPath());
+                        log.trace("JcifListingThread: adding directory " + f.getPath());
                         directories.add(new JcifsFile2(f));
                     }
                 }
@@ -157,7 +160,7 @@ public class JcifListingEngine extends ListingEngine {
 
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
-                    if (DBG) Log.d(TAG, "JcifListingThread: abort");
+                    log.debug("JcifListingThread: abort");
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (mListener != null) { // always report end even when aborted
@@ -178,8 +181,8 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final SmbAuthException e) {
-                if (DBG) Log.e(TAG, "JcifListingThread: SmbAuthException", e);
-                else Log.w(TAG, "JcifListingThread: SmbAuthException");
+                if (DBG) log.error("JcifListingThread: SmbAuthException", e);
+                else log.warn("JcifListingThread: SmbAuthException");
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -194,7 +197,7 @@ public class JcifListingEngine extends ListingEngine {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
-                Log.e(TAG, "JcifListingThread: SmbException", e);
+                log.error("JcifListingThread: SmbException", e);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -204,7 +207,7 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final MalformedURLException e) {
-                Log.e(TAG, "JcifListingThread: MalformedURLException", e);
+                log.error("JcifListingThread: MalformedURLException", e);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted

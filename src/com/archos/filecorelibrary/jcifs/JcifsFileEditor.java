@@ -31,13 +31,16 @@ import com.archos.filecorelibrary.FileEditor;
 import android.net.Uri;
 import android.util.Log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 public class JcifsFileEditor extends FileEditor{
 
-    private static final String TAG = "JcifsFileEditor";
     private static final boolean DBG = false;
-    
+    private static final Logger log = LoggerFactory.getLogger(JcifsFileEditor.class);
+
     public JcifsFileEditor(Uri uri) {
         super(uri);
     }
@@ -74,7 +77,7 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public OutputStream getOutputStream() throws SmbException, MalformedURLException, UnknownHostException {
-        return  new SmbFileOutputStream(getSmbFile(mUri));
+        return new SmbFileOutputStream(getSmbFile(mUri));
     }
 
     @Override
@@ -110,19 +113,19 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public boolean exists() {
-        if (DBG) Log.d(TAG, "exists: check " + mUri);
+        log.trace("exists: check " + mUri);
         try {
             SmbFile sf = getSmbFile(mUri);
             if (sf != null) {
                 boolean doesItExist = sf.exists();
                 if (DBG) {
-                    if (doesItExist) Log.d(TAG, "exists: " + mUri + " exists");
-                    else Log.d(TAG, "exists: " + mUri + " does not exist");
+                    if (doesItExist) log.trace("exists: " + mUri + " exists");
+                    else log.trace("exists: " + mUri + " does not exist");
                 }
                 return doesItExist;
                 //return sf.exists();
             } else {
-                Log.w(TAG, "exists: getSmbFile returned null!");
+                log.warn("exists: getSmbFile returned null!");
             }
         } catch (SmbException e) {
             caughtException(e, "exists", "SmbException in exists for " + mUri);
@@ -133,7 +136,7 @@ public class JcifsFileEditor extends FileEditor{
     }
 
     private void caughtException(Throwable e, String method, String exceptionType) {
-        if (DBG) Log.e(TAG, method + ": caught" + exceptionType, e);
-        else Log.w(TAG, method + ": caught "+ exceptionType);
+        if (DBG) log.error(method + ": caught" + exceptionType, e);
+        else log.warn(method + ": caught "+ exceptionType);
     }
 }

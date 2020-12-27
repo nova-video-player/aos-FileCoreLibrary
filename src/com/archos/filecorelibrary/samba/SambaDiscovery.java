@@ -48,12 +48,15 @@ import android.util.Log;
 import com.archos.environment.ArchosFeatures;
 import com.archos.environment.ArchosUtils;
 import com.archos.environment.NetworkState;
+import com.archos.filecorelibrary.jcifs.JcifsFileEditor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SambaDiscovery implements InternalDiscoveryListener {
 
-    private final static String TAG = "SambaDiscovery";
-    private static boolean DBG = false;
+    private static final Logger log = LoggerFactory.getLogger(SambaDiscovery.class);
 
     public static final int SOCKET_TIMEOUT = 150;
 
@@ -128,7 +131,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
      */
     @Override
     synchronized public void onShareFound(String workgroupName, String shareName, String shareAddress) {
-        if (DBG) Log.d(TAG, "onShareFound "+workgroupName+" \""+shareName+"\" "+shareAddress);
+        log.debug("onShareFound "+workgroupName+" \""+shareName+"\" "+shareAddress);
 
         boolean alreadyFound = false;
 
@@ -144,7 +147,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                     // When shareName is not null and not empty, we must remove a previous instance
                     // with the same address (but no name because from TCP discovery) to replace it
                     if (shareName != null && !shareName.isEmpty()) {
-                        if (DBG) Log.d(TAG, "addIfNeeded: removing " + shareAddress);
+                        log.debug("addIfNeeded: removing " + shareAddress);
                         shIter.remove();
                     }
                 }
@@ -165,26 +168,26 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         if (workgroup == null) {
             workgroup = new Workgroup(workgroupName);
             mWorkgroups.put(workgroupName, workgroup);
-            if (DBG) Log.d(TAG, "new workgroup "+workgroup.getName()+" added");
+            log.debug("new workgroup "+workgroup.getName()+" added");
         }
 
         // Add the new share
         workgroup.addShare(shareName, shareAddress);
-        if (DBG) Log.d(TAG, "added share " + shareName + " ; "+shareAddress);
+        log.debug("added share " + shareName + " ; "+shareAddress);
         mThereIsAnUpdate = true;
         informListener(false);
     }
 
     @Override
     public void onInternalDiscoveryEnd(InternalDiscovery discovery, boolean aborted) {
-        if (DBG) Log.d(TAG, "onInternalDiscoveryEnd "+discovery.getClass().getSimpleName()+" aborted="+aborted);
+        log.debug("onInternalDiscoveryEnd "+discovery.getClass().getSimpleName()+" aborted="+aborted);
         mInternalDiscoveries.remove(discovery);
 
         // Tell the discovery is over when all the internal discoveries are over
         // We do not tell that the discovery is over when it is aborted because some new discovery threads may already be started
         if (mInternalDiscoveries.isEmpty() && !aborted) {
             informListener(true);
-            if (DBG) Log.d(TAG, "onInternalDiscoveryEnd calls discoveryFinished");
+            log.debug("onInternalDiscoveryEnd calls discoveryFinished");
             discoveryFinished();
         }
     }
@@ -257,7 +260,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         mWorkgroups.clear(); // reset previous results
 
         if (!NetworkState.isLocalNetworkConnected(mContext)) {
-            if (DBG) Log.d(TAG, "start: no localNetworkConnected (eth/wifi), do not start discovery!");
+            log.debug("start: no localNetworkConnected (eth/wifi), do not start discovery!");
             return;
         }
 
@@ -293,7 +296,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         mInternalDiscoveries.add(new TcpDiscovery(this, ipAddress, mSocketReadDurationMs, 1000));
 
         // Start all the discoveries
-        if (DBG) Log.d(TAG, "Start discovery");
+        log.debug("Start discovery");
         for (InternalDiscovery discovery : mInternalDiscoveries) {
             discovery.start();
         }
@@ -308,11 +311,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         if (ipAddress == null)
             return;
 
-        if (DBG) Log.d(TAG, "Start UDP only discovery");
+        log.debug("Start UDP only discovery");
         UdpDiscovery udpDiscovery = new UdpDiscovery(this, ipAddress, socketReadDurationMs);
         mInternalDiscoveries.add(udpDiscovery); // this list will probably not be used in "blocking" mode be better be consistant
         udpDiscovery.run_blocking(); // running in the current thread
-        if (DBG) Log.d(TAG, "UDP only discovery finished");
+        log.debug("UDP only discovery finished");
     }
 
     /**
@@ -407,7 +410,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         for(LinkAddress la: las) {
             InetAddress inetAddress = la.getAddress();
             if (inetAddress instanceof Inet4Address) {
-                if (DBG) Log.d(TAG, lp.getInterfaceName() + ": " + inetAddress.getHostAddress());
+                log.debug(lp.getInterfaceName() + ": " + inetAddress.getHostAddress());
                 return inetAddress.getHostAddress();
             }
         }
@@ -422,7 +425,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
             NetworkCapabilities np = connMgr.getNetworkCapabilities(n);
             String iname =  lp.getInterfaceName();
             if (iname != null && np != null) {
-                if (DBG) Log.d(TAG, ">>> " + iname + ": " + np.hasTransport(cap));
+                log.debug(">>> " + iname + ": " + np.hasTransport(cap));
                 if (np.hasTransport(cap))
                     return lp;
             }
@@ -483,7 +486,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                 lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_WIFI);
             if (lp != null)
                 ipAddress =  getIp(lp);
-            if (DBG) Log.d(TAG, "initIpAddress: " + ipAddress);
+            log.debug("initIpAddress: " + ipAddress);
             if (ipAddress != null)
                 return ipAddress;
         }
@@ -504,7 +507,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                 }
             }
         } catch (SocketException e) {
-            Log.e(TAG,"getIpAddress", e);
+            log.error("getIpAddress", e);
         }
 
         final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -533,7 +536,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                 }
             }
         } catch (SocketException e) {
-            Log.e(TAG,"getIpAddress", e);
+            log.error("getIpAddress", e);
         }
         
     return getLocalIpAddress();
@@ -543,7 +546,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         int intIpAddress = findDoubleNatIp();
         InetAddress address = inetFromInt(intIpAddress);
         if (address != null) {
-            if (DBG) Log.d(TAG, "getDoubleNatIpAddress: " + address.getHostAddress());
+            log.debug("getDoubleNatIpAddress: " + address.getHostAddress());
             return address.getHostAddress();
         }
         return null;
@@ -553,7 +556,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         int intIpAddress = findLocalIp();
         InetAddress address = inetFromInt(intIpAddress);
         if (address != null) {
-            if (DBG) Log.d(TAG, "getLocalIpAddress: " + address.getHostAddress());
+            log.debug("getLocalIpAddress: " + address.getHostAddress());
             return address.getHostAddress();
         }
         return null;

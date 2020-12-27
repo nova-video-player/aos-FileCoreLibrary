@@ -17,6 +17,8 @@ package com.archos.filecorelibrary.ftp;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.net.Uri;
@@ -26,6 +28,8 @@ import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
 public class FTPFile2 extends MetaFile2 {
+
+    private static final Logger log = LoggerFactory.getLogger(FTPFile2.class);
 
     private static final long serialVersionUID = 2L;
 
@@ -61,6 +65,7 @@ public class FTPFile2 extends MetaFile2 {
         } else {
             mName = name;
         }
+        log.debug("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory);
     }
 
     @SuppressWarnings("unused")

@@ -23,6 +23,9 @@ import com.archos.filecorelibrary.samba.InternalDiscoveryListener;
 import com.archos.filecorelibrary.samba.SambaDiscovery;
 import com.archos.filecorelibrary.samba.Workgroup;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -52,6 +55,8 @@ public class UdpDiscovery implements InternalDiscovery {
 
     private boolean mAbort = false;
 
+    private static final Logger log = LoggerFactory.getLogger(UdpDiscovery.class);
+
     public UdpDiscovery(InternalDiscoveryListener listener, String ipAddress, int socketReadDurationMs) {
         mThread = new UdpDiscoveryThread();
         mListener = listener;
@@ -61,6 +66,7 @@ public class UdpDiscovery implements InternalDiscovery {
 
     @Override
     public void start() {
+        log.debug("start thread alive? " + isAlive());
         mThread.start(); // start the Thread
     }
 
@@ -81,6 +87,7 @@ public class UdpDiscovery implements InternalDiscovery {
 
     private class UdpDiscoveryThread extends Thread {
         public void run() {
+            log.debug("UdpDiscoveryThread.run()");
 
             NbtAddress[] addrs;
             LinkedList<InetAddress> addresses = new LinkedList<>();
@@ -90,7 +97,7 @@ public class UdpDiscovery implements InternalDiscovery {
             try {
                 selector = Selector.open();
             } catch (IOException e) {
-                if(DBG) Log.d(TAG, "abort UdpDiscovery: no selector");
+                log.debug("abort UdpDiscovery: no selector");
                 return;
             }
             byte[] snd_buf = new byte[576];
@@ -133,8 +140,8 @@ public class UdpDiscovery implements InternalDiscovery {
                     datagramChannel.socket().bind(null);
                     datagramChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                 } catch (IOException e) {
-                    if (DBG) Log.e(TAG, "doTcpDiscovery: caught IOException", e);
-                    else Log.w(TAG, "doTcpDiscovery: caught IOException");
+                    if (DBG) log.error("doTcpDiscovery: caught IOException", e);
+                    else log.warn("doTcpDiscovery: caught IOException");
                 }
             }
 
@@ -145,8 +152,8 @@ public class UdpDiscovery implements InternalDiscovery {
                     try {
                         readyChannels = selector.select(SambaDiscovery.SOCKET_TIMEOUT);
                     } catch (IOException e) {
-                        if (DBG) Log.e(TAG, "doTcpDiscovery: caught IOException", e);
-                        else Log.w(TAG, "doTcpDiscovery: caught IOException");
+                        if (DBG) log.error("doTcpDiscovery: caught IOException", e);
+                        else log.warn("doTcpDiscovery: caught IOException");
                     }
                 }
                 if (readyChannels == 0) continue;
@@ -237,7 +244,7 @@ public class UdpDiscovery implements InternalDiscovery {
                         final String shareName = addr.getHostName();
                         final String shareAddress = "smb://" + remoteAddr.getHostAddress() + '/';
 
-                        if(DBG) Log.d(TAG, "found share " + shareName + " at " + shareAddress);
+                        log.trace("found share " + shareName + " at " + shareAddress);
                         mListener.onShareFound(workgroupName, shareName, shareAddress);
 
                         // Update the JCIFS cache
@@ -252,6 +259,7 @@ public class UdpDiscovery implements InternalDiscovery {
     }
 
     void addShareHostToCache(String shareName, InetAddress ip) {
+        /*
         int ipv4Address = 0;
         byte[] ipAddress = ip.getAddress();
         if (ipAddress.length == 4) {
@@ -267,7 +275,8 @@ public class UdpDiscovery implements InternalDiscovery {
             addr.hostName.srcHashCode = context.getConfig().getBroadcastAddress().hashCode();
             NameServiceClientImpl impl = (NameServiceClientImpl) context.getNameServiceClient();
             impl.cacheAddress(name, addr);
-            if (DBG) Log.d(TAG, "Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
+            log.debug("Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
         }
+         */
     }
 }

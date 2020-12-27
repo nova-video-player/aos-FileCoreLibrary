@@ -21,6 +21,9 @@ import android.util.Log;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +41,7 @@ import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
  */
 public class JcifsRawLister extends RawLister {
 
-    private final static String TAG = "JcifsRawLister";
-    private final static boolean DBG = false;
+    private static final Logger log = LoggerFactory.getLogger(JcifsRawLister.class);
 
     public JcifsRawLister(Uri uri) {
         super(uri);
@@ -52,7 +54,7 @@ public class JcifsRawLister extends RawLister {
             for(SmbFile f : listFiles){
                 // better verify that it is a file or directory before adding
                 if(f.isFile() || f.isDirectory()) {
-                    if (DBG) Log.d(TAG, " found " + f.getPath());
+                    log.trace("found " + f.getPath());
                     files.add(new JcifsFile2(f));
                 }
             }

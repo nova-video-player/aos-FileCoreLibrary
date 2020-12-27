@@ -23,6 +23,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.net.Uri;
 import android.util.Log;
@@ -31,7 +33,7 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase.Credential;
 
 public class Session {
-    private static final String TAG = "ftp.Session";
+    private static final Logger log = LoggerFactory.getLogger(Session.class);
     private static Session sSession = null;
     private final HashMap<Credential, FTPClient> ftpsClients;
 
@@ -40,7 +42,6 @@ public class Session {
         ftpClients = new HashMap<Credential, FTPClient>();
         ftpsClients = new HashMap<Credential, FTPClient>();
     }
-
 
     public void removeFTPClient(Uri cred){
         for(Entry<Credential,FTPClient> e : ftpClients.entrySet()){
@@ -109,12 +110,12 @@ public class Session {
             return ftpclient;
         }
         // Not previous session found, open a new one
-        Log.d(TAG, "create new ftp session for "+uri);
+        log.debug("create new ftp session for "+uri);
         FTPClient ftp = getNewFTPClient(uri,FTP.BINARY_FILE_TYPE);
         if(ftp==null)
             return null;
         Uri key = buildKeyFromUri(uri);
-        Log.d(TAG, "new ftp session created with key "+key);
+        log.debug("new ftp session created with key "+key);
         ftpClients.put(cred, ftp);
         return ftp;
     }
@@ -129,12 +130,12 @@ public class Session {
             return ftpclient;
         }
         // Not previous session found, open a new one
-        Log.d(TAG, "create new ftp session for "+uri);
+        log.debug("create new ftp session for "+uri);
         FTPClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
         if(ftp==null)
             return null;
         Uri key = buildKeyFromUri(uri);
-        Log.d(TAG, "new ftp session created with key "+key);
+        log.debug("new ftp session created with key "+key);
         ftpsClients.put(cred, ftp);
         return ftp;
     }
