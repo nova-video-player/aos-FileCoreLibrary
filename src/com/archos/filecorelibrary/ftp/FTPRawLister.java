@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +43,19 @@ public class FTPRawLister extends RawLister {
     }
 
     public List<MetaFile2> getFileList() throws IOException, AuthenticationException {
-        FTPClient ftp = Session.getInstance().getFTPClient(mUri);
+        FTPClient ftp;
+        if (mUri.getScheme().equals("ftps"))
+            ftp = Session.getInstance().getNewFTPSClient(mUri, -1);
+        else
+            ftp = Session.getInstance().getNewFTPClient(mUri, -1);
+
         ftp.cwd(mUri.getPath()); 
-        org.apache.commons.net.ftp.FTPFile[] listFiles = ftp.listFiles(); 
+        FTPFile[] listFiles = ftp.listFiles();
 
         if(listFiles==null)
             return null;
         ArrayList<MetaFile2> list = new ArrayList<MetaFile2>();
-        for(org.apache.commons.net.ftp.FTPFile f : listFiles){
+        for(FTPFile f : listFiles){
             if(!f.getName().equals("..")|| !f.getName().equals(".")){
                 FTPFile2 sf = new FTPFile2(f , Uri.withAppendedPath(mUri, f.getName()));
                 log.trace("FTPRawLister: add " + sf.getName());
