@@ -17,6 +17,7 @@ package com.archos.filecorelibrary.ftp;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +117,7 @@ public class FTPFile2 extends MetaFile2 {
     @Override
     public boolean equals(Object other) {
         if (other instanceof FTPFile2) {
-            return getUri().equals( ((FTPFile2)other).getUri() );
+            return getUri().equals(((FTPFile2)other).getUri());
         } else {
             return false;
         }
@@ -140,15 +141,15 @@ public class FTPFile2 extends MetaFile2 {
      *
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        FTPClient ftp = null;
-        if (uri.getScheme().equals("ftps"))
-            ftp = Session.getInstance().getFTPSClient(uri);
-        else
-            ftp = Session.getInstance().getFTPClient(uri);
-        FTPFile ftpFile = ftp.mlistFile(uri.getPath());
-        if(ftpFile!=null)
-            return new FTPFile2(ftpFile,uri);
-        else
-            return null;
+        if (uri.getScheme().equals("ftps")) {
+            FTPSClient ftp = Session.getInstance().getFTPSClient(uri);
+            FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+        } else {
+            FTPClient ftp = Session.getInstance().getFTPClient(uri);
+            FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+        }
+        return null;
     }
 }

@@ -22,7 +22,9 @@ import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilter;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,14 +118,20 @@ public class FtpListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                FTPClient ftp;
-
-                if (mUri.getScheme().equals("ftps"))
-                    ftp = Session.getInstance().getFTPSClient(mUri);
-                else
+                Boolean isFtps = false;
+                FTPFile[] listFiles;
+                FTPSClient ftps = null;
+                FTPClient ftp = null;
+                if (mUri.getScheme().equals("ftps")) {
+                    ftps = Session.getInstance().getFTPSClient(mUri);
+                    ftps.cwd(mUri.getPath());
+                    listFiles = ftps.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
+                    isFtps = true;
+                } else {
                     ftp = Session.getInstance().getFTPClient(mUri);
-                ftp.cwd(mUri.getPath());
-                org.apache.commons.net.ftp.FTPFile[] listFiles = ftp.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
+                    ftp.cwd(mUri.getPath());
+                    listFiles = ftp.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
+                }
 
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
@@ -154,8 +162,8 @@ public class FtpListingEngine extends ListingEngine {
 
                 final ArrayList<FTPFile2> directories = new ArrayList<FTPFile2>();
                 final ArrayList<FTPFile2> files = new ArrayList<FTPFile2>();
-                for(org.apache.commons.net.ftp.FTPFile f : listFiles){
-                    FTPFile2 sf = new FTPFile2(f , Uri.withAppendedPath(mUri, f.getName()));
+                for (FTPFile f : listFiles){
+                    FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
                     if (sf.isDirectory()) {
                         log.trace("FtpListingThread: add directory " + sf.getName());
                         directories.add(sf);
@@ -164,7 +172,8 @@ public class FtpListingEngine extends ListingEngine {
                         files.add(sf);
                     }
                 }
-                ftp.cwd("/");
+                if (isFtps) ftps.cwd("/");
+                else ftp.cwd("/");
 
                 // Put directories first, then files
                 final Comparator<? super FTPFile2> comparator = new FileComparator().selectFileComparator(mSortOrder);
@@ -206,20 +215,16 @@ public class FtpListingEngine extends ListingEngine {
                         }
                     }
                 });
-            }
-            catch (UnknownHostException e) {
+            } catch (UnknownHostException e) {
                 log.error("FtpListingThread",e);
                 postFatalError(e);
-            }
-            catch (SocketException e) {
+            } catch (SocketException e) {
                 log.error("FtpListingThread",e);
                 postFatalError(e);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 log.error("FtpListingThread",e);
                 postFatalError(e);
-            }
-            catch (final AuthenticationException e) {
+            } catch (final AuthenticationException e) {
                 log.error("FtpListingThread",e);
                 mUiHandler.post(new Runnable() {
                     public void run() {
@@ -228,8 +233,7 @@ public class FtpListingEngine extends ListingEngine {
                         }
                     }
                 });
-            }
-            finally {
+            } finally {
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (mListener != null) { // always report end even when aborted or ended

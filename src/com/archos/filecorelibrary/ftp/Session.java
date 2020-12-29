@@ -35,12 +35,12 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase.Credential;
 public class Session {
     private static final Logger log = LoggerFactory.getLogger(Session.class);
     private static Session sSession = null;
-    private static HashMap<Credential, FTPClient> ftpsClients;
+    private static HashMap<Credential, FTPSClient> ftpsClients;
     private static HashMap<Credential, FTPClient> ftpClients;
 
     public Session() {
         ftpClients = new HashMap<Credential, FTPClient>();
-        ftpsClients = new HashMap<Credential, FTPClient>();
+        ftpsClients = new HashMap<Credential, FTPSClient>();
     }
 
     public static Session getInstance() {
@@ -50,10 +50,8 @@ public class Session {
     }
 
     public void removeFTPClient(Uri cred) {
-        Boolean isFtps = false;
-        if (cred.getScheme().equals("ftps")) isFtps = true;
-        if (isFtps) {
-            for (Entry<Credential, FTPClient> e : ftpsClients.entrySet())
+        if (cred.getScheme().equals("ftps")) {
+            for (Entry<Credential, FTPSClient> e : ftpsClients.entrySet())
                 if ((e.getKey()).getUriString().equals(cred.toString()))
                     ftpsClients.remove(e.getKey());
         } else {
@@ -104,7 +102,7 @@ public class Session {
         return ftp;
     }
 
-    public FTPClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
+    public FTPSClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();
         if (port < 0) port = 21; // default port
@@ -163,21 +161,21 @@ public class Session {
         if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
         log.debug("new ftp session created with key " + key);
-        ftpsClients.put(cred, ftp);
+        ftpClients.put(cred, ftp);
         return ftp;
     }
 
-    public FTPClient getFTPSClient(Uri uri) throws SocketException, IOException, AuthenticationException{
+    public FTPSClient getFTPSClient(Uri uri) throws SocketException, IOException, AuthenticationException{
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
         if (cred == null)
             cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(), true);
-        FTPClient ftpclient = ftpsClients.get(cred);
+        FTPSClient ftpclient = ftpsClients.get(cred);
         if (ftpclient!=null && ftpclient.isConnected())
             return ftpclient;
         // Not previous session found, open a new one
         log.debug("create new ftp session for "+uri);
-        FTPClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+        FTPSClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
         if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
         log.debug("new ftp session created with key "+key);
