@@ -118,10 +118,10 @@ public class FtpListingEngine extends ListingEngine {
             try {
                 FTPClient ftp;
 
-                if(mUri.getScheme().equals("ftps"))
-                        ftp= Session.getInstance().getFTPSClient(mUri);
-                    else
-                        ftp= Session.getInstance().getFTPClient(mUri);
+                if (mUri.getScheme().equals("ftps"))
+                    ftp = Session.getInstance().getFTPSClient(mUri);
+                else
+                    ftp = Session.getInstance().getFTPClient(mUri);
                 ftp.cwd(mUri.getPath());
                 org.apache.commons.net.ftp.FTPFile[] listFiles = ftp.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
 

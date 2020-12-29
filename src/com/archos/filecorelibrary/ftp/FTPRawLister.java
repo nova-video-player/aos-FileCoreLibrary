@@ -45,9 +45,9 @@ public class FTPRawLister extends RawLister {
     public List<MetaFile2> getFileList() throws IOException, AuthenticationException {
         FTPClient ftp;
         if (mUri.getScheme().equals("ftps"))
-            ftp = Session.getInstance().getNewFTPSClient(mUri, -1);
+            ftp = Session.getInstance().getFTPSClient(mUri);
         else
-            ftp = Session.getInstance().getNewFTPClient(mUri, -1);
+            ftp = Session.getInstance().getFTPClient(mUri);
 
         ftp.cwd(mUri.getPath()); 
         FTPFile[] listFiles = ftp.listFiles();

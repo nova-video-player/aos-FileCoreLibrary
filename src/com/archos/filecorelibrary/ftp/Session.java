@@ -35,171 +35,158 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase.Credential;
 public class Session {
     private static final Logger log = LoggerFactory.getLogger(Session.class);
     private static Session sSession = null;
-    private final HashMap<Credential, FTPClient> ftpsClients;
+    private static HashMap<Credential, FTPClient> ftpsClients;
+    private static HashMap<Credential, FTPClient> ftpClients;
 
-    private HashMap <Credential, FTPClient> ftpClients;
-    public Session(){
+    public Session() {
         ftpClients = new HashMap<Credential, FTPClient>();
         ftpsClients = new HashMap<Credential, FTPClient>();
     }
 
-    public void removeFTPClient(Uri cred){
-        for(Entry<Credential,FTPClient> e : ftpClients.entrySet()){
-            if((e.getKey()).getUriString().equals(cred.toString())){
-                ftpClients.remove(e.getKey()); 
-            }
+    public static Session getInstance() {
+        if (sSession == null)
+            sSession = new Session();
+        return sSession;
+    }
+
+    public void removeFTPClient(Uri cred) {
+        Boolean isFtps = false;
+        if (cred.getScheme().equals("ftps")) isFtps = true;
+        if (isFtps) {
+            for (Entry<Credential, FTPClient> e : ftpsClients.entrySet())
+                if ((e.getKey()).getUriString().equals(cred.toString()))
+                    ftpsClients.remove(e.getKey());
+        } else {
+            for (Entry<Credential, FTPClient> e : ftpClients.entrySet())
+                if ((e.getKey()).getUriString().equals(cred.toString()))
+                    ftpClients.remove(e.getKey());
         }
     }
 
-    public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException{
-
+    public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();
-        if (port<0) {
-            port = 21; // default port
-        }
+        if (port < 0) port = 21; // default port
 
-        String username="anonymous"; // default user
+        String username = "anonymous"; // default user
         String password = ""; // default password
-
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(path.toString());
-        if(cred!=null){
-            password= cred.getPassword();
+        if (cred != null) {
+            password = cred.getPassword();
             username = cred.getUsername();
         }
-        FTPClient ftp= new FTPClient();
 
+        FTPClient ftp = new FTPClient();
         //try to connect
         ftp.connect(path.getHost(), port);
-        //login to 	server
-        if(!ftp.login(username, password))
-        {
-            ftp.logout();
-            throw new AuthenticationException();
-        }
-        if(mode>=0){
-            ftp.setFileType(mode);
-
-        }
-        int reply = ftp.getReplyCode();
-        //FTPReply stores a set of constants for FTP reply codes. 
-        if (!FTPReply.isPositiveCompletion(reply))
-        {
-            try {
-                ftp.disconnect();
-            } catch (IOException e) {
-                throw e;
+        if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+            log.debug("getNewFTPClient: path " + path);
+            //login to 	server
+            if (!ftp.login(username, password)) {
+                ftp.logout();
+                throw new AuthenticationException();
             }
-            return null;
+            if (mode >= 0) ftp.setFileType(mode);
+            int reply = ftp.getReplyCode();
+            //FTPReply stores a set of constants for FTP reply codes.
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                try {
+                    ftp.disconnect();
+                } catch (IOException e) {
+                    log.error("getNewFTPClient: caught IOException ", e);
+                }
+                return null;
+            }
+            //enter passive mode
+            ftp.enterLocalPassiveMode();
         }
-        //enter passive mode
-        ftp.enterLocalPassiveMode();
-
         return ftp;
     }
 
-    public FTPClient getFTPClient(Uri uri) throws SocketException, IOException, AuthenticationException{
+    public FTPClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
+        // Use default port if not set
+        int port = path.getPort();
+        if (port < 0) port = 21; // default port
+
+        String username = "anonymous"; // default user
+        String password = ""; // default password
+        NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
+        Credential cred = database.getCredential(path.toString());
+        if (cred != null) {
+            password = cred.getPassword();
+            username = cred.getUsername();
+        }
+
+        FTPSClient ftp = new FTPSClient("TLS", false);
+        //try to connect
+        ftp.connect(path.getHost(), port);
+        if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+            //login to 	server
+            if (!ftp.login(username, password)) {
+                ftp.logout();
+                throw new AuthenticationException();
+            }
+            if (mode >= 0) ftp.setFileType(mode);
+
+            int reply = ftp.getReplyCode();
+            //FTPReply stores a set of constants for FTP reply codes.
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                try {
+                    ftp.disconnect();
+                } catch (IOException e) {
+                    throw e;
+                }
+                return null;
+            }
+            //enter passive mode
+            ftp.enterLocalPassiveMode();
+            // Set protection buffer size
+            ftp.execPBSZ(0);
+            // Set data channel protection to private
+            ftp.execPROT("P");
+        }
+        return ftp;
+    }
+
+    public FTPClient getFTPClient(Uri uri) throws SocketException, IOException, AuthenticationException {
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
-        if(cred==null){
-            cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(), true);
-        }
+        if (cred == null)
+            cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(), true);
         FTPClient ftpclient = ftpClients.get(cred);
-        if (ftpclient!=null && ftpclient.isConnected()){
+        if (ftpclient != null && ftpclient.isConnected())
             return ftpclient;
-        }
+        FTPClient ftp = getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
         // Not previous session found, open a new one
-        log.debug("create new ftp session for "+uri);
-        FTPClient ftp = getNewFTPClient(uri,FTP.BINARY_FILE_TYPE);
-        if(ftp==null)
-            return null;
+        log.debug("create new ftp session for " + uri);
+        if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
-        log.debug("new ftp session created with key "+key);
-        ftpClients.put(cred, ftp);
+        log.debug("new ftp session created with key " + key);
+        ftpsClients.put(cred, ftp);
         return ftp;
     }
+
     public FTPClient getFTPSClient(Uri uri) throws SocketException, IOException, AuthenticationException{
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
-        if(cred==null){
+        if (cred == null)
             cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(), true);
-        }
         FTPClient ftpclient = ftpsClients.get(cred);
-        if (ftpclient!=null && ftpclient.isConnected()){
+        if (ftpclient!=null && ftpclient.isConnected())
             return ftpclient;
-        }
         // Not previous session found, open a new one
         log.debug("create new ftp session for "+uri);
         FTPClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
-        if(ftp==null)
-            return null;
+        if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
         log.debug("new ftp session created with key "+key);
         ftpsClients.put(cred, ftp);
         return ftp;
     }
+
     private Uri buildKeyFromUri(Uri uri) {
         // We use the Uri without the path segment as key: for example, "ftp://blabla.com:21/toto/titi" gives a "ftp://blabla.com:21" key
         return uri.buildUpon().path("").build();
-    }
-
-    public static Session getInstance(){
-        if(sSession==null)
-            sSession= new Session();
-        return sSession;
-    }
-
-    public FTPClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException{
-
-        // Use default port if not set
-        int port = path.getPort();
-        if (port<0) {
-            port = 21; // default port
-        }
-
-        String username="anonymous"; // default user
-        String password = ""; // default password
-
-        NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
-        Credential cred = database.getCredential(path.toString());
-        if(cred!=null){
-            password= cred.getPassword();
-            username = cred.getUsername();
-        }
-        FTPSClient ftp= new FTPSClient("TLS", false);
-        //try to connect
-        ftp.connect(path.getHost(), port);
-
-        //login to 	server
-        if(!ftp.login(username, password))
-        {
-
-            ftp.logout();
-            throw new AuthenticationException();
-        }
-        if(mode>=0){
-            ftp.setFileType(mode);
-
-        }
-        int reply = ftp.getReplyCode();
-        //FTPReply stores a set of constants for FTP reply codes.
-        if (!FTPReply.isPositiveCompletion(reply))
-        {
-            try {
-                ftp.disconnect();
-            } catch (IOException e) {
-                throw e;
-            }
-            return null;
-        }
-        //enter passive mode
-        ftp.enterLocalPassiveMode();
-        // Set protection buffer size
-        ftp.execPBSZ(0);
-        // Set data channel protection to private
-        ftp.execPROT("P");
-
-        return ftp;
     }
 }

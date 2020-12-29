@@ -47,9 +47,9 @@ public class FtpFileEditor extends FileEditor {
         FTPClient ftp = null;
         try {
             if (mUri.getScheme().equals("ftps"))
-                ftp = Session.getInstance().getNewFTPSClient(mUri, -1);
+                ftp = Session.getInstance().getFTPSClient(mUri);
             else
-                ftp = Session.getInstance().getNewFTPClient(mUri, -1);
+                ftp = Session.getInstance().getFTPClient(mUri);
             return ftp.makeDirectory(mUri.getPath());
         } catch (AuthenticationException e) {
             // TODO Auto-generated catch block

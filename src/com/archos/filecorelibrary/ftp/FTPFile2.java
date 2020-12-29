@@ -140,11 +140,11 @@ public class FTPFile2 extends MetaFile2 {
      *
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        FTPClient ftp=null;
-        if(uri.getScheme().equals("ftps"))
-            ftp= Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+        FTPClient ftp = null;
+        if (uri.getScheme().equals("ftps"))
+            ftp = Session.getInstance().getFTPSClient(uri);
         else
-            ftp= Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
+            ftp = Session.getInstance().getFTPClient(uri);
         FTPFile ftpFile = ftp.mlistFile(uri.getPath());
         if(ftpFile!=null)
             return new FTPFile2(ftpFile,uri);
