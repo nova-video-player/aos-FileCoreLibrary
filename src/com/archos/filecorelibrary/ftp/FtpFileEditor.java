@@ -154,7 +154,7 @@ public class FtpFileEditor extends FileEditor {
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
                 return ftpFile != null;
             } else {
-                FTPClient ftp = Session.getInstance().getFTPClient(mUri;
+                FTPClient ftp = Session.getInstance().getFTPClient(mUri);
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
                 return ftpFile != null;
             }
