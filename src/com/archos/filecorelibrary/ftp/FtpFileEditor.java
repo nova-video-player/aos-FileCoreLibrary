@@ -69,10 +69,10 @@ public class FtpFileEditor extends FileEditor {
     @Override
     public InputStream getInputStream() throws AuthenticationException, SocketException, IOException {
         if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
             return ftp.retrieveFileStream(mUri.getPath());
         } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPClient ftp = Session.getInstance().getFTPClient(mUri);
             return ftp.retrieveFileStream(mUri.getPath());
         }
     }
@@ -80,11 +80,11 @@ public class FtpFileEditor extends FileEditor {
     @Override
     public InputStream getInputStream(long from) throws Exception {
         if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
             ftp.setRestartOffset(from); // will refuse in ascii mode
             return ftp.retrieveFileStream(mUri.getPath());
         } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPClient ftp = Session.getInstance().getFTPClient(mUri);
             ftp.setRestartOffset(from); // will refuse in ascii mode
             return ftp.retrieveFileStream(mUri.getPath());
         }
@@ -93,10 +93,10 @@ public class FtpFileEditor extends FileEditor {
     @Override
     public OutputStream getOutputStream() throws AuthenticationException, SocketException, IOException {
         if (mUri.getScheme().equals("ftps")) {
-            FTPSClient  ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPSClient  ftp = Session.getInstance().getFTPSClient(mUri);
             return ftp.storeFileStream(mUri.getPath());
         } else {
-            FTPClient  ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPClient  ftp = Session.getInstance().getFTPClient(mUri);
             return ftp.storeFileStream(mUri.getPath());
         }
     }
@@ -104,10 +104,10 @@ public class FtpFileEditor extends FileEditor {
     @Override
     public void delete() throws SocketException, IOException, AuthenticationException {
         if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, -1);
+            FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
             ftp.deleteFile(mUri.getPath());
         } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, -1);
+            FTPClient ftp = Session.getInstance().getFTPClient(mUri);
             ftp.deleteFile(mUri.getPath());
         }
     }
@@ -150,11 +150,11 @@ public class FtpFileEditor extends FileEditor {
     public boolean exists() {
         try {
             if (mUri.getScheme().equals("ftps")) {
-                FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+                FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
                 return ftpFile != null;
             } else {
-                FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+                FTPClient ftp = Session.getInstance().getFTPClient(mUri;
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
                 return ftpFile != null;
             }
