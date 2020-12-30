@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
@@ -47,6 +48,7 @@ public class FTPRawLister extends RawLister {
         FTPFile[] listFiles;
         if (mUri.getScheme().equals("ftps")) {
             FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
+            Log.d("marc", "getFileList: isConnected " + ftp.isConnected() + ", isAvailable " + ftp.isAvailable());
             ftp.cwd(mUri.getPath());
             listFiles = ftp.listFiles();
         } else {

@@ -52,12 +52,32 @@ public class Session {
     public void removeFTPClient(Uri cred) {
         if (cred.getScheme().equals("ftps")) {
             for (Entry<Credential, FTPSClient> e : ftpsClients.entrySet())
-                if ((e.getKey()).getUriString().equals(cred.toString()))
+                if ((e.getKey()).getUriString().equals(cred.toString())) {
+                    if (e.getValue().isConnected()) {
+                        try {
+                            log.debug("removeFTPSClient: logout + disconnect ");
+                            e.getValue().logout();
+                            e.getValue().disconnect();
+                        } catch (IOException ioe) {
+                            log.error("removeFTPClient: caught IOException ", ioe);
+                        }
+                    }
                     ftpsClients.remove(e.getKey());
+                }
         } else {
             for (Entry<Credential, FTPClient> e : ftpClients.entrySet())
-                if ((e.getKey()).getUriString().equals(cred.toString()))
+                if ((e.getKey()).getUriString().equals(cred.toString())) {
+                    if (e.getValue().isConnected()) {
+                        try {
+                            log.debug("removeFTPClient: logout + disconnect");
+                            e.getValue().logout();
+                            e.getValue().disconnect();
+                        } catch (IOException ioe) {
+                            log.error("removeFTPClient: caught IOException ", ioe);
+                        }
+                    }
                     ftpClients.remove(e.getKey());
+                }
         }
     }
 
@@ -82,13 +102,20 @@ public class Session {
             log.debug("getNewFTPClient: path " + path);
             //login to 	server
             if (!ftp.login(username, password)) {
-                ftp.logout();
+                log.debug("getNewFTPClient: logout + disconnect");
+                try {
+                    ftp.logout();
+                    ftp.disconnect();
+                } catch (IOException e) {
+                    log.error("getNewFTPClient: caught IOException ", e);
+                }
                 throw new AuthenticationException();
             }
             if (mode >= 0) ftp.setFileType(mode);
             int reply = ftp.getReplyCode();
             //FTPReply stores a set of constants for FTP reply codes.
             if (!FTPReply.isPositiveCompletion(reply)) {
+                log.debug("getNewFTPClient: logout + disconnect");
                 try {
                     ftp.disconnect();
                 } catch (IOException e) {
@@ -122,18 +149,26 @@ public class Session {
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
             //login to 	server
             if (!ftp.login(username, password)) {
+                log.debug("getNewFTPClient: logout + disconnect");
                 ftp.logout();
+                if (ftp.isConnected()) {
+                    try {
+                        ftp.disconnect();
+                    } catch (IOException ioe) {
+                        log.error("getNewFTPSClient: caught IOException ", ioe);
+                    }
+                }
                 throw new AuthenticationException();
             }
             if (mode >= 0) ftp.setFileType(mode);
 
             int reply = ftp.getReplyCode();
-            //FTPReply stores a set of constants for FTP reply codes.
             if (!FTPReply.isPositiveCompletion(reply)) {
+                log.debug("getNewFTPClient: logout + disconnect");
                 try {
                     ftp.disconnect();
                 } catch (IOException e) {
-                    throw e;
+                    log.error("getNewFTPSClient: caught IOException ", e);
                 }
                 return null;
             }
@@ -143,6 +178,8 @@ public class Session {
             ftp.execPBSZ(0);
             // Set data channel protection to private
             ftp.execPROT("P");
+        } else {
+            ftp.disconnect();
         }
         return ftp;
     }
