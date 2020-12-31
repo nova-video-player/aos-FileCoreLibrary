@@ -125,6 +125,8 @@ public class Session {
             }
             //enter passive mode
             ftp.enterLocalPassiveMode();
+            // Send keepalive to preserve control channel every 5mn
+            ftp.setControlKeepAliveTimeout(300);
         }
         return ftp;
     }
@@ -178,6 +180,8 @@ public class Session {
             ftp.execPBSZ(0);
             // Set data channel protection to private
             ftp.execPROT("P");
+            // Send keepalive to preserve control channel every 5mn
+            ftp.setControlKeepAliveTimeout(300);
         } else {
             ftp.disconnect();
         }
