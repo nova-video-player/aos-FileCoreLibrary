@@ -81,6 +81,32 @@ public class Session {
         }
     }
 
+    public Boolean closeNewFTPSClient(FTPSClient ftp) {
+        if (ftp == null) return true;
+        if (ftp.isConnected())
+            try {
+                log.debug("closeNewFTPSClient: logout + disconnect ");
+                ftp.logout();
+                ftp.disconnect();
+            } catch (IOException ioe) {
+                log.error("closeNewFTPSClient: caught IOException ", ioe);
+            }
+        return true;
+    }
+
+    public Boolean closeNewFTPClient(FTPClient ftp) {
+        if (ftp == null) return true;
+        if (ftp.isConnected())
+            try {
+                log.debug("closeNewFTPClient: logout + disconnect ");
+                ftp.logout();
+                ftp.disconnect();
+            } catch (IOException ioe) {
+                log.error("closeNewFTPClient: caught IOException ", ioe);
+            }
+        return true;
+    }
+
     public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();
@@ -166,7 +192,7 @@ public class Session {
 
             int reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
-                log.debug("getNewFTPClient: logout + disconnect");
+                log.debug("getNewFTPSClient: logout + disconnect");
                 try {
                     ftp.disconnect();
                 } catch (IOException e) {
@@ -194,14 +220,16 @@ public class Session {
         if (cred == null)
             cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(), true);
         FTPClient ftpclient = ftpClients.get(cred);
-        if (ftpclient != null && ftpclient.isConnected())
+        if (ftpclient != null && ftpclient.isConnected()) {
+            log.debug("getFTPClient: reusing ftp session for " + uri);
             return ftpclient;
+        }
         FTPClient ftp = getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
         // Not previous session found, open a new one
-        log.debug("create new ftp session for " + uri);
+        log.debug("getFTPClient: create new ftp session for " + uri);
         if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
-        log.debug("new ftp session created with key " + key);
+        log.debug("getFTPClient: new ftp session created with key " + key);
         ftpClients.put(cred, ftp);
         return ftp;
     }
@@ -212,14 +240,16 @@ public class Session {
         if (cred == null)
             cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(), true);
         FTPSClient ftpclient = ftpsClients.get(cred);
-        if (ftpclient!=null && ftpclient.isConnected())
+        if (ftpclient!=null && ftpclient.isConnected()) {
+            log.debug("getFTPSClient: reusing ftp session for " + uri);
             return ftpclient;
+        }
         // Not previous session found, open a new one
-        log.debug("create new ftp session for "+uri);
+        log.debug("getFTPSClient: create new ftp session for "+uri);
         FTPSClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
         if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
-        log.debug("new ftp session created with key "+key);
+        log.debug("getFTPSClient: new ftp session created with key " + key);
         ftpsClients.put(cred, ftp);
         return ftp;
     }

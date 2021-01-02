@@ -141,6 +141,7 @@ public class FTPFile2 extends MetaFile2 {
      *
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
+        log.debug("fromUri: " + uri);
         if (uri.getScheme().equals("ftps")) {
             FTPSClient ftp = Session.getInstance().getFTPSClient(uri);
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());

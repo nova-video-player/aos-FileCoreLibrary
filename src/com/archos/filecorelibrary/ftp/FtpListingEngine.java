@@ -77,14 +77,14 @@ public class FtpListingEngine extends ListingEngine {
     private void postFatalError(final Exception e) {
         mUiHandler.post(new Runnable() {
             public void run() {
-                if (!mAbort && mListener != null) { // do not report error if aborted
-                    ErrorEnum error;
-                    if(e instanceof java.net.UnknownHostException)
-                        error = ErrorEnum.ERROR_HOST_NOT_FOUND;
-                    else
-                        error = ErrorEnum.ERROR_UNKNOWN;
-                    mListener.onListingFatalError(e,error);
-                }
+            if (!mAbort && mListener != null) { // do not report error if aborted
+                ErrorEnum error;
+                if(e instanceof java.net.UnknownHostException)
+                    error = ErrorEnum.ERROR_HOST_NOT_FOUND;
+                else
+                    error = ErrorEnum.ERROR_UNKNOWN;
+                mListener.onListingFatalError(e,error);
+            }
             }
         });
     }
@@ -95,22 +95,22 @@ public class FtpListingEngine extends ListingEngine {
          */
         @Override
         public boolean accept(org.apache.commons.net.ftp.FTPFile f) {
-            if (f != null) {
-                final String filename = f.getName();
-                if (filename.equals(".") || filename.equals("..")) {
-                    return false;
-                }
-                if (f.isFile()) {
-                    return keepFile(filename);
-                } else if (f.isDirectory()) {
-                    return keepDirectory(filename);
-                } else {
-                    log.debug("neither file nor directory: " + filename);
-                    return false;
-                }
-            } else {
+        if (f != null) {
+            final String filename = f.getName();
+            if (filename.equals(".") || filename.equals("..")) {
                 return false;
             }
+            if (f.isFile()) {
+                return keepFile(filename);
+            } else if (f.isDirectory()) {
+                return keepDirectory(filename);
+            } else {
+                log.debug("neither file nor directory: " + filename);
+                return false;
+            }
+        } else {
+            return false;
+        }
         }
     };
 
