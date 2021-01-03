@@ -122,18 +122,24 @@ public class Session {
         }
 
         FTPClient ftp = new FTPClient();
+        ftp.setAutodetectUTF8(true); // must be done before connecting
+        //ftp.setControlEncoding("UTF-8");
         //try to connect
         ftp.connect(path.getHost(), port);
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            log.debug("getNewFTPClient: path " + path);
+            log.debug("getNewFTPClient: connected to " + path);
+            //enter passive mode
+            ftp.enterLocalPassiveMode();
+            // Send keepalive to preserve control channel every 5mn
+            ftp.setControlKeepAliveTimeout(300);
             //login to 	server
             if (!ftp.login(username, password)) {
-                log.debug("getNewFTPClient: logout + disconnect");
+                log.debug("getNewFTPClient: failed to login now logout + disconnect");
                 try {
                     ftp.logout();
                     ftp.disconnect();
                 } catch (IOException e) {
-                    log.error("getNewFTPClient: caught IOException ", e);
+                    log.error("getNewFTPClient: caught IOException during disconnect ", e);
                 }
                 throw new AuthenticationException();
             }
@@ -141,18 +147,14 @@ public class Session {
             int reply = ftp.getReplyCode();
             //FTPReply stores a set of constants for FTP reply codes.
             if (!FTPReply.isPositiveCompletion(reply)) {
-                log.debug("getNewFTPClient: logout + disconnect");
+                log.debug("getNewFTPClient: cannot setFileType logout + disconnect");
                 try {
                     ftp.disconnect();
                 } catch (IOException e) {
-                    log.error("getNewFTPClient: caught IOException ", e);
+                    log.error("getNewFTPClient: caught IOException disconnecting ", e);
                 }
                 return null;
             }
-            //enter passive mode
-            ftp.enterLocalPassiveMode();
-            // Send keepalive to preserve control channel every 5mn
-            ftp.setControlKeepAliveTimeout(300);
         }
         return ftp;
     }
@@ -172,34 +174,12 @@ public class Session {
         }
 
         FTPSClient ftp = new FTPSClient("TLS", false);
+        ftp.setAutodetectUTF8(true); // must be done before connecting
+        //ftp.setControlEncoding("UTF-8");
         //try to connect
         ftp.connect(path.getHost(), port);
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            //login to 	server
-            if (!ftp.login(username, password)) {
-                log.debug("getNewFTPClient: logout + disconnect");
-                ftp.logout();
-                if (ftp.isConnected()) {
-                    try {
-                        ftp.disconnect();
-                    } catch (IOException ioe) {
-                        log.error("getNewFTPSClient: caught IOException ", ioe);
-                    }
-                }
-                throw new AuthenticationException();
-            }
-            if (mode >= 0) ftp.setFileType(mode);
-
-            int reply = ftp.getReplyCode();
-            if (!FTPReply.isPositiveCompletion(reply)) {
-                log.debug("getNewFTPSClient: logout + disconnect");
-                try {
-                    ftp.disconnect();
-                } catch (IOException e) {
-                    log.error("getNewFTPSClient: caught IOException ", e);
-                }
-                return null;
-            }
+            log.debug("getNewFTPSClient: connected to " + path);
             //enter passive mode
             ftp.enterLocalPassiveMode();
             // Set protection buffer size
@@ -208,9 +188,38 @@ public class Session {
             ftp.execPROT("P");
             // Send keepalive to preserve control channel every 5mn
             ftp.setControlKeepAliveTimeout(300);
+            ftp.setControlEncoding("UTF-8");
+            //login to 	server
+            if (!ftp.login(username, password)) {
+                log.debug("getNewFTPSClient: failed to login now logout + disconnect");
+                ftp.logout();
+                if (ftp.isConnected()) {
+                    try {
+                        ftp.disconnect();
+                    } catch (IOException ioe) {
+                        log.error("getNewFTPSClient: caught IOException during disconnect ", ioe);
+                        Log.e("tag", "getNewFTPSClient: caught IOException during disconnect ", ioe);
+                    }
+                }
+                throw new AuthenticationException();
+            }
+            if (mode >= 0) ftp.setFileType(mode);
+
+            int reply = ftp.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                log.debug("getNewFTPSClient: cannot setFileType logout + disconnect");
+                try {
+                    ftp.disconnect();
+                } catch (IOException e) {
+                    log.error("getNewFTPSClient: caught IOException disconnecting ", e);
+                    Log.e("session", "getNewFTPSClient: caught IOException disconnecting ", e);
+                }
+                return null;
+            }
         } else {
             ftp.disconnect();
         }
+        log.debug("getNewFTPSClient: all went well, returning ftpsClient");
         return ftp;
     }
 
