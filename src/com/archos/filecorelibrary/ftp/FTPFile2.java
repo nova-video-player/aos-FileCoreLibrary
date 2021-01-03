@@ -14,7 +14,6 @@
 
 package com.archos.filecorelibrary.ftp;
 
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -43,7 +42,7 @@ public class FTPFile2 extends MetaFile2 {
     private final boolean mCanWrite;
     private final long mLength;
 
-    public FTPFile2(org.apache.commons.net.ftp.FTPFile file, Uri uri) {
+    public FTPFile2(FTPFile file, Uri uri) {
 
         if (uri == null) {
             throw new IllegalArgumentException("uri cannot be null");
@@ -66,7 +65,7 @@ public class FTPFile2 extends MetaFile2 {
         } else {
             mName = name;
         }
-        log.debug("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory);
+        log.trace("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory);
     }
 
     @SuppressWarnings("unused")
@@ -143,11 +142,14 @@ public class FTPFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         log.debug("fromUri: " + uri);
         if (uri.getScheme().equals("ftps")) {
+            // TODO MARC this is not ok but it does not crash
             FTPSClient ftp = Session.getInstance().getFTPSClient(uri);
+            if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());
             if (ftpFile != null) return new FTPFile2(ftpFile,uri);
         } else {
             FTPClient ftp = Session.getInstance().getFTPClient(uri);
+            if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());
             if (ftpFile != null) return new FTPFile2(ftpFile,uri);
         }
