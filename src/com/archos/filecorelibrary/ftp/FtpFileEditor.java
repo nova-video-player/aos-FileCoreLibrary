@@ -80,11 +80,11 @@ public class FtpFileEditor extends FileEditor {
     @Override
     public InputStream getInputStream(long from) throws Exception {
         if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
             ftp.setRestartOffset(from); // will refuse in ascii mode
             return ftp.retrieveFileStream(mUri.getPath());
         } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+            FTPClient ftp = Session.getInstance().getFTPClient(mUri);
             ftp.setRestartOffset(from); // will refuse in ascii mode
             return ftp.retrieveFileStream(mUri.getPath());
         }
