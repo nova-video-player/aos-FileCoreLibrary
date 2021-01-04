@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.ftp;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -142,17 +143,22 @@ public class FTPFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         log.debug("fromUri: " + uri);
         if (uri.getScheme().equals("ftps")) {
-            // TODO MARC this is not ok but it does not crash
-            FTPSClient ftp = Session.getInstance().getFTPSClient(uri);
-            if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
+            // ftpClient is not thread safe: using a new instance (need to close afterwards)
+            FTPSClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+            if (ftp.featureValue("MLST") == null) log.error("fromUri: ftp server does not support MLST!!!");
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            Session.closeNewFTPSClient(ftp);
             if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+            else log.warn("fromUri: ftps detected but ftpfile is null!");
         } else {
-            FTPClient ftp = Session.getInstance().getFTPClient(uri);
+            FTPClient ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
             if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            Session.closeNewFTPClient(ftp);
             if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+            else log.warn("fromUri: ftp detected but ftpfile is null!");
         }
+        log.warn("fromUri: uh! returning null!!!");
         return null;
     }
 }

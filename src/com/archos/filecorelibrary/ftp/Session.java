@@ -81,8 +81,8 @@ public class Session {
         }
     }
 
-    public Boolean closeNewFTPSClient(FTPSClient ftp) {
-        if (ftp == null) return true;
+    public static void closeNewFTPSClient(FTPSClient ftp) {
+        if (ftp == null) return;
         if (ftp.isConnected())
             try {
                 log.debug("closeNewFTPSClient: logout + disconnect ");
@@ -91,11 +91,10 @@ public class Session {
             } catch (IOException ioe) {
                 log.error("closeNewFTPSClient: caught IOException ", ioe);
             }
-        return true;
     }
 
-    public Boolean closeNewFTPClient(FTPClient ftp) {
-        if (ftp == null) return true;
+    public static void closeNewFTPClient(FTPClient ftp) {
+        if (ftp == null) return;
         if (ftp.isConnected())
             try {
                 log.debug("closeNewFTPClient: logout + disconnect ");
@@ -104,7 +103,6 @@ public class Session {
             } catch (IOException ioe) {
                 log.error("closeNewFTPClient: caught IOException ", ioe);
             }
-        return true;
     }
 
     public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
@@ -223,6 +221,7 @@ public class Session {
         return ftp;
     }
 
+    // Note that ftpClient is not thread safe thus reusing is not really an option here
     public FTPClient getFTPClient(Uri uri) throws SocketException, IOException, AuthenticationException {
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
@@ -243,6 +242,7 @@ public class Session {
         return ftp;
     }
 
+    // Note that ftpsClient is not thread safe thus reusing is not really an option here
     public FTPSClient getFTPSClient(Uri uri) throws SocketException, IOException, AuthenticationException{
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
