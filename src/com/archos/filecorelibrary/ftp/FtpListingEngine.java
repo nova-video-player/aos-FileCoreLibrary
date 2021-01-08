@@ -21,6 +21,7 @@ import android.util.Log;
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilter;
@@ -117,18 +118,19 @@ public class FtpListingEngine extends ListingEngine {
     private final class FtpListingThread extends Thread {
 
         public void run(){
+            Boolean isFtps = false;
+            FTPSClient ftps = null;
+            FTPClient ftp = null;
             try {
-                Boolean isFtps = false;
+                log.debug("FtpListingThread:run");
                 FTPFile[] listFiles;
-                FTPSClient ftps = null;
-                FTPClient ftp = null;
                 if (mUri.getScheme().equals("ftps")) {
-                    ftps = Session.getInstance().getFTPSClient(mUri);
+                    ftps = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
                     ftps.cwd(mUri.getPath());
                     listFiles = ftps.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
                     isFtps = true;
                 } else {
-                    ftp = Session.getInstance().getFTPClient(mUri);
+                    ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
                     ftp.cwd(mUri.getPath());
                     listFiles = ftp.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
                 }
@@ -234,6 +236,8 @@ public class FtpListingEngine extends ListingEngine {
                     }
                 });
             } finally {
+                if (isFtps) Session.closeNewFTPSClient(ftps);
+                else Session.closeNewFTPClient(ftp);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (mListener != null) { // always report end even when aborted or ended

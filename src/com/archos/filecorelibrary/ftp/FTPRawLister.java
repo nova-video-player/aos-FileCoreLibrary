@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -46,14 +47,17 @@ public class FTPRawLister extends RawLister {
 
     public List<MetaFile2> getFileList() throws IOException, AuthenticationException {
         FTPFile[] listFiles;
+        log.debug("getFileList");
         if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getFTPSClient(mUri);
+            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
             ftp.cwd(mUri.getPath());
             listFiles = ftp.listFiles();
+            Session.closeNewFTPSClient(ftp);
         } else {
-            FTPClient ftp = Session.getInstance().getFTPClient(mUri);
+            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
             ftp.cwd(mUri.getPath());
             listFiles = ftp.listFiles();
+            Session.closeNewFTPClient(ftp);
         }
 
         if(listFiles==null)

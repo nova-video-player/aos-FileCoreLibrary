@@ -68,13 +68,13 @@
     <string name="internal_storage_unified">Almacenamiento</string>
     <string name="sd_card_storage">Tarjeta SD</string>
     <string name="usb_host_storage">USB</string>
-    <string name="other_storage">Disco</string>
+    <string name="other_storage">Unidad</string>
     <string name="usb_ptp_storage">PTP</string>
     <string name="cloud_storage">En la Nube</string>
     <string name="directory_empty">La carpeta está vacía</string>
     <string name="no_server">Servidor no encontrado</string>
     <string name="loading">Espere mientras se carga…</string>
-    <string name="ssh_error">Imposible conectar. Por favor, revisa tu conexión y credenciales</string>
+    <string name="ssh_error">Imposible conectar: Por favor, compruebe su conexión y credenciales</string>
     <string name="ssh_remote_address">Acceso remoto</string>
     <string name="ssh_remote_address_error">Debe especificar una dirección remota</string>
     <string name="ssh_password">Contraseña</string>

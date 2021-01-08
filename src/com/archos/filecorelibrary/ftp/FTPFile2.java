@@ -43,7 +43,7 @@ public class FTPFile2 extends MetaFile2 {
     private final boolean mCanWrite;
     private final long mLength;
 
-    public FTPFile2(org.apache.commons.net.ftp.FTPFile file, Uri uri) {
+    public FTPFile2(FTPFile file, Uri uri) {
 
         if (uri == null) {
             throw new IllegalArgumentException("uri cannot be null");
@@ -66,7 +66,7 @@ public class FTPFile2 extends MetaFile2 {
         } else {
             mName = name;
         }
-        log.debug("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory);
+        log.trace("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory);
     }
 
     @SuppressWarnings("unused")
@@ -143,14 +143,22 @@ public class FTPFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         log.debug("fromUri: " + uri);
         if (uri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getFTPSClient(uri);
+            // ftpClient is not thread safe: using a new instance (need to close afterwards)
+            FTPSClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+            if (ftp.featureValue("MLST") == null) log.error("fromUri: ftp server does not support MLST!!!");
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            Session.closeNewFTPSClient(ftp);
             if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+            else log.warn("fromUri: ftps detected but ftpfile is null!");
         } else {
-            FTPClient ftp = Session.getInstance().getFTPClient(uri);
+            FTPClient ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
+            if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
             FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            Session.closeNewFTPClient(ftp);
             if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+            else log.warn("fromUri: ftp detected but ftpfile is null!");
         }
+        log.warn("fromUri: uh! returning null!!!");
         return null;
     }
 }
