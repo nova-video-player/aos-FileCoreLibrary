@@ -221,15 +221,17 @@ public class JcifsUtils {
     public static SmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
         Boolean isSmbV2 = isServerSmbV2(uri.getHost());
         CIFSContext context = null;
-        if (isSmbV2 == null) { // server type not identified, default to smbV2
+        if (isSmbV2 == null) { // server type not identified, default to smbV2&1 auto
             context = getBaseContext(true);
             log.debug("getSmbFileStrictNego: server NOT identified passing smbv2/smbv1 capable context for uri " + uri);
-        } else if (isSmbV2) { // provide smbV2 only
-            context = getBaseContextOnly(true);
-            log.debug("getSmbFileStrictNego: server already identified as smbv2 processing uri " + uri);
-        } else { // if dont't know (null) or smbV2 provide smbV2 only to try out. Fallback needs to be implemented in each calls
-            context = getBaseContextOnly(false);
-            log.debug("getSmbFileStrictNego: server already identified as smbv1 processing uri " + uri);
+        } else {
+            if (isSmbV2) { // provide smbV2 only
+                context = getBaseContextOnly(true);
+                log.debug("getSmbFileStrictNego: server already identified as smbv2 processing uri " + uri);
+            } else { // if dont't know (null) or smbV2 provide smbV2 only to try out. Fallback needs to be implemented in each calls
+                context = getBaseContextOnly(false);
+                log.debug("getSmbFileStrictNego: server already identified as smbv1 processing uri " + uri);
+            }
         }
         CIFSContext ctx = null;
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
