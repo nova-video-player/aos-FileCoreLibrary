@@ -174,11 +174,11 @@ public class JcifsUtils {
     }
 
     // isServerSmbV2 returns true/false/null, null is do not know
-    public static Boolean isServerSmbV2(String server) throws MalformedURLException {
+    public static Boolean isServerSmbV2(String server, int port) throws MalformedURLException {
         Boolean isSmbV2 = ListServers.get(server);
         log.debug("isServerSmbV2 for " + server + " previous state is " + isSmbV2);
         if (isSmbV2 == null) { // let's probe server root
-            Uri uri = Uri.parse("smb://" + server + "/");
+            Uri uri = Uri.parse("smb://" + server + ":" + port + "/");
             SmbFile smbFile = null;
             try {
                 log.debug("isServerSmbV2: probing " + uri + " to check if smbV2");
@@ -219,7 +219,7 @@ public class JcifsUtils {
     }
 
     public static SmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
-        Boolean isSmbV2 = isServerSmbV2(uri.getHost());
+        Boolean isSmbV2 = isServerSmbV2(uri.getHost(), uri.getPort());
         CIFSContext context = null;
         if (isSmbV2 == null) { // server type not identified, default to smbV2&1 auto
             context = getBaseContext(true);
