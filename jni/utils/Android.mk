@@ -16,9 +16,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libfilecoreutils
 
 LOCAL_LDLIBS := -L$(TARGET_OUT) -llog
-ifneq ($(TARGET_ARCH_ABI),x86)
-LOCAL_LDLIBS += -fuse-ld=bfd
-endif
 
 # All of the source files that we will compile.
 LOCAL_SRC_FILES:= \
