@@ -98,10 +98,6 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
         // disable dfs makes win10 shares with ms account work
         prop.put("jcifs.smb.client.dfs.disabled", "true");
-        // Required to make WD MyCloud work cf. https://github.com/AgNO3/jcifs-ng/issues/225
-        // made guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186
-        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "true");
-
         PropertyConfiguration propertyConfiguration = null;
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
@@ -133,6 +129,7 @@ public class JcifsUtils {
 
         // get around https://github.com/AgNO3/jcifs-ng/issues/40 and this is required for guest login on win10 smb2
         prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
+
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
         // with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST, jcifs-ng author recommends no change
@@ -140,10 +137,6 @@ public class JcifsUtils {
         else prop.put("jcifs.resolveOrder", "DNS,BCAST");
         // allow plaintext password fallback
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
-
-        // Required to make WD MyCloud work cf. https://github.com/AgNO3/jcifs-ng/issues/225
-        // made guest work on Win10 https://github.com/AgNO3/jcifs-ng/issues/186
-        prop.put("jcifs.smb.client.disableSpnegoIntegrity", "true");
 
         PropertyConfiguration propertyConfiguration = null;
         try {
