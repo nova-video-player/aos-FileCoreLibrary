@@ -156,11 +156,25 @@ public class JcifsUtils {
     }
 
     public static CIFSContext getBaseContext(boolean isSmb2) {
-        return isSmb2 ? baseContextSmb2 : baseContextSmb1;
+        //return isSmb2 ? baseContextSmb2 : baseContextSmb1;
+        if (isSmb2) {
+            if (baseContextSmb2 == null) baseContextSmb2 = createContext(true);
+            return baseContextSmb2;
+        } else {
+            if (baseContextSmb1 == null) baseContextSmb1 = createContext(false);
+            return baseContextSmb1;
+        }
     }
 
     public static CIFSContext getBaseContextOnly(boolean isSmb2) {
-        return isSmb2 ? baseContextSmb2Only : baseContextSmb1Only;
+        //return isSmb2 ? baseContextSmb2Only : baseContextSmb1Only;
+        if (isSmb2) {
+            if (baseContextSmb2Only == null) baseContextSmb2Only = createContextOnly(true);
+            return baseContextSmb2Only;
+        } else {
+            if (baseContextSmb1Only == null) baseContextSmb1Only = createContextOnly(false);
+            return baseContextSmb1Only;
+        }
     }
 
     private static HashMap<String, Boolean> ListServers = new HashMap<>();
