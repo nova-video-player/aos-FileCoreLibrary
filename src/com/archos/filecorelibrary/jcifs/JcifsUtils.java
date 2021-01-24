@@ -97,6 +97,11 @@ public class JcifsUtils {
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
         // disable dfs makes win10 shares with ms account work
         prop.put("jcifs.smb.client.dfs.disabled", "true");
+
+        // Needed for Huawei router https://github.com/AgNO3/jcifs-ng/issues/225
+        // see also https://github.com/AgNO3/jcifs-ng/issues/226
+        prop.put("jcifs.smb.useRawNTLM", "true");
+
         PropertyConfiguration propertyConfiguration = null;
         try {
             propertyConfiguration = new PropertyConfiguration(prop);
