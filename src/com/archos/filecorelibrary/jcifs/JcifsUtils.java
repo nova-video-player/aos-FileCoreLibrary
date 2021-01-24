@@ -45,7 +45,7 @@ public class JcifsUtils {
     // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
     // this is a hack to get around some issues seen with jcifs-ng
     // note to self: do not try to revert to false since it does not work (HP printer, livebox smbV1 broken with smbV2 enabled)
-    public final static boolean LIMIT_PROTOCOL_NEGO = true;
+    public final static boolean LIMIT_PROTOCOL_NEGO = false;
 
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
