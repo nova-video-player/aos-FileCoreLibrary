@@ -91,7 +91,6 @@ public class JcifsUtils {
         // do not change resolveOrder for now
         // with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST, jcifs-ng author recommends no change
         if (isResolverBcastFirst()) prop.put("jcifs.resolveOrder", "BCAST,DNS");
-        else prop.put("jcifs.resolveOrder", "DNS,BCAST");
         // get around https://github.com/AgNO3/jcifs-ng/issues/40 and this is required for guest login on win10 smb2
         prop.put("jcifs.smb.client.ipcSigningEnforced", "false");
         // allow plaintext password fallback
@@ -134,7 +133,6 @@ public class JcifsUtils {
         // do not change resolveOrder for now
         // with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST, jcifs-ng author recommends no change
         if (isResolverBcastFirst()) prop.put("jcifs.resolveOrder", "BCAST,DNS");
-        else prop.put("jcifs.resolveOrder", "DNS,BCAST");
         // allow plaintext password fallback
         prop.put("jcifs.smb.client.disablePlainTextPasswords", "false");
 
