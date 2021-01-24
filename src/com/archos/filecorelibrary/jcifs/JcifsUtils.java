@@ -102,8 +102,8 @@ public class JcifsUtils {
         // disable dfs makes win10 shares with ms account work
         prop.put("jcifs.smb.client.dfs.disabled", "true");
 
-        // Needed for Huawei router https://github.com/AgNO3/jcifs-ng/issues/225
-        // see also https://github.com/AgNO3/jcifs-ng/issues/226
+        // needed for Huawei router https://github.com/AgNO3/jcifs-ng/issues/225 using SMB1
+        // see also https://github.com/AgNO3/jcifs-ng/issues/226, not clear it does not interfere with SMB2 only servers
         prop.put("jcifs.smb.useRawNTLM", "true");
 
         PropertyConfiguration propertyConfiguration = null;
