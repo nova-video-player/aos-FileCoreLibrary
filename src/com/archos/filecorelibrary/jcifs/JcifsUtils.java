@@ -216,7 +216,7 @@ public class JcifsUtils {
         if (isSmbV2 == null) { // let's probe server root
             Uri uri;
             if (port != -1) uri = Uri.parse("smb://" + server + ":" + port + "/");
-            else uri = Uri.parse("smb://" + server);
+            else uri = Uri.parse("smb://" + server + '/');
             SmbFile smbFile = null;
             try {
                 log.debug("isServerSmbV2: probing " + uri + " to check if smbV2");
