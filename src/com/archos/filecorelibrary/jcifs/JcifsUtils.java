@@ -48,6 +48,8 @@ public class JcifsUtils {
     // update note to self: true creates protocol identification issues it seems (not threadsafe with multiple parallel requests?)
     public final static boolean LIMIT_PROTOCOL_NEGO = false;
 
+    public final static boolean RESOLUTION_CACHE_INJECTION = true;
+
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
 
