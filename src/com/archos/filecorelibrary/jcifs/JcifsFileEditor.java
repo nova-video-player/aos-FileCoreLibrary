@@ -38,7 +38,6 @@ import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 public class JcifsFileEditor extends FileEditor{
 
-    private static final boolean DBG = false;
     private static final Logger log = LoggerFactory.getLogger(JcifsFileEditor.class);
 
     public JcifsFileEditor(Uri uri) {
@@ -118,7 +117,7 @@ public class JcifsFileEditor extends FileEditor{
             SmbFile sf = getSmbFile(mUri);
             if (sf != null) {
                 boolean doesItExist = sf.exists();
-                if (DBG) {
+                if (log.isTraceEnabled()) {
                     if (doesItExist) log.trace("exists: " + mUri + " exists");
                     else log.trace("exists: " + mUri + " does not exist");
                 }
@@ -136,7 +135,7 @@ public class JcifsFileEditor extends FileEditor{
     }
 
     private void caughtException(Throwable e, String method, String exceptionType) {
-        if (DBG) log.error(method + ": caught" + exceptionType, e);
+        if (log.isTraceEnabled()) log.error(method + ": caught" + exceptionType, e);
         else log.warn(method + ": caught "+ exceptionType);
     }
 }

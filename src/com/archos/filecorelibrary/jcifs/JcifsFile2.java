@@ -37,7 +37,6 @@ import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 public class JcifsFile2 extends MetaFile2 {
 
     private static final long serialVersionUID = 2L;
-    private static final boolean DBG = true;
 
     private static final Logger log = LoggerFactory.getLogger(JcifsFile2.class);
 
@@ -126,7 +125,7 @@ public class JcifsFile2 extends MetaFile2 {
     }
 
     private void caughtException(Throwable e, String method, String exceptionType) {
-        if (DBG) log.error(method + ": caught" + exceptionType, e);
+        if (log.isTraceEnabled()) log.error(method + ": caught" + exceptionType, e);
         else log.warn(method + ": caught "+ exceptionType);
     }
 
