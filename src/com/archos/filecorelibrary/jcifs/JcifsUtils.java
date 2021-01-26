@@ -47,11 +47,14 @@ public class JcifsUtils {
     // note to self: do not try to revert to false since it does not work (HP printer, livebox smbV1 broken with smbV2 enabled) but jcifs.smb.useRawNTLM=true solves this!
     // update note to self: true creates protocol identification issues it seems (not threadsafe with multiple parallel requests?)
     public final static boolean LIMIT_PROTOCOL_NEGO = false;
-
     public final static boolean RESOLUTION_CACHE_INJECTION = true;
+    public final static boolean PREVENT_MULTIPLE_TIME_SERVER_PROBING = true;
 
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
+
+    private static HashMap<String, Boolean> listServersSmb2 = new HashMap<>();
+    private static HashMap<String, Boolean> listServersBeingProbed = new HashMap<>();
 
     private static Context mContext;
 
@@ -182,21 +185,27 @@ public class JcifsUtils {
         }
     }
 
-    private static HashMap<String, Boolean> ListServers = new HashMap<>();
-
     public static void declareServerSmbV2(String server, boolean isSmbV2) {
         log.debug("declareServerSmbV2 for " + server + " " + isSmbV2);
-        ListServers.put(server, isSmbV2);
+        listServersSmb2.put(server, isSmbV2);
+    }
+
+    public static void declareServerBeingProbed(String server, boolean probed) {
+        log.debug("declareServerBeingProbed for " + server + " " + probed);
+        listServersBeingProbed.put(server, probed);
     }
 
     private static CIFSContext getCifsContext(Uri uri, Boolean isSmbV2) {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
         if (cred != null) {
+            log.debug("getCifsContext using credentials for " + uri);
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
             context = getBaseContext(isSmbV2).withCredentials(auth);
-        } else
+        } else {
+            log.debug("getCifsContext using NO credentials for " + uri);
             context = getBaseContext(isSmbV2).withGuestCrendentials();
+        }
         return context;
     }
 
@@ -204,16 +213,26 @@ public class JcifsUtils {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
         if (cred != null) {
+            log.debug("getCifsContext using credentials for " + uri);
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
             context = getBaseContextOnly(isSmbV2).withCredentials(auth);
-        } else
+        } else {
+            log.debug("getCifsContextOnly using NO credentials for " + uri);
             context = getBaseContextOnly(isSmbV2).withGuestCrendentials();
+        }
         return context;
     }
 
     // isServerSmbV2 returns true/false/null, null is do not know
     public static Boolean isServerSmbV2(String server, int port) throws MalformedURLException {
-        Boolean isSmbV2 = ListServers.get(server);
+        Boolean isSmbV2 = listServersSmb2.get(server);
+        Boolean isServerBeingProbed = listServersBeingProbed.get(server);
+        // do not multiple probe one same server until we know first result
+        if (isServerBeingProbed != null && isServerBeingProbed) {
+            log.debug("isServerSmbV2: " + server + " already being probed in parallel returning null if debouncing");
+            if (PREVENT_MULTIPLE_TIME_SERVER_PROBING) return null;
+        }
+        declareServerBeingProbed(server, true);
         log.debug("isServerSmbV2 for " + server + " previous state is " + isSmbV2);
         if (isSmbV2 == null) { // let's probe server root
             Uri uri;
@@ -227,12 +246,16 @@ public class JcifsUtils {
                 smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                 declareServerSmbV2(server, true);
                 log.debug("isServerSmbV2 for " + server + " returning true");
+                declareServerBeingProbed(server, false);
                 return true;
             } catch (SmbAuthException authE) {
-                log.warn("isServerSmbV2: caught SmbAutException in probing SMB2, state for " + server + "  returning null");
+                if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbAutException in probing SMB2, state for " + server + "  returning null", authE);
+                else log.warn("isServerSmbV2: caught SmbAutException in probing SMB2, state for " + server + "  returning null");
+                declareServerBeingProbed(server, false);
                 return null;
             } catch (SmbException smbE) {
-                log.debug("isServerSmbV2: caught SmbException in probing SMB2 " + smbE);
+                if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbException in probing SMB2 ", smbE);
+                else log.warn("isServerSmbV2: caught SmbException in probing SMB2");
                 try {
                     log.debug("isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
                     CIFSContext ctx = getCifsContextOnly(uri, false);
@@ -240,17 +263,25 @@ public class JcifsUtils {
                     smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                     declareServerSmbV2(server, false);
                     log.debug("isServerSmbV2 for " + server + " returning false");
+                    declareServerBeingProbed(server, false);
                     return false;
                 } catch (SmbAuthException authE2) {
-                    log.warn("isServerSmbV2: caught SmbAutException in probing SMB1, state for " + server + "  returning null");
+                    if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbAutException in probing SMB1, state for " + server + "  returning null ", authE2);
+                    else log.warn("isServerSmbV2: caught SmbAutException in probing SMB1, state for " + server + "  returning null");
+                    declareServerBeingProbed(server, false);
                     return null;
                 } catch (SmbException smbE2) {
                     log.warn("isServerSmbV2: caught SmbException in probing SMB1, returning null");
+                    if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbException in probing SMB1, returning null", smbE2);
+                    else log.warn("isServerSmbV2: caught SmbException in probing SMB1, returning null");
+                    declareServerBeingProbed(server, false);
                     return null;
                 }
             }
-        } else
+        } else {
+            declareServerBeingProbed(server, false);
             return isSmbV2;
+        }
     }
 
     public static SmbFile getSmbFile(Uri uri) throws MalformedURLException {
