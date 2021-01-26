@@ -259,24 +259,24 @@ public class UdpDiscovery implements InternalDiscovery {
     }
 
     void addShareHostToCache(String shareName, InetAddress ip) {
-        /*
-        int ipv4Address = 0;
-        byte[] ipAddress = ip.getAddress();
-        if (ipAddress.length == 4) {
-            for (int i = 0; i < 4; i++) {
-                ipv4Address = (ipv4Address << 8) + (ipAddress[i] & 0xFF);
+        if (JcifsUtils.RESOLUTION_CACHE_INJECTION) {
+            int ipv4Address = 0;
+            byte[] ipAddress = ip.getAddress();
+            if (ipAddress.length == 4) {
+                for (int i = 0; i < 4; i++) {
+                    ipv4Address = (ipv4Address << 8) + (ipAddress[i] & 0xFF);
+                }
+                CIFSContext context = JcifsUtils.getBaseContextOnly(false);
+                Name name = new Name(context.getConfig(), shareName, 0x20, null);
+                NbtAddress addr = new NbtAddress(name, ipv4Address, false, NbtAddress.B_NODE,
+                        false, false, true, true,
+                        UNKNOWN_MAC_ADDRESS);
+                //we need to fake the broadcast hashcode for hitting cache
+                addr.hostName.srcHashCode = context.getConfig().getBroadcastAddress().hashCode();
+                NameServiceClientImpl impl = (NameServiceClientImpl) context.getNameServiceClient();
+                impl.cacheAddress(name, addr);
+                log.debug("Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
             }
-            CIFSContext context = JcifsUtils.getBaseContextOnly(false);
-            Name name = new Name(context.getConfig(), shareName, 0x20, null );
-            NbtAddress addr = new NbtAddress(name, ipv4Address, false, NbtAddress.B_NODE,
-                    false, false, true, true,
-                    UNKNOWN_MAC_ADDRESS );
-            //we need to fake the broadcast hashcode for hitting cache
-            addr.hostName.srcHashCode = context.getConfig().getBroadcastAddress().hashCode();
-            NameServiceClientImpl impl = (NameServiceClientImpl) context.getNameServiceClient();
-            impl.cacheAddress(name, addr);
-            log.debug("Check cache after insert " + impl.getCachedAddress(name).getHostName() + " at " + impl.getCachedAddress(name).getHostAddress());
         }
-         */
     }
 }
