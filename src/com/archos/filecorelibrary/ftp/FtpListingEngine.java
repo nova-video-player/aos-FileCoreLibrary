@@ -16,13 +16,9 @@ package com.archos.filecorelibrary.ftp;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
-import com.archos.filecorelibrary.sftp.SFTPFile2;
-import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.SftpException;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -99,36 +95,23 @@ public class FtpListingEngine extends ListingEngine {
          */
         @Override
         public boolean accept(FTPFile f) {
-            if (f != null) {
-                FTPFile fToCheck;
-                final String filename = f.getName();
-                if (filename.equals(".") || filename.equals("..")) {
-                    return false;
-                }
-                if (f.isSymbolicLink()) {
-                    /*
-                    try {
-                        log.debug("FTPFileFilter:accept link detected " + filename);
-                        fToCheck = FTPFile2.getFTPFile(Uri.parse(mUri + "/" + filename));
-                    } catch (Exception e) {
-                        log.warn("FTPFileFilter:accept caught exception folling link on " + filename);
-                        fToCheck = f;
-                    }
-                     */
-                    return true;
-                } else {
-                    fToCheck = f;
-                }
-                if (fToCheck.isFile()) {
-                    return keepFile(filename);
-                } else if (fToCheck.isDirectory()) {
-                    return keepDirectory(filename);
-                } else {
-                    log.debug("FTPFileFilter:accept neither file nor directory: " + filename);
-                    return false;
-                }
+            if (f == null) return false;
+            final String filename = f.getName();
+            if (filename.equals(".") || filename.equals("..")) {
+                return false;
             }
-            return false;
+            if (f.isSymbolicLink()) {
+                // treat links as files
+                // TODO: treat dir case
+                return keepFile(filename);
+            } else if (f.isFile()) {
+                return keepFile(filename);
+            } else if (f.isDirectory()) {
+                return keepDirectory(filename);
+            } else {
+                log.debug("FTPFileFilter:accept neither file nor directory: " + filename);
+                return false;
+            }
         }
     };
 
@@ -182,56 +165,56 @@ public class FtpListingEngine extends ListingEngine {
                 final ArrayList<FTPFile2> directories = new ArrayList<FTPFile2>();
                 final ArrayList<FTPFile2> files = new ArrayList<FTPFile2>();
                 for (FTPFile f : listFiles){
-                    if (f.isSymbolicLink()) {
+                    if (f.isSymbolicLink()) { // it must be a symlink to file since dirs not selected
                         try {
-                            FTPFile[] fToCheckA;
-                            log.debug("FtpListingThread:run link detected " + f.getName() + " pointing to " + f.getLink());
+                            FTPFile[] fToCheckA = null;
+                            FTPFile fToCheck = null;
+                            log.debug("FtpListingThread:run link detected " + f.getName() + " pointing to " + f.getLink() + ", checking mlistFile on " + mUri.getPath()+"/"+f.getLink());
+
+                            // TODO MARC check listDirectories for directories
+
                             /*
-                            if (isFtps) fToCheck = ftps.mlistFile(f.getLink());
-                            else fToCheck = ftp.mlistFile(f.getLink());
+                            // method 1: use new ftpClient --> FAILS EXCEPTION
+                            log.debug("FtpListingThread:run link detected trying getFTPFile on " + Uri.parse(mUri+"/"+f.getLink()));
+                            fToCheck = FTPFile2.getFTPFile(Uri.parse(mUri+"/"+f.getLink()));
+                             */
+
+                            /*
+                            // method 2: use mlistFile on current client --> FAILS NULL
+                            if (isFtps) fToCheck = ftps.mlistFile(mUri.getPath()+"/"+f.getLink());
+                            else fToCheck = ftp.mlistFile(mUri.getPath()+"/"+f.getLink());
+                             */
+
+                            /*
+                            // method 3: use listFiles and take first element in array --> FAILS NULL
+                            if (isFtps) fToCheckA = ftps.listFiles(mUri.getPath()+"/"+f.getLink());
+                            else fToCheckA = ftp.listFiles(mUri.getPath()+"/"+f.getLink());
+                            log.debug("FtpListingThread:run link detected listFiles returns length " + fToCheckA.length);
+                            if (fToCheckA.length >0)
+                                fToCheck = fToCheckA[0];
+                             */
+
+                            /*
                             if (fToCheck == null) {
                                 log.warn("FtpListingThread:run could not retrieve FTPFile " + f.getLink());
-                                fToCheck = f;
-                            }
-                             */
-                            // mlistFile returns null on link... use listFiles[0] and try to determine if it points to dir or file
-                            if (isFtps) fToCheckA = ftps.listFiles(f.getLink());
-                            else fToCheckA = ftp.listFiles(f.getLink());
-                            if (listFiles == null) {
-                                log.warn("FtpListingThread:run could not retrieve FTPFile " + f.getLink());
                             } else {
-                                log.debug("FtpListingThread:run yeah followed link " + f.getName() + " and have size array " + fToCheckA.length);
-                                if (fToCheckA.length > 1) {
-                                    log.debug("FtpListingThread:run yeah followed link " + f.getName() + " is a directory (not empty)");
-                                    FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
-                                    log.trace("FtpListingThread:run add directory " + sf.getName());
+                                FTPFile2 sf = new FTPFile2(fToCheck, Uri.withAppendedPath(mUri, f.getName()));
+                                if (sf.isDirectory()) {
+                                    log.trace("FtpListingThread: add directory " + sf.getName());
                                     directories.add(sf);
-                                } else if (fToCheckA.length == 1) {
-                                    if (fToCheckA[0] == null) {
-                                        log.debug("FtpListingThread:run yeah followed link " + f.getName() + " is a directory (empty) or file pointing to nowhere, not adding");
-                                    } else {
-                                        log.debug("FtpListingThread:run yeah followed link " + f.getName() + " is a directory");
-                                        // size 1 should be file no????
-                                        FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
-                                        log.trace("FtpListingThread: add directory " + sf.getName());
-                                        // check if file is to be accepted
-                                        directories.add(sf);
-                                    }
-                                } else if (fToCheckA.length == 0) {
-                                    log.debug("FtpListingThread:run yeah followed link " + f.getName() + " is a file or directory adding if extension is ok");
-                                    // check if file is to be accepted
-                                    if (keepFile(f.getName())) {
-                                        log.trace("FtpListingThread: add file " + f.getName());
-                                        FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
-                                        files.add(sf);
-                                        log.trace("FtpListingThread: added file " + sf.getName() + " and still alive");
-                                    }
                                 } else {
-                                    log.warn("FtpListingThread:run yeah followed link " + f.getName() + " but do not know if file or directory !!!");
+                                    log.trace("FtpListingThread: add file " + sf.getName());
+                                    files.add(sf);
                                 }
                             }
+                             */
+
+                            // nothing works: trust the link but it does not work afterwards (cannot access file)
+                            FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
+                            files.add(sf);
+
                         } catch (Exception e) {
-                            log.warn("FtpListingThread:run caught exception folling link on " + f.getName());
+                            log.warn("FtpListingThread:run caught exception following link on " + f.getName());
                         }
                     } else {
                         FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
