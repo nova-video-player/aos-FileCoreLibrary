@@ -27,8 +27,6 @@ import com.archos.filecorelibrary.sftp.SFTPFile2;
  */
 public class MetaFile2Factory {
     public static MetaFile2 getMetaFileForUrl(Uri uri) throws Exception {
-
-
         if ("smb".equalsIgnoreCase(uri.getScheme())) {
             return JcifsFile2.fromUri(uri);
         }

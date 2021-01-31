@@ -28,6 +28,8 @@ import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
+import java.io.IOException;
+
 public class FTPFile2 extends MetaFile2 {
 
     private static final Logger log = LoggerFactory.getLogger(FTPFile2.class);
@@ -37,6 +39,7 @@ public class FTPFile2 extends MetaFile2 {
     private final String mUriString;
     private final String mName;
     private final boolean mIsDirectory;
+    private final boolean mIsLink;
     private final boolean mIsFile;
     private final long mLastModified;
     private final boolean mCanRead;
@@ -51,6 +54,30 @@ public class FTPFile2 extends MetaFile2 {
 
         mUriString = uri.toString();
         String name = file.getName();
+        mIsLink = file.isSymbolicLink();
+
+        /*
+        // TODO MARC file permissions to be also in follow link
+        if (mIsLink) {
+            FTPFile linkedFile = null;
+            try {
+                linkedFile = getFTPFile(uri);
+            } catch (Exception e) {
+                log.warn("FTPFile2: caught exception following link " + uri);
+            }
+            if (linkedFile != null) {
+                mIsDirectory = linkedFile.isDirectory();
+                mIsFile = linkedFile.isFile();
+            } else {
+                mIsDirectory = false;
+                mIsFile = false;
+            }
+        } else {
+            mIsDirectory = file.isDirectory();
+            mIsFile = file.isFile();
+        }
+         */
+        // TODO MARC REMOVE IF ABOVE
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         if (file.getTimestamp() != null)
@@ -140,25 +167,64 @@ public class FTPFile2 extends MetaFile2 {
      * get metafile2 object from a uri (please use this only if absolutely necessary
      *
      */
+    /*
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         log.debug("fromUri: " + uri);
+        FTPFile ftpFile;
         if (uri.getScheme().equals("ftps")) {
             // ftpClient is not thread safe: using a new instance (need to close afterwards)
             FTPSClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
             if (ftp.featureValue("MLST") == null) log.error("fromUri: ftp server does not support MLST!!!");
-            FTPFile ftpFile = ftp.mlistFile(uri.getPath());
-            Session.closeNewFTPSClient(ftp);
-            if (ftpFile != null) return new FTPFile2(ftpFile,uri);
-            else log.warn("fromUri: ftps detected but ftpfile is null!");
+            ftpFile = ftp.mlistFile(uri.getPath());
+            Session.closeNewFTPClient(ftp);
         } else {
             FTPClient ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
             if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
-            FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+            ftpFile = ftp.mlistFile(uri.getPath());
             Session.closeNewFTPClient(ftp);
-            if (ftpFile != null) return new FTPFile2(ftpFile,uri);
-            else log.warn("fromUri: ftp detected but ftpfile is null!");
         }
-        log.warn("fromUri: uh! returning null!!!");
+        if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+        log.warn("fromUri: ftp detected but ftpfile is null!");
+        return null;
+    }
+     */
+
+    public static MetaFile2 fromUri(Uri uri) throws Exception {
+        log.debug("fromUri: " + uri);
+        FTPFile ftpFile = getFTPFile(uri);
+        if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+        log.warn("fromUri: ftp detected but ftpfile is null!");
+        return null;
+    }
+
+    // getFTPFile follows links one hop
+    public final static FTPFile getFTPFile(Uri uri) throws Exception {
+        if (uri == null) return null;
+        log.debug("getFTPFile: " + uri);
+        FTPFile ftpFile;
+        if (uri.getScheme().equals("ftps")) {
+            FTPSClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+            if (ftp.featureValue("MLST") == null) log.warn("getFTPFile: ftp server does not support MLST!!!");
+            log.debug("getFTPFile: mlistFile on " + uri.getPath());
+            ftpFile = ftp.mlistFile(uri.getPath());
+            log.debug("getFTPFile: still alive got ftpFile for " + ftpFile.getName());
+            if (ftpFile.isSymbolicLink()) {
+                log.debug("getFTPFile: follow link " + ftpFile.getLink());
+                ftpFile = ftp.mlistFile(ftpFile.getLink());
+            }
+            Session.closeNewFTPSClient(ftp);
+        } else {
+            FTPClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+            if (ftp.featureValue("MLST") == null) log.warn("getFTPFile: ftp server does not support MLST!!!");
+            ftpFile = ftp.mlistFile(uri.getPath());
+            if (ftpFile.isSymbolicLink()) {
+                log.debug("getFTPFile: follow link " + ftpFile.getLink());
+                ftpFile = ftp.mlistFile(ftpFile.getLink());
+            }
+            Session.closeNewFTPClient(ftp);
+        }
+        if (ftpFile != null) return ftpFile;
+        log.warn("getFTPFile: ftp detected but ftpfile is null!");
         return null;
     }
 }
