@@ -171,7 +171,7 @@ public class FtpListingEngine extends ListingEngine {
                             FTPFile fToCheck = null;
                             log.debug("FtpListingThread:run link detected " + f.getName() + " pointing to " + f.getLink() + ", checking mlistFile on " + mUri.getPath()+"/"+f.getLink());
 
-                            // TODO MARC check listDirectories for directories
+                            // TODO MARC check listDirectories for directories or mlistDir
 
                             /*
                             // method 1: use new ftpClient --> FAILS EXCEPTION
@@ -179,11 +179,12 @@ public class FtpListingEngine extends ListingEngine {
                             fToCheck = FTPFile2.getFTPFile(Uri.parse(mUri+"/"+f.getLink()));
                              */
 
-                            /*
+                            // this one works with proftpd with mlst enabled in mod_facts
                             // method 2: use mlistFile on current client --> FAILS NULL
+                            // /!\ WARNING: fToCheck.getName has full path since ftp root!
+                            log.debug("FtpListingThread:run adding mlistFile on "+ mUri.getPath()+"/"+f.getLink());
                             if (isFtps) fToCheck = ftps.mlistFile(mUri.getPath()+"/"+f.getLink());
                             else fToCheck = ftp.mlistFile(mUri.getPath()+"/"+f.getLink());
-                             */
 
                             /*
                             // method 3: use listFiles and take first element in array --> FAILS NULL
@@ -194,11 +195,12 @@ public class FtpListingEngine extends ListingEngine {
                                 fToCheck = fToCheckA[0];
                              */
 
-                            /*
                             if (fToCheck == null) {
                                 log.warn("FtpListingThread:run could not retrieve FTPFile " + f.getLink());
                             } else {
-                                FTPFile2 sf = new FTPFile2(fToCheck, Uri.withAppendedPath(mUri, f.getName()));
+                                log.warn("FtpListingThread:run working on getLink " + f.getLink() + " whose getName is " + fToCheck.getName());
+                                log.debug("FtpListingThread:run adding file " + fToCheck.getName() + " with uri "+ mUri.getScheme()+"://"+mUri.getHost()+":"+mUri.getPort()+fToCheck.getName());
+                                FTPFile2 sf = new FTPFile2(fToCheck, Uri.parse(mUri.getScheme()+"://"+mUri.getHost()+":"+mUri.getPort()+fToCheck.getName()), f.getName());
                                 if (sf.isDirectory()) {
                                     log.trace("FtpListingThread: add directory " + sf.getName());
                                     directories.add(sf);
@@ -207,17 +209,19 @@ public class FtpListingEngine extends ListingEngine {
                                     files.add(sf);
                                 }
                             }
-                             */
 
+                            /*
                             // nothing works: trust the link but it does not work afterwards (cannot access file)
                             FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
                             files.add(sf);
+                             */
+
 
                         } catch (Exception e) {
                             log.warn("FtpListingThread:run caught exception following link on " + f.getName());
                         }
                     } else {
-                        FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
+                        FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()), null);
                         if (sf.isDirectory()) {
                             log.trace("FtpListingThread: add directory " + sf.getName());
                             directories.add(sf);

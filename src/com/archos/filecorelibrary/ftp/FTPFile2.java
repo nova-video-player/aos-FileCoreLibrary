@@ -46,54 +46,47 @@ public class FTPFile2 extends MetaFile2 {
     private final boolean mCanWrite;
     private final long mLength;
 
-    public FTPFile2(FTPFile file, Uri uri) {
+    public FTPFile2(FTPFile file, Uri uri, String forcedName) {
 
         if (uri == null) {
             throw new IllegalArgumentException("uri cannot be null");
         }
 
         mUriString = uri.toString();
-        String name = file.getName();
+        String name;
+        if (forcedName == null) name = file.getName();
+        else name = forcedName;
         mIsLink = file.isSymbolicLink();
 
-        /*
-        // TODO MARC file permissions to be also in follow link
+        FTPFile fileToCheck = null;
         if (mIsLink) {
-            FTPFile linkedFile = null;
             try {
-                linkedFile = getFTPFile(uri);
+                fileToCheck = getFTPFile(uri);
             } catch (Exception e) {
                 log.warn("FTPFile2: caught exception following link " + uri);
             }
-            if (linkedFile != null) {
-                mIsDirectory = linkedFile.isDirectory();
-                mIsFile = linkedFile.isFile();
-            } else {
-                mIsDirectory = false;
-                mIsFile = false;
+            if (fileToCheck == null) {
+                fileToCheck = file;
             }
         } else {
-            mIsDirectory = file.isDirectory();
-            mIsFile = file.isFile();
+            fileToCheck = file;
         }
-         */
-        // TODO MARC REMOVE IF ABOVE
-        mIsDirectory = file.isDirectory();
-        mIsFile = file.isFile();
-        if (file.getTimestamp() != null)
-            mLastModified = file.getTimestamp().getTimeInMillis();
+        mIsDirectory = fileToCheck.isDirectory();
+        mIsFile = fileToCheck.isFile();
+        if (fileToCheck.getTimestamp() != null)
+            mLastModified = fileToCheck.getTimestamp().getTimeInMillis();
         else
             mLastModified = 0;
-        mCanRead = file.hasPermission(FTPFile.USER_ACCESS, FTPFile.READ_PERMISSION);
-        mCanWrite = file.hasPermission(FTPFile.USER_ACCESS, FTPFile.WRITE_PERMISSION);
-        mLength = file.getSize();
+        mCanRead = fileToCheck.hasPermission(FTPFile.USER_ACCESS, FTPFile.READ_PERMISSION);
+        mCanWrite = fileToCheck.hasPermission(FTPFile.USER_ACCESS, FTPFile.WRITE_PERMISSION);
+        mLength = fileToCheck.getSize();
         // remove the '/' at the end of directory name
         if (mIsDirectory && name.endsWith("/")) {
             mName = name.substring(0, name.length()-1);
         } else {
             mName = name;
         }
-        log.trace("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory);
+        log.trace("FTPFile2 uri: " + uri + ", isFile=" + mIsFile + ", isDirectory=" + mIsDirectory + ", canRead=" + mCanRead + ", length=" + mLength);
     }
 
     @SuppressWarnings("unused")
@@ -192,12 +185,13 @@ public class FTPFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         log.debug("fromUri: " + uri);
         FTPFile ftpFile = getFTPFile(uri);
-        if (ftpFile != null) return new FTPFile2(ftpFile,uri);
+        if (ftpFile != null) return new FTPFile2(ftpFile,uri, null);
         log.warn("fromUri: ftp detected but ftpfile is null!");
         return null;
     }
 
     // getFTPFile follows links one hop
+    // /!\ works only on files not directories
     public final static FTPFile getFTPFile(Uri uri) throws Exception {
         if (uri == null) return null;
         log.debug("getFTPFile: " + uri);
@@ -208,16 +202,18 @@ public class FTPFile2 extends MetaFile2 {
             log.debug("getFTPFile: mlistFile on " + uri.getPath());
             ftpFile = ftp.mlistFile(uri.getPath());
             log.debug("getFTPFile: still alive got ftpFile for " + ftpFile.getName());
-            if (ftpFile.isSymbolicLink()) {
+            if (ftpFile != null && ftpFile.isSymbolicLink()) {
                 log.debug("getFTPFile: follow link " + ftpFile.getLink());
                 ftpFile = ftp.mlistFile(ftpFile.getLink());
             }
             Session.closeNewFTPSClient(ftp);
         } else {
-            FTPClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+            FTPClient ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
             if (ftp.featureValue("MLST") == null) log.warn("getFTPFile: ftp server does not support MLST!!!");
             ftpFile = ftp.mlistFile(uri.getPath());
-            if (ftpFile.isSymbolicLink()) {
+            // Important: mlst works on single file only for proftpd no dir! otherwise use mlsd
+            // TODO mlst or mlsd for dir
+            if (ftpFile != null && ftpFile.isSymbolicLink()) {
                 log.debug("getFTPFile: follow link " + ftpFile.getLink());
                 ftpFile = ftp.mlistFile(ftpFile.getLink());
             }
