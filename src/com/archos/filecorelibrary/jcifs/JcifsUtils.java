@@ -328,8 +328,8 @@ public class JcifsUtils {
     }
 
     public static boolean isResolverBcastFirst() {
-        log.debug("isResolverBcastFirst=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", true));
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", true);
+        log.debug("isResolverBcastFirst=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false));
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false);
     }
 
 }
