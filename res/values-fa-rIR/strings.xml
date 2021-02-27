@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">نام:</string>
+    <string name="file_info_label_size">اندازه:</string>
+    <string name="file_info_label_size_internal">اندازه (درونی):</string>
+    <string name="file_info_directory_empty">پوشه تهی</string>
+    <string name="file_info_one_directory">۱ پوشه</string>
+    <string name="file_info_directories">پوشه‌ها</string>
+    <string name="file_info_one_file">۱ پرونده</string>
+    <string name="file_info_files">پرونده‌ها</string>
+    <!-- Archos file manager core -->
+    <!-- Samba share settings -->
+    <string name="samba_domain">دامنه</string>
+    <string name="samba_username">نام کاربری</string>
+    <string name="samba_password">گذرواژه</string>
+    <string name="samba_show_password">نمایش گذرواژه</string>
+    <!-- WiFi Direct strings-->
+    <!-- FileManager strings -->
+    <string name="ssh_password">گذرواژه</string>
+    <string name="ssh_username">نام کاربری</string>
+    <string name="delete">حذف</string>
+    <string name="new_directory">پوشه نو</string>
+    <string name="new_file">پرونده نو</string>
+    <string name="enter_new_name">نام:</string>
+    <string name="file_name">نام پرونده</string>
+    <string name="folder_name">نام پوشه</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <!-- Shortcuts -->
+    <!-- DLNA -->
+    <string name="video">ویدیو</string>
+    <string name="audio">صدا</string>
+    <string name="picture">عکس</string>
+    <!-- ZIP -->
+    <!-- Notifications -->
+    <!-- Network Scanning -->
+    <!-- Hiding from media scanning -->
+    <!-- Folder Picker -->
+</resources>

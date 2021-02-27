@@ -28,6 +28,8 @@
     <string name="samba_add_server">הוסף שרת</string>
     <string name="samba_server">ציין שרת</string>
     <string name="samba_share">ציין שיתוף</string>
+    <string name="refresh">רענן</string>
+    <string name="network_timeout">התיקיה המרוחקת אינה זמינה,\n בדוק את הגדרות הרשת ונסה שנית.</string>
     <string name="samba_loading">נא המתן בעת טעינת תיקיה משותפת…</string>
     <string name="samba_reloading">נא המתן בעת טעינת תיקיה משותפת מחדש…</string>
     <string name="samba_password_request_title">דרושה ססמא לתיקיה משותפת</string>
@@ -35,7 +37,10 @@
     <string name="samba_password">ססמא</string>
     <string name="samba_show_password">הצג ססמא</string>
     <string name="samba_wrong_password">שם המשתמש או הסיסמה שגויים.</string>
+    <string name="no_saved_passwords">אין סיסמאות שמורות</string>
     <!-- WiFi Direct strings-->
+    <string name="file_uploading">הקובץ כרגע בהעלאה</string>
+    <string name="back_cancel">לחץ חזור לביטול</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">אין באפשרותך להשתמש באחסון הפנימי בזמן שהוא מחובר וטעון ע\"י ה- USB.</string>
     <string name="network_storage">רשת</string>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Tên:</string>
+    <string name="file_info_label_size">Kích cỡ:</string>
+    <string name="file_info_label_size_internal">Kích cỡ (bộ nhớ trong):</string>
+    <string name="file_info_label_size_sd">Kích cỡ (Thẻ nhớ):</string>
+    <string name="file_info_label_can_read">đọc</string>
+    <string name="file_info_label_cannot_read">không thể đọc</string>
+    <string name="file_info_label_can_write">ghi</string>
+    <string name="file_info_label_cannot_write">không thể ghi</string>
+    <string name="file_info_label_last_modified">Sửa đổi lần cuối:</string>
+    <string name="file_info_directory_empty">Thư mục trống</string>
+    <string name="file_info_one_directory">1 thư mục</string>
+    <string name="file_info_directories">thư mục</string>
+    <string name="file_info_one_file">1 tập tin</string>
+    <string name="file_info_files">tập tin</string>
+    <string name="network_shared_folders">Thư mục chia sẻ (SMB)</string>
+    <!-- Archos file manager core -->
+    <string name="file_copy_pattern">sao chép</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <!-- Samba share settings -->
+    <string name="samba_settings_title">Cài đặt thư mục chia sẻ</string>
+    <string name="samba_settings_summary">Thiết lập tên người dùng và mật khẩu để truy cập thư mục chia sẻ trên mạng riêng của bạn</string>
+    <string name="samba_profiles">Hồ sơ thư mục chia sẻ</string>
+    <string name="samba_delete_settings">Bạn có thực sự muốn xóa cài đặt này không?</string>
+    <string name="samba_add_server">Thêm 1 máy chủ</string>
+    <string name="samba_server">Xác định máy chủ</string>
+    <string name="samba_share">Xác định chia sẻ</string>
+    <string name="refresh">Làm mới</string>
+    <!-- WiFi Direct strings-->
+    <!-- FileManager strings -->
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <!-- Shortcuts -->
+    <!-- DLNA -->
+    <!-- ZIP -->
+    <!-- Notifications -->
+    <!-- Network Scanning -->
+    <!-- Hiding from media scanning -->
+    <!-- Folder Picker -->
+</resources>
