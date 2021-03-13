@@ -27,8 +27,56 @@
     <string name="samba_server">Xác định máy chủ</string>
     <string name="samba_share">Xác định chia sẻ</string>
     <string name="refresh">Làm mới</string>
+    <string name="samba_username">Tên người dùng</string>
+    <string name="samba_password">Mật khẩu</string>
+    <string name="samba_show_password">Hiện mật khẩu</string>
+    <string name="samba_wrong_password">Tên người dùng hoặc mật khẩu không đúng</string>
+    <string name="preferences">Tùy chỉnh</string>
+    <string name="shared_folder_credentials">Mật khẩu</string>
+    <string name="no_saved_passwords">Không có mật khẩu đã lưu</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="back_cancel">Nhấn Back để hủy</string>
+    <string name="nonetwork_title" comment="deprecated">Không có kết nối WiFi</string>
+    <string name="no_network_title">Không có kết nối mạng</string>
     <!-- FileManager strings -->
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Mạng</string>
+    <string name="external_storage">Bộ nhớ ngoài</string>
+    <string name="internal_storage">Bộ nhớ trong</string>
+    <string name="internal_storage_unified">Bộ nhớ</string>
+    <string name="sd_card_storage">Thẻ SD</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Đám mây</string>
+    <string name="ssh_password">Mật khẩu</string>
+    <string name="ssh_username">Tên người dùng</string>
+    <string name="delete">Xóa</string>
+    <string name="rename">Đổi tên</string>
+    <string name="details">Chi tiết</string>
+    <string-array name="folder_or_file">
+        <item>Tạo một thư mục</item>
+        <item>Tạo một tập tin rỗng</item>
+    </string-array>
+    <string name="new_directory">Thư mục mới</string>
+    <string name="new_file">Tập tin mới</string>
+    <string name="new_folder_or_file">Thư mục hoặc tập tin mới</string>
+    <string name="enter_new_name">Tên:</string>
+    <string name="file_name">Tên tập tin</string>
+    <string name="folder_name">Tên thư mục</string>
+    <string name="run_in_background">Tối thiểu</string>
+    <string name="confirm_deleting_cancellation">Bạn có thực sự muốn hủy xóa không?</string>
+    <string name="confirm_copying_cancellation">Bạn có thật sự muốn hủy sao chép?</string>
+    <string name="confirm_moving_cancellation">Bạn có thật sự muốn hủy di chuyển?</string>
+    <string name="cannot_create_directory">Không thể tạo thư mục mới</string>
+    <string name="cannot_create_file">Không thể tạo tập tin mới</string>
+    <string name="cannot_delete_directory">Không thể xóa thư mục</string>
+    <string name="cannot_delete_file">Không thể xóa tập tin</string>
+    <string name="cannot_delete_files">Không thể xóa tập tin</string>
+    <string name="directory_deleted">Thư mục đã được xóa</string>
+    <string name="file_deleted">Tập tin đã được xóa</string>
+    <string name="files_deleted">Tập tin đã được xóa</string>
+    <string name="cannot_rename">Không thể đổi tên</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <!-- Shortcuts -->
