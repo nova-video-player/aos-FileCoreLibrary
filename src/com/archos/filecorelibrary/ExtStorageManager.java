@@ -127,8 +127,12 @@ public class ExtStorageManager {
             @SuppressWarnings("unchecked")
             Method asInterface = Stub.getMethod("asInterface", paramTypes);
 
-            @SuppressWarnings("unchecked")
-            Method getPath = StorageVolume.getMethod("getPath", noparams);
+            Method getPath = null;
+            try {
+                getPath = StorageVolume.getMethod("getPath", noparams);
+            } catch (Exception gl) {
+                Log.e(TAG, "updateAllVolumes: caught exception, grey listing reflection denied");
+            }
 
             Method isPrimary = null;
             Method getStorageId = null;
@@ -180,15 +184,19 @@ public class ExtStorageManager {
                     if ((isPrimary != null) && (boolean) isPrimary.invoke(storageVolumesArray[i], noparams)) continue;
                     // storage ID is 0x00010001 for primary storage now StorageVolume.STORAGE_ID_PRIMARY
                     if ((getStorageId != null) && (int) getStorageId.invoke(storageVolumesArray[i], noparams) == 0x00010001) continue;
-                    String volName = (String) getPath.invoke(storageVolumesArray[i], noparams);
-                    String volState = getVolumeState(volName);
-                    if ((Environment.MEDIA_MOUNTED.equals(volState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(volState))) {
-                        ExtStorageType volumeType = getVolumeType(volName);
-                        volumesMap.get(volumeType).add(volName);
-                        if(getUuid != null) {
-                            volumesIdMap.put(volName, (String) getUuid.invoke(storageVolumesArray[i], noparams));
-                            if (DBG) Log.d(TAG, "Volumes scan result (<N): " + volName + " " + volState);
+                    if (getPath != null) {
+                        String volName = (String) getPath.invoke(storageVolumesArray[i], noparams);
+                        String volState = getVolumeState(volName);
+                        if ((Environment.MEDIA_MOUNTED.equals(volState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(volState))) {
+                            ExtStorageType volumeType = getVolumeType(volName);
+                            volumesMap.get(volumeType).add(volName);
+                            if (getUuid != null) {
+                                volumesIdMap.put(volName, (String) getUuid.invoke(storageVolumesArray[i], noparams));
+                                if (DBG) Log.d(TAG, "Volumes scan result (<N): " + volName + " " + volState);
+                            }
                         }
+                    } else {
+                        Log.w(TAG, "updateAllVolumes: cannot get volName and volState");
                     }
                 }
             }
@@ -244,7 +252,7 @@ public class ExtStorageManager {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "updateAllVolumes: caught exception ", e);
         }
     }
 
