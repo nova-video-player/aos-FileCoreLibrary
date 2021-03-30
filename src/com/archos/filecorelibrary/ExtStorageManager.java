@@ -128,10 +128,9 @@ public class ExtStorageManager {
             Method asInterface = Stub.getMethod("asInterface", paramTypes);
 
             Method getPath = null;
-            try {
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R) { // R/30/API11
+                // reflection grey listed denied on API30
                 getPath = StorageVolume.getMethod("getPath", noparams);
-            } catch (Exception gl) {
-                Log.e(TAG, "updateAllVolumes: caught exception, grey listing reflection denied");
             }
 
             Method isPrimary = null;
