@@ -58,6 +58,8 @@ public class JcifsUtils {
 
     private static Context mContext;
 
+    private static Boolean prefChanged = false;
+
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile JcifsUtils sInstance;
 
@@ -79,6 +81,11 @@ public class JcifsUtils {
     private JcifsUtils(Context context) {
         mContext = context;
         log.debug("JcifsUtils: initializing contexts");
+        reCreateAllContexts();
+    }
+
+    public static void reCreateAllContexts() {
+        log.debug("JcifsUtils: reCreateAllContexts");
         baseContextSmb1 = createContext(false);
         baseContextSmb2 = createContext(true);
         baseContextSmb1Only = createContextOnly(false);
@@ -165,6 +172,7 @@ public class JcifsUtils {
 
     public static CIFSContext getBaseContext(boolean isSmb2) {
         //return isSmb2 ? baseContextSmb2 : baseContextSmb1;
+        checkPrefChange();
         if (isSmb2) {
             if (baseContextSmb2 == null) baseContextSmb2 = createContext(true);
             return baseContextSmb2;
@@ -176,12 +184,26 @@ public class JcifsUtils {
 
     public static CIFSContext getBaseContextOnly(boolean isSmb2) {
         //return isSmb2 ? baseContextSmb2Only : baseContextSmb1Only;
+        checkPrefChange();
         if (isSmb2) {
             if (baseContextSmb2Only == null) baseContextSmb2Only = createContextOnly(true);
             return baseContextSmb2Only;
         } else {
             if (baseContextSmb1Only == null) baseContextSmb1Only = createContextOnly(false);
             return baseContextSmb1Only;
+        }
+    }
+
+    public static void notifyPrefChange() {
+        log.debug("notifyPrefChange: preference changed");
+        prefChanged = true;
+    }
+
+    private static void checkPrefChange() {
+        if (prefChanged) {
+            log.debug("JcifsUtils: reCreateAllContexts after preference change");
+            prefChanged = false;
+            reCreateAllContexts();
         }
     }
 
