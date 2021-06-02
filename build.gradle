@@ -98,7 +98,7 @@ dependencies {
     // jcifs-ng depends on bouncycastle (automated when using maven repo)
     api 'org.bouncycastle:bcprov-jdk15to18:1.66'
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'commons-net:commons-net:3.7.2'
     implementation 'org.slf4j:slf4j-api:1.7.30'
