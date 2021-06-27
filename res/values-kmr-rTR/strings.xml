@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Nav:</string>
+    <string name="file_info_label_size">Mezinahî:</string>
+    <string name="file_info_label_size_internal">Mezinahî (hundir):</string>
+    <string name="file_info_label_size_sd">Mezinahî (SD):</string>
+    <string name="file_info_label_permission">Destûr:</string>
+    <string name="file_info_label_can_read">xwendin</string>
+    <string name="file_info_label_cannot_read">nikare bixwîne</string>
+    <string name="file_info_label_can_write">nivîsîn</string>
+    <string name="file_info_label_cannot_write">nikare binivîsîne</string>
+    <string name="file_info_label_last_modified">Guhertoya dawî:</string>
+    <string name="file_info_label_mime_type">Cureyê Mime:</string>
+    <string name="file_info_directory_empty">Peldanka vala</string>
+    <string name="file_info_one_directory">1 peldank</string>
+    <string name="file_info_directories">peldankan</string>
+    <string name="file_info_one_file">1 pel</string>
+    <string name="file_info_files">pelan</string>
+    <string name="usbhost_ptp_storage">Kameraya derve</string>
+    <string name="network_media_servers">Pêşkêşgerên medyayê (UPnP)</string>
+    <string name="network_shared_folders">Peldankên hevbeş (SMB)</string>
+    <!-- Archos file manager core -->
+    <string name="file_copy_pattern">kopî</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCÇDEÊFGHIÎJKLMNOPQRSŞTUÛVWXYZ</string>
+    <!-- Samba share settings -->
+    <string name="samba_settings_title">Mîhengên peldankên hevbeş</string>
+    <string name="samba_settings_summary">Navên bikarhêneran û şîfreyan damezîne da ku peldankên parvekirinê yên li ser tora xwe ya taybet bidest bixe</string>
+    <string name="samba_profiles">Profîlên peldankên hevbeş</string>
+    <string name="samba_delete_settings">Tu bi rastî dixwazî vê mîhengê jê bibî?</string>
+    <string name="samba_add_server">Pêşkêşkarek lê zêde bike</string>
+    <string name="samba_server">Pêşkêşkarekê diyar bike</string>
+    <string name="samba_share">Parvekirinekê diyar bike</string>
+    <string name="refresh">Taze bike</string>
+    <string name="network_timeout">Bibore, peldanka dûr ne gihîştiye.\nGirêdana xwe ya torê kontrol bike û dîsa biceribîne.</string>
+    <string name="samba_loading">Ji kerema xwe li bendê bimîne dema barkirina peldanka hevbeş&#8230;</string>
+    <string name="samba_reloading">Ji kerema xwe li bendê bimîne dema ku peldanka hevbeş ji nû ve bar dike&#8230;</string>
+    <string name="samba_password_request_title">Daxwaza şîfreya peldanka hevpar</string>
+    <string name="samba_domain">Domaîn</string>
+    <string name="samba_username">Navê bikarhêner</string>
+    <string name="samba_password">Şîfre</string>
+    <string name="samba_show_password">Şîfreyê nîşan bide</string>
+    <string name="samba_wrong_password">Navê bikarhêner an şîfre çewt e</string>
+    <string name="preferences">Vebijark</string>
+    <string name="shared_folder_credentials">Şîfre</string>
+    <string name="no_saved_passwords">Şîfreyên tomarkirî tune</string>
+    <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">li vir bi rêya WiFi Direct bistînin</string>
+    <string name="empty_message">Cîhazên hedefên berdest vedîtin&#8230;&lt;br/&gt;Pêdivî ye ku amûra armancê çalak bike &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; vebijark</string>
+    <string name="wifip2p_waiting">Veguhestina WiFi Direct dê di demek kurt de dest pê bike</string>
+    <string name="connect_to_target">Bi hedefê ve girêdide</string>
+    <string name="upload_in_progress">Di pêşveçûnê de bar bike&#8230;</string>
+    <string name="file_uploading">Pelê te tê barkirin</string>
+    <string name="back_cancel">Ji bo betalkirinê bi paş ve bipêçe</string>
+    <string name="server_wait">Ji bo girêdan û şandina dosyayekê li benda mûxatabê xwe ye</string>
+    <string name="download_in_progress">Dakêşin berdewam e&#8230;</string>
+    <string name="file_downloading">Pelê te tê dakêşin</string>
+    <string name="server_ready">Amade ye ku werbigire</string>
+    <string name="nonetwork_title" comment="deprecated">Girêdana WiFi tune</string>
+    <string name="no_network_title">Girêdana torê tune</string>
+    <string name="nonetwork_message">Ji bo vê taybetmendiyê divê Tu WiFi çalak bikî</string>
+    <!-- FileManager strings -->
+    <string name="storage_busy_message">Dema ku bi USB ve girêdayî ye û hatiye girêdan, tu nikarî depoya hundirîn bi kar bîne.</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Tor</string>
+    <string name="external_storage">Derveyî</string>
+    <string name="internal_storage">Hundirî</string>
+    <string name="internal_storage_unified">Hilanîn</string>
+    <string name="sd_card_storage">Karta SD</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Ajokar</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Ewr</string>
+    <string name="directory_empty">Peldanka vala</string>
+    <string name="no_server">Tu pêşkêşkar nehate dîtin</string>
+    <string name="loading">Barkirin&#8230;</string>
+    <string name="ssh_error">Nikare girêdanê bike: ji kerema xwe, girêdan û pêveka xwe kontrol bike</string>
+    <string name="ssh_remote_address">Navnîşana dûr</string>
+    <string name="ssh_remote_address_error">Divê tu navnîşaneke ji dûr ve diyar bikî</string>
+    <string name="ssh_password">Şîfre</string>
+    <string name="ssh_username">Navê bikarhêner</string>
+    <string name="ssh_port">Xala girêdanî (vebijandî)</string>
+    <string name="ssh_path">Rê (vebijdar)</string>
+    <string name="save_password">Şîfreyê tomar bike</string>
+    <string name="ssh_prompt">Cura FTP</string>
+    <string name="download_prompt">Pelê dakêşe peldankê:</string>
+    <string name="browse_ftp_server">Server</string>
+    <string name="cannot_list">Naverok nayê lîstekirin</string>
+    <string name="error_listing">Çewtiyek çêbû</string>
+    <string name="error_host_not_found">Rajeker nehate dîtin</string>
+    <string name="error_unknown_host">Rajekerê nenas</string>
+    <string name="error_no_connection">Bi rajeker re nehate girêdan</string>
+    <string name="error_credentials">Nikare pêveka lîsteyê bike: pêveka xwe kontrol bike</string>
+    <string name="error_no_permission">Destûr nayê dayîn ku ev hesab vê pelrêçê navnîş bike</string>
+    <string name="error_file_not_found">Pel nehate dîtin</string>
+    <string name="error_time_out">Dem derbas bû</string>
+    <string name="deleting">Jêbirin</string>
+    <string name="deleting_many">%1$d/%2$d pelên jêbirî</string>
+    <string name="deleting_one">Yek pelî jê dibe</string>
+    <string name="copying">Kopî dike&#8230;</string>
+    <string name="moving">Tevgerî&#8230;</string>
+    <string name="open_file">Pelê veke</string>
+    <string name="open_file_after_download">Piştî temambûna kopiyê pelê veke</string>
+    <string name="pasting_copy_one">Kopîkirina pelekî (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Jibergirtin: %1$d/%2$d pelên (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Yek pelêk bar dike (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Livdar: %1$d/%2$d pelên (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Jêbirin</string>
+    <string name="rename">Navlêkirin</string>
+    <string name="details">Hûrgulî</string>
+    <string name="refresh_directory">Peldankê nû bike</string>
+    <string-array name="folder_or_file">
+        <item>Peldankekê biafirîne</item>
+        <item>Pelekî vala biafirîne</item>
+    </string-array>
+    <string name="new_directory">Peldanka Nû</string>
+    <string name="new_file">Pelê nû</string>
+    <string name="new_folder_or_file">Peldanka an pelê nû</string>
+    <string name="refresh_servers_list">Lîsteya serverê nûve bikin</string>
+    <string name="enable_network_shares">Parvekirinên torê çalak bikin</string>
+    <string name="go_top">Vegere jor</string>
+    <string name="uncheck_impossible">Dema ku peldanka dêûbav tête hilbijartin ne gengaz e ku meriv hilbijartinê biguheze</string>
+    <string name="confirm_delete_one">Ma hûn bi rastî dixwazin wiya jêbikin?</string>
+    <string name="confirm_delete_parent_folder">Wusa dixuye ku peldanka dêûbav vîdyoyek din nagire, gerek em wê jê bibin?</string>
+    <string name="confirm_delete_many">Ma hûn bi rastî dixwazin wana jêbikin?</string>
+    <string name="enter_new_name">Nav:</string>
+    <string name="file_name">Navê pelê</string>
+    <string name="folder_name">Navê peldankê</string>
+    <string name="run_in_background">Kêmtir bike</string>
+    <string name="confirm_deleting_cancellation">Ji dil dixwazî jêbirinê betal bikî?</string>
+    <string name="confirm_copying_cancellation">Ji rastî dixwazî kopîkirinê betal bikî?</string>
+    <string name="confirm_moving_cancellation">Ma hûn bi rastî dixwazin tevgerê betal bikin?</string>
+    <string name="cannot_create_directory">Nikare peldankeke nû biafirîne</string>
+    <string name="cannot_create_file">Pelekî nû nayê afirandin</string>
+    <string name="cannot_delete_directory">Peldank nayê jêbirin</string>
+    <string name="cannot_delete_file">Pel nayê jêbirin</string>
+    <string name="cannot_delete_files">Pel an jî pelan jê nabe</string>
+    <string name="directory_deleted">Peldank hat jêbirin</string>
+    <string name="file_deleted">Pel hate jêbirin</string>
+    <string name="files_deleted">Dosya hatin jêbirin</string>
+    <string name="cannot_rename">Nikare navê xwe ji nû ve binav bike</string>
+    <string name="cannot_paste_folder_into_itself">Nikare peldankan di nav xwe de an yek ji peldankên wan de kopî bike an bar bike</string>
+    <string name="cannot_paste_file_same_location">Pel an jî pelan li cihê xwe yê esasî ve nehate pêve kirin</string>
+    <string name="cannot_paste_over_network">Pelan li ser torê çênabe</string>
+    <string name="copy_directory_success_one">Peldank hate jibergirtin</string>
+    <string name="copy_directory_success_many">Peldankan hatin jibergirtin</string>
+    <string name="copy_file_success_one">Pel hate jibergirtin</string>
+    <string name="copy_file_success_many">Pelên kopî kirin</string>
+    <string name="copy_directory_failed_one">Peldank nehate jibergirtin</string>
+    <string name="copy_directory_failed_many">Peldankan ji ber nehate kopîkirin</string>
+    <string name="copy_file_failed_one">Dosya nehate kopîkirin</string>
+    <string name="copy_file_failed_many">Dosyayên ji ber nehatine kopîkirin</string>
+    <string name="cut_directory_success_one">Peldank hate guheztin</string>
+    <string name="cut_directory_success_many">Peldankan hatin guheztin</string>
+    <string name="cut_file_success_one">Pel hate guheztin</string>
+    <string name="cut_file_success_many">Pelên hat bar kirin</string>
+    <string name="cut_directory_failed_one">Peldank nehat guhastin</string>
+    <string name="cut_directory_failed_many">Peldankan nehatin veguheztin</string>
+    <string name="cut_file_failed_one">Pel nehat bar kirin</string>
+    <string name="cut_file_failed_many">Peên nehatin bar kirin</string>
+    <string name="pasting_done">Pêvekirin qediya</string>
+    <string name="copy_done">Serkeftinê kopî bikin</string>
+    <string name="copy_canceled">Kopîkirin betal kirin</string>
+    <string name="cut_done">Serkeftin birrîn</string>
+    <string name="cut_canceled">Qut kirin betal</string>
+    <string name="delete_done">Serkeftinê jêbirin</string>
+    <string name="delete_canceled">Hate jêbirin</string>
+    <string name="cannot_open_file">Pel nayê vekirin</string>
+    <string name="no_application_to_open_file">Tu serîlêdanek li ser vê cîhazê nikare vê pelê veke</string>
+    <string name="delete_still_ongoing">Jêbirin hê jî di pêvekê de berdewam dike</string>
+    <string name="copy_on_device">Vîdyoyê li ser cîhazê dakêşe</string>
+    <string name="copy_on_device_multi">Daxistina cîhazê</string>
+    <string name="storage_swapped_primary">sereke</string>
+    <string name="storage_swapped_secondary">dûwemdor</string>
+    <string name="yes">"Erê"</string>
+    <string name="no">"Na"</string>
+    <string name="share">Parveke</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Pelê bi viya re parve bikin</string>
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Ji bo parvekirina pelê sepan tune</string>
+    <string name="upnp_not_allowed">Destûr nayê dayîn ku hûn xwe bigihînin vê servera UPNP. Ji kerema xwe pêşî veavakirina gihîştina xwe biguherînin.</string>
+    <string name="single_mode">Yekoyek</string>
+    <string name="double_mode">Dûcar</string>
+    <string name="swap_panel">Pêguherî</string>
+    <string name="move">Tevger</string>
+    <!-- Shortcuts -->
+    <string name="shortcuts">Kurterî</string>
+    <string name="add_to_shortcuts">Kurterîyekê biafirîne</string>
+    <string name="remove_from_shortcuts">Kurterê jê bike</string>
+    <string name="shortcut_added" comment="deprecated">Kurtenavê %s hat afirandin</string>
+    <string name="shortcut_removed" comment="deprecated">Kurtenavê %s jê birin</string>
+    <string name="shortcut_created">Kurteriya \"%1$s\" hat afirandin</string>
+    <string name="one_shortcut_removed">Kurteyek jê bir</string>
+    <string name="n_shortcut_removed">Kurteriya %1$d hat jêbirin</string>
+    <string name="server_not_available" comment="deprecated">Pêşkêşkar niha tune ye</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s niha tune</string>
+    <string name="cannot_open_shortcut">Naveroka vê kurterê niha tune ye.\nJi kerema xwe kontrol bike ka hûn xwedî rêyên pêwist in an na.</string>
+    <string name="network_shortcuts">Kurteriyên torê</string>
+    <string name="media_servers">Serverên medyayê</string>
+    <string name="shortcut_list_empty">Ji bo afirandina kurtedirêjiyên peldankên dûrên bijare yên li ser peldankên hedef bitikînin û \"%s\" di darikên çalakiya jorîn de hilbijêrin.</string>
+    <!-- DLNA -->
+    <string name="dlna_share">Parvekirina medyayê</string>
+    <string name="video">Vîdyo</string>
+    <string name="audio">Deng</string>
+    <string name="picture">Wêne</string>
+    <string name="share_types">Cureyên parvekirinê</string>
+    <!-- ZIP -->
+    <string name="zip_extract_action">Derxe vir</string>
+    <string name="zip_extract_success_message">Serkeftina derxistinê</string>
+    <string name="zip_compress_action">Wekî arşîva Zip kom bike</string>
+    <string name="zip_extracting_message">Pelên ji arşîva ZIP derxistin..</string>
+    <string name="zip_compressing_message">Pel li arşîva Zipê tê zêdekirin</string>
+    <string name="zip_compressing_many">%1$d/%2$d pelên hatine zextkirin</string>
+    <string name="zip_compressing_one">Pel tê guvaştin</string>
+    <string name="zip_compressing_success">Serkeftina zextan</string>
+    <string name="zip_compressing_canceled">Guvaştin betal kirin</string>
+    <string name="zip_extracting_many">%1$d/%2$d pelên hatine derxistin</string>
+    <string name="zip_extracting_one">Pelek tê derxistin (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Dema arşîv dihate vekirin çewtiyek çêbû.\nDibe ku arşîva te xera bûye an jî cihê te yê depokirina dîskê belaş têrê nake.</string>
+    <string name="zip_extract_canceled">Derxistin betal bû</string>
+    <string name="zip_compress_error_message">Dema arşîva te dihate afirandin çewtiyek çêbû.\nDibe ku cihê te yê depokirina dîskê belaş têrê nake.</string>
+    <string name="zip_cannot_open_inner_entry">Di hundirê arşîvekê de pel nayê vekirin. Pêşî derxe.</string>
+    <string name="zip_size_limit">Gera zîpê bi pelên ji 20 MB piçûktir re sînordar e</string>
+    <!-- Notifications -->
+    <string name="copy_error">Kopî têk çû</string>
+    <string name="cut_error">Qutkirin bi ser neket</string>
+    <string name="delete_error">Jêbirin bi ser neket</string>
+    <!-- Network Scanning -->
+    <string name="scan_network_index">Pelên medyaya îndex</string>
+    <string name="scan_network_remove">Medyayê ji îndeksê rake</string>
+    <string name="debug_browse_to_root">Li roota cîhazê bigere (tenê debug)</string>
+    <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Ji pirtûkxaneya medyayê rake</string>
+    <string name="nomedia_remove">Li pirtûkxaneya medyayê zêde bike</string>
+    <string name="nomedia_fail">Çewtî, nikare vê peldankê ji pirtûkxaneya medyayê rake</string>
+    <string name="nomedia_warning">Naveroka multimedya ya vê peldankê wê êdî di serîlêdanên multimedya de xuya nebe.\nTu dixwazî berdewam bikî?</string>
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Peldankekê hilbijêre</string>
+    <string name="choose_a_folder_help">Di peldanka ku tu dixwazî hilbijêrî de bigere û bişkojka PAŞ bikar bîne da ku biçe astekê.</string>
+    <string name="current_choice">Vebijêrka heyî:</string>
+    <string name="no_selection">hilbijartin tune</string>
+    <string name="external_storage_fake_name">Hilanîna cîhazê</string>
+    <string name="sdcard_fake_name">Karta SD</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(peldank tune ye)</string>
+    <string name="navigation_drawer_open">Kişandina navîgasyonê veke</string>
+    <string name="navigation_drawer_close">Kişandina navîgasyonê bigire</string>
+    <string name="listing_sort_mode">Moda rêzkirinê</string>
+    <string name="listing_sort_by_name">Li gorî navê rêz bikin</string>
+    <string name="listing_sort_by_size">Li gorî mezinahiyê rêz bikin</string>
+    <string name="listing_sort_by_date">Li gorî tarîxê rêz bikin</string>
+    <string name="listing_ascending">Hilkişîn</string>
+    <string name="listing_descending">Daketan</string>
+    <string name="acquire_external_usb_permission">Ji bo gihîştina depoya derve pêwîstî bi destûrnameya taybet bi rêveberê pelan heye. Ji kerema xwe depokirina xwe di ekrana pêş de hilbijêrin</string>
+</resources>
