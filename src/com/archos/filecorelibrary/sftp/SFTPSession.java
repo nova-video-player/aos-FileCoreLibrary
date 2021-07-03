@@ -148,7 +148,7 @@ public class SFTPSession {
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(path.toString());
         if(cred==null){
-            cred = new Credential("anonymous","",buildKeyFromUri(path).toString(), true);
+            cred = new Credential("anonymous","",buildKeyFromUri(path).toString(),"",true);
 
         }
 

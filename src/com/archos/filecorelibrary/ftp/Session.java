@@ -226,7 +226,7 @@ public class Session {
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
         if (cred == null)
-            cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(), true);
+            cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(),"",true);
         FTPClient ftpclient = ftpClients.get(cred);
         if (ftpclient != null && ftpclient.isConnected()) {
             log.debug("getFTPClient: reusing ftp session for " + uri);
@@ -247,7 +247,7 @@ public class Session {
         NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
         Credential cred = database.getCredential(uri.toString());
         if (cred == null)
-            cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(), true);
+            cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(),"",true);
         FTPSClient ftpclient = ftpsClients.get(cred);
         if (ftpclient!=null && ftpclient.isConnected()) {
             log.debug("getFTPSClient: reusing ftp session for " + uri);

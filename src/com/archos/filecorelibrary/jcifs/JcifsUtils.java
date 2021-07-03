@@ -222,7 +222,7 @@ public class JcifsUtils {
         CIFSContext context = null;
         if (cred != null) {
             log.debug("getCifsContext using credentials for " + uri);
-            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             context = getBaseContext(isSmbV2).withCredentials(auth);
         } else {
             log.debug("getCifsContext using NO credentials for " + uri);
@@ -236,7 +236,7 @@ public class JcifsUtils {
         CIFSContext context = null;
         if (cred != null) {
             log.debug("getCifsContext using credentials for " + uri);
-            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             context = getBaseContextOnly(isSmbV2).withCredentials(auth);
         } else {
             log.debug("getCifsContextOnly using NO credentials for " + uri);
@@ -332,7 +332,7 @@ public class JcifsUtils {
         CIFSContext ctx = null;
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred != null) {
-            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator("", cred.getUsername(), cred.getPassword());
+            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             ctx = context.withCredentials(auth);
         } else
             ctx = context.withGuestCrendentials();

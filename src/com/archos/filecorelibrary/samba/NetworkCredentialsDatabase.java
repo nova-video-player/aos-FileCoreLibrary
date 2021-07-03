@@ -48,23 +48,26 @@ public class NetworkCredentialsDatabase {
     private static final String CREDENTIALS_TABLE = "credentials_table";
     private static final String KEY_PATH = "path";
     private static final String KEY_USERNAME = "username";
+    private static final String KEY_DOMAIN = "domain";
     private static final String KEY_PASSWORD = "password";
-    private static final String[] COLS = { KEY_PATH, KEY_USERNAME, KEY_PASSWORD };
+    private static final String[] COLS = { KEY_PATH, KEY_USERNAME, KEY_PASSWORD, KEY_DOMAIN };
     private static final byte[] cipherKey = "vimcufJies8".getBytes();
 
     private static final String DATABASE_CREATE_CREDENTIALS =
-            "create table "+CREDENTIALS_TABLE+" (" + KEY_PATH + " text not null primary key, "+KEY_USERNAME+" text, " + KEY_PASSWORD + " text);";
-    public static final int DATABASE_VERSION = 1;
+            "create table "+CREDENTIALS_TABLE+" (" + KEY_PATH + " text not null primary key, "+KEY_USERNAME+" text, " + KEY_PASSWORD + " text, " + KEY_DOMAIN + " text);";
+    public static final int DATABASE_VERSION = 2;
 
     public static class Credential implements Serializable{
         String mUsername;
         String mPassword;
         String mUriString;
+        String mDomain;
         boolean mIsTemporary;
-        public Credential(String username, String password, String uriString, boolean isTemporary){
+        public Credential(String username, String password, String uriString, String domain, boolean isTemporary){
             mUsername = username;
             mPassword = password;
             mUriString = uriString;
+            mDomain = domain;
             mIsTemporary = isTemporary;
         }
         public String getUriString(){
@@ -76,8 +79,12 @@ public class NetworkCredentialsDatabase {
         public String getUsername(){
             return mUsername;
         }
+        public String getDomain(){
+            return mDomain;
+        }
         public void setPassword(String password){mPassword = password;}
         public void setUsername(String username){mUsername = username;}
+        public void setDomain(String domain){mDomain = domain;}
         public boolean isTemporary(){
             return mIsTemporary;
         }
@@ -95,6 +102,8 @@ public class NetworkCredentialsDatabase {
                 return false;
             if (mUsername != null ? !mUsername.equals(that.mUsername) : that.mUsername != null)
                 return false;
+            if (mDomain != null ? !mDomain.equals(that.mDomain) : that.mDomain != null)
+                return false;
 
             return true;
         }
@@ -104,6 +113,7 @@ public class NetworkCredentialsDatabase {
             int result = mUsername != null ? mUsername.hashCode() : 0;
             result = 31 * result + (mPassword != null ? mPassword.hashCode() : 0);
             result = 31 * result + (mUriString != null ? mUriString.hashCode() : 0);
+            result = 31 * result + (mDomain != null ? mDomain.hashCode() : 0);
             return result;
         }
     }
@@ -126,6 +136,7 @@ public class NetworkCredentialsDatabase {
         ContentValues initialValues = new ContentValues(1);
         initialValues.put(KEY_PATH, cred.getUriString());
         initialValues.put(KEY_USERNAME, cred.getUsername());
+        initialValues.put(KEY_DOMAIN, cred.getDomain());
         initialValues.put(KEY_PASSWORD, encrypt(cred.getPassword()));
         mDB.insertWithOnConflict(CREDENTIALS_TABLE, null, initialValues, SQLiteDatabase.CONFLICT_REPLACE);
         cred.mIsTemporary = false;
@@ -155,6 +166,7 @@ public class NetworkCredentialsDatabase {
                     int pathColumnIndex = cursor.getColumnIndex(KEY_PATH);
                     int usernameColumnIndex = cursor.getColumnIndex(KEY_USERNAME);
                     int passwordColumnIndex = cursor.getColumnIndex(KEY_PASSWORD);
+                    int domainColumnIndex = cursor.getColumnIndex(KEY_DOMAIN);
                     int shortcutCount = cursor.getCount();
 
                     if (shortcutCount > 0) {
@@ -162,8 +174,9 @@ public class NetworkCredentialsDatabase {
                         do {
                             String path = cursor.getString(pathColumnIndex);
                             String username = cursor.getString(usernameColumnIndex);
+                            String domain = cursor.getString(domainColumnIndex);
                             String password = decrypt(cursor.getString(passwordColumnIndex));
-                            mCredentials.put(path, new Credential(username, password, path, false));
+                            mCredentials.put(path, new Credential(username, password, path, domain,false));
                         } while (cursor.moveToNext());
                     }
                 cursor.close();
@@ -171,6 +184,7 @@ public class NetworkCredentialsDatabase {
                 close();
                 //load old credentials database
                 for (String str : SambaConfiguration.getSingleSettingList()) {
+                    // TODO to check if it is still relevant because old is really old
                     SambaSingleSetting single = SambaConfiguration.getSingleSetting(str);
                     String username = single.getUsername();
                     if (username.lastIndexOf("/") != -1) {
@@ -178,7 +192,7 @@ public class NetworkCredentialsDatabase {
                     }
                     String password = single.getPassword();
                     String path = "smb://" + single.getServer() + (single.getShare() != null ? "/" + single.getShare() : "");
-                    saveCredential(new Credential(username, password, path, false));
+                    saveCredential(new Credential(username, password, path, "",false));
                     SambaConfiguration.deleteSingleSetting(single.getSection());
 
                 }
@@ -275,18 +289,19 @@ public class NetworkCredentialsDatabase {
         }
     }
 
-    private  class DatabaseHelper extends SQLiteOpenHelper {
-
+    private class DatabaseHelper extends SQLiteOpenHelper {
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
-
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(DATABASE_CREATE_CREDENTIALS);
         }
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {            
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion < 2) {
+                db.execSQL("ALTER TABLE "+CREDENTIALS_TABLE+" ADD COLUMN " + KEY_DOMAIN + " TEXT");
+            }
         }
     }
 }
