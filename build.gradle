@@ -17,9 +17,7 @@ allprojects {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
-
+    compileSdkVersion 30
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
