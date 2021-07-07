@@ -182,16 +182,14 @@ public class NetUtils implements LifecycleObserver {
 
     public int getAvailableNetworksCount() {
         int count = 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            Network[] allNetworks = mConnectivityMgr.getAllNetworks(); // added in API 21 (Lollipop)
-            for (Network network : allNetworks) {
-                NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
-                if (networkCapabilities != null)
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
-                        count++;
-            }
+        Network[] allNetworks = mConnectivityMgr.getAllNetworks(); // added in API 21 (Lollipop)
+        for (Network network : allNetworks) {
+            NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
+            if (networkCapabilities != null)
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                    count++;
         }
         return count;
     }
@@ -199,18 +197,16 @@ public class NetUtils implements LifecycleObserver {
     public List<Integer> getAvailableNetworks() {
         List<Integer> activeNetworks = new ArrayList<>();
         Network[] allNetworks; // added in API 21 (Lollipop)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            allNetworks = mConnectivityMgr.getAllNetworks();
-            for (Network network : allNetworks) {
-                NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
-                if (networkCapabilities != null) {
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
-                        activeNetworks.add(TRANSPORT_WIFI);
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
-                        activeNetworks.add(TRANSPORT_CELLULAR);
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
-                        activeNetworks.add(TRANSPORT_CELLULAR);
-                }
+        allNetworks = mConnectivityMgr.getAllNetworks();
+        for (Network network : allNetworks) {
+            NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
+            if (networkCapabilities != null) {
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
+                    activeNetworks.add(TRANSPORT_WIFI);
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+                    activeNetworks.add(TRANSPORT_CELLULAR);
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                    activeNetworks.add(TRANSPORT_CELLULAR);
             }
         }
         return activeNetworks;

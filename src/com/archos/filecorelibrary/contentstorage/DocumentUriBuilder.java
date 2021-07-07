@@ -105,10 +105,7 @@ public class DocumentUriBuilder {
         Constructor<?> constructor = c.getDeclaredConstructor(DocumentFile.class, Context.class, Uri.class);
         constructor.setAccessible(true);
         Uri docUri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            docUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, uri.getLastPathSegment());
-        else
-            docUri = buildDocumentUriUsingTree(uri);
+        docUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, uri.getLastPathSegment());
         return (DocumentFile) constructor.newInstance(null, context, docUri);
     }
 

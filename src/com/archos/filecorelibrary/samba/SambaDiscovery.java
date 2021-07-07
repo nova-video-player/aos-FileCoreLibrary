@@ -476,20 +476,18 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
         ConnectivityManager connMgr = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            LinkProperties lp;
-            String ipAddress = null;
-            lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_VPN);
-            if (lp == null)
-                lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_ETHERNET);
-            if (lp == null)
-                lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_WIFI);
-            if (lp != null)
-                ipAddress =  getIp(lp);
-            log.debug("initIpAddress: " + ipAddress);
-            if (ipAddress != null)
-                return ipAddress;
-        }
+        LinkProperties lp;
+        String ipAddressString = null;
+        lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_VPN);
+        if (lp == null)
+            lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_ETHERNET);
+        if (lp == null)
+            lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_WIFI);
+        if (lp != null)
+            ipAddressString =  getIp(lp);
+        log.debug("initIpAddress: " + ipAddressString);
+        if (ipAddressString != null)
+            return ipAddressString;
 
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {

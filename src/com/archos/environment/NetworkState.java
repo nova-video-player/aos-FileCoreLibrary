@@ -214,16 +214,14 @@ public class NetworkState {
 
     public int getAvailableNetworksCount() {
         int count = 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            Network[] allNetworks = mConnectivityManager.getAllNetworks(); // added in API 21 (Lollipop)
-            for (Network network : allNetworks) {
-                NetworkCapabilities networkCapabilities = mConnectivityManager.getNetworkCapabilities(network);
-                if (networkCapabilities != null)
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
-                        count++;
-            }
+        Network[] allNetworks = mConnectivityManager.getAllNetworks(); // added in API 21 (Lollipop)
+        for (Network network : allNetworks) {
+            NetworkCapabilities networkCapabilities = mConnectivityManager.getNetworkCapabilities(network);
+            if (networkCapabilities != null)
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                    count++;
         }
         return count;
     }
