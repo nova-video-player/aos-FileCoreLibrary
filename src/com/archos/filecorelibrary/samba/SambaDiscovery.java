@@ -292,6 +292,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
         // Init the TCP and UDP discoveries
         mInternalDiscoveries.add(new UdpDiscovery(this, ipAddress, mSocketReadDurationMs));
+        mInternalDiscoveries.add(new MdnsDiscovery(this, mContext, mSocketReadDurationMs));
         //tcp is quicker than udp sometimes, but we only use it as fallback, so we delay it 1 sec
         mInternalDiscoveries.add(new TcpDiscovery(this, ipAddress, mSocketReadDurationMs, 1000));
 
