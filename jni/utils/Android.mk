@@ -4,8 +4,8 @@ include $(CLEAR_VARS)
 ### libnativehelper ###
 LIBNATIVEHELPER_DIR := libnativehelper
 include $(CLEAR_VARS)
-LOCAL_MODULE    := libnativehelper
-LOCAL_SRC_FILES := ../../../native/$(LIBNATIVEHELPER_DIR)/obj/local/$(TARGET_ARCH_ABI)/libnativehelper.so
+LOCAL_MODULE    := libnvpnativehelper
+LOCAL_SRC_FILES := ../../../native/$(LIBNATIVEHELPER_DIR)/obj/local/$(TARGET_ARCH_ABI)/libnvpnativehelper.so
 LOCAL_EXPORT_C_INCLUDES :=  ../native/$(LIBNATIVEHELPER_DIR)/include/nativehelper
 include $(PREBUILT_SHARED_LIBRARY)
 
@@ -29,7 +29,15 @@ LOCAL_SRC_FILES += sendfile64.S
 LOCAL_CFLAGS += -DCONFIG_ARM
 endif
 
-LOCAL_SHARED_LIBRARIES := libnativehelper
+LOCAL_SHARED_LIBRARIES := libnvpnativehelper
+
+$(warning libfilecorelibrary local module: $(LOCAL_MODULE))
+$(warning libfilecorelibrary target_out: $(TARGET_OUT))
+$(warning libfilecorelibrary local_ldlibs: $(LOCAL_LDLIBS))
+$(warning libfilecorelibrary local_cflags: $(LOCAL_CFLAGS))
+$(warning libfilecorelibrary local_shared_libraries: $(LOCAL_SHARED_LIBRARIES))
+$(warning libfilecorelibrary build_android_libs: $(BUILD_ANDROID_LIBS))
+$(warning libfilecorelibrary build_shared_library: $(BUILD_SHARED_LIBRARY))
 
 include $(BUILD_ANDROID_LIBS)
 include $(BUILD_SHARED_LIBRARY)
