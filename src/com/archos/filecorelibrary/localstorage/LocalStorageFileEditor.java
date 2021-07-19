@@ -14,20 +14,22 @@
 
 package com.archos.filecorelibrary.localstorage;
 
+import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
-
-import androidx.documentfile.provider.DocumentFile;
 
 import com.archos.filecorelibrary.ExtStorageManager;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.environment.ArchosUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,8 +47,7 @@ import java.util.List;
 public class LocalStorageFileEditor extends FileEditor {
     private final Context mContext;
 
-    private static final String TAG = "LocalStorageFileEditor";
-    private static final boolean DBG = false;
+    private static final Logger log = LoggerFactory.getLogger(LocalStorageFileEditor.class);
 
     private static final String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath();
     private static final String USBHOST_PTP_PATH = ExtStorageManager.getExternalStorageUsbHostPtpDirectory().getPath();
@@ -168,10 +169,10 @@ public class LocalStorageFileEditor extends FileEditor {
         // TODO: does not work on usb external storage on recent Android
         File fileToDelete = new File(mUri.getPath());
         if (fileToDelete.isDirectory()) {
-            if (DBG) Log.d(TAG, "delete: folder " + mUri.getPath());
+            log.debug("delete: folder " + mUri.getPath());
             deleteFolder(mUri);
         } else {
-            if (DBG) Log.d(TAG, "delete: file " + mUri.getPath());
+            log.debug("delete: file " + mUri.getPath());
             deleteFile(fileToDelete);
         }
     }
@@ -230,7 +231,7 @@ public class LocalStorageFileEditor extends FileEditor {
         Uri uri = MediaStore.Files.getContentUri("external");
         String where = MediaStore.MediaColumns.DATA + "=?";
         String[] selectionArgs = { mUri.getPath() };
-        if (DBG) Log.d(TAG, "deleteFileAndDatabase: where " + where + ", selectionArgs " + selectionArgs);
+        log.debug("deleteFileAndDatabase: where " + where + ", selectionArgs " + selectionArgs);
         cr.delete(uri, where, selectionArgs);
         boolean delete = false;
         try {

@@ -14,26 +14,19 @@
 
 package com.archos.filecorelibrary;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import android.hardware.usb.UsbManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.storage.StorageVolume;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
-import android.util.Log;
-
-import androidx.core.app.NotificationCompat;
 
 import com.archos.filecorelibrary.contentstorage.DocumentUriBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,9 +37,8 @@ import java.util.Set;
 
 public class FileUtils {
 
-    private static final String TAG = FileUtils.class.getSimpleName();
-    private static final boolean DBG = false;
-    
+    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
+
     final static char SEP = '/';
     final static String SEPARATOR = "/";
 
@@ -82,12 +74,12 @@ public class FileUtils {
     public static Uri removeLastSegment(Uri uri){
         int index;
         String str = uri.toString();
-        if (DBG) Log.d(TAG, "removeLastSegment input: " + str);
+        log.debug("removeLastSegment input: " + str);
         if (str.endsWith(SEPARATOR))
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
         else index = str.lastIndexOf(SEPARATOR);
         if (index <= 0) return null;
-        if (DBG) Log.d(TAG, "removeLastSegment output: " + str.substring(0, index + 1));
+        log.debug("removeLastSegment output: " + str.substring(0, index + 1));
         // MUST keep the trailing "/" for samba
         return Uri.parse(str.substring(0, index + 1));
     }
@@ -157,7 +149,7 @@ public class FileUtils {
             return contentUri;
 
         // log contentUri.getHost() to whitelist only MediaProvider for this file:/// access
-        if (DBG) Log.d(TAG, "getRealUriFromVideoURI: contentUri.getHost()=" + contentUri.getHost());
+        log.debug("getRealUriFromVideoURI: contentUri.getHost()=" + contentUri.getHost());
         Cursor cursor = null;
 
         String[] proj = { MediaStore.Video.Media.DATA };
@@ -228,10 +220,10 @@ public class FileUtils {
     }
 
     public static String getName(String file) {
-        if (DBG) Log.d(TAG, "getName input: " + file);
+        log.debug("getName input: " + file);
         if (file.lastIndexOf(SEPARATOR) >= 0 && file.lastIndexOf(SEPARATOR) < (file.length() - 1))
             file = file.substring(file.lastIndexOf(SEPARATOR) + 1);
-        if (DBG) Log.d(TAG, "getName result: " + file);
+        log.debug("getName result: " + file);
         return file;
     }
 
