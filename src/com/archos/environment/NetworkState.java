@@ -27,7 +27,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
-import android.util.Log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
