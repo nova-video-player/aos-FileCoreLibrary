@@ -98,16 +98,20 @@ public class NetworkState {
         boolean connected = isNetworkConnected(mContext);
         if (connected != mConnected) { // only fire change if there is a change
             log.debug("updateFrom: connected changed notifying, " + mConnected + "->" +  connected);
-            propertyChangeSupport.firePropertyChange(WAN_STATE, mConnected, connected);
+            boolean oldState = mConnected;
             mConnected = connected;
-        }
+            propertyChangeSupport.firePropertyChange(WAN_STATE, oldState, connected);
+        } else
+            log.debug("updateFrom: connected (" + connected + ") state not changed -> not notifying");
         boolean hasLocalConnection = isLocalNetworkConnected(mContext) || preferences.getBoolean("vpn_mobile", false);
         if (hasLocalConnection != mHasLocalConnection) { // only fire change if there is a change
             log.debug("updateFrom: hasLocalConnection changed notifying, " + mHasLocalConnection + "->" +  hasLocalConnection);
             returnBoolean = true;
-            propertyChangeSupport.firePropertyChange(LAN_STATE, mHasLocalConnection, hasLocalConnection);
+            boolean oldState = mHasLocalConnection;
             mHasLocalConnection = hasLocalConnection;
-        }
+            propertyChangeSupport.firePropertyChange(LAN_STATE, oldState, hasLocalConnection);
+        } else
+            log.debug("updateFrom: hasLocalConnection (" + hasLocalConnection + ") not changed -> not notifying, " + mHasLocalConnection + "->" +  hasLocalConnection);
         return returnBoolean;
     }
 
