@@ -3,12 +3,13 @@ package com.archos.filecorelibrary.samba;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
-import android.os.Build;
-import android.util.Log;
-
-import androidx.annotation.RequiresApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MdnsDiscovery implements InternalDiscovery {
+
+    private static final Logger log = LoggerFactory.getLogger(MdnsDiscovery.class);
+
     private NsdManager mNsdManager;
     private MdnsListener mMdnsListener;
     private boolean mAlive = false;
@@ -24,7 +25,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int i) {
-            Log.e("PHH", "Failed resolving " + nsdServiceInfo);
+            log.error("onResolveFailed: Failed resolving " + nsdServiceInfo);
             if(mFailCount < 10) {
                 mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(mInfo, mFailCount + 1));
             }
@@ -32,7 +33,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
-            Log.d("PHH", "Share found nogroup:" + nsdServiceInfo.getServiceName() + ":" + nsdServiceInfo.getHost().getHostAddress());
+            log.debug("onServiceResolved: share found nogroup:" + nsdServiceInfo.getServiceName() + ":" + nsdServiceInfo.getHost().getHostAddress());
             String uri = "smb://" + nsdServiceInfo.getHost().getHostAddress() + "/";
             mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName(), uri);
         }
@@ -42,12 +43,12 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onStartDiscoveryFailed(String s, int i) {
-            Log.d("PHH", "Failed starting discovery..." + s + ":" + i);
+            log.debug("onStartDiscoveryFailed: failed starting discovery..." + s + ":" + i);
         }
 
         @Override
         public void onStopDiscoveryFailed(String s, int i) {
-            Log.d("PHH", "Failed stopping discovery..." + s + ":" + i);
+            log.debug("onStopDiscoveryFailed: failed stopping discovery..." + s + ":" + i);
         }
 
         @Override
@@ -62,7 +63,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onServiceFound(NsdServiceInfo nsdServiceInfo) {
-            Log.d("PHH", "Found service " + nsdServiceInfo);
+            log.debug("Found service " + nsdServiceInfo);
             // MdnsResolveListener CAN NOT be reused across services
             mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(nsdServiceInfo, 0));
         }
@@ -76,19 +77,19 @@ public class MdnsDiscovery implements InternalDiscovery {
     public MdnsDiscovery(InternalDiscoveryListener listener, Context ctxt, int socketReadDurationMs) {
         mNsdManager = (NsdManager)ctxt.getSystemService(Context.NSD_SERVICE);
         mMdnsListener = new MdnsListener();
-        Log.d("PHH","Created mdns discovery");
+        log.debug("MdnsDiscovery: created mdns discovery");
         mSmbListener = listener;
     }
 
     @Override
     public void start() {
-        Log.d("PHH","Starting discovering...");
+        log.debug("start: starting discovering...");
         mNsdManager.discoverServices("_smb._tcp", NsdManager.PROTOCOL_DNS_SD, mMdnsListener);
     }
 
     @Override
     public void run_blocking() {
-        Log.wtf("PHH", "Didn't expect this call");
+        log.warn("run_blocking: didn't expect this call");
     }
 
     @Override
