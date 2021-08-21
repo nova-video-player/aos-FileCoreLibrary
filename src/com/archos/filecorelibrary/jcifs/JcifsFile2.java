@@ -53,7 +53,45 @@ public class JcifsFile2 extends MetaFile2 {
      * SmbFile argument must contain already valid data (name, size, etc.)
      * because this method won't make any network call
      */
-    public JcifsFile2(SmbFile file) throws SmbException {
+    public JcifsFile2(NovaSmbFile nSmbFile) throws SmbException {
+        // no need to redo subst... not the right way
+        buildJcifsFile2(nSmbFile);
+    }
+
+    /**
+     * Constructor from Uri. Does network access to get the data.
+     * Private so that user has to use the static fromUri() instead (to make it more clear)
+     */
+    private JcifsFile2(Uri uri) throws MalformedURLException, SmbException {
+        // Create the SmbFile instance
+        NovaSmbFile nSmbFile = getSmbFile(uri);
+        buildJcifsFile2(nSmbFile);
+    }
+
+    public JcifsFile2(SmbFile file, String shareName, String shareIp) throws SmbException {
+        buildJcifsFile2(file, shareName, shareIp);
+    }
+
+    private void buildJcifsFile2(SmbFile file, String shareName, String shareIp) throws SmbException {
+        if (shareIp == null) shareIp = shareName;
+        buildJcifsFile2(file);
+        mUriString = mUriString.replaceFirst(shareIp, shareName);
+        mName = mName.replaceFirst(shareIp, shareName);
+    }
+
+    private void buildJcifsFile2(NovaSmbFile nFile) throws SmbException {
+        buildJcifsFile2(nFile.smbFile);
+        mUriString = nFile.getCanonicalPath();
+        mName = nFile.getName();
+        if (mIsDirectory && mName.endsWith("/")) {
+            mName = mName.substring(0, mName.length()-1);
+        } else {
+            mName = mName;
+        }
+    }
+
+    private void buildJcifsFile2(SmbFile file) throws SmbException {
+
         if (file == null) {
             throw new IllegalArgumentException("JcifsFile2: file cannot be null");
         }
@@ -63,7 +101,6 @@ public class JcifsFile2 extends MetaFile2 {
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
-        log.debug("JcifsFile2: for file " + file.getPath());
         mCanRead = false;
         mCanWrite = false;
         mLength = 0;
@@ -80,42 +117,6 @@ public class JcifsFile2 extends MetaFile2 {
             }
         }
 
-        // remove the '/' at the end of directory name (Jcifs adds it)
-        if (mIsDirectory && name.endsWith("/")) {
-            mName = name.substring(0, name.length()-1);
-        } else {
-            mName = name;
-        }
-    }
-
-    /**
-     * Constructor from Uri. Does network access to get the data.
-     * Private so that user has to use the static fromUri() instead (to make it more clear)
-     */
-    private JcifsFile2(Uri uri) throws MalformedURLException, SmbException {
-        // Create the SmbFile instance
-        SmbFile file = getSmbFile(uri);
-        // Using the methods doing network access to get the actual data
-        mUriString = file.getCanonicalPath();
-        String name  = file.getName();
-        mIsDirectory = file.isDirectory();
-        mIsFile = file.isFile();
-        mLastModified = file.lastModified();
-        mCanRead = false;
-        mCanWrite = false;
-        mLength = 0;
-        if (mIsDirectory || mIsFile) {
-            // generates an exception in case of a directory not accessible but need this information for deletion
-            try {
-                mCanRead = file.canRead();
-                mCanWrite = file.canWrite();
-                if (mIsFile) mLength = file.length();
-            } catch (SmbAuthException e) {
-                caughtException(e, "JfisFile2 " + file.getCanonicalPath(), "SmbAuthException");
-            } catch (SmbException e) {
-                caughtException(e, "JfisFile2 " + file.getCanonicalPath(), "SmbException");
-            }
-        }
         // remove the '/' at the end of directory name (Jcifs adds it)
         if (mIsDirectory && name.endsWith("/")) {
             mName = name.substring(0, name.length()-1);

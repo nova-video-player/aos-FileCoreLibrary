@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ import android.net.LinkAddress;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -96,7 +98,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     /**
      * We have several (2 as of today...) discovery engine internally
      */
-    private List<InternalDiscovery> mInternalDiscoveries = new ArrayList<InternalDiscovery>(2);
+    private List<InternalDiscovery> mInternalDiscoveries = new ArrayList<InternalDiscovery>(3);
 
     /**
      * true if user aborted the discovery
@@ -107,6 +109,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
      * Workgroups indexed by name
      */
     final private Map<String, Workgroup> mWorkgroups = new HashMap<String, Workgroup>();
+
+    // shareName/IP resolver
+    final private static Hashtable<String, String> shareNameResolver = new Hashtable<String, String>();
+    // name/IP resolution
+    //public static Hashtable nameResolution = new Hashtable<String, String>();
 
     public Handler getmUiHandler() {
         return mUiHandler;
@@ -124,6 +131,26 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         this.mThereIsAnUpdate = mThereIsAnUpdate;
     }
 
+    public static String dumpShareNameResolver() {
+       return shareNameResolver.toString();
+    }
+
+    public static String getIpFromShareName(String shareName) {
+        return shareNameResolver.get(shareName);
+    }
+
+    public static void registerShareNameIP(String shareName, String shareIp) {
+        if (shareIp != null && shareName != null) shareNameResolver.put(shareName, shareIp);
+    }
+
+    public static void deRegisterShareNameIP(String shareName) {
+        shareNameResolver.remove(shareName);
+    }
+
+    public static void flushShareNameResolver() {
+        shareNameResolver.clear();
+    }
+
     /**
      * Called by two threads (Udp and Tcp) when they detect a (new) share
      * @param workgroupName
@@ -132,6 +159,12 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     @Override
     synchronized public void onShareFound(String workgroupName, String shareName, String shareAddress) {
         log.debug("onShareFound "+workgroupName+" \""+shareName+"\" "+shareAddress);
+        if (shareAddress != null) {
+            String shareIP = Uri.parse(shareAddress).getHost();
+            // take into account when sharename is an ip
+            registerShareNameIP(((shareName.isEmpty()) ? shareIP : shareName), shareIP);
+            log.trace("onShareFound: shareNameResolver hastable " + dumpShareNameResolver());
+        }
 
         boolean alreadyFound = false;
 
@@ -512,7 +545,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (wifi.isConnected()) {
-            WifiManager myWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager myWifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo myWifiInfo = myWifiManager.getConnectionInfo();
             int ipAddress = myWifiInfo.getIpAddress();
             InetAddress address = inetFromInt(ipAddress);

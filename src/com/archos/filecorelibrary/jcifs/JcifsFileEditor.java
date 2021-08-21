@@ -52,7 +52,7 @@ public class JcifsFileEditor extends FileEditor{
     @Override
     public boolean mkdir() {
         try {
-            getSmbFile(mUri).mkdir();
+            getSmbFile(mUri).smbFile.mkdir();
             return true;
         } catch (SmbException e) {
             caughtException(e, "mkdir", "SmbException in mkdir " + mUri);
@@ -64,34 +64,34 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new SmbFileInputStream(getSmbFile(mUri));
+        return new SmbFileInputStream(getSmbFile(mUri).smbFile);
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        InputStream is = new SmbFileInputStream(getSmbFile(mUri));
+        InputStream is = new SmbFileInputStream(getSmbFile(mUri).smbFile);
         is.skip(from);
         return is;
     }
 
     @Override
     public OutputStream getOutputStream() throws SmbException, MalformedURLException, UnknownHostException {
-        return new SmbFileOutputStream(getSmbFile(mUri));
+        return new SmbFileOutputStream(getSmbFile(mUri).smbFile);
     }
 
     @Override
     public void delete() throws Exception {
-        SmbFile smbFile = getSmbFile(mUri);
+        SmbFile smbFile = getSmbFile(mUri).smbFile;
         if (smbFile.isFile() || smbFile.isDirectory())
-            getSmbFile(mUri).delete();
+            getSmbFile(mUri).smbFile.delete();
     }
 
     @Override
     public boolean rename(String newName) {
         try {
-            SmbFile from = getSmbFile(mUri);
+            SmbFile from = getSmbFile(mUri).smbFile;
             if (from != null) {
-                SmbFile to = getSmbFile(Uri.parse(from.getParent() + "/" + newName));
+                SmbFile to = getSmbFile(Uri.parse(from.getParent() + "/" + newName)).smbFile;
                 if (to != null) {
                     from.renameTo(to);
                     return true;
@@ -114,7 +114,7 @@ public class JcifsFileEditor extends FileEditor{
     public boolean exists() {
         log.trace("exists: check " + mUri);
         try {
-            SmbFile sf = getSmbFile(mUri);
+            SmbFile sf = getSmbFile(mUri).smbFile;
             if (sf != null) {
                 boolean doesItExist = sf.exists();
                 if (log.isTraceEnabled()) {

@@ -14,6 +14,8 @@
 
 package com.archos.filecorelibrary.jcifs;
 
+import static com.archos.filecorelibrary.jcifs.NovaSmbFile.getIpUriString;
+
 import android.content.Context;
 import android.net.Uri;
 
@@ -65,6 +67,7 @@ public class JcifsUtils {
 
     // get the instance, context is used for initial context injection
     public static JcifsUtils getInstance(Context context) {
+        if (context == null) log.warn("getInstance: context passed is null!!!");
         if (sInstance == null) {
             synchronized(JcifsUtils.class) {
                 if (sInstance == null) sInstance = new JcifsUtils(context.getApplicationContext());
@@ -264,7 +267,7 @@ public class JcifsUtils {
             try {
                 log.debug("isServerSmbV2: probing " + uri + " to check if smbV2");
                 CIFSContext ctx = getCifsContextOnly(uri, true);
-                smbFile = new SmbFile(uri.toString(), ctx);
+                smbFile = new SmbFile(getIpUriString(uri), ctx);
                 smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                 declareServerSmbV2(server, true);
                 log.debug("isServerSmbV2 for " + server + " returning true");
@@ -281,7 +284,7 @@ public class JcifsUtils {
                 try {
                     log.debug("isServerSmbV2: it is not smbV2 probing " + uri + " to check if smbV1");
                     CIFSContext ctx = getCifsContextOnly(uri, false);
-                    smbFile = new SmbFile(uri.toString(), ctx);
+                    smbFile = new SmbFile(getIpUriString(uri), ctx);
                     smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                     declareServerSmbV2(server, false);
                     log.debug("isServerSmbV2 for " + server + " returning false");
@@ -306,15 +309,14 @@ public class JcifsUtils {
         }
     }
 
-    public static SmbFile getSmbFile(Uri uri) throws MalformedURLException {
-        log.debug("getSmbFile: for " + uri);
+    public static NovaSmbFile getSmbFile(Uri uri) throws MalformedURLException {
         if (LIMIT_PROTOCOL_NEGO)
             return getSmbFileStrictNego(uri);
         else
             return getSmbFileAllProtocols(uri, isSMBv2Enabled());
     }
 
-    public static SmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
+    public static NovaSmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
         Boolean isSmbV2 = isServerSmbV2(uri.getHost(), uri.getPort());
         CIFSContext context = null;
         if (isSmbV2 == null) { // server type not identified, default to smbV2&1 auto
@@ -336,12 +338,12 @@ public class JcifsUtils {
             ctx = context.withCredentials(auth);
         } else
             ctx = context.withGuestCrendentials();
-        return new SmbFile(uri.toString(), ctx);
+        return new NovaSmbFile(uri, ctx);
     }
 
-    public static SmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException {
+    public static NovaSmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException {
         CIFSContext context = getCifsContext(uri, isSMBv2);
-        return new SmbFile(uri.toString(), context);
+        return new NovaSmbFile(uri, context);
     }
 
     public static boolean isSMBv2Enabled() {

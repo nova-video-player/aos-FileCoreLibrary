@@ -48,14 +48,15 @@ public class JcifsRawLister extends RawLister {
     }
 
     public List<MetaFile2> getFileList() throws SmbException, MalformedURLException{
-        SmbFile[] listFiles = getSmbFile(mUri).listFiles();
+        NovaSmbFile nSmbFile = getSmbFile(mUri);
+        SmbFile[] listFiles = getSmbFile(mUri).smbFile.listFiles();
         if(listFiles!=null){
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
                 // better verify that it is a file or directory before adding
                 if(f.isFile() || f.isDirectory()) {
                     log.trace("found " + f.getPath());
-                    files.add(new JcifsFile2(f));
+                    files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                 }
             }
             return files;

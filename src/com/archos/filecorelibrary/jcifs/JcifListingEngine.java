@@ -109,7 +109,8 @@ public class JcifListingEngine extends ListingEngine {
         public void run(){
             try {
                 log.debug("JcifListingThread: listFiles for: " + mUri.toString());
-                SmbFile[] listFiles = getSmbFile(mUri).listFiles(mFileFilter);
+                NovaSmbFile nSmbFile = getSmbFile(mUri);
+                SmbFile[] listFiles = nSmbFile.smbFile.listFiles(mFileFilter);
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
                     mUiHandler.post(new Runnable() {
@@ -142,11 +143,11 @@ public class JcifListingEngine extends ListingEngine {
                 for (SmbFile f : listFiles) {
                     if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
                         log.trace("JcifListingThread: adding file " + f.getPath());
-                        files.add(new JcifsFile2(f));
+                        files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                     }
                     else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
                         log.trace("JcifListingThread: adding directory " + f.getPath());
-                        directories.add(new JcifsFile2(f));
+                        directories.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                     }
                 }
 
