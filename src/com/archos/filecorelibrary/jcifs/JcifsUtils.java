@@ -49,7 +49,7 @@ public class JcifsUtils {
     // note to self: do not try to revert to false since it does not work (HP printer, livebox smbV1 broken with smbV2 enabled) but jcifs.smb.useRawNTLM=true solves this!
     // update note to self: true creates protocol identification issues it seems (not threadsafe with multiple parallel requests?)
     public final static boolean LIMIT_PROTOCOL_NEGO = false;
-    public final static boolean RESOLUTION_CACHE_INJECTION = true;
+    public final static boolean RESOLUTION_CACHE_INJECTION = false;
     public final static boolean PREVENT_MULTIPLE_TIME_SERVER_PROBING = true;
 
     private static Properties prop = null;
