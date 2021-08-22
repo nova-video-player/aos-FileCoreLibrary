@@ -15,7 +15,6 @@
 package jcifs.netbios;
 
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.archos.filecorelibrary.jcifs.JcifsUtils;
 import com.archos.filecorelibrary.samba.InternalDiscovery;
@@ -43,7 +42,6 @@ import jcifs.Configuration;
 import static jcifs.netbios.NbtAddress.UNKNOWN_MAC_ADDRESS;
 
 public class UdpDiscovery implements InternalDiscovery {
-    private static final String TAG = "UdpDiscovery";
     private static final boolean DBG = false;
 
     private static final int SMB_NS_PORT = 137;
