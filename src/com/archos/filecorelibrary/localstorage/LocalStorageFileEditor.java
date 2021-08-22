@@ -14,12 +14,10 @@
 
 package com.archos.filecorelibrary.localstorage;
 
-import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
@@ -230,15 +228,18 @@ public class LocalStorageFileEditor extends FileEditor {
         ContentResolver cr = context.getContentResolver();
         Uri uri = MediaStore.Files.getContentUri("external");
         String where = MediaStore.MediaColumns.DATA + "=?";
+        log.debug("deleteFileAndDatabase mUri=" + mUri);
         String[] selectionArgs = { mUri.getPath() };
-        log.debug("deleteFileAndDatabase: where " + where + ", selectionArgs " + selectionArgs);
+        log.debug("deleteFileAndDatabase: where " + where + ", selectionArgs " + Arrays.toString(selectionArgs));
         cr.delete(uri, where, selectionArgs);
         boolean delete = false;
         try {
             // TODO: does not work on external usb storage on recent Android
             delete();
             delete = true;
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("deleteFileAndDatabase: caught exception ",e);
+        }
 
         if (!(delete || !exists())) {
             // in case delete fail because file has already been deleted by cr.delete
