@@ -27,6 +27,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jcifs.netbios.UdpDiscovery;
@@ -138,15 +139,16 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     }
 
     public static String getIpFromShareName(String shareName) {
-        return shareNameResolver.get(shareName);
+        if (shareName == null) return null;
+        return shareNameResolver.get(shareName.toUpperCase());
     }
 
     public static void registerShareNameIP(String shareName, String shareIp) {
-        if (shareIp != null && shareName != null) shareNameResolver.put(shareName, shareIp);
+        if (shareIp != null && shareName != null) shareNameResolver.put(shareName.toUpperCase(), shareIp);
     }
 
     public static void deRegisterShareNameIP(String shareName) {
-        shareNameResolver.remove(shareName);
+        shareNameResolver.remove(shareName.toUpperCase());
     }
 
     public static void flushShareNameResolver() {
@@ -172,18 +174,27 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
         // Check if this address is already in the list
         Iterator<Workgroup> wkIter = mWorkgroups.values().iterator();
+        Share curShare;
         while(wkIter.hasNext()) {
             Workgroup wk = wkIter.next();
             Iterator<Share> shIter = wk.getShares().iterator();
             while (shIter.hasNext()) {
-                if (shIter.next().getAddress().equals(shareAddress)) {
+                curShare = shIter.next(); // this one is upperCase
+                if (curShare.getName().equalsIgnoreCase(shareName)) {
                     alreadyFound = true;
-
-                    // When shareName is not null and not empty, we must remove a previous instance
-                    // with the same address (but no name because from TCP discovery) to replace it
-                    if (shareName != null && !shareName.isEmpty()) {
-                        log.debug("addIfNeeded: removing " + shareAddress);
-                        shIter.remove();
+                    if (shareName != null) {
+                        if (shareName.toUpperCase().equals(shareName)) {
+                            // if shareName is upperCase let's use this one instead of probably the mdns one
+                            log.debug("addIfNeeded: replacing probable mdns discovery removing " + shareAddress);
+                            shIter.remove();
+                        } else {
+                            if (curShare.getAddress().equals(shareAddress) && !shareName.isEmpty()) {
+                                // When shareName is not null and not empty, we must remove a previous instance
+                                // with the same address (but no name because from TCP discovery) to replace it
+                                log.debug("addIfNeeded: replacing tcp discovery or updating removing " + shareAddress);
+                                shIter.remove();
+                            }
+                        }
                     }
                 }
             }
