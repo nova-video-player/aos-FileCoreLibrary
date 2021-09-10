@@ -195,7 +195,11 @@ public class UdpDiscovery implements InternalDiscovery {
                             } catch (UnknownHostException e) {
                                 continue;
                             }
-                            response.readWireFormat(rcv_buf.array(), 0);
+                            try {
+                                response.readWireFormat(rcv_buf.array(), 0);
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                log.error("UdpDiscoveryThread", e);
+                            }
                             addrs = response.addressArray;
                             readResponse(addrs, remoteAddress.getAddress());
                         }
