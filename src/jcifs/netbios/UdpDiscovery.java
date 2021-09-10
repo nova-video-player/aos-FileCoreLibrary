@@ -44,7 +44,7 @@ import static jcifs.netbios.NbtAddress.UNKNOWN_MAC_ADDRESS;
 
 public class UdpDiscovery implements InternalDiscovery {
     private static final String TAG = "UdpDiscovery";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static final int SMB_NS_PORT = 137;
 
