@@ -44,7 +44,7 @@ import static jcifs.netbios.NbtAddress.UNKNOWN_MAC_ADDRESS;
 
 public class UdpDiscovery implements InternalDiscovery {
     private static final String TAG = "UdpDiscovery";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int SMB_NS_PORT = 137;
 
@@ -100,12 +100,13 @@ public class UdpDiscovery implements InternalDiscovery {
                 log.debug("abort UdpDiscovery: no selector");
                 return;
             }
-            byte[] snd_buf = new byte[576];
-            ByteBuffer rcv_buf = ByteBuffer.allocate(576);
             final String netRange = mIpAddress.substring(0, mIpAddress.lastIndexOf(".") + 1);
             // Send node status request to each IP
             CIFSContext cifsContext = JcifsUtils.getBaseContextOnly(false);
             Configuration configuration = cifsContext.getConfig();
+            byte[] snd_buf = new byte[configuration.getNetbiosSndBufSize()];
+            ByteBuffer rcv_buf = ByteBuffer.allocate(configuration.getNetbiosRcvBufSize());
+            if (DBG) Log.d(TAG, "UdpDiscoveryThread: size (snd|rcv)_buf " + configuration.getNetbiosSndBufSize());
             final NodeStatusRequest request = new NodeStatusRequest(configuration,
                     new Name(configuration,
                             NbtAddress.ANY_HOSTS_NAME, 0x00, null));
