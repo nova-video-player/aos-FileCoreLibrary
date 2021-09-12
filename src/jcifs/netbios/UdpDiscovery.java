@@ -171,6 +171,9 @@ public class UdpDiscovery implements InternalDiscovery {
                                     //log.debug("sent " + nbSent + " with "+ currentChannel);
                                 }
                             } catch (Exception ignored) {
+                                if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", ignored);
+                                else log.warn("doTcpDiscovery: caught Exception");
+
                             }
                         }
                     }
@@ -181,6 +184,8 @@ public class UdpDiscovery implements InternalDiscovery {
                         try {
                             remoteAddress = (InetSocketAddress) currentChannel.receive(rcv_buf);
                         } catch (IOException ignored) {
+                            if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", ignored);
+                            else log.warn("doTcpDiscovery: caught IOException");
                         }
                         if (remoteAddress != null) {
                             NodeStatusResponse response = null;
@@ -189,9 +194,17 @@ public class UdpDiscovery implements InternalDiscovery {
                                         cifsContext.getNameServiceClient().getByName(
                                                 remoteAddress.getAddress().getHostAddress()).unwrap(NbtAddress.class));
                             } catch (UnknownHostException e) {
+                                if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", e);
+                                else log.warn("doTcpDiscovery: caught UnknownHostException");
                                 continue;
                             }
-                            response.readWireFormat(rcv_buf.array(), 0);
+                            try {
+                                response.readWireFormat(rcv_buf.array(), 0);
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                log.error("UdpDiscoveryThread", e);
+                                if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", e);
+                                else log.warn("doTcpDiscovery: caught ArrayIndexOutOfBoundsException");
+                            }
                             addrs = response.addressArray;
                             readResponse(addrs, remoteAddress.getAddress());
                         }
