@@ -45,6 +45,8 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
 import com.archos.environment.ArchosFeatures;
 import com.archos.environment.ArchosUtils;
 import com.archos.environment.NetworkState;
@@ -477,9 +479,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         ConnectivityManager connMgr = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            LinkProperties lp;
+            LinkProperties lp = null;
             String ipAddress = null;
-            lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_VPN);
+            // use VPN interface only if specified in settings because on TV it would shield visibility of local network
+            if (PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_network_prefer_vpn", false))
+                lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_VPN);
             if (lp == null)
                 lp = getLP(connMgr, NetworkCapabilities.TRANSPORT_ETHERNET);
             if (lp == null)
