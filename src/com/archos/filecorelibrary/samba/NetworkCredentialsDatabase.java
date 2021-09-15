@@ -17,11 +17,15 @@ package com.archos.filecorelibrary.samba;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Base64;
+import android.util.Log;
 
+import java.io.File;
 import java.io.Serializable;
 import java.security.Key;
 import java.util.ArrayList;
@@ -39,6 +43,9 @@ import javax.crypto.spec.SecretKeySpec;
  *
  */     
 public class NetworkCredentialsDatabase {
+
+    private static final String TAG =  "NetworkCredentialsDatabase";
+
     private static NetworkCredentialsDatabase networkDatabase;
     //useful to keep both temporary and saved credentials
     private HashMap<String,Credential> mCredentials;
@@ -55,6 +62,7 @@ public class NetworkCredentialsDatabase {
     private static final String DATABASE_CREATE_CREDENTIALS =
             "create table "+CREDENTIALS_TABLE+" (" + KEY_PATH + " text not null primary key, "+KEY_USERNAME+" text, " + KEY_PASSWORD + " text);";
     public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_CREATE_VERSION = 1;
 
     public static class Credential implements Serializable{
         String mUsername;
@@ -275,10 +283,13 @@ public class NetworkCredentialsDatabase {
         }
     }
 
-    private  class DatabaseHelper extends SQLiteOpenHelper {
+    private class DatabaseHelper extends SQLiteOpenHelper {
+
+        private final File mDatabaseFile;
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+            mDatabaseFile = context.getDatabasePath(DATABASE_NAME);
         }
 
         @Override
@@ -286,7 +297,48 @@ public class NetworkCredentialsDatabase {
             db.execSQL(DATABASE_CREATE_CREDENTIALS);
         }
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {            
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion < DATABASE_CREATE_VERSION) {
+                Log.d(TAG, "Upgrade not supported for version " + oldVersion + ", recreating the database.");
+                // triggers database deletion
+                deleteDatabase();
+            }
+            if (oldVersion < 2) {
+                db.execSQL("ALTER TABLE " + CREDENTIALS_TABLE + " ADD COLUMN " + KEY_DOMAIN + " TEXT");
+            }
+        }
+
+        @Override
+        public synchronized SQLiteDatabase getWritableDatabase() {
+            try {
+                return super.getWritableDatabase();
+            } catch (SQLiteException e) {
+                // we need to downgrade now.
+                Log.w(TAG, "Database downgrade not supported. Deleting database.");
+            }
+            // try to delete the file
+            if (mDatabaseFile.delete()) {
+                // optional callback that could be overwritten to
+                // do additional cleanup.
+                onDatabaseDeleted(mDatabaseFile);
+            }
+            // now return a freshly created database
+            // or throw the error if it still does not work.
+            return super.getWritableDatabase();
+        }
+
+        public void deleteDatabase() {
+            throw new SQLiteDbDowngradeFailedException();
+        }
+        public void onDatabaseDeleted(File database) {
+            // noop - overwrite it if you want to be notified about deletion.
+        }
+
+        class SQLiteDbDowngradeFailedException extends SQLiteException {
+            public SQLiteDbDowngradeFailedException() {}
+            public SQLiteDbDowngradeFailedException(String error) {
+                super(error);
+            }
         }
     }
 }
