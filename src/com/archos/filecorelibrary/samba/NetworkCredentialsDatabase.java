@@ -303,9 +303,6 @@ public class NetworkCredentialsDatabase {
                 // triggers database deletion
                 deleteDatabase();
             }
-            if (oldVersion < 2) {
-                db.execSQL("ALTER TABLE " + CREDENTIALS_TABLE + " ADD COLUMN " + KEY_DOMAIN + " TEXT");
-            }
         }
 
         @Override
