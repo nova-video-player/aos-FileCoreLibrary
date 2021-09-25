@@ -6,6 +6,12 @@ import android.net.nsd.NsdServiceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
+
 public class MdnsDiscovery implements InternalDiscovery {
 
     private static final Logger log = LoggerFactory.getLogger(MdnsDiscovery.class);
@@ -34,8 +40,18 @@ public class MdnsDiscovery implements InternalDiscovery {
         @Override
         public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
             log.debug("onServiceResolved: share found nogroup:" + nsdServiceInfo.getServiceName() + ":" + nsdServiceInfo.getHost().getHostAddress());
-            String uri = "smb://" + nsdServiceInfo.getHost().getHostAddress() + "/";
-            mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName(), uri);
+            try {
+                InetAddress hostInetAddress = InetAddress.getByName(nsdServiceInfo.getHost().getHostAddress());
+                byte[] addressInBytes = hostInetAddress.getAddress();
+                //Inet6Address IPv6 = Inet6Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressBytes, NetworkInterface.getByInetAddress(hostInetAddress));
+                Inet4Address IPv4 = (Inet4Address) Inet4Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
+                log.debug("NsdServiceInfo: IPv4 address " + IPv4.getHostAddress());
+                //log.debug("NsdServiceInfo: IPv6 address " + IPv6.getHostAddress());
+                String uri = "smb://" + IPv4.getHostAddress() + "/";
+                mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName(), uri);
+            } catch (UnknownHostException e) {
+                log.error("onServiceResolved: caught UnknownHostException ", e);
+            }
         }
     }
 
