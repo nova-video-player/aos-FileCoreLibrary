@@ -68,6 +68,7 @@ public class JcifsUtils {
     // get the instance, context is used for initial context injection
     public static JcifsUtils getInstance(Context context) {
         if (context == null) log.warn("getInstance: context passed is null!!!");
+        else if (mContext == null) mContext = context;
         if (sInstance == null) {
             synchronized(JcifsUtils.class) {
                 if (sInstance == null) sInstance = new JcifsUtils(context.getApplicationContext());
@@ -84,6 +85,7 @@ public class JcifsUtils {
     private JcifsUtils(Context context) {
         mContext = context;
         log.debug("JcifsUtils: initializing contexts");
+        if (sInstance == null) sInstance = getInstance(context);
         reCreateAllContexts();
     }
 
