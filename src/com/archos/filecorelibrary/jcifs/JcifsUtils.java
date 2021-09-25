@@ -85,7 +85,6 @@ public class JcifsUtils {
     private JcifsUtils(Context context) {
         mContext = context;
         log.debug("JcifsUtils: initializing contexts");
-        if (sInstance == null) sInstance = getInstance(context);
         reCreateAllContexts();
     }
 
