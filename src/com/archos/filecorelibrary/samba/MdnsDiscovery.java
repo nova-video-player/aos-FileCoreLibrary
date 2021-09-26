@@ -48,7 +48,7 @@ public class MdnsDiscovery implements InternalDiscovery {
                 log.debug("NsdServiceInfo: IPv4 address " + IPv4.getHostAddress());
                 //log.debug("NsdServiceInfo: IPv6 address " + IPv6.getHostAddress());
                 String uri = "smb://" + IPv4.getHostAddress() + "/";
-                mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName(), uri);
+                mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName().toUpperCase(), uri);
             } catch (UnknownHostException e) {
                 log.error("onServiceResolved: caught UnknownHostException ", e);
             }
