@@ -243,20 +243,20 @@ public class NetworkCredentialsDatabase {
     public Credential getCredential(String uriString){
         Credential ret = null;
         if (uriString == null) return ret;
-        String uriLowerCase = uriString.toLowerCase();
+        String uriUpperCase = uriString.toUpperCase();
 
-        if(mCredentials.containsKey(uriLowerCase)) {
-            return mCredentials.get(uriLowerCase);
+        if(mCredentials.containsKey(uriUpperCase)) {
+            return mCredentials.get(uriUpperCase);
 
         }
-        if(uriLowerCase.endsWith("/")&&uriLowerCase.length()>1&&mCredentials.containsKey(uriLowerCase.substring(0, uriLowerCase.length()-1))){
-            return mCredentials.get(uriLowerCase.substring(0, uriLowerCase.length()-1));
+        if(uriUpperCase.endsWith("/")&&uriUpperCase.length()>1&&mCredentials.containsKey(uriUpperCase.substring(0, uriUpperCase.length()-1))){
+            return mCredentials.get(uriUpperCase.substring(0, uriUpperCase.length()-1));
         }
         /*
             now we check if a parent has credentials, we will keep the longest one
          */
         for(String parent : mCredentials.keySet()){
-            if(uriLowerCase.startsWith(parent)){ // this is potentially the right one
+            if(uriUpperCase.startsWith(parent)){ // this is potentially the right one
                 if(parent.endsWith("/")&&(ret==null||ret.getUriString().length()<parent.length())) { // this one is appropriate
                     ret = mCredentials.get(parent);
                 }
@@ -265,7 +265,7 @@ public class NetworkCredentialsDatabase {
                     // to avoid these cases :
                     // credential for /this/is/a/path
                     // uriString : /this/is/a/pathbutdifferent
-                    if(uriLowerCase.charAt(parent.length())=='/'&&(ret==null||ret.getUriString().length()<parent.length())) {
+                    if(uriUpperCase.charAt(parent.length())=='/'&&(ret==null||ret.getUriString().length()<parent.length())) {
                         ret = mCredentials.get(parent);
                     }
                 }
