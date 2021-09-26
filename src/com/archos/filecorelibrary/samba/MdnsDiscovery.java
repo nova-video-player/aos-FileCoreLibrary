@@ -43,14 +43,16 @@ public class MdnsDiscovery implements InternalDiscovery {
             try {
                 InetAddress hostInetAddress = InetAddress.getByName(nsdServiceInfo.getHost().getHostAddress());
                 byte[] addressInBytes = hostInetAddress.getAddress();
-                //Inet6Address IPv6 = Inet6Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressBytes, NetworkInterface.getByInetAddress(hostInetAddress));
+                //Inet6Address IPv6 = Inet6Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes, NetworkInterface.getByInetAddress(hostInetAddress));
                 Inet4Address IPv4 = (Inet4Address) Inet4Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
                 log.debug("NsdServiceInfo: IPv4 address " + IPv4.getHostAddress());
                 //log.debug("NsdServiceInfo: IPv6 address " + IPv6.getHostAddress());
                 String uri = "smb://" + IPv4.getHostAddress() + "/";
                 mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName().toUpperCase(), uri);
             } catch (UnknownHostException e) {
-                log.error("onServiceResolved: caught UnknownHostException ", e);
+                log.error("onServiceResolved: caught UnknownHostException for " + nsdServiceInfo.getServiceName() + "/" + nsdServiceInfo.getHost().getHostAddress(), e);
+            } catch (ClassCastException cce) {
+                log.error("onServiceResolved: caught ClassCastException for " + nsdServiceInfo.getServiceName() + "/" + nsdServiceInfo.getHost().getHostAddress() , cce);
             }
         }
     }
