@@ -32,8 +32,8 @@
     <string name="samba_share">Определить папку общего доступа</string>
     <string name="refresh">Обновить</string>
     <string name="network_timeout">Извините, удаленная папка недоступна.\nПроверьте подключение к сети и повторите попытку.</string>
-    <string name="samba_loading">Дождитесь загрузки общей папки…</string>
-    <string name="samba_reloading">Дождитесь перезагрузки общей папки…</string>
+    <string name="samba_loading">Дождитесь загрузки общей папки&#8230;</string>
+    <string name="samba_reloading">Дождитесь перезагрузки общей папки&#8230;</string>
     <string name="samba_password_request_title">Запрос на пароль общей папки</string>
     <string name="samba_domain">Домен</string>
     <string name="samba_username">Имя пользователя</string>
@@ -135,7 +135,7 @@
     <string name="cannot_create_file">Не удается создать файл</string>
     <string name="cannot_delete_directory">Невозможно удалить папку</string>
     <string name="cannot_delete_file">Невозможно удалить файл</string>
-    <string name="cannot_delete_files">Невозможно удалить Файлы</string>
+    <string name="cannot_delete_files">Невозможно удалить файлы</string>
     <string name="directory_deleted">Папка удалена</string>
     <string name="file_deleted">Файл удален</string>
     <string name="files_deleted">Файлы удалены</string>
@@ -228,14 +228,14 @@
     <string name="cut_error">Вырезать не удалось</string>
     <string name="delete_error">Удаление не удалось</string>
     <!-- Network Scanning -->
-    <string name="scan_network_index">Индексация медиафайлов</string>
-    <string name="scan_network_remove">Удалить медиа из индекса</string>
+    <string name="scan_network_index">Индексировать файлы</string>
+    <string name="scan_network_remove">Не индексировать файлы</string>
     <string name="debug_browse_to_root">Просмотр корня устройства (только отладка)</string>
     <!-- Hiding from media scanning -->
     <string name="nomedia_create">Удалить из библиотеки</string>
     <string name="nomedia_remove">Добавить в библиотеку</string>
-    <string name="nomedia_fail">Ошибка, невозможно удалить эту папку из библиотеки медиа</string>
-    <string name="nomedia_warning">Мультимедийное содержимое этой папки больше не будет отображаться в мультимедиа-приложениях.\nВы уверены, что хотите продолжить?</string>
+    <string name="nomedia_fail">Ошибка, невозможно удалить эту папку из библиотеки</string>
+    <string name="nomedia_warning">Содержимое этой папки больше не будет отображаться в мультимедийных приложениях.\nВы уверены, что хотите продолжить?</string>
     <!-- Folder Picker -->
     <string name="choose_a_folder">Выберите папку</string>
     <string name="choose_a_folder_help">Перейдите в папку, которую вы хотите выбрать и нажмите OK. Используйте кнопку BACK, чтобы перейти на один уровень.</string>
@@ -246,7 +246,7 @@
     <string name="usb_host_fake_name">USB</string>
     <string name="no_directory">(нет папки)</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
-    <string name="navigation_drawer_close">Закрыть навигационную панель</string>
+    <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="listing_sort_mode">Тип сортировки</string>
     <string name="listing_sort_by_name">Сортировать по имени</string>
     <string name="listing_sort_by_size">Сортировать по размеру</string>
