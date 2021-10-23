@@ -246,7 +246,24 @@ public class FileUtilsQ {
         return mimeType != null && mimeType.startsWith("video");
     }
 
+    public static boolean isImageFile(Uri uri) {
+        if (uri == null) return false;
+        String uriPath = uri.getPath().toLowerCase(Locale.ROOT);
+        String mimeType = URLConnection.guessContentTypeFromName(uriPath);
+        return mimeType != null && mimeType.startsWith("image");
+    }
+
+    public static boolean isAudioFile(Uri uri) {
+        if (uri == null) return false;
+        String uriPath = uri.getPath().toLowerCase(Locale.ROOT);
+        String mimeType = URLConnection.guessContentTypeFromName(uriPath);
+        return mimeType != null && mimeType.startsWith("audio");
+    }
+
     public static Uri getContentUri(Uri uri) {
+
+        // TODO add image and music too
+
         contentUri = null;
         // several methods https://stackoverflow.com/questions/7305504/convert-file-uri-to-content-uri
 
@@ -264,37 +281,57 @@ public class FileUtilsQ {
 
         ContentResolver contentResolver = mContext.getContentResolver();
         boolean isVideo = isVideoFile(uri);
+        boolean isImage = isImageFile(uri);
+        boolean isAudio = isAudioFile(uri);
         Uri mediaUri;
+        String[] projection;
+        String selection;
         Cursor cursor;
         if (isVideo) {
-            // content://media/external/file/## uri
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 mediaUri = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
             } else {
                 mediaUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
             }
-            //mediaUri = Uri.parse("content://media/external_primary/videos/media");
-            cursor = contentResolver.query(mediaUri,
-                    new String[] { MediaStore.Video.Media._ID },
-                    MediaStore.Video.Media.DATA + "=?",
-                    new String[] {uri.getPath()}, null);
+            projection = new String[]{MediaStore.Video.Media._ID};
+            selection = MediaStore.Video.Media.DATA + "=?";
+        } else if (isImage) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                mediaUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            } else {
+                mediaUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            }
+            projection = new String[]{MediaStore.Images.Media._ID};
+            selection = MediaStore.Images.Media.DATA + "=?";
+        } else if (isAudio) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                mediaUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            } else {
+                mediaUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            }
+            projection = new String[]{MediaStore.Audio.Media._ID};
+            selection = MediaStore.Audio.Media.DATA + "=?";
         } else {
             // content://media/external/file/## uri
             mediaUri = MediaStore.Files.getContentUri("external");
-            cursor = contentResolver.query(mediaUri,
-                    new String[] { MediaStore.MediaColumns._ID },
-                    MediaStore.MediaColumns.DATA + "=?",
-                    new String[] {uri.getPath()}, null);
+            projection = new String[] { MediaStore.MediaColumns._ID };
+            selection = MediaStore.MediaColumns.DATA + "=?";
         }
+        cursor = contentResolver.query(mediaUri, projection, selection,
+                new String[] {uri.getPath()}, null);
         int id;
         if (cursor != null && cursor.moveToFirst()) {
             if (isVideo) {
                 id = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.VideoColumns._ID));
-                // content://media/external/file/## uri
+                contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+            } else if (isImage) {
+                id = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+                contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+            } else if (isAudio) {
+                id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID));
                 contentUri = Uri.withAppendedPath(mediaUri, "" + id);
             } else {
                 id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
-                // content://media/external/file/## uri
                 contentUri = MediaStore.Files.getContentUri("external",id);
             }
             cursor.close();
