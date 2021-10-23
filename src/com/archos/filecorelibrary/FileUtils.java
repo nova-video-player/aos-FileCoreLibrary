@@ -320,7 +320,8 @@ public class FileUtils {
     // dump database to storage
     public static void backupDatabase(Context context, String dbFileName) {
         try {
-            File sdCard = Environment.getExternalStorageDirectory();
+            File sdCard = context.getExternalFilesDir(null);
+            // dump into /sdcard/Android/data/org.courville.nova/files
             File dataDir = Environment.getDataDirectory();
 
             String packageName = context.getApplicationInfo().packageName;
