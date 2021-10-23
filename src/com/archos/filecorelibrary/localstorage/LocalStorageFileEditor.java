@@ -18,11 +18,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
 import com.archos.filecorelibrary.ExtStorageManager;
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtilsQ;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.environment.ArchosUtils;
 
@@ -185,8 +187,12 @@ public class LocalStorageFileEditor extends FileEditor {
     }
 
     private void deleteFile(File file) throws DeleteFailException {
-        if (!file.delete()) {
+        log.debug("deleteFile: file " + file.getPath() + ", mUri " + mUri);
+        if (!file.delete() || Build.VERSION.SDK_INT > 29) { // TODO MARC is this the right test?
+            log.debug("deleteFile: delete failed -> going the Q way");
             if (mContext != null) {
+                /*
+                // TODO MARC deprecate
                 ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), file);
                 try {
                     if (!external.delete()) {
@@ -194,12 +200,20 @@ public class LocalStorageFileEditor extends FileEditor {
                     }
                     return;
                 } catch (IOException e1) {}
-            }
-            else {
+                 */
+
+                // TODO MARC remove manual experimentation zone
+                //FileUtilsQ.scanFile(Uri.parse("/storage/emulated/0/Movies/Avatar_The_Last_Airbender-s03/Avatar_The_Last_Airbender-s03e07-The_Runaway.eng.srt"));
+                //FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), Uri.parse("content://media/external_primary/file/154"));
+
+                if (!FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri)))
+                    throw new DeleteFailException();
+                else return;
+
+            } else {
                 throw new DeleteFailException();
             }
-        }
-        else {
+        } else {
             deleteFromDatabase(file);
         }
     }
@@ -225,6 +239,8 @@ public class LocalStorageFileEditor extends FileEditor {
             // when some folders are protected
             throw new DeleteFailException();
         }
+        // TODO MARC redundant remove: should have done the delete on old Android?
+        /*
         ContentResolver cr = context.getContentResolver();
         Uri uri = MediaStore.Files.getContentUri("external");
         String where = MediaStore.MediaColumns.DATA + "=?";
@@ -232,7 +248,9 @@ public class LocalStorageFileEditor extends FileEditor {
         String[] selectionArgs = { mUri.getPath() };
         log.debug("deleteFileAndDatabase: where " + where + ", selectionArgs " + Arrays.toString(selectionArgs));
         cr.delete(uri, where, selectionArgs);
+         */
         boolean delete = false;
+        //delete = FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri));
         try {
             // TODO: does not work on external usb storage on recent Android
             delete();
