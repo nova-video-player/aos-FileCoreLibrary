@@ -11,13 +11,9 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.webkit.MimeTypeMap;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
-import androidx.core.content.FileProvider;
-
-import com.archos.filecorelibrary.jcifs.JcifsUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +50,9 @@ public class FileUtilsQ {
 
     private static ActivityResultLauncher<IntentSenderRequest> mDeleteLauncher;
 
+    public static String publicAppDirectory = null;
+    public static String privateAppDirectory = null;
+
     public static void setDeleteLauncher(ActivityResultLauncher<IntentSenderRequest> launcher) {
         mDeleteLauncher = launcher;
     }
@@ -81,6 +80,8 @@ public class FileUtilsQ {
 
     public FileUtilsQ(Context context) {
         mContext = context;
+        publicAppDirectory = mContext.getExternalFilesDir(null).getPath();
+        privateAppDirectory = mContext.getFilesDir().getPath();
     }
 
     public FileUtilsQ with(Context context) {
@@ -91,7 +92,7 @@ public class FileUtilsQ {
     /**
      * Create new media uri.
      */
-    public Uri create(String directory, String filename, String mimetype) {
+    public static Uri create(String directory, String filename, String mimetype) {
 
         ContentResolver contentResolver = mContext.getContentResolver();
 
@@ -114,7 +115,7 @@ public class FileUtilsQ {
         //ex. MediaStore.Images.Media.EXTERNAL_CONTENT_URI will save object into android Pictures directory.
         //ex. MediaStore.Videos.Media.EXTERNAL_CONTENT_URI will save object into android Movies directory.
         //if content values not provided, system will automatically add values after object was written.
-        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+        return contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues);
     }
 
     /**
@@ -156,7 +157,8 @@ public class FileUtilsQ {
                 IntentSender sender = pendingIntent.getIntentSender();
                 IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
                 launcher.launch(request);
-                // TOTO MARC isSuccessful =
+                // TODO MARC correct
+                isSuccessful = true;
             }
         }
 
@@ -227,6 +229,10 @@ public class FileUtilsQ {
     private static Uri contentUri;
 
     public static void scanFile(Uri uri) {
+        if (uri == null) {
+            log.error("scanFile: uri is null!");
+            return;
+        }
         MediaScannerConnection.scanFile(mContext, new String[]{ uri.getPath() },
                 null, // mimetypes
                 new MediaScannerConnection.OnScanCompletedListener() {
@@ -261,12 +267,7 @@ public class FileUtilsQ {
     }
 
     public static Uri getContentUri(Uri uri) {
-
-        // TODO add image and music too
-
         contentUri = null;
-        // several methods https://stackoverflow.com/questions/7305504/convert-file-uri-to-content-uri
-
         File fileToDelete = new File(uri.getPath());
         if (!fileToDelete.exists()) {
             log.debug("getContentUri: file " + uri + " does not exist: easy job!");
@@ -274,11 +275,6 @@ public class FileUtilsQ {
         } else {
             log.debug("getContentUri: file " + uri + " exists");
         }
-
-        // TODO MARC converge on single method that works everywhere
-        // NOK log.debug("getContentUri: Uri.parse " + Uri.parse(uri.getPath()));
-        // NOK log.debug("getContentUri: Uri.fromFile " + Uri.fromFile(new File(uri.getPath())));
-
         ContentResolver contentResolver = mContext.getContentResolver();
         boolean isVideo = isVideoFile(uri);
         boolean isImage = isImageFile(uri);
@@ -331,29 +327,13 @@ public class FileUtilsQ {
                 id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID));
                 contentUri = Uri.withAppendedPath(mediaUri, "" + id);
             } else {
+                //id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
                 id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
                 contentUri = MediaStore.Files.getContentUri("external",id);
             }
             cursor.close();
         }
         log.debug("getContentUri: contentResolver " + contentUri);
-
-        /*
-        // provides content://org.courville.nova.provider/external_files/filepath --> not working on phones
-        contentUri = null;
-        contentUri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", new File(uri.getPath()));
-        log.debug("getContentUri: fileProvider provides contentUri " + contentUri);
-         */
-
-        if (false) {
-            // this is the universal way but is asynchronous and requires to rework the logic...
-            if (contentUri == null || !contentUri.getScheme().startsWith("content")) {
-                // this one provides content://media/external_primary/video/media/## but is asynchronous --> should do observer?
-                scanFile(uri);
-                log.debug("getContentUri: mediaScannerScanFile provides contentUri " + contentUri);
-            }
-        }
-
         return contentUri;
     }
 }
