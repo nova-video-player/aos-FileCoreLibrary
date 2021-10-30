@@ -226,6 +226,9 @@ public class LocalStorageFileEditor extends FileEditor {
             }
         }
         deleteFile(new File(uri.getPath()));
+        // delete nfoJpg corresponding folder too and avoid loops
+        if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster"))
+            deleteFolder(Uri.parse(uri.getPath().replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster")));
     }
 
     /**
