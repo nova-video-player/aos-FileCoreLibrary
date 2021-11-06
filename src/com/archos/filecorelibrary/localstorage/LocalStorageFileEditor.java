@@ -194,7 +194,9 @@ public class LocalStorageFileEditor extends FileEditor {
             if (mContext != null) {
                 if (Build.VERSION.SDK_INT > 29 && (! FileUtils.isNovaOwnedFile(file))) {
                     log.debug("deleteFile: delete failed -> going the Q way");
-                    if (!FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri)))
+                    // isDeleteOK can be null since UI involved in Android Q+
+                    Boolean isDeleteOk = FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri));
+                    if (isDeleteOk != null && ! isDeleteOk)
                         throw new DeleteFailException();
                     else return;
                 } else {
@@ -211,6 +213,7 @@ public class LocalStorageFileEditor extends FileEditor {
                 throw new DeleteFailException();
             }
         } else {
+            // nova db delete
             deleteFromDatabase(file);
         }
     }
