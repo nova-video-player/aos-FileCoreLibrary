@@ -128,7 +128,7 @@ public class FileUtilsQ {
     public static Boolean delete(ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri) {
 
         if (uri == null) return true;
-        boolean isSuccessful = false;
+        Boolean isSuccessful = null;
         ContentResolver contentResolver = mContext.getContentResolver();
 
         try {
@@ -157,9 +157,9 @@ public class FileUtilsQ {
                 IntentSender sender = pendingIntent.getIntentSender();
                 IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
                 launcher.launch(request);
-                // TODO MARC correct
-                isSuccessful = true;
-            }
+                // at this point isSuccessful must remain null because it is delegated to launcher UI interaction
+            } else
+                isSuccessful = false;
         }
 
         return isSuccessful;
