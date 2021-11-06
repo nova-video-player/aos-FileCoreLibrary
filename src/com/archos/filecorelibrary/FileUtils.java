@@ -77,7 +77,7 @@ public class FileUtils {
                         ", " + Environment.getExternalStorageDirectory().getPath() +
                         ", " + FileUtilsQ.publicAppDirectory + "/files/nfoPoster");
                 lowerCasePath = uri.getPath().toLowerCase();
-                if (! lowerCasePath.startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
+                if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
                         (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
                     relocatedUri = Uri.parse(relocatedPath.replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster"));
                 Uri relocatedDir = removeLastSegment(relocatedUri);
