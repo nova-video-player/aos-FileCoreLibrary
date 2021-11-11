@@ -162,10 +162,13 @@ return null;
     }
 
     @Override
-    public void delete() throws Exception {
+    public Boolean delete() throws Exception {
+        Boolean isDeleteOK = null;
         DocumentFile file = DocumentUriBuilder.getDocumentFileForUri(mUri);
-        if(!file.delete())
+        isDeleteOK = file.delete();
+        if(!isDeleteOK)
             throw new DeleteFailException();
+        return isDeleteOK;
     }
 
     /**

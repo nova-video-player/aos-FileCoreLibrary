@@ -80,10 +80,11 @@ public class JcifsFileEditor extends FileEditor{
     }
 
     @Override
-    public void delete() throws Exception {
+    public Boolean delete() throws Exception {
         SmbFile smbFile = getSmbFile(mUri).smbFile;
         if (smbFile.isFile() || smbFile.isDirectory())
             getSmbFile(mUri).smbFile.delete();
+        return null;
     }
 
     @Override

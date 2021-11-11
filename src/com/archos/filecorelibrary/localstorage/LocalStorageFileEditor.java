@@ -162,7 +162,8 @@ public class LocalStorageFileEditor extends FileEditor {
     }
 
     @Override
-    public void delete() throws Exception {
+    public Boolean delete() throws Exception {
+        Boolean isDeleteOK = null;
         if (checkIfShouldNotTouchFolder(mUri)) {
             // when some folders are protected
             throw new DeleteFailException();
@@ -171,10 +172,12 @@ public class LocalStorageFileEditor extends FileEditor {
         File fileToDelete = new File(mUri.getPath());
         if (fileToDelete.isDirectory()) {
             log.debug("delete: folder " + mUri.getPath());
-            deleteFolder(mUri);
+            isDeleteOK = deleteFolder(mUri);
+            return isDeleteOK;
         } else {
             log.debug("delete: file " + mUri.getPath());
-            deleteFile(fileToDelete);
+            isDeleteOK = deleteFile(fileToDelete);
+            return isDeleteOK;
         }
     }
 
@@ -188,17 +191,18 @@ public class LocalStorageFileEditor extends FileEditor {
         }
     }
 
-    private void deleteFile(File file) throws DeleteFailException {
+    private Boolean deleteFile(File file) throws DeleteFailException {
+        Boolean isDeleteOK = null;
         log.debug("deleteFile: file " + file.getPath() + ", mUri " + mUri);
-        if (!file.delete()) { // TODO MARC is this the right test?
+        if (!file.delete()) {
             if (mContext != null) {
                 if (Build.VERSION.SDK_INT > 29 && (! FileUtils.isNovaOwnedFile(file))) {
                     log.debug("deleteFile: delete failed -> going the Q way");
                     // isDeleteOK can be null since UI involved in Android Q+
-                    Boolean isDeleteOk = FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri));
-                    if (isDeleteOk != null && ! isDeleteOk)
+                    isDeleteOK = FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri));
+                    if (isDeleteOK != null && ! isDeleteOK)
                         throw new DeleteFailException();
-                    else return;
+                    else return isDeleteOK;
                 } else {
                     log.debug("deleteFile: delete failed -> going the traditional way");
                     ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), file);
@@ -206,32 +210,37 @@ public class LocalStorageFileEditor extends FileEditor {
                         if (!external.delete()) {
                             throw new DeleteFailException();
                         }
-                        return;
+                        return true;
                     } catch (IOException e1) {}
                 }
             } else {
                 throw new DeleteFailException();
             }
         } else {
+            // TODO MARC do this only if delete is ok...
             // nova db delete
             deleteFromDatabase(file);
+            return true;
         }
+        return isDeleteOK;
     }
 
-    private void deleteFolder(Uri uri) throws Exception {
+    private Boolean deleteFolder(Uri uri) throws Exception {
+        Boolean isDeleteOK = null;
         log.debug("deleteFolder: " + uri);
         LocalStorageRawLister lsrl = new LocalStorageRawLister(uri);
         List<MetaFile2> children = lsrl.getFileList();
         if (children != null) {
             for (MetaFile2 child : children) {
                 // TODO missing deleteFileAndAssociatedFiles: only performs video deletion but it belongs to Video...
-                child.getFileEditorInstance(mContext).delete();
+                isDeleteOK = child.getFileEditorInstance(mContext).delete();
             }
         }
-        deleteFile(new File(uri.getPath()));
+        isDeleteOK = deleteFile(new File(uri.getPath()));
         // delete nfoJpg corresponding folder too and avoid loops
         if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster"))
-            deleteFolder(Uri.parse(uri.getPath().replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster")));
+            isDeleteOK = deleteFolder(Uri.parse(uri.getPath().replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster")));
+        return isDeleteOK;
     }
 
     /**
@@ -239,7 +248,8 @@ public class LocalStorageFileEditor extends FileEditor {
      * @param context
      * @throws DeleteFailException if database AND file delete fails
      */
-    public void deleteFileAndDatabase(Context context) throws DeleteFailException {
+    public Boolean deleteFileAndDatabase(Context context) throws DeleteFailException {
+        Boolean isDeleteOK = null;
         if (checkIfShouldNotTouchFolder(mUri)) {
             // when some folders are protected
             throw new DeleteFailException();
@@ -255,7 +265,7 @@ public class LocalStorageFileEditor extends FileEditor {
         boolean delete = false;
         try {
             // TODO: does not work on external usb storage on recent Android
-            delete();
+            isDeleteOK = delete();
             delete = true;
         } catch (Exception e) {
             log.error("deleteFileAndDatabase: caught exception ",e);
@@ -265,6 +275,7 @@ public class LocalStorageFileEditor extends FileEditor {
             // in case delete fail because file has already been deleted by cr.delete
             throw new DeleteFailException();
         }
+        return isDeleteOK;
     }
 
     @Override
