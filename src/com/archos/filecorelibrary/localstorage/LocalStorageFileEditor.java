@@ -217,7 +217,7 @@ public class LocalStorageFileEditor extends FileEditor {
                 throw new DeleteFailException();
             }
         } else {
-            // TODO MARC do this only if delete is ok...
+            // TODO do this only if delete is ok...
             // nova db delete
             deleteFromDatabase(file);
             return true;
@@ -254,7 +254,7 @@ public class LocalStorageFileEditor extends FileEditor {
             // when some folders are protected
             throw new DeleteFailException();
         }
-        // TODO MARC redundant?
+        // TODO redundant?
         ContentResolver cr = context.getContentResolver();
         Uri uri = MediaStore.Files.getContentUri("external");
         String where = MediaStore.MediaColumns.DATA + "=?";
