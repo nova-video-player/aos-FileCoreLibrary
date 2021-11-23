@@ -104,7 +104,7 @@ public class ZipFileEditor extends FileEditor {
     }
 
     @Override
-    public void delete() throws Exception {
+    public Boolean delete() throws Exception {
         throw new LocalStorageFileEditor.DeleteFailException();
     }
 

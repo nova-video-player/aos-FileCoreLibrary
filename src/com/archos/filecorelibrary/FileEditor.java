@@ -41,7 +41,7 @@ public abstract class FileEditor {
     public abstract InputStream getInputStream() throws Exception;
     public abstract InputStream getInputStream(long from) throws Exception;
     public abstract OutputStream getOutputStream() throws Exception;
-    public abstract void delete() throws Exception;
+    public abstract Boolean delete() throws Exception;
     public abstract boolean rename(String newName);
     public abstract boolean move(Uri uri);
     public abstract boolean exists();

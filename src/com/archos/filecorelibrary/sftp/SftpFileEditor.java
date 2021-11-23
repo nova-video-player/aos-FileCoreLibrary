@@ -165,12 +165,11 @@ public class SftpFileEditor  extends FileEditor{
     }
 
     @Override
-    public void delete() throws Exception {
+    public Boolean delete() throws Exception {
         Channel channel = null;
         try {
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
             ((ChannelSftp)channel).rm(mUri.getPath());
-
         } catch (JSchException e) {
             if(channel!=null&&channel.isConnected())
                 channel.disconnect();
@@ -184,9 +183,9 @@ public class SftpFileEditor  extends FileEditor{
             if(channel!=null&&channel.isConnected())
                 channel.disconnect();
         }
-
-
+        return null;
     }
+
     @Override
     public boolean rename(String newName){
         Channel channel = null;

@@ -15,14 +15,26 @@ package com.archos.filecorelibrary.localstorage;
 
 
 
+import android.app.PendingIntent;
+import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.IntentSender;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+
+import androidx.activity.result.IntentSenderRequest;
+
+import com.archos.filecorelibrary.FileUtilsQ;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 /**
  * Wrapper for manipulating files via the Android Media Content Provider. As of Android 4.4 KitKat, applications can no longer write
@@ -40,12 +52,15 @@ import java.io.OutputStream;
  */
 public class ExternalSDFileWriter {
 
+    private static final Logger log = LoggerFactory.getLogger(ExternalSDFileWriter.class);
+
     private final File file;
     private final ContentResolver contentResolver;
     private final Uri filesUri;
     private final Uri imagesUri;
 
     public ExternalSDFileWriter(ContentResolver contentResolver, File file) {
+        log.debug("ExternalSDFileWriter " + file.getPath());
         this.file = file;
         this.contentResolver = contentResolver;
         filesUri = MediaStore.Files.getContentUri("external");
@@ -83,8 +98,10 @@ public class ExternalSDFileWriter {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Files.FileColumns.DATA, file.getAbsolutePath());
             // TODO: leads to a crash on external usb storage on recent Android
+            log.debug("delete: insert like it was an image imagesUri " + imagesUri + ", filesUri " + filesUri);
             contentResolver.insert(imagesUri, values);
 
+            // TODO MARC the real delete is there
             // Delete the created entry, such that content provider will delete the file.
             contentResolver.delete(filesUri, where, selectionArgs);
         }

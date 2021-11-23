@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.BaseColumns;
@@ -56,6 +57,40 @@ public class FileUtils {
             return null;
         }
         return url.substring(0, index + 1);
+    }
+
+    public static Boolean isNovaOwnedFile(File file) {
+        if (file == null) return false;
+        return file.getPath().startsWith(FileUtilsQ.publicAppDirectory) || file.getPath().startsWith(FileUtilsQ.privateAppDirectory);
+    }
+
+    public static Uri relocateNfoJpgAppPublicDir(Uri uri) {
+        // converts local file uri for jpg and nfo ONLY to public application uri to avoid Android Q storage restrictions
+        // and creates the relocate directory if not existing
+        if (uri == null) return null;
+        Uri relocatedUri = uri;
+        String lowerCasePath;
+        String relocatedPath = uri.getPath();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // TODO MARC make it always because migration
+            if (("file".equals(uri.getScheme()) || relocatedPath.startsWith("/"))) {
+                log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath +
+                        ", " + Environment.getExternalStorageDirectory().getPath() +
+                        ", " + FileUtilsQ.publicAppDirectory + "/files/nfoPoster");
+                lowerCasePath = uri.getPath().toLowerCase();
+                if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
+                        (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
+                    relocatedUri = Uri.parse(relocatedPath.replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster"));
+                Uri relocatedDir = removeLastSegment(relocatedUri);
+                File dir = new File(relocatedDir.getPath());
+                try {
+                    dir.mkdirs();
+                } catch (Exception e) {
+                    log.error("relocateNfoJpgAppPublicDir: cannot recreate tree structure for " + dir.getPath());
+                }
+            }
+        }
+        log.debug("relocateNfoJpgAppPublicDir: " + uri + " -> " + relocatedUri.getPath());
+        return relocatedUri;
     }
 
     public static Uri getParentUrl(Uri uri) {
@@ -320,7 +355,8 @@ public class FileUtils {
     // dump database to storage
     public static void backupDatabase(Context context, String dbFileName) {
         try {
-            File sdCard = Environment.getExternalStorageDirectory();
+            File sdCard = context.getExternalFilesDir(null);
+            // dump into /sdcard/Android/data/org.courville.nova/files
             File dataDir = Environment.getDataDirectory();
 
             String packageName = context.getApplicationInfo().packageName;

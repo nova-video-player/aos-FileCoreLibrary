@@ -109,17 +109,19 @@ public class FtpFileEditor extends FileEditor {
     }
 
     @Override
-    public void delete() throws SocketException, IOException, AuthenticationException {
+    public Boolean delete() throws SocketException, IOException, AuthenticationException {
+        Boolean isDeleteOK = null;
         // TODO: missing way to close ftpClient, this creates leaks
         if (mUri.getScheme().equals("ftps")) {
             FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-            ftp.deleteFile(mUri.getPath());
+            isDeleteOK = ftp.deleteFile(mUri.getPath());
             Session.closeNewFTPSClient(ftp);
         } else {
             FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-            ftp.deleteFile(mUri.getPath());
+            isDeleteOK = ftp.deleteFile(mUri.getPath());
             Session.closeNewFTPClient(ftp);
         }
+        return isDeleteOK;
     }
 
     @Override
