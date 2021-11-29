@@ -71,22 +71,19 @@ public class FileUtils {
         Uri relocatedUri = uri;
         String lowerCasePath;
         String relocatedPath = uri.getPath();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // TODO MARC make it always because migration
-            if (("file".equals(uri.getScheme()) || relocatedPath.startsWith("/"))) {
-                log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath +
-                        ", " + Environment.getExternalStorageDirectory().getPath() +
-                        ", " + FileUtilsQ.publicAppDirectory + "/files/nfoPoster");
-                lowerCasePath = uri.getPath().toLowerCase();
-                if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
-                        (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
-                    relocatedUri = Uri.parse(relocatedPath.replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster"));
-                Uri relocatedDir = removeLastSegment(relocatedUri);
-                File dir = new File(relocatedDir.getPath());
-                try {
-                    dir.mkdirs();
-                } catch (Exception e) {
-                    log.error("relocateNfoJpgAppPublicDir: cannot recreate tree structure for " + dir.getPath());
-                }
+        // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
+        if (("file".equals(uri.getScheme()) || relocatedPath.startsWith("/"))) {
+            log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath + ", " + FileUtilsQ.publicAppDirectory + "/nfoPoster");
+            lowerCasePath = uri.getPath().toLowerCase();
+            if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
+                    (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
+                relocatedUri = prefixPublicNfoPosterUri(relocatedUri);
+            Uri relocatedDir = removeLastSegment(relocatedUri);
+            File dir = new File(relocatedDir.getPath());
+            try {
+                dir.mkdirs();
+            } catch (Exception e) {
+                log.error("relocateNfoJpgAppPublicDir: cannot recreate tree structure for " + dir.getPath());
             }
         }
         log.debug("relocateNfoJpgAppPublicDir: " + uri + " -> " + relocatedUri.getPath());
@@ -141,6 +138,7 @@ public class FileUtils {
         if (uri == null) return false;
         return uri.getScheme()==null||"file".equals(uri.getScheme())||"content".equalsIgnoreCase(uri.getScheme())||uri.toString().startsWith("/");
     }
+
     public static String getFileNameWithoutExtension(Uri uri){
         String name = getName(uri);
         return stripExtensionFromName(name);
@@ -157,7 +155,7 @@ public class FileUtils {
     }
 
 
-    public static  String getExtension(String filename) {
+    public static String getExtension(String filename) {
         if (filename == null)
             return null;
         int dotPos = filename.lastIndexOf('.');
