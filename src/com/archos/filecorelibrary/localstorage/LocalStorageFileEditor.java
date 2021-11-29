@@ -14,6 +14,8 @@
 
 package com.archos.filecorelibrary.localstorage;
 
+import static com.archos.filecorelibrary.FileUtils.prefixPublicNfoPosterUri;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -238,8 +240,9 @@ public class LocalStorageFileEditor extends FileEditor {
         }
         isDeleteOK = deleteFile(new File(uri.getPath()));
         // delete nfoJpg corresponding folder too and avoid loops
-        if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster"))
-            isDeleteOK = deleteFolder(Uri.parse(uri.getPath().replaceFirst(Environment.getExternalStorageDirectory().getPath() , FileUtilsQ.publicAppDirectory + "/nfoPoster")));
+        if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) {
+            isDeleteOK = deleteFolder(prefixPublicNfoPosterUri(uri));
+        }
         return isDeleteOK;
     }
 

@@ -64,6 +64,23 @@ public class FileUtils {
         return file.getPath().startsWith(FileUtilsQ.publicAppDirectory) || file.getPath().startsWith(FileUtilsQ.privateAppDirectory);
     }
 
+    public static Uri prefixPublicNfoPosterUri(Uri uri) {
+        // keep the full path of remote storage and prefix it with publicAppDirectory + "/nfoPoster/"
+        // full path is kept to cope with extSdCard or USB storage for which we cannot detect the root path easily
+        if (uri == null) return null;
+        String path = uri.getPath();
+        if (! path.startsWith(FileUtilsQ.publicAppDirectory)) {
+            String scheme = uri.getScheme();
+            if (scheme != null && ! scheme.equals(""))
+                scheme = scheme + "://";
+            else scheme = "";
+            path = path.replaceFirst("/", FileUtilsQ.publicAppDirectory + "/nfoPoster/");
+            log.debug("prefixPublicNfoPosterUri: " + uri + " --> " + path);
+            return Uri.parse(scheme + path);
+        }
+        else return uri;
+    }
+
     public static Uri relocateNfoJpgAppPublicDir(Uri uri) {
         // converts local file uri for jpg and nfo ONLY to public application uri to avoid Android Q storage restrictions
         // and creates the relocate directory if not existing
