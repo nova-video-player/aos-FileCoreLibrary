@@ -17,7 +17,7 @@ allprojects {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -36,7 +36,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         multiDexEnabled true
     }
 
