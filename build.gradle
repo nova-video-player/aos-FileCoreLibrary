@@ -101,7 +101,7 @@ dependencies {
     implementation 'commons-net:commons-net:3.8.0'
     implementation 'org.slf4j:slf4j-api:1.7.32'
     implementation 'com.github.tony19:logback-android:2.0.0'
-    // TODO use https://github.com/mwiede/jsch instead of https://sourceforge.net/projects/jsch/files/jsch/
+    // new jsch https://github.com/mwiede/jsch instead of https://sourceforge.net/projects/jsch/files/jsch/
     // see http://www.matez.de/index.php/2020/06/22/the-future-of-jsch-without-ssh-rsa/
-    // implementation 'com.github.mwiede:jsch:0.1.70'
+    api 'com.github.mwiede:jsch:0.1.70'
 }
