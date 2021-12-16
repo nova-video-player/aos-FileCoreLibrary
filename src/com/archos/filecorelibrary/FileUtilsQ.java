@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -161,9 +162,56 @@ public class FileUtilsQ {
             } else
                 isSuccessful = false;
         }
-
         return isSuccessful;
+    }
 
+    // deleteAll implement batch deletes using API31 in case of securityException when multiple deletes is requested
+    public static Boolean deleteAll(ActivityResultLauncher<IntentSenderRequest> launcher, List<Uri> allUris) {
+
+        if (allUris == null) return true;
+        if (allUris.size() == 0) {
+            log.warn("deleteAll: allUris empty!");
+            return true;
+        }
+        Boolean isSuccessful = null;
+        ContentResolver contentResolver = mContext.getContentResolver();
+        ArrayList<Uri> collection = new ArrayList<>();
+
+        for (Uri uri : allUris) {
+            try {
+                // delete object using resolver
+                log.debug("deleteAll: uri " + uri);
+                contentResolver.delete(uri, null, null);
+            } catch (SecurityException e) {
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) { // only for API29...
+                    PendingIntent pendingIntent = null;
+                    log.debug("deleteAll: SecurityException Q<=Android<R");
+                    // if exception is recoverable then again send delete request using intent
+                    if (e instanceof RecoverableSecurityException) {
+                        log.debug("deleteAll: RecoverableSecurityException");
+                        RecoverableSecurityException exception = (RecoverableSecurityException) e;
+                        pendingIntent = exception.getUserAction().getActionIntent();
+                        log.debug("deleteAll: pending intent not null");
+                        IntentSender sender = pendingIntent.getIntentSender();
+                        IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+                        launcher.launch(request);
+                    }
+                } else // Android R dealing with API30 securityException later for batch delete
+                    collection.add(uri);
+            }
+        }
+        if (! collection.isEmpty()) { // at least one SecurityException
+            PendingIntent pendingIntent = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // should be always true
+                log.debug("deleteAll: SecurityException Android >= R");
+                pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
+                log.debug("deleteAll: pending intent not null");
+                IntentSender sender = pendingIntent.getIntentSender();
+                IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+                launcher.launch(request);
+            }
+        } else isSuccessful = true;
+        return isSuccessful;
     }
 
     /**
@@ -333,7 +381,7 @@ public class FileUtilsQ {
             }
             cursor.close();
         }
-        log.debug("getContentUri: contentResolver " + contentUri);
+        log.debug("getContentUri: contentUri " + contentUri);
         return contentUri;
     }
 }

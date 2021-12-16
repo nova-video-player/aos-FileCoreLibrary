@@ -62,8 +62,7 @@ public class ExternalSDFileWriter {
      * Deletes the file. Returns true if the file has been successfully deleted or otherwise does not exist. This operation is not
      * recursive.
      */
-    public boolean delete()
-            throws IOException {
+    public boolean delete() throws IOException {
         if (!file.exists()) {
             return true;
         }

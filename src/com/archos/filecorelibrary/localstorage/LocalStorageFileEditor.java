@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,7 +69,6 @@ public class LocalStorageFileEditor extends FileEditor {
 
     public LocalStorageFileEditor(Uri uri, Context context) {
         super(uri);
-
         mContext = context;
     }
 
@@ -183,13 +183,35 @@ public class LocalStorageFileEditor extends FileEditor {
         }
     }
 
-    private void deleteFromDatabase(File file) {
-        log.debug("deleteFromDatabase: " + file.getPath());
+    public Boolean deleteDir(Uri dirUri) throws Exception {
+        Boolean isDeleteOK = null;
+        File dirToDelete = new File(dirUri.getPath());
+        if (dirToDelete.isDirectory()) {
+            log.debug("deleteDir: folder " + dirUri.getPath());
+            isDeleteOK = dirToDelete.delete();
+            return isDeleteOK;
+        } else {
+            log.debug("deleteDir: not a folder " + dirUri.getPath());
+            return false;
+        }
+    }
+
+    public void deleteFromDatabase(File file) {
+        deleteFromDatabase(file.getAbsolutePath());
+    }
+
+    public void deleteFromDatabase(Uri uri) {
+        deleteFromDatabase(uri.getPath());
+    }
+
+    private void deleteFromDatabase(String path) {
+        log.debug("deleteFromDatabase: " + path);
         if (mContext != null) {
-            Uri uri = MediaStore.Files.getContentUri("external");
+            Uri extUri = MediaStore.Files.getContentUri("external");
             String where = MediaStore.MediaColumns.DATA + "=?";
-            String[] selectionArgs = { file.getAbsolutePath() };
-            mContext.getContentResolver().delete(uri, where, selectionArgs);
+            String[] selectionArgs = { path };
+            log.debug("deleteFromDatabase: where " + where + ", selectionArgs " + Arrays.toString(selectionArgs));
+            mContext.getContentResolver().delete(extUri, where, selectionArgs);
         }
     }
 
@@ -219,7 +241,6 @@ public class LocalStorageFileEditor extends FileEditor {
                 throw new DeleteFailException();
             }
         } else {
-            // TODO do this only if delete is ok...
             // nova db delete
             deleteFromDatabase(file);
             return true;
@@ -233,12 +254,36 @@ public class LocalStorageFileEditor extends FileEditor {
         LocalStorageRawLister lsrl = new LocalStorageRawLister(uri);
         List<MetaFile2> children = lsrl.getFileList();
         if (children != null) {
+            List<Uri> toDeleteLocal = new ArrayList<>();
+            List<Uri> contentUrisToDelete = new ArrayList<>();
+            Uri contentUri;
             for (MetaFile2 child : children) {
-                // TODO missing deleteFileAndAssociatedFiles: only performs video deletion but it belongs to Video...
-                isDeleteOK = child.getFileEditorInstance(mContext).delete();
+                toDeleteLocal.add(child.getUri());
+                contentUri = FileUtilsQ.getContentUri(child.getUri());
+                log.debug("deleteFolder: files to be batch processed: " + child.getUri() + " -> contentUri " + contentUri);
+                // if contentUri is null file has already been deleted before...
+                if (contentUri != null) contentUrisToDelete.add(contentUri);
+                else {
+                    log.debug("deleteFolder: " + child.getUri() + " has no contentUri, try java file delete");
+                    File toDelete = new File(child.getUri().getPath());
+                    toDelete.delete();
+                }
             }
+            if (! contentUrisToDelete.isEmpty())
+                isDeleteOK = FileUtilsQ.deleteAll(FileUtilsQ.getDeleteLauncher(), contentUrisToDelete);
+            else isDeleteOK = true;
+            if (children.isEmpty()) {
+                log.debug("deleteFolder: empty children for " + uri);
+                File toDelete = new File(uri.getPath());
+                toDelete.delete();
+            }
+        } else { // in case of single empty directory we get there too
+            log.debug("deleteFolder: empty directory children for " + uri);
+            File toDelete = new File(uri.getPath());
+            toDelete.delete();
+            isDeleteOK = deleteFile(new File(uri.getPath()));
         }
-        isDeleteOK = deleteFile(new File(uri.getPath()));
+        deleteDir(uri); // directory is not in MediaStore and java IO delete seems to work when folder is empty
         // delete nfoJpg corresponding folder too and avoid loops
         if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) {
             isDeleteOK = deleteFolder(prefixPublicNfoPosterUri(uri));
@@ -257,14 +302,7 @@ public class LocalStorageFileEditor extends FileEditor {
             // when some folders are protected
             throw new DeleteFailException();
         }
-        // TODO redundant?
-        ContentResolver cr = context.getContentResolver();
-        Uri uri = MediaStore.Files.getContentUri("external");
-        String where = MediaStore.MediaColumns.DATA + "=?";
-        log.debug("deleteFileAndDatabase mUri=" + mUri);
-        String[] selectionArgs = { mUri.getPath() };
-        log.debug("deleteFileAndDatabase: where " + where + ", selectionArgs " + Arrays.toString(selectionArgs));
-        cr.delete(uri, where, selectionArgs);
+        deleteFromDatabase(mUri);
         boolean delete = false;
         try {
             // TODO: does not work on external usb storage on recent Android
@@ -273,7 +311,6 @@ public class LocalStorageFileEditor extends FileEditor {
         } catch (Exception e) {
             log.error("deleteFileAndDatabase: caught exception ",e);
         }
-
         if (!(delete || !exists())) {
             // in case delete fail because file has already been deleted by cr.delete
             throw new DeleteFailException();
