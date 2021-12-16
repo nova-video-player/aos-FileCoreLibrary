@@ -379,8 +379,8 @@ public class FileUtilsQ {
                 id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
                 contentUri = MediaStore.Files.getContentUri("external",id);
             }
-            cursor.close();
         }
+        if (cursor != null) cursor.close();
         log.debug("getContentUri: contentUri " + contentUri);
         return contentUri;
     }
