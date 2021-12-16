@@ -183,7 +183,7 @@ public class LocalStorageFileEditor extends FileEditor {
         }
     }
 
-    public Boolean deleteDir(Uri dirUri) throws Exception {
+    public Boolean deleteDir(Uri dirUri) {
         Boolean isDeleteOK = null;
         File dirToDelete = new File(dirUri.getPath());
         if (dirToDelete.isDirectory()) {
@@ -194,6 +194,22 @@ public class LocalStorageFileEditor extends FileEditor {
             log.debug("deleteDir: not a folder " + dirUri.getPath());
             return false;
         }
+    }
+
+    public Boolean deleteSingleFileOldStyle(Uri fileUri) {
+        Boolean isDeleteOK = null;
+        File toDelete = new File(fileUri.getPath());
+        isDeleteOK = toDelete.delete();
+        if (! isDeleteOK) {
+            ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), toDelete);
+            try {
+                isDeleteOK = external.delete();
+            } catch (IOException ioe) {
+                log.debug("deleteSingleFile: caught IOException for ExternalSDFileWriter " + fileUri);
+                isDeleteOK = false;
+            }
+        }
+        return isDeleteOK;
     }
 
     public void deleteFromDatabase(File file) {
@@ -257,21 +273,28 @@ public class LocalStorageFileEditor extends FileEditor {
             List<Uri> toDeleteLocal = new ArrayList<>();
             List<Uri> contentUrisToDelete = new ArrayList<>();
             Uri contentUri;
+            Uri fileUri;
             for (MetaFile2 child : children) {
-                toDeleteLocal.add(child.getUri());
-                contentUri = FileUtilsQ.getContentUri(child.getUri());
-                log.debug("deleteFolder: files to be batch processed: " + child.getUri() + " -> contentUri " + contentUri);
-                // if contentUri is null file has already been deleted before...
-                if (contentUri != null) contentUrisToDelete.add(contentUri);
-                else {
-                    log.debug("deleteFolder: " + child.getUri() + " has no contentUri, try java file delete");
-                    File toDelete = new File(child.getUri().getPath());
-                    toDelete.delete();
+                fileUri = child.getUri();
+                toDeleteLocal.add(fileUri);
+                if (Build.VERSION.SDK_INT > 29) {
+                    contentUri = FileUtilsQ.getContentUri(fileUri);
+                    log.debug("deleteFolder: files to be batch processed: " + fileUri + " -> contentUri " + contentUri);
+                    // if contentUri is null file has already been deleted before...
+                    if (contentUri != null) contentUrisToDelete.add(contentUri);
+                    else { // in case of no contentUri try luck
+                        log.debug("deleteFolder: " + fileUri + " has no contentUri, try old style file delete");
+                        deleteSingleFileOldStyle(fileUri);
+                    }
+                } else { // <= API29
+                    deleteSingleFileOldStyle(fileUri);
                 }
             }
-            if (! contentUrisToDelete.isEmpty())
+            if (! contentUrisToDelete.isEmpty()) { // cannot be empty if API>29
+                log.debug("deleteFolder: delete failed -> going the Q way");
                 isDeleteOK = FileUtilsQ.deleteAll(FileUtilsQ.getDeleteLauncher(), contentUrisToDelete);
-            else isDeleteOK = true;
+            } else isDeleteOK = true;
+
             if (children.isEmpty()) {
                 log.debug("deleteFolder: empty children for " + uri);
                 File toDelete = new File(uri.getPath());
@@ -283,6 +306,7 @@ public class LocalStorageFileEditor extends FileEditor {
             toDelete.delete();
             isDeleteOK = deleteFile(new File(uri.getPath()));
         }
+        // TOCHECK: works on external storage?
         deleteDir(uri); // directory is not in MediaStore and java IO delete seems to work when folder is empty
         // delete nfoJpg corresponding folder too and avoid loops
         if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) {
