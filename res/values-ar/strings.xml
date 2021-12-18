@@ -2,6 +2,8 @@
 <resources>
     <string name="file_info_label_name">الاسم:</string>
     <string name="file_info_label_size">الحجم:</string>
+    <string name="file_info_label_size_internal">الحجم (الداخلي):</string>
+    <string name="file_info_label_size_sd">الحجم:</string>
     <string name="file_info_label_permission">تصريح:</string>
     <string name="file_info_label_can_read">يمكن القراءة</string>
     <string name="file_info_label_cannot_read">لا يمكن القراءة</string>
@@ -28,8 +30,11 @@
     <string name="samba_add_server">أضف خادم</string>
     <string name="samba_server">عرف خادم</string>
     <string name="samba_share">عرف مشاركة</string>
+    <string name="refresh">تنشيط</string>
+    <string name="network_timeout">عذراً، المجلد البعيد غير قابل للوصول.\nتحقق من اتصال الشبكة الخاصة بك وحاول مرة أخرى.</string>
     <string name="samba_loading"> الرجاء الانتظار حتى يتم تحميل الحافظات…</string>
     <string name="samba_reloading"> برجاء الانتظار حتى يتم اعادة تحميل الحافظات…</string>
+    <string name="samba_password_request_title">طلب كلمة مرور المجلد المشترك</string>
     <string name="samba_wrong_password">اسم المستخدم أو كلمة المرور غير صحيحة.</string>
     <!-- WiFi Direct strings-->
     <!-- FileManager strings -->
