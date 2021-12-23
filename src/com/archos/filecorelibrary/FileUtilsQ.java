@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -81,8 +82,16 @@ public class FileUtilsQ {
 
     public FileUtilsQ(Context context) {
         mContext = context;
-        publicAppDirectory = mContext.getExternalFilesDir(null).getPath();
+        // at this point externalStorageState might not be ready
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            publicAppDirectory = mContext.getExternalFilesDir(null).getPath();
+        } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
+            // TOFIX doing wild guess but should in reality wait for result to be available
+            log.warn("FileUtilsQ: getExternalStorageState " + Environment.getExternalStorageState() + " is not mounted!");
+            publicAppDirectory = "/sdcard/Android/data/org.courville.nova/files";
+        }
         privateAppDirectory = mContext.getFilesDir().getPath();
+        log.debug("FileUtilsQ: publicAppDirectory " + publicAppDirectory + ", privateAppDirectory " + privateAppDirectory);
     }
 
     public FileUtilsQ with(Context context) {
