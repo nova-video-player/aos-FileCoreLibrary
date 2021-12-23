@@ -30,18 +30,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * 9th July 2021.
- * <p>
- * A class to read write external shared storage for android R.
- * Since Android 11 you can only access the android specified directories such as
- * DCIM, Download, Documents, Pictures, Movies, Music etc.
- * <p>
- * This class is just for an example class.
- *
- * @author <a href="https://github.com/fiftyonemoon">hardkgosai</a>.
- * @since 1.0.3.2
- */
+// inspired from https://github.com/fiftyonemoon
+
 public class FileUtilsQ {
 
     private static final Logger log = LoggerFactory.getLogger(FileUtilsQ.class);
