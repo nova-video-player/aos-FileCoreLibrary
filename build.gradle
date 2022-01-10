@@ -13,6 +13,8 @@ allprojects {
         }
         // to generate the required jar dependencies e.g. cling seamless
         preBuild.dependsOn(ndkBuild)
+        compileDebugJavaWithJavac.dependsOn(ndkBuild)
+        compileReleaseJavaWithJavac.dependsOn(ndkBuild)
     }
 }
 
@@ -61,6 +63,7 @@ task ndkBuild(type:Exec) {
         file("libs/armeabi-v7a/libc++_shared.so").exists()
         file("libs/x86/libc++_shared.so").exists()
         file("libs/x86_64/libc++_shared.so").exists()
+        file("libs/jcifs-ng.jar").exists()
     }
     //OutputFiles/OutputDirectories
     List<String> myCmd = new ArrayList<String>()
