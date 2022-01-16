@@ -19,52 +19,91 @@
     <string name="network_shared_folders">תיקיות משותפות (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">העתק</string>
-    <string name="fast_scroll_numeric_alphabet"> 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
     <string name="samba_settings_title">הגדרות תיקיות משותפות</string>
     <string name="samba_settings_summary">הגדר שמות משתמשים וסיסמאות בכדי לגשת לתיקיות משותפות ברשת הפרטית שלך</string>
     <string name="samba_profiles">פרופילי תיקיות משותפות</string>
     <string name="samba_delete_settings">האם אתה בטוח שברצונך למחוק הגדרה זו?</string>
     <string name="samba_add_server">הוסף שרת</string>
-    <string name="samba_server">ציין שרת</string>
-    <string name="samba_share">ציין שיתוף</string>
+    <string name="samba_server">הגדר שרת</string>
+    <string name="samba_share">הגדר שיתוף</string>
     <string name="refresh">רענן</string>
     <string name="network_timeout">התיקיה המרוחקת אינה זמינה,\n בדוק את הגדרות הרשת ונסה שנית.</string>
-    <string name="samba_loading">נא המתן בעת טעינת תיקיה משותפת…</string>
-    <string name="samba_reloading">נא המתן בעת טעינת תיקיה משותפת מחדש…</string>
-    <string name="samba_password_request_title">דרושה ססמא לתיקיה משותפת</string>
+    <string name="samba_loading">נא המתן בעת טעינת תיקיה משותפת&#8230;</string>
+    <string name="samba_reloading">נא המתן בעת טעינת תיקיה משותפת מחדש&#8230;</string>
+    <string name="samba_password_request_title">דרושה סיסמה לתיקיה משותפת</string>
+    <string name="samba_domain">דומיין</string>
     <string name="samba_username">שם משתמש</string>
-    <string name="samba_password">ססמא</string>
-    <string name="samba_show_password">הצג ססמא</string>
+    <string name="samba_password">סיסמה</string>
+    <string name="samba_show_password">הצג סיסמה</string>
     <string name="samba_wrong_password">שם המשתמש או הסיסמה שגויים.</string>
+    <string name="preferences">העדפות</string>
+    <string name="shared_folder_credentials">סיסמאות</string>
     <string name="no_saved_passwords">אין סיסמאות שמורות</string>
     <!-- WiFi Direct strings-->
+    <string name="upload_in_progress">העלאה מתבצעת&#8230;</string>
     <string name="file_uploading">הקובץ כרגע בהעלאה</string>
     <string name="back_cancel">לחץ חזור לביטול</string>
+    <string name="download_in_progress">הורדה מתבצעת&#8230;</string>
+    <string name="file_downloading">הקובץ כרגע בהורדה</string>
+    <string name="nonetwork_title" comment="deprecated">אין חיבור WiFi</string>
+    <string name="no_network_title">אין חיבור רשת</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">אין באפשרותך להשתמש באחסון הפנימי בזמן שהוא מחובר וטעון ע\"י ה- USB.</string>
+    <string name="ssh_storage">FTP</string>
     <string name="network_storage">רשת</string>
     <string name="external_storage">חיצוני</string>
     <string name="internal_storage">פנימי</string>
+    <string name="internal_storage_unified">אחסון</string>
     <string name="sd_card_storage">כרטיס SD</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">כונן</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">ענן</string>
     <string name="directory_empty">התיקיה ריקה</string>
     <string name="no_server">לא נמצא שרת מדיה</string>
     <string name="loading">אנא המתן בזמן הטעינה…</string>
+    <string name="ssh_remote_address">כתובת מרוחקת</string>
+    <string name="ssh_password">סיסמה</string>
+    <string name="ssh_username">שם משתמש</string>
+    <string name="ssh_port">פורט (אופציונלי)</string>
+    <string name="ssh_path">נתיב (אופציונלי)</string>
+    <string name="save_password">שמור סיסמה</string>
+    <string name="ssh_prompt">סוג FTP</string>
+    <string name="download_prompt">הורד קובץ לתיקיה:</string>
+    <string name="browse_ftp_server">שרת</string>
     <string name="cannot_list">לא ניתן להציג תוכן</string>
     <string name="error_listing">אירעה שגיאה</string>
+    <string name="error_file_not_found">הקובץ לא נמצא</string>
+    <string name="copying">מעתיק&#8230;</string>
+    <string name="moving">מעביר&#8230;</string>
+    <string name="open_file">פתח קובץ</string>
     <string name="delete">מחק</string>
     <string name="rename">שנה שם</string>
     <string name="details">פרטים</string>
     <string name="refresh_directory">רענן תיקיה</string>
+    <string-array name="folder_or_file">
+        <item>צור תיקיה</item>
+        <item>צור קובץ ריק</item>
+    </string-array>
     <string name="new_directory">תיקה חדשה</string>
+    <string name="new_file">קובץ חדש</string>
+    <string name="new_folder_or_file">תיקיה חדשה או קובץ חדש</string>
     <string name="refresh_servers_list">רענן רשימת שרתים</string>
     <string name="enable_network_shares">אפשר שיתופי רשת</string>
     <string name="go_top">חזור לראש</string>
+    <string name="confirm_delete_one">האם אתה בטוח שברצונך למחוק?</string>
+    <string name="confirm_delete_many">האם אתה בטוח שברצונך למחוק?</string>
     <string name="enter_new_name">שם תיקיה:</string>
+    <string name="file_name">שם קובץ</string>
+    <string name="folder_name">שם תיקיה</string>
+    <string name="run_in_background">מזער</string>
     <string name="confirm_deleting_cancellation">האם אתה בטוח שברצונך לבטל את המחיקה?</string>
     <string name="confirm_copying_cancellation">האם אתה בטוח שברצונך לבטל את ההעתקה?</string>
     <string name="confirm_moving_cancellation">האם אתה בטוח שברצונך לבטל את ההעברה?</string>
     <string name="cannot_create_directory">לא ניתן ליצור תיקיה חדשה</string>
+    <string name="cannot_create_file">לא ניתן ליצור קובץ חדש</string>
     <string name="cannot_delete_directory">לא ניתן למחוק את התיקיה</string>
     <string name="cannot_delete_file">לא ניתן למחוק את הקובץ</string>
     <string name="cannot_delete_files">לא ניתן למחוק את הקבצים</string>
@@ -75,8 +114,15 @@
     <string name="cannot_paste_folder_into_itself">לא ניתן להעתיק או להעביר תיקיות לתוך עצמן או לתוך תת-התיקיות שלהן</string>
     <string name="cannot_paste_file_same_location">לא ניתן להדביק את הקבצים ולמיקומם המקורי</string>
     <string name="cannot_paste_over_network">לא ניתן להדביק קבצים דרך הרשת</string>
+    <string name="copy_file_success_one">קובץ הועתק</string>
+    <string name="cut_directory_success_one">תיקייה הועברה</string>
+    <string name="cut_directory_success_many">תיקיות הועברו</string>
+    <string name="cut_file_success_one">קובץ הועבר</string>
+    <string name="cut_file_success_many">קבצים הועברו</string>
+    <string name="cut_directory_failed_one">תיקייה לא הועברה</string>
     <string name="cannot_open_file">לא ניתן לפתוח קובץ</string>
     <string name="delete_still_ongoing">המחיקה עדיין מתבצעת ברקע</string>
+    <string name="storage_swapped_secondary">משני</string>
     <string name="yes">"כן"</string>
     <string name="no">"לא"</string>
     <string name="share">שתף</string>
@@ -90,10 +136,14 @@
     <string name="swap_panel">החלף</string>
     <string name="move">העבר</string>
     <!-- Shortcuts -->
+    <string name="shortcuts">קיצורי דרך</string>
     <string name="add_to_shortcuts">צור קיצור דרך</string>
     <string name="remove_from_shortcuts">הסר קיצור דרך</string>
     <string name="shortcut_added" comment="deprecated">קיצור דרך %s נוצר</string>
     <string name="shortcut_removed" comment="deprecated">קיצור דרך %s הוסר</string>
+    <string name="shortcut_created">קיצור דרך \"%1$s\" נוצר</string>
+    <string name="one_shortcut_removed">קיצור דרך אחד נמחק</string>
+    <string name="n_shortcut_removed">%1$d קיצורי דרך נמחקו</string>
     <string name="server_not_available" comment="deprecated">השרת כעת אינו זמין</string>
     <string name="cannot_open_shortcut">תוכן קיצור הדרך אינו זמין כעת. \nאנא בדקו שיש לכם את ההרשאות המתאימות.</string>
     <string name="network_shortcuts">קיצורי דרך רשת</string>
