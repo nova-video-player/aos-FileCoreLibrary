@@ -14,6 +14,7 @@
     <string name="file_info_directories">thư mục</string>
     <string name="file_info_one_file">1 tập tin</string>
     <string name="file_info_files">tập tin</string>
+    <string name="network_media_servers">Media servers (UPnP)</string>
     <string name="network_shared_folders">Thư mục chia sẻ (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">sao chép</string>
@@ -27,6 +28,11 @@
     <string name="samba_server">Xác định máy chủ</string>
     <string name="samba_share">Xác định chia sẻ</string>
     <string name="refresh">Làm mới</string>
+    <string name="network_timeout">Xin lỗi, không thể truy cập thư mục từ xa.\nHãy kiểm tra kết nối mạng của bạn và thử lại.</string>
+    <string name="samba_loading">Vui lòng đợi trong khi tải thư mục được chia sẻ&#8230;</string>
+    <string name="samba_reloading">Vui lòng đợi trong khi tải lại thư mục được chia sẻ&#8230;</string>
+    <string name="samba_password_request_title">Yêu cầu mật khẩu thư mục chia sẻ</string>
+    <string name="samba_domain">Tên miền</string>
     <string name="samba_username">Tên người dùng</string>
     <string name="samba_password">Mật khẩu</string>
     <string name="samba_show_password">Hiện mật khẩu</string>
@@ -36,10 +42,22 @@
     <string name="no_saved_passwords">Không có mật khẩu đã lưu</string>
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">nhận ở đây qua WiFi Direct</string>
+    <string name="empty_message">Phát hiện ra thiết bị mục tiêu khả dụng&#8230;&lt;br/&gt;Thiết bị mục tiêu phải kích hoạt&lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;lựa chọn</string>
+    <string name="wifip2p_waiting">Truyền trực tiếp qua WiFi sẽ sớm bắt đầu</string>
+    <string name="connect_to_target">Đang kết nối với mục tiêu</string>
+    <string name="upload_in_progress">Đang tải lên&#8230;</string>
+    <string name="file_uploading">Tệp của bạn đang tải lên</string>
     <string name="back_cancel">Nhấn Back để hủy</string>
+    <string name="server_wait">Đang đợi ứng dụng khách kết nối và gửi tệp</string>
+    <string name="download_in_progress">Đang tải xuống&#8230;</string>
+    <string name="file_downloading">Tệp của bạn đang tải xuống</string>
+    <string name="server_ready">Sẵn sàng nhận</string>
     <string name="nonetwork_title" comment="deprecated">Không có kết nối WiFi</string>
     <string name="no_network_title">Không có kết nối mạng</string>
+    <string name="nonetwork_message">Bạn cần kích hoạt WiFi cho tính năng này</string>
     <!-- FileManager strings -->
+    <string name="storage_busy_message">Bạn không thể sử dụng bộ nhớ trong trong khi nó được kết nối và gắn kết qua USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Mạng</string>
     <string name="external_storage">Bộ nhớ ngoài</string>
@@ -47,10 +65,38 @@
     <string name="internal_storage_unified">Bộ nhớ</string>
     <string name="sd_card_storage">Thẻ SD</string>
     <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Bộ Nhớ Khác</string>
     <string name="usb_ptp_storage">PTP</string>
     <string name="cloud_storage">Đám mây</string>
+    <string name="directory_empty">Thư mục trống</string>
+    <string name="no_server">Không tìm thấy máy chủ</string>
+    <string name="loading">Đang tải &#8230;</string>
+    <string name="ssh_error">Không thể kết nối. Hãy kiểm tra lại kết nối mạng và thử lại</string>
+    <string name="ssh_remote_address">Remote Address</string>
+    <string name="ssh_remote_address_error">Bạn phải chỉ định một remote address</string>
     <string name="ssh_password">Mật khẩu</string>
     <string name="ssh_username">Tên người dùng</string>
+    <string name="ssh_path">Đường dẫn (tùy chọn)</string>
+    <string name="save_password">Lưu mật khẩu</string>
+    <string name="ssh_prompt">Kiểu FTP</string>
+    <string name="download_prompt">Tải tệp xuống thư mục:</string>
+    <string name="browse_ftp_server">Máy chủ</string>
+    <string name="cannot_list">Không thể liệt kê nội dung</string>
+    <string name="error_listing">Đã xảy ra lỗi</string>
+    <string name="error_host_not_found">Không tìm thấy máy chủ</string>
+    <string name="error_unknown_host">Máy chủ không xác định</string>
+    <string name="error_no_connection">Không kết nối được với máy chủ</string>
+    <string name="error_credentials">Không thể liệt kê thư mục: hãy kiểm tra thông tin xác thực của bạn</string>
+    <string name="error_no_permission">Tài khoản này không được phép liệt kê danh sách này</string>
+    <string name="error_file_not_found">Không tìm thấy tệp</string>
+    <string name="error_time_out">Kết Nối Quá Lâu</string>
+    <string name="deleting">Đang xóa</string>
+    <string name="deleting_many">đã xóa %1$d/%2$d</string>
+    <string name="deleting_one">Xóa một tệp</string>
+    <string name="copying">Đang sao chép %s&#8230;</string>
+    <string name="moving">Đang di chuyển %s&#8230;</string>
+    <string name="open_file">Mở tệp</string>
+    <string name="open_file_after_download">Mở tệp sau khi sao chép hoàn tất</string>
     <string name="delete">Xóa</string>
     <string name="rename">Đổi tên</string>
     <string name="details">Chi tiết</string>
@@ -77,9 +123,22 @@
     <string name="file_deleted">Tập tin đã được xóa</string>
     <string name="files_deleted">Tập tin đã được xóa</string>
     <string name="cannot_rename">Không thể đổi tên</string>
+    <string name="yes">"Đồng ý"</string>
+    <string name="no">"Không"</string>
+    <string name="share">Chia sẻ</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Chia sẻ tệp qua</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Không có ứng dụng nào để chia sẻ tệp</string>
+    <string name="upnp_not_allowed">Bạn không được phép truy cập vào máy chủ UPnP này. Vui lòng thay đổi cấu hình truy cập của bạn trước.</string>
+    <string name="single_mode">Đĩa đơn</string>
+    <string name="double_mode">Nhân bản</string>
+    <string name="swap_panel">Chuyển đổi</string>
+    <string name="move">Di chuyển</string>
     <!-- Shortcuts -->
+    <string name="shortcuts">Lối tắt</string>
+    <string name="add_to_shortcuts">Tạo lối tắt</string>
+    <string name="remove_from_shortcuts">Xóa lối tắt</string>
     <!-- DLNA -->
     <!-- ZIP -->
     <!-- Notifications -->

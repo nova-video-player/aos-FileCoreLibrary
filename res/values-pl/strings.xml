@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="file_info_label_name">Imię i nazwisko:</string>
+    <string name="file_info_label_name">Nazwa:</string>
     <string name="file_info_label_size">Rozmiar:</string>
     <string name="file_info_label_size_internal">Rozmiar (wewnętrzny):</string>
     <string name="file_info_label_size_sd">Rozmiar (SD):</string>
@@ -29,10 +29,10 @@
     <string name="samba_delete_settings">Czy na pewno chcesz usunąć te ustawienia?</string>
     <string name="samba_add_server">Dodaj serwer</string>
     <string name="samba_server">Zdefiniuj serwer</string>
-    <string name="samba_share">Zdefiniuj udostępnianie</string>
+    <string name="samba_share">Zdefiniuj udział sieciowy</string>
     <string name="refresh">Odśwież</string>
-    <string name="network_timeout">Przepraszamy, zdalny folder jest niedostępny.\nSprawdź połączenie z internetem i spróbuj ponownie.</string>
-    <string name="samba_loading">Proszę czekać, trwa ładowanie foldera współdzielonego…</string>
+    <string name="network_timeout">Zdalny folder jest niedostępny.\nSprawdź połączenie sieciowe i spróbuj ponownie.</string>
+    <string name="samba_loading">Ładowanie folderu sieciowego w toku&#8230;</string>
     <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego…</string>
     <string name="samba_password_request_title">Dzielony folder wymaga hasła</string>
     <string name="samba_domain">Domena</string>
@@ -40,18 +40,18 @@
     <string name="samba_password">Hasło</string>
     <string name="samba_show_password">Pokaż hasło</string>
     <string name="samba_wrong_password">Nieprawidłowa nazwa użytkownika lub hasło</string>
-    <string name="preferences">Ustawienia</string>
+    <string name="preferences">Preferencje</string>
     <string name="shared_folder_credentials">Hasła</string>
     <string name="no_saved_passwords">Brak zapisanych haseł</string>
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">Wi-Fi Direct</string>
-    <string name="receive_p2p_here">odebrano via WiFi Direct</string>
+    <string name="receive_p2p_here">odbierz przez WiFi Direct</string>
     <string name="empty_message">Odnajdywanie dostępnych urządzeń docelowych&#8230;&lt;br/&gt;Urządzenie docelowe musi mieć aktywna opcję &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
     <string name="wifip2p_waiting">Transfer WiFi Direct rozpocznie się wkrótce</string>
     <string name="connect_to_target">Łączenie</string>
     <string name="upload_in_progress">Wysyłanie w toku&#8230;</string>
     <string name="file_uploading">Plik jest przesyłany</string>
-    <string name="back_cancel">Naciśnij cofnij aby anulować</string>
+    <string name="back_cancel">Naciśnij cofnij, aby anulować</string>
     <string name="server_wait">Oczekiwanie na klienta, aby połączyć i wysłać plik</string>
     <string name="download_in_progress">Pobieranie w toku&#8230;</string>
     <string name="file_downloading">Twój plik jest pobierany</string>
