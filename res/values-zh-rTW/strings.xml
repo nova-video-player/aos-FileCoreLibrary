@@ -1,16 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="file_info_label_name">名稱：</string>
+    <string name="file_info_label_size">大小：</string>
+    <string name="file_info_label_size_internal">大小 (內部儲存空間)：</string>
+    <string name="file_info_label_size_sd">大小 (記憶卡)：</string>
+    <string name="file_info_label_permission">權限：</string>
+    <string name="file_info_label_can_read">讀取</string>
+    <string name="file_info_label_cannot_read">無法讀取</string>
+    <string name="file_info_label_can_write">寫入</string>
+    <string name="file_info_label_cannot_write">無法寫入</string>
+    <string name="file_info_label_last_modified">最後變更：</string>
+    <string name="file_info_label_mime_type">MIME 類型：</string>
+    <string name="file_info_directory_empty">空的資料夾</string>
+    <string name="file_info_one_directory">一個資料夾</string>
+    <string name="file_info_directories">資料夾</string>
+    <string name="file_info_one_file">一個檔案</string>
+    <string name="file_info_files">檔案</string>
+    <string name="usbhost_ptp_storage">外部攝影機</string>
+    <string name="network_media_servers">媒體伺服器 (UPnP)</string>
+    <string name="network_shared_folders">共用資料夾 (SMB)</string>
     <!-- Archos file manager core -->
+    <string name="file_copy_pattern">複製</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
+    <string name="samba_settings_title">共用資料夾設定</string>
+    <string name="samba_settings_summary">設定使用者名稱和密碼以存取私人網路上的共用資料夾</string>
+    <string name="samba_profiles">共用資料夾設定檔</string>
+    <string name="samba_delete_settings">確定要刪除此設定嗎？</string>
+    <string name="samba_add_server">新增伺服器</string>
+    <string name="samba_server">定義伺服器</string>
+    <string name="samba_share">定義共用</string>
+    <string name="refresh">重新整理</string>
+    <string name="network_timeout">抱歉！網路資料夾無法存取，\n請確認網路連線後再試一次。</string>
+    <string name="samba_loading">請稍後，正在載入共用資料夾 &#8230;</string>
+    <string name="samba_reloading">請稍後，正在重新載入共用資料夾 &#8230;</string>
+    <string name="samba_password_request_title">共用資料夾需要密碼才能存取</string>
+    <string name="samba_domain">網域</string>
+    <string name="samba_username">使用者名稱</string>
+    <string name="samba_password">密碼</string>
+    <string name="samba_show_password">顯示密碼</string>
+    <string name="samba_wrong_password">使用者名稱或密碼不正確</string>
+    <string name="preferences">偏好設定</string>
+    <string name="shared_folder_credentials">密碼</string>
+    <string name="no_saved_passwords">沒有已儲存的密碼</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi 直連</string>
+    <string name="receive_p2p_here">藉由 WiFi 直連接收到這</string>
+    <string name="empty_message">發現可用的目標裝置 &#8230;&lt;br/&gt; 目標裝置必須啟動 &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; 選項</string>
+    <string name="wifip2p_waiting">WiFi 直連即將開始傳送</string>
+    <string name="connect_to_target">正在連結至目標裝置</string>
+    <string name="upload_in_progress">正在上傳 &#8230;</string>
+    <string name="file_uploading">檔案正在上傳</string>
+    <string name="back_cancel">按「返回鍵」來取消</string>
+    <string name="server_wait">等待用戶端連接並傳送檔案</string>
+    <string name="download_in_progress">正在下載 &#8230;</string>
+    <string name="file_downloading">檔案正在下載</string>
+    <string name="server_ready">準備接收中</string>
+    <string name="nonetwork_title" comment="deprecated">沒有無線網路連線</string>
+    <string name="no_network_title">沒有網路連線</string>
+    <string name="nonetwork_message">必須啟動無線網路才能使用這個功能</string>
     <!-- FileManager strings -->
+    <string name="storage_busy_message">已連接且掛載隨身碟時，無法使用內部儲存空間。</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">網路儲存空間</string>
+    <string name="external_storage">外部儲存空間</string>
+    <string name="internal_storage">內部儲存空間</string>
+    <string name="internal_storage_unified">儲存空間</string>
+    <string name="sd_card_storage">記憶卡</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">儲存裝置</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">雲端</string>
+    <string name="directory_empty">空的資料夾</string>
+    <string name="no_server">找不到伺服器</string>
+    <string name="loading">正在載入 &#8230;</string>
+    <string name="ssh_error">無法連線：請檢查您的網路狀態及憑證</string>
+    <string name="ssh_remote_address">主機位址</string>
+    <string name="ssh_remote_address_error">您必須指定主機位址</string>
+    <string name="ssh_password">密碼</string>
+    <string name="ssh_username">使用者名稱</string>
+    <string name="ssh_port">連接埠 (可選填)</string>
+    <string name="ssh_path">路徑 (可選填)</string>
+    <string name="save_password">儲存密碼</string>
+    <string name="ssh_prompt">FTP 類型</string>
+    <string name="download_prompt">下載檔案到資料夾：</string>
+    <string name="browse_ftp_server">伺服器</string>
+    <string name="cannot_list">無法列出內容</string>
+    <string name="error_listing">發生錯誤</string>
+    <string name="error_host_not_found">找不到主機</string>
+    <string name="error_unknown_host">不明的主機</string>
+    <string name="error_no_connection">無法連接到主機</string>
+    <string name="error_credentials">無法顯示目錄：請檢查您的憑證</string>
+    <string name="error_no_permission">這個帳號不允許顯示此目錄</string>
+    <string name="error_file_not_found">找不到檔案</string>
+    <string name="error_time_out">逾時</string>
+    <string name="deleting">正在刪除</string>
+    <string name="deleting_many">已刪除檔案 %1$d/%2$d</string>
+    <string name="deleting_one">正在刪除一個檔案</string>
+    <string name="copying">正在複製 &#8230;</string>
+    <string name="moving">正在移動 &#8230;</string>
+    <string name="open_file">開啟檔案</string>
+    <string name="open_file_after_download">複製完成後開啟檔案</string>
+    <string name="pasting_copy_one">正在複製一個檔案 (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">正在複製：%1$d/%2$d 檔案 (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">正在移動一個檔案 (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">正在移動：%1$d/%2$d 檔案 (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">刪除</string>
+    <string name="rename">重新命名</string>
+    <string name="details">詳細資料</string>
+    <string name="refresh_directory">重新整理資料夾</string>
+    <string-array name="folder_or_file">
+        <item>新增資料夾</item>
+        <item>建立一個空白檔案</item>
+    </string-array>
+    <string name="new_directory">新增資料夾</string>
+    <string name="new_file">新增檔案</string>
+    <string name="new_folder_or_file">新增資料夾或檔案</string>
+    <string name="refresh_servers_list">更新伺服器清單</string>
+    <string name="enable_network_shares">開啟網路分享</string>
+    <string name="go_top">回到頂端</string>
+    <string name="uncheck_impossible">當上層資料夾被選取時無法更改選擇</string>
+    <string name="confirm_delete_one">確定要刪除嗎？</string>
+    <string name="confirm_delete_parent_folder">上層資料夾似乎不包含任何其它影片，是否要將其要刪除？</string>
+    <string name="confirm_delete_many">確定要刪除嗎？</string>
+    <string name="enter_new_name">名稱：</string>
+    <string name="file_name">檔案名稱</string>
+    <string name="folder_name">資料夾名稱</string>
+    <string name="run_in_background">最小化</string>
+    <string name="confirm_deleting_cancellation">確定要取消刪除嗎？</string>
+    <string name="confirm_copying_cancellation">確定要取消複製嗎？</string>
+    <string name="confirm_moving_cancellation">確定要取消移動嗎？</string>
+    <string name="cannot_create_directory">無法新增資料夾</string>
+    <string name="cannot_create_file">無法新增檔案</string>
+    <string name="cannot_delete_directory">無法刪除資料夾</string>
+    <string name="cannot_delete_file">無法刪除檔案</string>
+    <string name="cannot_delete_files">無法刪除檔案</string>
+    <string name="directory_deleted">資料夾已被刪除</string>
+    <string name="file_deleted">檔案已被刪除</string>
+    <string name="files_deleted">檔案已經刪除</string>
+    <string name="cannot_rename">無法重新命名</string>
+    <string name="cannot_paste_folder_into_itself">無法移動或複製資料夾到它的子資料夾</string>
+    <string name="cannot_paste_file_same_location">無法將檔案貼到相同的位置</string>
+    <string name="cannot_paste_over_network">無法藉由網路將檔案貼上</string>
+    <string name="copy_directory_success_one">資料夾已複製</string>
+    <string name="copy_directory_success_many">資料夾已複製</string>
+    <string name="copy_file_success_one">檔案已複製</string>
+    <string name="copy_file_success_many">檔案已複製</string>
+    <string name="copy_directory_failed_one">資料夾無法複製</string>
+    <string name="copy_directory_failed_many">資料夾無法複製</string>
+    <string name="copy_file_failed_one">檔案無法複製</string>
+    <string name="copy_file_failed_many">資料夾無法複製</string>
+    <string name="cut_directory_success_one">資料夾已移動</string>
+    <string name="cut_directory_success_many">資料夾已移動</string>
+    <string name="cut_file_success_one">檔案已移動</string>
+    <string name="cut_file_success_many">檔案已移動</string>
+    <string name="cut_directory_failed_one">資料夾無法移動</string>
+    <string name="cut_directory_failed_many">資料夾無法移動</string>
+    <string name="cut_file_failed_one">檔案無法移動</string>
+    <string name="cut_file_failed_many">檔案無法移動</string>
+    <string name="pasting_done">已完成貼上</string>
+    <string name="copy_done">已成功複製</string>
+    <string name="copy_canceled">已取消複製</string>
+    <string name="cut_done">已成功剪下</string>
+    <string name="cut_canceled">已取消剪下</string>
+    <string name="delete_done">已成功刪除</string>
+    <string name="delete_canceled">已取消刪除</string>
+    <string name="cannot_open_file">無法開啟檔案</string>
+    <string name="no_application_to_open_file">本裝置沒有可開啟此檔案的程式</string>
+    <string name="delete_still_ongoing">刪除持續在後台進行</string>
+    <string name="copy_on_device">下載影片到裝置</string>
+    <string name="copy_on_device_multi">下載到裝置</string>
+    <string name="storage_swapped_primary">主要</string>
+    <string name="storage_swapped_secondary">次要</string>
+    <string name="yes">"是"</string>
+    <string name="no">"否"</string>
+    <string name="share">共用</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">藉由以下方式共用檔案：</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">沒有可共用此檔案的程式</string>
+    <string name="upnp_not_allowed">您無法存取此 UPnP 伺服器，請先修改存取設定。</string>
+    <string name="single_mode">單一模式</string>
+    <string name="double_mode">雙重模式</string>
+    <string name="swap_panel">交換</string>
+    <string name="move">移動</string>
     <!-- Shortcuts -->
+    <string name="shortcuts">捷徑</string>
+    <string name="add_to_shortcuts">新增捷徑</string>
+    <string name="remove_from_shortcuts">刪除捷徑</string>
+    <string name="shortcut_added" comment="deprecated">捷徑 %s 已建立</string>
+    <string name="shortcut_removed" comment="deprecated">捷徑 %s 已刪除</string>
+    <string name="shortcut_created">捷徑「%1$s」已建立</string>
+    <string name="one_shortcut_removed">已刪除一個捷徑</string>
+    <string name="n_shortcut_removed">已刪除 %1$d 個捷徑</string>
+    <string name="server_not_available" comment="deprecated">伺服器目前無法連線</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s 目前無法連線</string>
+    <string name="cannot_open_shortcut">目前無法使用該捷徑的內容，\n請檢查您具有足夠的權限。</string>
+    <string name="network_shortcuts">網路捷徑</string>
+    <string name="media_servers">媒體伺服器</string>
+    <string name="shortcut_list_empty">長按您喜歡的網路資料夾並在指令工具列上方選擇「%s」新增捷徑。</string>
     <!-- DLNA -->
+    <string name="dlna_share">影音分享</string>
+    <string name="video">影片</string>
+    <string name="audio">音訊</string>
+    <string name="picture">圖片</string>
+    <string name="share_types">共用類型</string>
     <!-- ZIP -->
+    <string name="zip_extract_action">解壓縮至此</string>
+    <string name="zip_extract_success_message">已成功解壓縮</string>
+    <string name="zip_compress_action">壓縮成 Zip 檔案</string>
+    <string name="zip_extracting_message">解壓縮 ZIP 檔案中...</string>
+    <string name="zip_compressing_message">壓縮檔案到 Zip 檔案</string>
+    <string name="zip_compressing_many">已壓縮檔案 %1$d/%2$d</string>
+    <string name="zip_compressing_one">正在壓縮一個檔案</string>
+    <string name="zip_compressing_success">已成功壓縮</string>
+    <string name="zip_compressing_canceled">已取消壓縮</string>
+    <string name="zip_extracting_many">已解壓縮檔案 %1$d/%2$d</string>
+    <string name="zip_extracting_one">正在解壓縮一個檔案 (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">解壓縮檔案發生錯誤。\n檔案可能損毀或磁碟可用空間不足。</string>
+    <string name="zip_extract_canceled">已取消解壓縮</string>
+    <string name="zip_compress_error_message">壓縮檔案發生錯誤。\n磁碟可用空間可能不足。</string>
+    <string name="zip_cannot_open_inner_entry">無法開啟壓縮檔中的檔案，請先解壓縮檔案。</string>
+    <string name="zip_size_limit">只能瀏覽小於 20 MB 的 Zip 壓縮檔</string>
     <!-- Notifications -->
+    <string name="copy_error">複製失敗</string>
+    <string name="cut_error">剪下失敗</string>
+    <string name="delete_error">刪除失敗</string>
     <!-- Network Scanning -->
+    <string name="scan_network_index">索引媒體檔案</string>
+    <string name="scan_network_remove">將媒體從索引中移除</string>
+    <string name="debug_browse_to_root">瀏覽裝置的根目錄 (除錯用)</string>
     <!-- Hiding from media scanning -->
+    <string name="nomedia_create">從媒體庫中移除</string>
+    <string name="nomedia_remove">新增至媒體庫</string>
+    <string name="nomedia_fail">失敗，無法將此資料夾從媒體庫中移除</string>
+    <string name="nomedia_warning">此資料夾的多媒體內容將不再出現於多媒體應用程式中。\n確定要繼續嗎？</string>
     <!-- Folder Picker -->
+    <string name="choose_a_folder">選擇資料夾</string>
+    <string name="choose_a_folder_help">導覽至您想要選取的資料夾後按下確定，按「返回鍵」回到上一層。</string>
+    <string name="current_choice">目前選取：</string>
+    <string name="no_selection">未選取</string>
+    <string name="external_storage_fake_name">裝置儲存空間</string>
+    <string name="sdcard_fake_name">記憶卡</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(沒有任何資料夾)</string>
+    <string name="navigation_drawer_open">開啟側邊選單</string>
+    <string name="navigation_drawer_close">關閉側邊選單</string>
+    <string name="listing_sort_mode">排序方式</string>
+    <string name="listing_sort_by_name">依名稱排序</string>
+    <string name="listing_sort_by_size">依大小排序</string>
+    <string name="listing_sort_by_date">依日期排序</string>
+    <string name="listing_ascending">升冪排序</string>
+    <string name="listing_descending">降冪排序</string>
+    <string name="acquire_external_usb_permission">檔案管理器需要取得存取您儲存空間的特殊權限，請在下一個螢幕選擇您的儲存空間。</string>
 </resources>

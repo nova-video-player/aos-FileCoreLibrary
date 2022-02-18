@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Namn:</string>
+    <string name="file_info_label_size">Storlek:</string>
+    <string name="file_info_label_size_internal">Storlek (intern):</string>
+    <string name="file_info_label_size_sd">Storlek (SD):</string>
+    <string name="file_info_label_permission">Behörighet:</string>
+    <string name="file_info_label_can_read">läs</string>
+    <string name="file_info_label_cannot_read">kan ej läsa</string>
+    <string name="file_info_label_can_write">skriv</string>
+    <string name="file_info_label_cannot_write">kan ej skriva</string>
+    <string name="file_info_label_last_modified">Senast ändrad:</string>
+    <string name="file_info_label_mime_type">MIME-typ:</string>
+    <string name="file_info_directory_empty">Tom mapp</string>
+    <string name="file_info_one_directory">1 mapp</string>
+    <string name="file_info_directories">mappar</string>
+    <string name="file_info_one_file">1 fil</string>
+    <string name="file_info_files">filer</string>
+    <string name="usbhost_ptp_storage">Extern kamera</string>
+    <string name="network_media_servers">Mediaservrar (UPnP)</string>
+    <string name="network_shared_folders">Delade mappar (SMB)</string>
+    <!-- Archos file manager core -->
+    <string name="file_copy_pattern">kopiera</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ</string>
+    <!-- Samba share settings -->
+    <string name="samba_settings_title">Inställningar för delade mappar</string>
+    <string name="samba_settings_summary">Ställ in användarnamn och lösenord för att komma åt delade mappar på ditt privata nätverk</string>
+    <string name="samba_profiles">Delade mapprofiler</string>
+    <string name="samba_delete_settings">Vill du verkligen ta bort denna inställning?</string>
+    <string name="samba_add_server">Lägg till server</string>
+    <string name="samba_server">Ange en server</string>
+    <string name="samba_share">Definiera en delning (share)</string>
+    <string name="refresh">Uppdatera</string>
+    <string name="network_timeout">Tyvärr, den delade mappen är inte tillgänglig.\nKontrollera din nätverksanslutning och försök igen.</string>
+    <string name="samba_loading">Vänta medan delad mapp laddas&#8230;</string>
+    <string name="samba_reloading">Vänta medan delad mapp laddas om&#8230;</string>
+    <string name="samba_password_request_title">Lösenordsbegäran för delad mapp</string>
+    <string name="samba_domain">Domän</string>
+    <string name="samba_username">Användarnamn</string>
+    <string name="samba_password">Lösenord</string>
+    <string name="samba_show_password">Visa lösenord</string>
+    <string name="samba_wrong_password">Fel användarnamn eller lösenord</string>
+    <string name="preferences">Inställningar</string>
+    <string name="shared_folder_credentials">Lösenord</string>
+    <string name="no_saved_passwords">Inga sparade lösenord</string>
+    <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">ta emot här via WiFi Direct</string>
+    <string name="empty_message">Söker tillgängliga målenheter&#8230;&lt;br/&gt;Enheten måste aktivera &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; inställningen</string>
+    <string name="wifip2p_waiting">WiFi Direct-överföring kommer strax påbörjas</string>
+    <string name="connect_to_target">Ansluter till mål</string>
+    <string name="upload_in_progress">Uppladdning pågår&#8230;</string>
+    <string name="file_uploading">Din fil laddas upp</string>
+    <string name="back_cancel">Tryck på bakåt-knappen för att avbryta</string>
+    <string name="server_wait">Väntar på att klienten ska ansluta och skicka en fil</string>
+    <string name="download_in_progress">Nedladdning pågår&#8230;</string>
+    <string name="file_downloading">Filen laddas ner</string>
+    <string name="server_ready">Redo att ta emot</string>
+    <string name="nonetwork_title" comment="deprecated">WiFi-anslutning saknas</string>
+    <string name="no_network_title">Nätverksanslutning saknas</string>
+    <string name="nonetwork_message">Du måste aktivera WiFi för denna funktion</string>
+    <!-- FileManager strings -->
+    <string name="storage_busy_message">Du kan inte använda den interna lagringen när den är ansluten och monterad via USB.</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Nätverk</string>
+    <string name="external_storage">Extern</string>
+    <string name="internal_storage">Intern</string>
+    <string name="internal_storage_unified">Lagring</string>
+    <string name="sd_card_storage">SD-kort</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Enhet</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Molnet</string>
+    <string name="directory_empty">Tom mapp</string>
+    <string name="no_server">Ingen server hittades</string>
+    <string name="loading">Laddar&#8230;</string>
+    <string name="ssh_error">Det går inte att ansluta : vänligen kontrollera din anslutning och inloggningsuppgifter</string>
+    <string name="ssh_remote_address">Serveradress</string>
+    <string name="ssh_remote_address_error">Du måste ange en serveradress</string>
+    <string name="ssh_password">Lösenord</string>
+    <string name="ssh_username">Användarnamn</string>
+    <string name="ssh_port">Port (valfritt)</string>
+    <string name="ssh_path">Sökväg (valfritt)</string>
+    <string name="save_password">Spara lösenord</string>
+    <string name="ssh_prompt">FTP-typ</string>
+    <string name="download_prompt">Ladda ner fil till mapp:</string>
+    <string name="browse_ftp_server">Server</string>
+    <string name="cannot_list">Kan inte lista innehåll</string>
+    <string name="error_listing">Ett fel inträffade</string>
+    <string name="error_host_not_found">Värden hittades inte</string>
+    <string name="error_unknown_host">Okänd värd</string>
+    <string name="error_no_connection">Det gick inte att ansluta till värd</string>
+    <string name="error_credentials">Det går inte att lista katalogen : kontrollera dina uppgifter</string>
+    <string name="error_no_permission">Detta konto har inte tillåtelse att lista denna katalog</string>
+    <string name="error_file_not_found">Filen hittades inte</string>
+    <string name="error_time_out">Tiden är ute</string>
+    <string name="deleting">Tar bort</string>
+    <string name="deleting_many">%1$d/%2$d raderade filer</string>
+    <string name="deleting_one">Tar bort en fil</string>
+    <string name="copying">Kopierar&#8230;</string>
+    <string name="moving">Flyttar&#8230;</string>
+    <string name="open_file">Öppna fil</string>
+    <string name="open_file_after_download">Öppna filen efter att kopieringen slutförts</string>
+    <string name="pasting_copy_one">Kopierar fil (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Kopierar: %1$d/%2$d filer (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Flyttar fil (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Flyttar: %1$d/%2$d filer (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Radera</string>
+    <string name="rename">Byt namn</string>
+    <string name="details">Detaljer</string>
+    <string name="refresh_directory">Uppdatera mapp</string>
+    <string-array name="folder_or_file">
+        <item>Skapa en mapp</item>
+        <item>Skapa en tom fil</item>
+    </string-array>
+    <string name="new_directory">Ny mapp</string>
+    <string name="new_file">Ny fil</string>
+    <string name="new_folder_or_file">Ny mapp eller fil</string>
+    <string name="refresh_servers_list">Uppdatera serverlistan</string>
+    <string name="enable_network_shares">Aktivera nätverksdelning</string>
+    <string name="go_top">Tillbaka till toppen</string>
+    <string name="uncheck_impossible">Omöjligt att ändra markering när överordnad mapp är vald</string>
+    <string name="confirm_delete_one">Vill du verkligen ta bort den?</string>
+    <string name="confirm_delete_parent_folder">Det verkar som om överordnad mapp inte innehåller någon annan video, ska vi ta bort den?</string>
+    <string name="confirm_delete_many">Vill du verkligen radera?</string>
+    <string name="enter_new_name">Namn:</string>
+    <string name="file_name">Filnamn</string>
+    <string name="folder_name">Mappnamn</string>
+    <string name="run_in_background">Minimera</string>
+    <string name="confirm_deleting_cancellation">Vill du verkligen avbryta raderingen?</string>
+    <string name="confirm_copying_cancellation">Vill du verkligen avbryta kopieringen?</string>
+    <string name="confirm_moving_cancellation">Vill du verkligen avbryta flytten?</string>
+    <string name="cannot_create_directory">Kan inte skapa ny mapp</string>
+    <string name="cannot_create_file">Kan inte skapa ny fil</string>
+    <string name="cannot_delete_directory">Kan inte ta bort mappen</string>
+    <string name="cannot_delete_file">Kan inte ta bort filen</string>
+    <string name="cannot_delete_files">Kan inte ta bort filerna</string>
+    <string name="directory_deleted">Mappen har tagits bort</string>
+    <string name="file_deleted">Filen har tagits bort</string>
+    <string name="files_deleted">Filerna har tagits bort</string>
+    <string name="cannot_rename">Kan ej byta namn</string>
+    <string name="cannot_paste_folder_into_itself">Kan inte kopiera eller flytta mappar till sig själva eller någon av deras undermappar</string>
+    <string name="cannot_paste_file_same_location">Kan inte klistra in filer till deras ursprungliga plats</string>
+    <string name="cannot_paste_over_network">Kan inte klistra in filer över nätverk</string>
+    <string name="copy_directory_success_one">Mapp kopierad</string>
+    <string name="copy_directory_success_many">Mappar kopierade</string>
+    <string name="copy_file_success_one">Fil kopierad</string>
+    <string name="copy_file_success_many">Filer kopierade</string>
+    <string name="copy_directory_failed_one">Mappen kopierades inte</string>
+    <string name="copy_directory_failed_many">Mapparna kopierades inte</string>
+    <string name="copy_file_failed_one">Filen kopierades inte</string>
+    <string name="copy_file_failed_many">Filerna kopierades inte</string>
+    <string name="cut_directory_success_one">Mappen har flyttats</string>
+    <string name="cut_directory_success_many">Mappar flyttade</string>
+    <string name="cut_file_success_one">Fil flyttad</string>
+    <string name="cut_file_success_many">Filer flyttade</string>
+    <string name="cut_directory_failed_one">Mappen kunde inte flyttas</string>
+    <string name="cut_directory_failed_many">Mapparna flyttades ej</string>
+    <string name="cut_file_failed_one">Filen flyttades ej</string>
+    <string name="cut_file_failed_many">Filerna flyttades ej</string>
+    <string name="pasting_done">Inklistring lyckades</string>
+    <string name="copy_done">Kopiering lyckades</string>
+    <string name="copy_canceled">Kopiering avbruten</string>
+    <string name="cut_done">Urklipp lyckades</string>
+    <string name="cut_canceled">Urklipp avbruten</string>
+    <string name="delete_done">Radering lyckades</string>
+    <string name="delete_canceled">Radering avbruten</string>
+    <string name="cannot_open_file">Kan inte öppna fil</string>
+    <string name="no_application_to_open_file">Ingen app på denna enhet kan öppna filen</string>
+    <string name="delete_still_ongoing">Raderingen fortsätter fortfarande i bakgrunden</string>
+    <string name="copy_on_device">Ladda ner video till enheten</string>
+    <string name="copy_on_device_multi">Ladda ner till enheten</string>
+    <string name="storage_swapped_primary">primär</string>
+    <string name="storage_swapped_secondary">sekundär</string>
+    <string name="yes">"Ja"</string>
+    <string name="no">"Nej"</string>
+    <string name="share">Dela</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Dela fil via</string>
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Ingen app tillgänglig för att dela filen</string>
+    <string name="upnp_not_allowed">Du har inte behörighet att komma åt den här UPNP-servern. Ändra din åtkomstkonfiguration först.</string>
+    <string name="single_mode">Enkel</string>
+    <string name="double_mode">Dubbel</string>
+    <string name="swap_panel">Byt</string>
+    <string name="move">Flytta</string>
+    <!-- Shortcuts -->
+    <string name="shortcuts">Genvägar</string>
+    <string name="add_to_shortcuts">Skapa en genväg</string>
+    <string name="remove_from_shortcuts">Ta bort genvägen</string>
+    <string name="shortcut_added" comment="deprecated">Genväg %s skapad</string>
+    <string name="shortcut_removed" comment="deprecated">Genväg %s borttagen</string>
+    <string name="shortcut_created">Genväg \"%1$s\" skapad</string>
+    <string name="one_shortcut_removed">En genväg borttagen</string>
+    <string name="n_shortcut_removed">%1$d genvägar raderade</string>
+    <string name="server_not_available" comment="deprecated">Servern är för närvarande inte tillgänglig</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s är för närvarande inte tillgänglig</string>
+    <string name="cannot_open_shortcut">Innehållet i denna genväg är för närvarande inte tillgängligt.\nKontrollera att du har behörighet som krävs.</string>
+    <string name="network_shortcuts">Nätverksgenvägar</string>
+    <string name="media_servers">Media servrar</string>
+    <string name="shortcut_list_empty">För att skapa genvägar till dina favoritfjärrmappar lång-klicka på målmapparna och välj \"%s\" i det översta åtgärdsfältet.</string>
+    <!-- DLNA -->
+    <string name="dlna_share">Mediadelning</string>
+    <string name="video">Video</string>
+    <string name="audio">Ljud</string>
+    <string name="picture">Bild</string>
+    <string name="share_types">Delningstyper</string>
+    <!-- ZIP -->
+    <string name="zip_extract_action">Packa upp här</string>
+    <string name="zip_extract_success_message">Extraktion lyckades</string>
+    <string name="zip_compress_action">Komprimera som zip-arkiv</string>
+    <string name="zip_extracting_message">Packar upp filer från zip-arkivet...</string>
+    <string name="zip_compressing_message">Komprimerar filer till Zip-arkiv</string>
+    <string name="zip_compressing_many">%1$d/%2$d komprimerade filer</string>
+    <string name="zip_compressing_one">Komprimerar fil</string>
+    <string name="zip_compressing_success">Komprimering lyckades</string>
+    <string name="zip_compressing_canceled">Komprimering avbruten</string>
+    <string name="zip_extracting_many">%1$d/%2$d extraherade filer</string>
+    <string name="zip_extracting_one">Extraherar fil (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Ett fel inträffade vid extrahering av ditt arkiv.\nArkivet kan vara skadat eller diskutrymme saknas.</string>
+    <string name="zip_extract_canceled">Extrahering avbruten</string>
+    <string name="zip_compress_error_message">Ett fel uppstod när du skapade ditt arkiv.\nKanske saknas ledigt lagringsutrymme.</string>
+    <string name="zip_cannot_open_inner_entry">Kan inte öppna filen i ett arkiv. Extrahera den först.</string>
+    <string name="zip_size_limit">Att bläddra i zip-filer är begränsat till filer mindre än 20 MB</string>
+    <!-- Notifications -->
+    <string name="copy_error">Kopiering misslyckades</string>
+    <string name="cut_error">Urklipp misslyckades</string>
+    <string name="delete_error">Radering misslyckades</string>
+    <!-- Network Scanning -->
+    <string name="scan_network_index">Indexera mediefiler</string>
+    <string name="scan_network_remove">Ta bort media från index</string>
+    <string name="debug_browse_to_root">Bläddra till enhetsrotmapp (endast felsökning)</string>
+    <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Ta bort från mediabibliotek</string>
+    <string name="nomedia_remove">Lägg till i mediabibliotek</string>
+    <string name="nomedia_fail">Ett fel insträffade, kan inte ta bort denna mapp från mediebiblioteket</string>
+    <string name="nomedia_warning">Multimedieinnehållet i den här mappen kommer inte längre att visas i multimedieapplikationerna.\nÄr du säker på att du vill fortsätta?</string>
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Välj en mapp</string>
+    <string name="choose_a_folder_help">Navigera in i mappen du vill välja och tryck på OK. Använd bakåtknappen för att gå upp en nivå.</string>
+    <string name="current_choice">Nuvarande val:</string>
+    <string name="no_selection">inget val</string>
+    <string name="external_storage_fake_name">Enhetslagring</string>
+    <string name="sdcard_fake_name">SD-kort</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(ingen mapp)</string>
+    <string name="navigation_drawer_open">Öppna navigeringsmenyn</string>
+    <string name="navigation_drawer_close">Stäng navigeringsmenyn</string>
+    <string name="listing_sort_mode">Sorteringsläge</string>
+    <string name="listing_sort_by_name">Sortera efter namn</string>
+    <string name="listing_sort_by_size">Sortera efter storlek</string>
+    <string name="listing_sort_by_date">Sortera efter datum</string>
+    <string name="listing_ascending">Stigande</string>
+    <string name="listing_descending">Fallande</string>
+    <string name="acquire_external_usb_permission">Filhanteraren behöver behörighet för åtkomst till extern lagring. Välj ditt lagringsutrymme på nästa skärm</string>
+</resources>
