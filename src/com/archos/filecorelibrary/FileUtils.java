@@ -89,7 +89,7 @@ public class FileUtils {
         String lowerCasePath;
         String relocatedPath = uri.getPath();
         // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
-        if (("file".equals(uri.getScheme()) || relocatedPath.startsWith("/"))) {
+        if (("file".equals(uri.getScheme()) || relocatedUri.toString().startsWith("/"))) {
             log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath + ", " + FileUtilsQ.publicAppDirectory + "/nfoPoster");
             lowerCasePath = uri.getPath().toLowerCase();
             if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
