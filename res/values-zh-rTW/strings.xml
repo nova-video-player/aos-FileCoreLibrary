@@ -12,8 +12,8 @@
     <string name="file_info_label_last_modified">最後變更：</string>
     <string name="file_info_label_mime_type">MIME 類型：</string>
     <string name="file_info_directory_empty">空的資料夾</string>
-    <string name="file_info_one_directory">一個資料夾</string>
-    <string name="file_info_directories">資料夾</string>
+    <string name="file_info_one_directory">1 個資料夾</string>
+    <string name="file_info_directories">個資料夾</string>
     <string name="file_info_one_file">一個檔案</string>
     <string name="file_info_files">檔案</string>
     <string name="usbhost_ptp_storage">外部攝影機</string>
@@ -60,7 +60,7 @@
     <string name="no_network_title">沒有網路連線</string>
     <string name="nonetwork_message">必須啟動無線網路才能使用這個功能</string>
     <!-- FileManager strings -->
-    <string name="storage_busy_message">已連接且掛載隨身碟時，無法使用內部儲存空間。</string>
+    <string name="storage_busy_message">已連接且掛載 USB 儲存裝置時，無法使用內部儲存空間。</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">網路儲存空間</string>
     <string name="external_storage">外部儲存空間</string>
@@ -120,7 +120,7 @@
     <string name="refresh_servers_list">更新伺服器清單</string>
     <string name="enable_network_shares">開啟網路分享</string>
     <string name="go_top">回到頂端</string>
-    <string name="uncheck_impossible">當上層資料夾被選取時無法更改選擇</string>
+    <string name="uncheck_impossible">當上層資料夾被選取時無法變更選擇</string>
     <string name="confirm_delete_one">確定要刪除嗎？</string>
     <string name="confirm_delete_parent_folder">上層資料夾似乎不包含任何其它影片，是否要將其要刪除？</string>
     <string name="confirm_delete_many">確定要刪除嗎？</string>
@@ -180,7 +180,7 @@
     <string name="send_file">藉由以下方式共用檔案：</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <string name="no_way_to_share_file">沒有可共用此檔案的程式</string>
-    <string name="upnp_not_allowed">您無法存取此 UPnP 伺服器，請先修改存取設定。</string>
+    <string name="upnp_not_allowed">您無法存取此 UPnP 伺服器，請先變更存取設定。</string>
     <string name="single_mode">單一模式</string>
     <string name="double_mode">雙重模式</string>
     <string name="swap_panel">交換</string>
