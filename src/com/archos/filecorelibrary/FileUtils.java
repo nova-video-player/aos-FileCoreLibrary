@@ -16,6 +16,7 @@ package com.archos.filecorelibrary;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -23,6 +24,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 
 import com.archos.filecorelibrary.contentstorage.DocumentUriBuilder;
 
@@ -33,6 +38,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 
@@ -67,43 +73,48 @@ public class FileUtils {
     public static Uri prefixPublicNfoPosterUri(Uri uri) {
         // keep the full path of remote storage and prefix it with publicAppDirectory + "/nfoPoster/"
         // full path is kept to cope with extSdCard or USB storage for which we cannot detect the root path easily
+        // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
-        String path = uri.getPath();
-        if (! path.startsWith(FileUtilsQ.publicAppDirectory)) {
-            String scheme = uri.getScheme();
-            if (scheme != null && ! scheme.equals(""))
-                scheme = scheme + "://";
-            else scheme = "";
-            path = path.replaceFirst("/", FileUtilsQ.publicAppDirectory + "/nfoPoster/");
-            log.debug("prefixPublicNfoPosterUri: " + uri + " --> " + path);
-            return Uri.parse(scheme + path);
-        }
-        else return uri;
+        if (canManageExternalStorage()) {
+            String path = uri.getPath();
+            if (!path.startsWith(FileUtilsQ.publicAppDirectory)) {
+                String scheme = uri.getScheme();
+                if (scheme != null && !scheme.equals(""))
+                    scheme = scheme + "://";
+                else scheme = "";
+                path = path.replaceFirst("/", FileUtilsQ.publicAppDirectory + "/nfoPoster/");
+                log.debug("prefixPublicNfoPosterUri: " + uri + " --> " + path);
+                return Uri.parse(scheme + path);
+            } else return uri;
+        } else return uri;
     }
 
     public static Uri relocateNfoJpgAppPublicDir(Uri uri) {
         // converts local file uri for jpg and nfo ONLY to public application uri to avoid Android Q storage restrictions
         // and creates the relocate directory if not existing
+        // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
         Uri relocatedUri = uri;
-        String lowerCasePath;
-        String relocatedPath = uri.getPath();
-        // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
-        if (("file".equals(uri.getScheme()) || relocatedUri.toString().startsWith("/"))) {
-            log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath + ", " + FileUtilsQ.publicAppDirectory + "/nfoPoster");
-            lowerCasePath = uri.getPath().toLowerCase();
-            if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")  && // avoid double prefixing
-                    (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
-                relocatedUri = prefixPublicNfoPosterUri(relocatedUri);
-            Uri relocatedDir = removeLastSegment(relocatedUri);
-            File dir = new File(relocatedDir.getPath());
-            try {
-                dir.mkdirs();
-            } catch (Exception e) {
-                log.error("relocateNfoJpgAppPublicDir: cannot recreate tree structure for " + dir.getPath());
+        if (canManageExternalStorage()) {
+            String lowerCasePath;
+            String relocatedPath = uri.getPath();
+            // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
+            if (("file".equals(uri.getScheme()) || relocatedUri.toString().startsWith("/"))) {
+                log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath + ", " + FileUtilsQ.publicAppDirectory + "/nfoPoster");
+                lowerCasePath = uri.getPath().toLowerCase();
+                if (!uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster") && // avoid double prefixing
+                        (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
+                    relocatedUri = prefixPublicNfoPosterUri(relocatedUri);
+                Uri relocatedDir = removeLastSegment(relocatedUri);
+                File dir = new File(relocatedDir.getPath());
+                try {
+                    dir.mkdirs();
+                } catch (Exception e) {
+                    log.error("relocateNfoJpgAppPublicDir: cannot recreate tree structure for " + dir.getPath());
+                }
             }
+            log.debug("relocateNfoJpgAppPublicDir: " + uri + " -> " + relocatedUri.getPath());
         }
-        log.debug("relocateNfoJpgAppPublicDir: " + uri + " -> " + relocatedUri.getPath());
         return relocatedUri;
     }
 
@@ -393,6 +404,45 @@ public class FileUtils {
             }
         } catch (Exception e) {
             throw new Error(e);
+        }
+    }
+
+    // returns permissions listed in the manifest file
+    public static String[] getPermissions(Context context) {
+        try {
+            return context
+                    .getPackageManager()
+                    .getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS)
+                    .requestedPermissions;
+        } catch (PackageManager.NameNotFoundException e) {
+            log.error("getPermissions: caught PackageManager.NameNotFoundException", e);
+            return new String[0];
+        }
+    }
+
+    // checks if permission listed in the manifest file
+    public static boolean hasPermission(String permission, Context context) {
+        return Arrays.asList(getPermissions(context)).contains(permission);
+    }
+
+    public static boolean hasManageExternalStoragePermission(Context context) {
+        return hasPermission("android.permission.MANAGE_EXTERNAL_STORAGE", context);
+    }
+
+    public static boolean canManageExternalStorage(){
+        boolean result;
+        if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
+            log.debug("canManageExternalStorage: API<23 -> true");
+            return true;
+        } else {
+            if(Build.VERSION.SDK_INT>29) {
+                result = Environment.isExternalStorageManager();
+                log.debug("canManageExternalStorage: API>29 -> " + result);
+                return result;
+            } else {
+                log.debug("canManageExternalStorage: 22<API<30 -> true");
+                return true;
+            }
         }
     }
 
