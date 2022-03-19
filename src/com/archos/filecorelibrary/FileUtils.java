@@ -75,7 +75,7 @@ public class FileUtils {
         // full path is kept to cope with extSdCard or USB storage for which we cannot detect the root path easily
         // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
-        if (canManageExternalStorage()) {
+        if (! canManageExternalStorage()) {
             String path = uri.getPath();
             if (!path.startsWith(FileUtilsQ.publicAppDirectory)) {
                 String scheme = uri.getScheme();
@@ -95,7 +95,7 @@ public class FileUtils {
         // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
         Uri relocatedUri = uri;
-        if (canManageExternalStorage()) {
+        if (! canManageExternalStorage()) {
             String lowerCasePath;
             String relocatedPath = uri.getPath();
             // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
