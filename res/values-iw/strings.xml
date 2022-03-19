@@ -2,6 +2,8 @@
 <resources>
     <string name="file_info_label_name">שם:</string>
     <string name="file_info_label_size">נפח:</string>
+    <string name="file_info_label_size_internal">גודל (פנימי):</string>
+    <string name="file_info_label_size_sd">גודל (SD):</string>
     <string name="file_info_label_permission">הרשאה:</string>
     <string name="file_info_label_can_read">ניתן לקריאה</string>
     <string name="file_info_label_cannot_read">לא ניתן לקריאה</string>
@@ -29,10 +31,10 @@
     <string name="samba_server">הגדר שרת</string>
     <string name="samba_share">הגדר שיתוף</string>
     <string name="refresh">רענן</string>
-    <string name="network_timeout">התיקיה המרוחקת אינה זמינה,\n בדוק את הגדרות הרשת ונסה שנית.</string>
-    <string name="samba_loading">נא המתן בעת טעינת תיקיה משותפת&#8230;</string>
-    <string name="samba_reloading">נא המתן בעת טעינת תיקיה משותפת מחדש&#8230;</string>
-    <string name="samba_password_request_title">דרושה סיסמה לתיקיה משותפת</string>
+    <string name="network_timeout">התיקייה המרוחקת אינה זמינה,\n בדוק את הגדרות הרשת ונסה שנית.</string>
+    <string name="samba_loading">נא המתן בעת טעינת תיקייה משותפת&#8230;</string>
+    <string name="samba_reloading">נא המתן בעת טעינת תיקייה משותפת מחדש&#8230;</string>
+    <string name="samba_password_request_title">דרושה סיסמה לתיקייה משותפת</string>
     <string name="samba_domain">דומיין</string>
     <string name="samba_username">שם משתמש</string>
     <string name="samba_password">סיסמה</string>
@@ -42,13 +44,21 @@
     <string name="shared_folder_credentials">סיסמאות</string>
     <string name="no_saved_passwords">אין סיסמאות שמורות</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">קבל כאן דרך WiFi Direct</string>
+    <string name="empty_message">מגלה התקני יעד זמינים&#8230;&lt;br/&gt;התקן יעד צריך להפעיל אפשרות &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
+    <string name="wifip2p_waiting">העברה באמצעות WiFi Direct תתחיל מיד</string>
+    <string name="connect_to_target">מתחבר ליעד</string>
     <string name="upload_in_progress">העלאה מתבצעת&#8230;</string>
     <string name="file_uploading">הקובץ כרגע בהעלאה</string>
     <string name="back_cancel">לחץ חזור לביטול</string>
+    <string name="server_wait">מחכה ללקוח שייתחבר וישלח קובץ</string>
     <string name="download_in_progress">הורדה מתבצעת&#8230;</string>
     <string name="file_downloading">הקובץ כרגע בהורדה</string>
+    <string name="server_ready">מוכן לקבל</string>
     <string name="nonetwork_title" comment="deprecated">אין חיבור WiFi</string>
     <string name="no_network_title">אין חיבור רשת</string>
+    <string name="nonetwork_message">יש צורך להפעיל WiFi עבור יכולת זו</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">אין באפשרותך להשתמש באחסון הפנימי בזמן שהוא מחובר וטעון ע\"י ה- USB.</string>
     <string name="ssh_storage">FTP</string>
@@ -61,67 +71,107 @@
     <string name="other_storage">כונן</string>
     <string name="usb_ptp_storage">PTP</string>
     <string name="cloud_storage">ענן</string>
-    <string name="directory_empty">התיקיה ריקה</string>
+    <string name="directory_empty">תיקייה ריקה</string>
     <string name="no_server">לא נמצא שרת מדיה</string>
     <string name="loading">אנא המתן בזמן הטעינה…</string>
+    <string name="ssh_error">אין אפשרות להתחבר: אנא בדוק את החיבור ופרטי המשתמש</string>
     <string name="ssh_remote_address">כתובת מרוחקת</string>
+    <string name="ssh_remote_address_error">יש לציין כתובת מרוחקת</string>
     <string name="ssh_password">סיסמה</string>
     <string name="ssh_username">שם משתמש</string>
     <string name="ssh_port">פורט (אופציונלי)</string>
     <string name="ssh_path">נתיב (אופציונלי)</string>
     <string name="save_password">שמור סיסמה</string>
     <string name="ssh_prompt">סוג FTP</string>
-    <string name="download_prompt">הורד קובץ לתיקיה:</string>
+    <string name="download_prompt">הורד קובץ לתיקייה:</string>
     <string name="browse_ftp_server">שרת</string>
     <string name="cannot_list">לא ניתן להציג תוכן</string>
     <string name="error_listing">אירעה שגיאה</string>
+    <string name="error_host_not_found">שרת לא נמצא</string>
+    <string name="error_unknown_host">שרת לא ידוע</string>
+    <string name="error_no_connection">אין אפשרות להתחבר לשרת</string>
+    <string name="error_credentials">לא ניתן להציג את התיקייה: בדוק את פרטי המשתמש שלך</string>
+    <string name="error_no_permission">לחשבון זה אין הרשאה להציג תיקייה זו</string>
     <string name="error_file_not_found">הקובץ לא נמצא</string>
+    <string name="error_time_out">נגמר הזמן</string>
+    <string name="deleting">מוחק</string>
+    <string name="deleting_many">%1$d/%2$d קבצים נמחקו</string>
+    <string name="deleting_one">מוחק קובץ אחד</string>
     <string name="copying">מעתיק&#8230;</string>
     <string name="moving">מעביר&#8230;</string>
     <string name="open_file">פתח קובץ</string>
+    <string name="open_file_after_download">פתח קובץ אחרי סיום העתקה</string>
+    <string name="pasting_copy_one">מעתיק קובץ אחד (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">מעתיק: %1$d/%2$d קבצים (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">מעביר קובץ אחד (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">מעביר: %1$d/%2$d קבצים (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
     <string name="delete">מחק</string>
     <string name="rename">שנה שם</string>
     <string name="details">פרטים</string>
-    <string name="refresh_directory">רענן תיקיה</string>
+    <string name="refresh_directory">רענן תיקייה</string>
     <string-array name="folder_or_file">
-        <item>צור תיקיה</item>
+        <item>צור תיקייה</item>
         <item>צור קובץ ריק</item>
     </string-array>
     <string name="new_directory">תיקה חדשה</string>
     <string name="new_file">קובץ חדש</string>
-    <string name="new_folder_or_file">תיקיה חדשה או קובץ חדש</string>
+    <string name="new_folder_or_file">תיקייה חדשה או קובץ חדש</string>
     <string name="refresh_servers_list">רענן רשימת שרתים</string>
     <string name="enable_network_shares">אפשר שיתופי רשת</string>
     <string name="go_top">חזור לראש</string>
+    <string name="uncheck_impossible">לא ניתן לשנות בחירה כאשר תיקיית אב בחורה</string>
     <string name="confirm_delete_one">האם אתה בטוח שברצונך למחוק?</string>
+    <string name="confirm_delete_parent_folder">נראה שתיקיית האב אינה מכילה קבצי וידאו נוספים, האם למחוק אותה?</string>
     <string name="confirm_delete_many">האם אתה בטוח שברצונך למחוק?</string>
-    <string name="enter_new_name">שם תיקיה:</string>
+    <string name="enter_new_name">שם:</string>
     <string name="file_name">שם קובץ</string>
-    <string name="folder_name">שם תיקיה</string>
+    <string name="folder_name">שם תיקייה</string>
     <string name="run_in_background">מזער</string>
     <string name="confirm_deleting_cancellation">האם אתה בטוח שברצונך לבטל את המחיקה?</string>
     <string name="confirm_copying_cancellation">האם אתה בטוח שברצונך לבטל את ההעתקה?</string>
     <string name="confirm_moving_cancellation">האם אתה בטוח שברצונך לבטל את ההעברה?</string>
-    <string name="cannot_create_directory">לא ניתן ליצור תיקיה חדשה</string>
+    <string name="cannot_create_directory">לא ניתן ליצור תיקייה חדשה</string>
     <string name="cannot_create_file">לא ניתן ליצור קובץ חדש</string>
-    <string name="cannot_delete_directory">לא ניתן למחוק את התיקיה</string>
+    <string name="cannot_delete_directory">לא ניתן למחוק את התיקייה</string>
     <string name="cannot_delete_file">לא ניתן למחוק את הקובץ</string>
     <string name="cannot_delete_files">לא ניתן למחוק את הקבצים</string>
-    <string name="directory_deleted">התיקיה נמחקה</string>
+    <string name="directory_deleted">התיקייה נמחקה</string>
     <string name="file_deleted">הקובץ נמחק</string>
     <string name="files_deleted">הקבצים נמחקו</string>
     <string name="cannot_rename">לא ניתן לשנות שם</string>
     <string name="cannot_paste_folder_into_itself">לא ניתן להעתיק או להעביר תיקיות לתוך עצמן או לתוך תת-התיקיות שלהן</string>
     <string name="cannot_paste_file_same_location">לא ניתן להדביק את הקבצים ולמיקומם המקורי</string>
     <string name="cannot_paste_over_network">לא ניתן להדביק קבצים דרך הרשת</string>
+    <string name="copy_directory_success_one">תיקייה הועתקה</string>
+    <string name="copy_directory_success_many">תיקיות הועתקו</string>
     <string name="copy_file_success_one">קובץ הועתק</string>
+    <string name="copy_file_success_many">קבצים הועתקו</string>
+    <string name="copy_directory_failed_one">תיקייה לא הועתקה</string>
+    <string name="copy_directory_failed_many">תיקיות לא הועתקו</string>
+    <string name="copy_file_failed_one">קובץ לא הועתק</string>
+    <string name="copy_file_failed_many">קבצים לא הועתקו</string>
     <string name="cut_directory_success_one">תיקייה הועברה</string>
     <string name="cut_directory_success_many">תיקיות הועברו</string>
     <string name="cut_file_success_one">קובץ הועבר</string>
     <string name="cut_file_success_many">קבצים הועברו</string>
     <string name="cut_directory_failed_one">תיקייה לא הועברה</string>
+    <string name="cut_directory_failed_many">תיקיות לא הועברו</string>
+    <string name="cut_file_failed_one">קובץ לא הועבר</string>
+    <string name="cut_file_failed_many">קבצים לא הועברו</string>
+    <string name="pasting_done">הדבקה בוצעה</string>
+    <string name="copy_done">העתקה הצליחה</string>
+    <string name="copy_canceled">העתקה בוטלה</string>
+    <string name="cut_done">גזירה הצליחה</string>
+    <string name="cut_canceled">גזירה בוטלה</string>
+    <string name="delete_done">מחיקה הצליחה</string>
+    <string name="delete_canceled">מחיקה בוטלה</string>
     <string name="cannot_open_file">לא ניתן לפתוח קובץ</string>
+    <string name="no_application_to_open_file">אין יישום על המכשיר שיכול לפתוח קובץ זה</string>
     <string name="delete_still_ongoing">המחיקה עדיין מתבצעת ברקע</string>
+    <string name="copy_on_device">הורד וידאו למכשיר</string>
+    <string name="copy_on_device_multi">הורד למכשיר</string>
+    <string name="storage_swapped_primary">ראשי</string>
     <string name="storage_swapped_secondary">משני</string>
     <string name="yes">"כן"</string>
     <string name="no">"לא"</string>
@@ -144,7 +194,8 @@
     <string name="shortcut_created">קיצור דרך \"%1$s\" נוצר</string>
     <string name="one_shortcut_removed">קיצור דרך אחד נמחק</string>
     <string name="n_shortcut_removed">%1$d קיצורי דרך נמחקו</string>
-    <string name="server_not_available" comment="deprecated">השרת כעת אינו זמין</string>
+    <string name="server_not_available" comment="deprecated">השרת אינו זמין כעת</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s לא זמין כרגע</string>
     <string name="cannot_open_shortcut">תוכן קיצור הדרך אינו זמין כעת. \nאנא בדקו שיש לכם את ההרשאות המתאימות.</string>
     <string name="network_shortcuts">קיצורי דרך רשת</string>
     <string name="media_servers">שרתי מדיה</string>
@@ -157,22 +208,50 @@
     <string name="share_types">סוגי_שיתוף</string>
     <!-- ZIP -->
     <string name="zip_extract_action">פרוס לכאן</string>
+    <string name="zip_extract_success_message">חילוץ הצליח</string>
     <string name="zip_compress_action">כווץ לארכיון ZIP</string>
     <string name="zip_extracting_message">פורס קבצים מארכיון ZIP…</string>
     <string name="zip_compressing_message">מכווץ קבצים לארכיון ZIP</string>
+    <string name="zip_compressing_many">%1$d/%2$d קבצים דחוסים</string>
+    <string name="zip_compressing_one">דוחס קובץ אחד</string>
+    <string name="zip_compressing_success">דחיסה הצליחה</string>
+    <string name="zip_compressing_canceled">דחיסה בוטלה</string>
+    <string name="zip_extracting_many">%1$d/%2$d קבצים חולצו</string>
+    <string name="zip_extracting_one">מחלץ קובץ אחד (%1$s/%2$s)</string>
     <string name="zip_extract_error_message">שגיאה בעת יצירת ארכיון. \nישנה אפשרות כי הארכיון פגום או אין מספיק מקום פנוי בהתקן האחסון.</string>
+    <string name="zip_extract_canceled">חילוץ בוטל</string>
     <string name="zip_compress_error_message">שגיאה בעת יצירת ארכיון. \nישנה אפשרות כי אין מספיק מקום פנוי בהתקן האחסון.</string>
     <string name="zip_cannot_open_inner_entry">לא ניתן לפתוח קובץ בתוך ארכיון. יש לבצע פריסה קודם לכן.</string>
     <string name="zip_size_limit">סיור בקבצי ZIP מוגבלת לקבצים קטנים מ- 20MB</string>
     <!-- Notifications -->
     <string name="copy_error">ההעתקה נכשלה</string>
+    <string name="cut_error">גזירה נכשלה</string>
+    <string name="delete_error">מחיקה נכשלה</string>
     <!-- Network Scanning -->
     <string name="scan_network_index">קטלג קבצי מדיה</string>
     <string name="scan_network_remove">הסר מדיה מהקטלוג</string>
+    <string name="debug_browse_to_root">דפדף לשורש המכשיר (מצב דיבאג)</string>
     <!-- Hiding from media scanning -->
     <string name="nomedia_create">הסר מספרית מדיה</string>
     <string name="nomedia_remove">הוסף לספרית מדיה</string>
-    <string name="nomedia_fail">הפעולה נכשלה, לא ניתן להסיר את תיקיה זו מספרית המדיה</string>
-    <string name="nomedia_warning">תוכן המולטימדיה של תיקיה זו לא יופיע יותר בתוכנות מולטימדיה.\nהאם להמשיך?</string>
+    <string name="nomedia_fail">הפעולה נכשלה, לא ניתן להסיר את תיקייה זו מספרית המדיה</string>
+    <string name="nomedia_warning">תוכן המולטימדיה של תיקייה זו לא יופיע יותר בתוכנות מולטימדיה.\nהאם להמשיך?</string>
     <!-- Folder Picker -->
+    <string name="choose_a_folder">בחר תיקייה</string>
+    <string name="choose_a_folder_help">נווט לתוך התיקייה שאתה מעוניין לבחור ולחץ אישור. השתמש במקש חזור כדי לעלות רמה אחת למעלה.</string>
+    <string name="current_choice">בחירה נוכחית:</string>
+    <string name="no_selection">אין בחירה</string>
+    <string name="external_storage_fake_name">אחסון המכשיר</string>
+    <string name="sdcard_fake_name">כרטיס SD</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(אין תיקייה)</string>
+    <string name="navigation_drawer_open">פתח מגירת ניווט</string>
+    <string name="navigation_drawer_close">סגור מגירת ניווט</string>
+    <string name="listing_sort_mode">שיטת המיון</string>
+    <string name="listing_sort_by_name">מיון לפי שם</string>
+    <string name="listing_sort_by_size">מיון לפי גודל</string>
+    <string name="listing_sort_by_date">מיון לפי תאריך</string>
+    <string name="listing_ascending">סדר עולה</string>
+    <string name="listing_descending">סדר יורד</string>
+    <string name="acquire_external_usb_permission">מנהל הקבצים צריך הרשאה מיוחדת לגשת לאחסון חיצוני. בחר בבקשה את האחסון שלך במסך הבא</string>
 </resources>
