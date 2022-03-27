@@ -58,7 +58,7 @@
     <string name="server_ready">מוכן לקבל</string>
     <string name="nonetwork_title" comment="deprecated">אין חיבור WiFi</string>
     <string name="no_network_title">אין חיבור רשת</string>
-    <string name="nonetwork_message">יש צורך להפעיל WiFi עבור יכולת זו</string>
+    <string name="nonetwork_message">יש צורך להפעיל WiFi עבור תכונה זו</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">אין באפשרותך להשתמש באחסון הפנימי בזמן שהוא מחובר וטעון ע\"י ה- USB.</string>
     <string name="ssh_storage">FTP</string>
