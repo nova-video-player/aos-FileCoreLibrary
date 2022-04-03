@@ -429,7 +429,8 @@ public class FileUtils {
         return hasPermission("android.permission.MANAGE_EXTERNAL_STORAGE", context);
     }
 
-    public static boolean canManageExternalStorage(){
+    // canManageExternalStorage does say if it can have full storage access but not if read/write permission is granted!
+    public static boolean canManageExternalStorage() {
         boolean result;
         if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
             log.debug("canManageExternalStorage: API<23 -> true");
@@ -442,6 +443,24 @@ public class FileUtils {
             } else {
                 log.debug("canManageExternalStorage: 22<API<30 -> true");
                 return true;
+            }
+        }
+    }
+
+    public static boolean canReadExternalStorage(Context context) {
+        boolean result = false;
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
+            log.debug("canReadExternalStorage: API<23 -> true");
+            return true;
+        } else {
+            if (Build.VERSION.SDK_INT>29) {
+                result = Environment.isExternalStorageManager();
+                log.debug("canReadExternalStorage: API>29 -> " + result);
+                return result;
+            } else {
+                result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                log.debug("canReadExternalStorage: 22<API<30 -> " + result);
+                return result;
             }
         }
     }
