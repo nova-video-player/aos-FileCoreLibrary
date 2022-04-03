@@ -453,7 +453,7 @@ public class FileUtils {
             log.debug("canReadExternalStorage: API<23 -> true");
             return true;
         } else {
-            if (Build.VERSION.SDK_INT>29) {
+            if (Build.VERSION.SDK_INT>29 && hasManageExternalStoragePermission(context)) {
                 result = Environment.isExternalStorageManager();
                 log.debug("canReadExternalStorage: API>29 -> " + result);
                 return result;
