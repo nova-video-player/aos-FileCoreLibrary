@@ -45,6 +45,8 @@ public class FileUtilsQ {
     public static String publicAppDirectory = null;
     public static String privateAppDirectory = null;
 
+    private static final String DEFAULT_PUBLIC_APP_DIR = "/sdcard/Android/data/org.courville.nova/files";
+
     public static void setDeleteLauncher(ActivityResultLauncher<IntentSenderRequest> launcher) {
         mDeleteLauncher = launcher;
     }
@@ -74,11 +76,13 @@ public class FileUtilsQ {
         mContext = context;
         // at this point externalStorageState might not be ready
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            publicAppDirectory = mContext.getExternalFilesDir(null).getPath();
+            File externalFilesDir = mContext.getExternalFilesDir(null);
+            if (externalFilesDir != null) publicAppDirectory = externalFilesDir.getPath();
+            else publicAppDirectory = DEFAULT_PUBLIC_APP_DIR;
         } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
             // TOFIX doing wild guess but should in reality wait for result to be available
             log.warn("FileUtilsQ: getExternalStorageState " + Environment.getExternalStorageState() + " is not mounted!");
-            publicAppDirectory = "/sdcard/Android/data/org.courville.nova/files";
+            publicAppDirectory = DEFAULT_PUBLIC_APP_DIR;
         }
         privateAppDirectory = mContext.getFilesDir().getPath();
         log.debug("FileUtilsQ: publicAppDirectory " + publicAppDirectory + ", privateAppDirectory " + privateAppDirectory);
