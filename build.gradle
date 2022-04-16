@@ -107,4 +107,5 @@ dependencies {
     // TODO use https://github.com/mwiede/jsch instead of https://sourceforge.net/projects/jsch/files/jsch/
     // see http://www.matez.de/index.php/2020/06/22/the-future-of-jsch-without-ssh-rsa/
     // implementation 'com.github.mwiede:jsch:0.1.70'
+    implementation 'io.sentry:sentry:5.7.3'
 }

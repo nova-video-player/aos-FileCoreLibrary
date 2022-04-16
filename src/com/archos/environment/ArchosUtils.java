@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.sentry.Breadcrumb;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 
 public final class ArchosUtils {
     private static final String TAG = "ArchosUtils";
@@ -29,13 +32,14 @@ public final class ArchosUtils {
     private static Context globalContext;
 
     public static boolean isAmazonApk() {
-       return android.os.Build.MANUFACTURER.toLowerCase().equals("amazon");
+        return android.os.Build.MANUFACTURER.toLowerCase().equals("amazon");
     }
 
     public static boolean isInstalledfromPlayStore(Context context) {
         final List<String> playStoreInstallerPackageNames = new ArrayList<>(Arrays.asList("com.android.vending", "com.google.android.feedback"));
         final String installerPackageName = context.getPackageManager().getInstallerPackageName(context.getPackageName());
-        if (DBG) Log.d(TAG, "isInstalledfromPlayStore: installerPackageName = " + installerPackageName);
+        if (DBG)
+            Log.d(TAG, "isInstalledfromPlayStore: installerPackageName = " + installerPackageName);
         return installerPackageName != null && playStoreInstallerPackageNames.contains(installerPackageName);
     }
 
@@ -64,6 +68,14 @@ public final class ArchosUtils {
 
     public static Context getGlobalContext() {
         return globalContext;
+    }
+
+    public static void addBreadcrumb(SentryLevel level, String category, String message) {
+        Breadcrumb breadcrumb = new Breadcrumb();
+        breadcrumb.setCategory(category);
+        breadcrumb.setMessage(message);
+        breadcrumb.setLevel(level);
+        Sentry.addBreadcrumb(breadcrumb);
     }
 
 }
