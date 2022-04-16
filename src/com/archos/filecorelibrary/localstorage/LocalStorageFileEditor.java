@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.localstorage;
 
+import static com.archos.filecorelibrary.FileUtils.canManageExternalStorage;
 import static com.archos.filecorelibrary.FileUtils.prefixPublicNfoPosterUri;
 
 import android.content.ContentResolver;
@@ -308,8 +309,8 @@ public class LocalStorageFileEditor extends FileEditor {
         }
         // TOCHECK: works on external storage?
         deleteDir(uri); // directory is not in MediaStore and java IO delete seems to work when folder is empty
-        // delete nfoJpg corresponding folder too and avoid loops
-        if (! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) {
+        // delete nfoJpg corresponding folder too and avoid loops i.e. do not prefix if canManageExternalStorage
+        if (! canManageExternalStorage() && ! uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) {
             isDeleteOK = deleteFolder(prefixPublicNfoPosterUri(uri));
         }
         return isDeleteOK;
