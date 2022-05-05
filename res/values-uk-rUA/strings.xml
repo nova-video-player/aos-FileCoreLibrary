@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Назва:</string>
+    <string name="file_info_label_size">Розмір:</string>
+    <string name="file_info_directory_empty">Порожня тека</string>
+    <string name="file_info_one_directory">1 тека</string>
+    <string name="file_info_one_file">1 файл</string>
+    <string name="usbhost_ptp_storage">Зовнішня камера</string>
+    <!-- Archos file manager core -->
+    <!-- Samba share settings -->
+    <string name="samba_add_server">Додати сервер</string>
+    <string name="samba_domain">Домен</string>
+    <string name="samba_username">Імʼя користувача</string>
+    <string name="samba_password">Пароль</string>
+    <string name="samba_show_password">Показувати пароль</string>
+    <string name="shared_folder_credentials">Паролі</string>
+    <!-- WiFi Direct strings-->
+    <!-- FileManager strings -->
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Мережа</string>
+    <string name="internal_storage_unified">Сховище</string>
+    <string name="sd_card_storage">SD-картка</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="cloud_storage">Хмара</string>
+    <string name="directory_empty">Порожня тека</string>
+    <string name="ssh_remote_address">Віддалена адреса</string>
+    <string name="ssh_password">Пароль</string>
+    <string name="ssh_username">Імʼя користувача</string>
+    <string name="save_password">Зберегти пароль</string>
+    <string name="browse_ftp_server">Сервер</string>
+    <string name="delete">Видалити</string>
+    <string name="rename">Перейменувати</string>
+    <string-array name="folder_or_file">
+        <item>Створити теку</item>
+        <item>Створити порожню теку</item>
+    </string-array>
+    <string name="new_directory">Нова тека</string>
+    <string name="new_file">Новий файл</string>
+    <string name="file_name">Назва файлу</string>
+    <string name="folder_name">Назва теки</string>
+    <string name="yes">"Так"</string>
+    <string name="no">"Ні"</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <!-- Shortcuts -->
+    <!-- DLNA -->
+    <!-- ZIP -->
+    <!-- Notifications -->
+    <!-- Network Scanning -->
+    <!-- Hiding from media scanning -->
+    <!-- Folder Picker -->
+    <string name="sdcard_fake_name">SD-картка</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="listing_sort_by_name">Сортувати за назвою</string>
+    <string name="listing_sort_by_size">Сортувати за розміром</string>
+    <string name="listing_sort_by_date">Сортувати за датою</string>
+</resources>

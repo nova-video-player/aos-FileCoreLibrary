@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Όνομα:</string>
+    <string name="file_info_label_size">Μέγεθος:</string>
+    <string name="file_info_label_size_internal">Μέγεθος (εσωτερικό):</string>
+    <string name="file_info_label_size_sd">Μέγεθος (SD):</string>
+    <string name="file_info_label_permission">Άδεια:</string>
+    <string name="file_info_label_can_read">Aνάγνωση</string>
+    <string name="file_info_label_cannot_read">Aδυναμία ανάγνωσης</string>
+    <string name="file_info_label_can_write">Εγγραφή</string>
+    <string name="file_info_label_cannot_write">Αδυναμία εγγραφής</string>
+    <string name="file_info_label_last_modified">Τελευταία τροποποίηση</string>
+    <string name="file_info_label_mime_type">Τύπος Mime:</string>
+    <string name="file_info_directory_empty">Κενός Φάκελος</string>
+    <string name="file_info_one_directory">1 φάκελος</string>
+    <string name="file_info_directories">Φάκελοι</string>
+    <string name="file_info_one_file">1 αρχείο</string>
+    <string name="file_info_files">Αρχεία</string>
+    <string name="usbhost_ptp_storage">Εξωτερική κάμερα</string>
+    <string name="network_media_servers">Διακομιστές πολυμέσων (UPnP)</string>
+    <string name="network_shared_folders">Κοινόχρηστοι φάκελοι (SMB)</string>
+    <!-- Archos file manager core -->
+    <string name="file_copy_pattern">Αντιγραφή</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <!-- Samba share settings -->
+    <string name="samba_settings_title">Ρυθμίσεις κοινόχρηστων φακέλων</string>
+    <string name="samba_settings_summary">Ρύθμιση ονομάτων χρηστών και κωδικών πρόσβασης για την πρόσβαση στους κοινόχρηστους φακέλους στο ιδιωτικό σας δίκτυο</string>
+    <string name="samba_profiles">Προφίλ κοινόχρηστων φακέλων</string>
+    <string name="samba_delete_settings">Θέλετε πραγματικά να διαγράψετε αυτή τη ρύθμιση?</string>
+    <string name="samba_add_server">Προσθήκη διακομιστή</string>
+    <string name="samba_server">Ορισμός διακομιστή</string>
+    <string name="samba_share">Ορίστε κοινή χρήση</string>
+    <string name="refresh">Ανανέωση</string>
+    <string name="network_timeout">Λυπούμαστε, ο απομακρυσμένος φάκελος δεν είναι προσβάσιμος. Ελέγξτε τη σύνδεση σας στο δίκτυου και προσπαθήστε ξανά.</string>
+    <string name="samba_loading">Παρακαλώ περιμένετε κατά τη φόρτωση κοινόχρηστου φακέλου</string>
+    <string name="samba_reloading">Παρακαλώ περιμένετε κατά την επαναφόρτωση κοινόχρηστου φακέλου</string>
+    <string name="samba_password_request_title">Αίτημα κωδικού πρόσβασης κοινόχρηστου φακέλου</string>
+    <string name="samba_domain">Τομέας</string>
+    <string name="samba_username">Όνομα Χρήστη</string>
+    <string name="samba_password">Κωδικόs πρόσβασης</string>
+    <string name="samba_show_password">Εμφάνιση κωδικού πρόσβασης</string>
+    <string name="samba_wrong_password">Το όνομα χρήστη ή κωδικός πρόσβασης είναι λανθασμένο</string>
+    <string name="preferences">Προτιμήσεις</string>
+    <string name="shared_folder_credentials">Κωδικοί πρόσβασης</string>
+    <string name="no_saved_passwords">Δεν υπάρχουν αποθηκευμένοι κωδικοί πρόσβασης</string>
+    <!-- WiFi Direct strings-->
+    <string name="wifi_direct">Wi-Fi Direct</string>
+    <string name="receive_p2p_here">Λήψη εδώ μέσω WiFi Direct</string>
+    <string name="connect_to_target">Σύνδεση στον προορισμό</string>
+    <string name="upload_in_progress">Μεταφόρτωση σε εξέλιξη</string>
+    <string name="file_uploading">Το αρχείο σας μεταφορτώνεται</string>
+    <string name="back_cancel">Πατήστε πίσω για ακύρωση</string>
+    <string name="server_wait">Αναμονή σύνδεσης και αποστολής αρχείου από τον πελάτη</string>
+    <string name="download_in_progress">Λήψη σε εξέλιξη&#8230;</string>
+    <string name="file_downloading">Το αρχείο σας κατεβαίνει</string>
+    <string name="server_ready">Ετοιμότητα λήψης</string>
+    <string name="nonetwork_title" comment="deprecated">Χωρίς Σύνδεση Wi-Fi</string>
+    <string name="no_network_title">Χωρίς σύνδεση δικτύου</string>
+    <string name="nonetwork_message">Πρέπει να ενεργοποιήσετε το WiFi για αυτή τη δυνατότητα</string>
+    <!-- FileManager strings -->
+    <string name="storage_busy_message">Δε μπορείτε να χρησιμοποιήσετε τον εσωτερικό χώρο αποθήκευσης όσο είναι συνδεδεμένος και προσαρτημένος μέσω USB</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Δίκτυο</string>
+    <string name="external_storage">Εξωτερικός</string>
+    <string name="internal_storage">Εσωτερικός</string>
+    <string name="internal_storage_unified">Αποθηκευτικός χώρος</string>
+    <string name="sd_card_storage">Κάρτα SD</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Οδηγός</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="directory_empty">Κενός Φάκελος</string>
+    <string name="no_server">Δεν βρέθηκε διακομιστής</string>
+    <string name="loading">Φόρτωση&#8230;</string>
+    <string name="ssh_error">Αδυναμία σύνδεσης: παρακαλούμε ελέγξτε τη σύνδεσή σας και τα διαπιστευτήριά σας</string>
+    <string name="ssh_remote_address">Απομακρυσμένη διεύθυνση</string>
+    <string name="ssh_remote_address_error">Πρέπει να καθορίσετε μια απομακρυσμένη διεύθυνση</string>
+    <string name="ssh_password">Κωδικόs πρόσβασης</string>
+    <string name="ssh_username">Όνομα Χρήστη</string>
+    <string name="ssh_port">Θύρα (προαιρετικό)</string>
+    <string name="ssh_path">Διαδρομή (προαιρετικό)</string>
+    <string name="save_password">Αποθήκευση κωδικού πρόσβασης</string>
+    <string name="ssh_prompt">Τύπος FTP</string>
+    <string name="download_prompt">Λήψη αρχείου στο φάκελο:</string>
+    <string name="browse_ftp_server">Διακομιστής</string>
+    <string name="cannot_list">Αδυναμία προβολής περιεχομένου</string>
+    <string name="error_listing">Παρουσιάστηκε ένα σφάλμα</string>
+    <string name="error_host_not_found">Δε βρέθηκε διακομιστής</string>
+    <string name="error_unknown_host">Άγνωστος διακομιστής</string>
+    <string name="error_no_connection">Αδυναμία σύνδεσης στον διακομιστή</string>
+    <string name="error_credentials">Αδυναμία προβολής καταλόγου: ελέγξτε τα διαπιστευτήριά σας</string>
+    <string name="error_no_permission">Αυτός ο λογαριασμός δεν επιτρέπεται να προβάλει αυτόν τον κατάλογο</string>
+    <string name="error_file_not_found">Το αρχείο δεν βρέθηκε</string>
+    <string name="error_time_out">Λήξη χρόνου</string>
+    <string name="deleting">Διαγραφή</string>
+    <string name="deleting_many">%1$d/%2$d Διαγραμμένα αρχεία</string>
+    <string name="deleting_one">Διαγραφή ενός αρχείου</string>
+    <string name="copying">Αντιγραφή&#8230;</string>
+    <string name="moving">Μετακίνηση&#8230;</string>
+    <string name="open_file">Άνοιγμα αρχείου</string>
+    <string name="open_file_after_download">Άνοιγμα αρχείου μετά την ολοκλήρωση της αντιγραφής</string>
+    <string name="pasting_copy_one">Αντιγραφή ενός αρχείου (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Αντιγραφή: %1$d/%2$d αρχεία (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Μετακίνηση ενός αρχείου (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Μετακίνηση: %1$d/%2$d αρχείων (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
+    <string name="delete">Διαγραφή</string>
+    <string name="rename">Μετονομασία</string>
+    <string name="details">Λεπτομέρειες</string>
+    <string name="refresh_directory">Ανανέωση φακέλου</string>
+    <string-array name="folder_or_file">
+        <item>Δημιουργία φακέλου</item>
+        <item>Δημιουργήστε ένα κενό αρχείο</item>
+    </string-array>
+    <string name="new_directory">Νέος φάκελος</string>
+    <string name="new_file">Νέο αρχείο</string>
+    <string name="new_folder_or_file">Νέος φάκελος ή αρχείο</string>
+    <string name="refresh_servers_list">Ανανέωση λίστας εξυπηρετητών</string>
+    <string name="enable_network_shares">Ενεργοποίηση διαμοιρασμού δικτύου</string>
+    <string name="go_top">Μετάβαση πίσω στην κορυφή</string>
+    <string name="uncheck_impossible">Αδύνατη η αλλαγή επιλογής όταν είναι επιλεγμένος ο γονικός φάκελος</string>
+    <string name="confirm_delete_one">Θέλετε πραγματικά να το διαγράψετε;</string>
+    <string name="confirm_delete_parent_folder">Ο γονικός φάκελος δεν περιέχει κανένα άλλο βίντεο, να τον διαγράψουμε;</string>
+    <string name="confirm_delete_many">Θέλετε πραγματικά να τα διαγράψετε;</string>
+    <string name="enter_new_name">Όνομα:</string>
+    <string name="file_name">Όνομα αρχείου</string>
+    <string name="folder_name">Όνομα φακέλου</string>
+    <string name="run_in_background">Ελαχιστοποίηση</string>
+    <string name="confirm_deleting_cancellation">Θέλετε πραγματικά να ακυρώσετε τη διαγραφή;</string>
+    <string name="confirm_copying_cancellation">Θέλετε πραγματικά να ακυρώσετε την αντιγραφή;</string>
+    <string name="confirm_moving_cancellation">Θέλετε πραγματικά να ακυρώσετε τη μετακίνηση;</string>
+    <string name="cannot_create_directory">Αδυναμία δημιουργίας νέου φακέλου</string>
+    <string name="cannot_create_file">Αδυναμία δημιουργίας νέου αρχείου</string>
+    <string name="cannot_delete_directory">Αδυναμία διαγραφής φακέλου</string>
+    <string name="cannot_delete_file">Αδυναμία διαγραφής του αρχείου</string>
+    <string name="cannot_delete_files">Αδυναμία διαγραφής αρχείων</string>
+    <string name="directory_deleted">Ο φάκελος έχει διαγραφεί</string>
+    <string name="file_deleted">Το αρχείο διαγράφηκε</string>
+    <string name="files_deleted">Τα αρχεία διαγράφηκαν</string>
+    <string name="cannot_rename">Αδυναμία μετονομασίας</string>
+    <string name="cannot_paste_folder_into_itself">Αδυναμία αντιγραφής ή μετακίνησης φακέλων στον εαυτό τους, ή σε έναν απο τους υποφακέλους</string>
+    <string name="cannot_paste_file_same_location">Αδυναμία επικόλλησης αρχείων στην αρχική θέση τους</string>
+    <string name="cannot_paste_over_network">Αδυναμία επικόλλησης αρχείων στο δίκτυο</string>
+    <string name="copy_directory_success_one">Ο φάκελος αντιγράφηκε</string>
+    <string name="copy_directory_success_many">Οι φάκελοι αντιγράφηκαν</string>
+    <string name="copy_file_success_one">Το αρχείο αντιγράφηκε</string>
+    <string name="copy_file_success_many">Τα αρχεία αντιγράφηκαν</string>
+    <string name="copy_directory_failed_one">Ο φάκελος δεν αντιγράφηκε</string>
+    <string name="copy_directory_failed_many">Οι φάκελοι δεν αντιγράφηκαν</string>
+    <string name="copy_file_failed_one">Το αρχείο δεν αντιγράφηκε</string>
+    <string name="copy_file_failed_many">Τα αρχεία δεν αντιγράφηκαν</string>
+    <string name="cut_directory_success_one">Ο φάκελος μετακινήθηκε</string>
+    <string name="cut_directory_success_many">Οι φάκελοι μετακινήθηκαν</string>
+    <string name="cut_file_success_one">Το αρχείο μετακινήθηκε</string>
+    <string name="cut_file_success_many">Τα αρχεία μετακινήθηκαν</string>
+    <string name="cut_directory_failed_one">Ο φάκελος δεν μετακινήθηκε</string>
+    <string name="cut_directory_failed_many">Οι φάκελοι δεν μετακινήθηκαν</string>
+    <string name="cut_file_failed_one">Το αρχείο δεν μετακινήθηκε</string>
+    <string name="cut_file_failed_many">Τα αρχεία δεν μετακινήθηκαν</string>
+    <string name="pasting_done">Η επικόλληση ολοκληρώθηκε</string>
+    <string name="copy_done">Επιτυχής αντιγραφή</string>
+    <string name="copy_canceled">Η αντιγραφή ακυρώθηκε</string>
+    <string name="cut_done">Επιτυχής αποκοπή</string>
+    <string name="cut_canceled">Η αποκοπή ακυρώθηκε</string>
+    <string name="delete_done">Επιτυχής διαγραφή</string>
+    <string name="delete_canceled">Διαγραφή ακυρώθηκε</string>
+    <string name="cannot_open_file">Αδυναμία ανοίγματος αρχείου</string>
+    <string name="no_application_to_open_file">Καμία εφαρμογή στη συσκευή δε μπορεί να ανοίξει το αρχείο</string>
+    <string name="delete_still_ongoing">Η διαγραφή συνεχίζεται στο παρασκήνιο</string>
+    <string name="copy_on_device">Λήψη βίντεο στη συσκευή</string>
+    <string name="copy_on_device_multi">Λήψη στη συσκευή</string>
+    <string name="storage_swapped_primary">Κεντρικό</string>
+    <string name="storage_swapped_secondary">Δευτερεύον</string>
+    <string name="yes">"Ναι"</string>
+    <string name="no">"Όχι"</string>
+    <string name="share">Κοινοποίηση</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Κοινή χρήση αρχείου μέσω</string>
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Δεν υπάρχει διαθέσιμη εφαρμογή για κοινή χρήση του αρχείου</string>
+    <string name="upnp_not_allowed">Δεν επιτρέπεται η πρόσβαση σε αυτόν τον εξυπηρετητή UPNP. Παρακαλώ αλλάξτε πρώτα τις ρυθμίσεις πρόσβασης σας.</string>
+    <string name="single_mode">Μονό</string>
+    <string name="double_mode">Διπλό</string>
+    <string name="swap_panel">Εναλλαγή</string>
+    <string name="move">Μετακίνηση</string>
+    <!-- Shortcuts -->
+    <string name="shortcuts">Συντομεύσεις</string>
+    <string name="add_to_shortcuts">Δημιουργία συντόμευσης</string>
+    <string name="remove_from_shortcuts">Αφαίρεση συντόμευσης</string>
+    <string name="shortcut_added" comment="deprecated">Η συντόμευση %s δημιουργήθηκε</string>
+    <string name="shortcut_removed" comment="deprecated">Η συντόμευση %s αφαιρέθηκε</string>
+    <string name="shortcut_created">Η συντόμευση \"%1$s\" δημιουργήθηκε</string>
+    <string name="one_shortcut_removed">Μία συντόμευση διαγράφηκε</string>
+    <string name="n_shortcut_removed">%1$d συντομεύσεις διαγράφηκαν</string>
+    <string name="server_not_available" comment="deprecated">Ο διακομιστής δεν είναι διαθέσιμος</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s δεν είναι διαθέσιμο</string>
+    <string name="cannot_open_shortcut">Τα περιεχόμενα αυτής της συντόμευσης δεν είναι διαθέσιμα προς το παρόν.\nΠαρακαλώ ελέγξτε ότι έχετε τα απαιτούμενα δικαιώματα.</string>
+    <string name="network_shortcuts">Συντομεύσεις δικτύου</string>
+    <string name="media_servers">Διακομιστές πολυμέσων</string>
+    <string name="shortcut_list_empty">Για να δημιουργήσετε συντομεύσεις στους αγαπημένους σας απομακρυσμένους φακέλους, κάντε παρατεταμένο κλικ στους φακέλους προορισμού και επιλέξτε \"%s\" στην επάνω γραμμή ενεργειών.</string>
+    <!-- DLNA -->
+    <string name="dlna_share">Κοινοποίηση μέσων</string>
+    <string name="video">Βίντεο</string>
+    <string name="audio">Ήχος</string>
+    <string name="picture">Εικόνα</string>
+    <string name="share_types">Τύποι κοινής χρήσης</string>
+    <!-- ZIP -->
+    <string name="zip_extract_action">Εξαγωγή εδώ</string>
+    <string name="zip_extract_success_message">Επιτυχής εξαγωγή</string>
+    <string name="zip_compress_action">Συμπίεση σε αρχείο ZIP</string>
+    <string name="zip_extracting_message">Εξαγωγή αρχείων από αρχείο ZIP</string>
+    <string name="zip_compressing_message">Συμπίεση αρχείων σε αρχείο ZIP</string>
+    <string name="zip_compressing_many">Συμπιεσμένα αρχεία</string>
+    <string name="zip_compressing_one">Συμπίεση ενός αρχείου</string>
+    <string name="zip_compressing_success">Επιτυχής συμπίεση</string>
+    <string name="zip_compressing_canceled">Η συμπίεση ακυρώθηκε</string>
+    <string name="zip_extracting_many">Εξαχθέντα αρχεία</string>
+    <string name="zip_extracting_one">Εξαγωγή ενός αρχείου</string>
+    <string name="zip_extract_error_message">Παρουσιάστηκε σφάλμα κατά την εξαγωγή του αρχείου σας. Ίσως το αρχείο είναι κατεστραμμένο ή ο ελεύθερος χώρος αποθήκευσης στο δίσκο δεν είναι αρκετός.</string>
+    <string name="zip_extract_canceled">Η εξαγωγή ακυρώθηκε</string>
+    <string name="zip_compress_error_message">Παρουσιάστηκε σφάλμα κατά τη δημιουργία του αρχείου σας. Ίσως ο ελεύθερος χώρος αποθήκευσης του δίσκου δεν είναι αρκετός.</string>
+    <string name="zip_cannot_open_inner_entry">Αδυναμία ανοίγματος αρχείου. Εξάγετε το πρώτα</string>
+    <string name="zip_size_limit">Η περιήγηση σε ZIP περιορίζεται σε αρχεία μικρότερα από 20 MB</string>
+    <!-- Notifications -->
+    <string name="copy_error">Αποτυχία αντιγραφής</string>
+    <string name="cut_error">Αποτυχία αποκοπής</string>
+    <string name="delete_error">Αποτυχία διαγραφής</string>
+    <!-- Network Scanning -->
+    <string name="scan_network_index">Δημιουργία ευρετήριου αρχείων πολυμέσων</string>
+    <string name="scan_network_remove">Αφαίρεση αρχείων πολυμέσων από το ευρετήριο</string>
+    <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Αφαίρεση από τη βιβλιοθήκη</string>
+    <string name="nomedia_remove">Προσθήκη στη βιβλιοθήκη</string>
+    <string name="nomedia_fail">Αποτυχία αφαίρεσης αυτού του φακέλου από τη βιβλιοθήκη</string>
+    <string name="nomedia_warning">Το περιεχόμενο πολυμέσων αυτού του φακέλου δε θα εμφανίζεται πλέον στις εφαρμογές πολυμέσων.\nΕίστε βέβαιοι ότι θέλετε να συνεχίσετε;</string>
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Επιλέξτε ένα φάκελο</string>
+    <string name="choose_a_folder_help">Πλοηγηθείτε στο φάκελο που θέλετε να επιλέξετε και πατήστε ΟΚ. Χρησιμοποιήστε το κουμπί ΠΙΣΩ για να ανέβετε σε ένα επίπεδο.</string>
+    <string name="current_choice">Τρέχουσα επιλογή:</string>
+    <string name="no_selection">Καμία επιλογή</string>
+    <string name="external_storage_fake_name">Αποθηκευτικός χώρος συσκευής</string>
+    <string name="sdcard_fake_name">Κάρτα SD</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(κανένας φάκελος)</string>
+    <string name="navigation_drawer_open">Άνοιγμα μενού πλοήγησης</string>
+    <string name="navigation_drawer_close">Κλείσιμο μενού πλοήγησης</string>
+    <string name="listing_sort_mode">Επιλογές ταξινόμησης</string>
+    <string name="listing_sort_by_name">Ταξινόμηση κατά όνομα</string>
+    <string name="listing_sort_by_size">Ταξινόμηση κατά μέγεθος</string>
+    <string name="listing_sort_by_date">Ταξινόμηση κατά ημερομηνία</string>
+    <string name="listing_ascending">Αύξουσα</string>
+    <string name="listing_descending">Φθίνουσα</string>
+    <string name="acquire_external_usb_permission">Η διαχείριση αρχείων χρειάζεται ειδική άδεια για πρόσβαση στον εξωτερικό χώρο αποθήκευσης. Παρακαλώ επιλέξτε τον αποθηκευτικό σας χώρο στην επόμενη οθόνη</string>
+</resources>
