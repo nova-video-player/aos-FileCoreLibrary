@@ -2,6 +2,10 @@
 <resources>
     <string name="file_info_label_name">Назва:</string>
     <string name="file_info_label_size">Розмір:</string>
+    <string name="file_info_label_size_internal">Розмір (внутрішній):</string>
+    <string name="file_info_label_size_sd">Розмір (SD):</string>
+    <string name="file_info_label_permission">Дозвіл:</string>
+    <string name="file_info_label_mime_type">Тип Mime:</string>
     <string name="file_info_directory_empty">Порожня тека</string>
     <string name="file_info_one_directory">1 тека</string>
     <string name="file_info_one_file">1 файл</string>
@@ -9,12 +13,16 @@
     <!-- Archos file manager core -->
     <!-- Samba share settings -->
     <string name="samba_add_server">Додати сервер</string>
+    <string name="refresh">Оновити</string>
     <string name="samba_domain">Домен</string>
     <string name="samba_username">Імʼя користувача</string>
     <string name="samba_password">Пароль</string>
     <string name="samba_show_password">Показувати пароль</string>
+    <string name="preferences">Налаштування</string>
     <string name="shared_folder_credentials">Паролі</string>
     <!-- WiFi Direct strings-->
+    <string name="back_cancel">Натисніть назад, щоб скасувати</string>
+    <string name="file_downloading">Ваш файл завантажується</string>
     <!-- FileManager strings -->
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Мережа</string>
@@ -26,32 +34,94 @@
     <string name="ssh_remote_address">Віддалена адреса</string>
     <string name="ssh_password">Пароль</string>
     <string name="ssh_username">Імʼя користувача</string>
+    <string name="ssh_port">Порт (необовʼязково)</string>
+    <string name="ssh_path">Шлях (необовʼязково)</string>
     <string name="save_password">Зберегти пароль</string>
+    <string name="ssh_prompt">Тип FTP</string>
+    <string name="download_prompt">Завантажити файл у теку:</string>
     <string name="browse_ftp_server">Сервер</string>
+    <string name="error_listing">Виникла помилка</string>
+    <string name="error_host_not_found">Вузол не знайдено</string>
+    <string name="error_unknown_host">Невідомий вузол</string>
+    <string name="error_no_connection">Не вдалося зʼєднатися з вузлом</string>
+    <string name="error_file_not_found">Файл не знайдено</string>
+    <string name="deleting">Видалення</string>
+    <string name="deleting_many">%1$d/%2$d видалених файлів</string>
+    <string name="deleting_one">Видалення одного файлу</string>
+    <string name="open_file">Відкрити файл</string>
+    <string name="pasting_copy_one">Копіювання одного файлу (%1$s/%2$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s кБ/с</string>
     <string name="delete">Видалити</string>
     <string name="rename">Перейменувати</string>
+    <string name="refresh_directory">Оновити теку</string>
     <string-array name="folder_or_file">
         <item>Створити теку</item>
         <item>Створити порожню теку</item>
     </string-array>
     <string name="new_directory">Нова тека</string>
     <string name="new_file">Новий файл</string>
+    <string name="new_folder_or_file">Нова тека або файл</string>
+    <string name="refresh_servers_list">Оновити список серверів</string>
+    <string name="go_top">На початок</string>
+    <string name="confirm_delete_one">Ви справді бажаєте видалити це?</string>
+    <string name="enter_new_name">Назва:</string>
     <string name="file_name">Назва файлу</string>
     <string name="folder_name">Назва теки</string>
+    <string name="run_in_background">Згорнути</string>
+    <string name="cannot_create_directory">Не вдалося створити нову теку</string>
+    <string name="cannot_create_file">Не вдалося створити новий файл</string>
+    <string name="cannot_delete_directory">Не вдалося видалити теку</string>
+    <string name="cannot_delete_file">Не вдалося видалити файл</string>
+    <string name="cannot_delete_files">Не вдалося видалити файли</string>
+    <string name="directory_deleted">Теку видалено</string>
+    <string name="file_deleted">Файл видалено</string>
+    <string name="files_deleted">Файли видалено</string>
+    <string name="copy_directory_success_one">Теку скопійовано</string>
+    <string name="copy_directory_success_many">Теки скопійовано</string>
+    <string name="copy_file_success_one">Файл скопійовано</string>
+    <string name="copy_file_success_many">Файли скопійовано</string>
+    <string name="copy_directory_failed_one">Теку не скопійовано</string>
+    <string name="copy_directory_failed_many">Теки не скопійовано</string>
+    <string name="copy_done">Скопійовано успішно</string>
+    <string name="copy_canceled">Копіювання скасовано</string>
+    <string name="cut_done">Вирізано успішно</string>
+    <string name="cut_canceled">Вирізання скасовано</string>
+    <string name="delete_done">Видалено успішно</string>
+    <string name="delete_canceled">Видалення скасовано</string>
+    <string name="cannot_open_file">Не вдалося відкрити файл</string>
     <string name="yes">"Так"</string>
     <string name="no">"Ні"</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <!-- Shortcuts -->
+    <string name="shortcuts">Скорочення</string>
+    <string name="add_to_shortcuts">Створити скорочення</string>
+    <string name="remove_from_shortcuts">Вилучити скорочення</string>
+    <string name="shortcut_added" comment="deprecated">Скорочення %s створено</string>
+    <string name="shortcut_removed" comment="deprecated">Скорочення %s вилучено</string>
+    <string name="shortcut_created">Скорочення \"%1$s\" створено</string>
+    <string name="one_shortcut_removed">Одне скорочення видалено</string>
+    <string name="n_shortcut_removed">%1$d скорочень видалено</string>
+    <string name="server_not_available" comment="deprecated">Сервер тимчасово не доступний</string>
     <!-- DLNA -->
     <!-- ZIP -->
+    <string name="zip_compressing_one">Стиснення одного файлу</string>
+    <string name="zip_compressing_success">Стиснення успішне</string>
+    <string name="zip_compressing_canceled">Стиснення скасовано</string>
     <!-- Notifications -->
     <!-- Network Scanning -->
     <!-- Hiding from media scanning -->
     <!-- Folder Picker -->
+    <string name="choose_a_folder">Обрати теку</string>
+    <string name="current_choice">Поточний вибір:</string>
     <string name="sdcard_fake_name">SD-картка</string>
     <string name="usb_host_fake_name">USB</string>
+    <string name="navigation_drawer_open">Відкрити шторку переходів</string>
+    <string name="navigation_drawer_close">Закрити шторку переходів</string>
+    <string name="listing_sort_mode">Режим сортування</string>
     <string name="listing_sort_by_name">Сортувати за назвою</string>
     <string name="listing_sort_by_size">Сортувати за розміром</string>
     <string name="listing_sort_by_date">Сортувати за датою</string>
+    <string name="listing_ascending">За зростанням</string>
+    <string name="listing_descending">За спаданням</string>
 </resources>

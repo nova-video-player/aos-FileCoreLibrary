@@ -46,6 +46,7 @@
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">Wi-Fi Direct</string>
     <string name="receive_p2p_here">Λήψη εδώ μέσω WiFi Direct</string>
+    <string name="wifip2p_waiting">Η μεταφορά WiFi Direct θα ξεκινήσει σύντομα</string>
     <string name="connect_to_target">Σύνδεση στον προορισμό</string>
     <string name="upload_in_progress">Μεταφόρτωση σε εξέλιξη</string>
     <string name="file_uploading">Το αρχείο σας μεταφορτώνεται</string>
@@ -68,6 +69,7 @@
     <string name="usb_host_storage">USB</string>
     <string name="other_storage">Οδηγός</string>
     <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">Cloud</string>
     <string name="directory_empty">Κενός Φάκελος</string>
     <string name="no_server">Δεν βρέθηκε διακομιστής</string>
     <string name="loading">Φόρτωση&#8230;</string>
