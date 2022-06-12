@@ -16,7 +16,6 @@
 package com.archos.filecorelibrary.jcifs;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
@@ -47,10 +46,15 @@ public class JcifsRawLister extends RawLister {
         super(uri);
     }
 
-    public List<MetaFile2> getFileList() throws SmbException, MalformedURLException{
+    public List<MetaFile2> getFileList() throws SmbException, MalformedURLException {
+        String uriString = mUri.toString();
+        if (! uriString.endsWith("/")) {
+            uriString += "/";
+            mUri = Uri.parse(uriString);
+        }
         NovaSmbFile nSmbFile = getSmbFile(mUri);
         SmbFile[] listFiles = getSmbFile(mUri).smbFile.listFiles();
-        if(listFiles!=null){
+        if (listFiles != null) {
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
                 // better verify that it is a file or directory before adding
