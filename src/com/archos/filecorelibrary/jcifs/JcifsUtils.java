@@ -100,10 +100,12 @@ public class JcifsUtils {
         prop = new Properties();
         prop.putAll(System.getProperties());
 
-        prop.put("jcifs.smb.client.enableSMB2", String.valueOf(isSmb2));
+        if (isSmb2) prop.put("jcifs.smb.client.maxVersion", "SMB311");
+        else prop.put("jcifs.smb.client.maxVersion", "SMB1");
+
         // must remain false to be able to talk to smbV1 only
         prop.put("jcifs.smb.client.useSMB2Negotiation", "false");
-        prop.put("jcifs.smb.client.disableSMB1", "false");
+        if (isSmb2) prop.put("jcifs.smb.client.minVersion", "SMB1");
         // resolve in this order to avoid netbios name being also a foreign DNS entry resulting in bad resolution
         // do not change resolveOrder for now
         // with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST, jcifs-ng author recommends no change
@@ -137,15 +139,15 @@ public class JcifsUtils {
         prop.putAll(System.getProperties());
 
         if (isSmb2) {
-            prop.put("jcifs.smb.client.disableSMB1", "true");
-            prop.put("jcifs.smb.client.enableSMB2", "true");
+            prop.put("jcifs.smb.client.maxVersion", "SMB311");
+            prop.put("jcifs.smb.client.minVersion", "SMB202");
             // note that connectivity with smbV1 will not be working
             prop.put("jcifs.smb.client.useSMB2Negotiation", "true");
             // disable dfs makes win10 shares with ms account work
             prop.put("jcifs.smb.client.dfs.disabled", "true");
         } else {
-            prop.put("jcifs.smb.client.disableSMB1", "false");
-            prop.put("jcifs.smb.client.enableSMB2", "false");
+            prop.put("jcifs.smb.client.maxVersion", "SMB1");
+            prop.put("jcifs.smb.client.minVersion", "SMB1");
             prop.put("jcifs.smb.client.useSMB2Negotiation", "false");
             // see https://github.com/AgNO3/jcifs-ng/issues/226
             prop.put("jcifs.smb.useRawNTLM", "true");
