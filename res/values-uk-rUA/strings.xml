@@ -5,11 +5,14 @@
     <string name="file_info_label_size_internal">Розмір (внутрішній):</string>
     <string name="file_info_label_size_sd">Розмір (SD):</string>
     <string name="file_info_label_permission">Дозвіл:</string>
+    <string name="file_info_label_last_modified">Востаннє змінено:</string>
     <string name="file_info_label_mime_type">Тип Mime:</string>
     <string name="file_info_directory_empty">Порожня тека</string>
     <string name="file_info_one_directory">1 тека</string>
     <string name="file_info_one_file">1 файл</string>
     <string name="usbhost_ptp_storage">Зовнішня камера</string>
+    <string name="network_media_servers">Медія-сервер (UPnP)</string>
+    <string name="network_shared_folders">Спільні теки (SMB)</string>
     <!-- Archos file manager core -->
     <!-- Samba share settings -->
     <string name="samba_add_server">Додати сервер</string>
