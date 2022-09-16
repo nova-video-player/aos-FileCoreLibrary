@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class TcpDiscovery implements InternalDiscovery {
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private static final Logger log = LoggerFactory.getLogger(TcpDiscovery.class);
 
     private final Thread mThread;
