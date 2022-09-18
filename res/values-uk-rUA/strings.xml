@@ -5,36 +5,78 @@
     <string name="file_info_label_size_internal">Розмір (внутрішній):</string>
     <string name="file_info_label_size_sd">Розмір (SD):</string>
     <string name="file_info_label_permission">Дозвіл:</string>
+    <string name="file_info_label_can_read">читання</string>
+    <string name="file_info_label_cannot_read">читання неможливе</string>
+    <string name="file_info_label_can_write">запис</string>
+    <string name="file_info_label_cannot_write">запис неможливий</string>
     <string name="file_info_label_last_modified">Востаннє змінено:</string>
-    <string name="file_info_label_mime_type">Тип Mime:</string>
+    <string name="file_info_label_mime_type">Mime-тип:</string>
     <string name="file_info_directory_empty">Порожня тека</string>
     <string name="file_info_one_directory">1 тека</string>
+    <string name="file_info_directories">теки</string>
     <string name="file_info_one_file">1 файл</string>
+    <string name="file_info_files">файли</string>
     <string name="usbhost_ptp_storage">Зовнішня камера</string>
-    <string name="network_media_servers">Медія-сервер (UPnP)</string>
+    <string name="network_media_servers">Медіа-сервер (UPnP)</string>
     <string name="network_shared_folders">Спільні теки (SMB)</string>
     <!-- Archos file manager core -->
+    <string name="file_copy_pattern">копіювати</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ</string>
     <!-- Samba share settings -->
+    <string name="samba_settings_title">Налаштування спільних папок</string>
+    <string name="samba_settings_summary">Налаштування користувачів та паролів для доступу до спільних папок у вашій приватній мережі</string>
+    <string name="samba_profiles">Профілі спільних папок</string>
+    <string name="samba_delete_settings">Ви дійсно хочете видалити це налаштування?</string>
     <string name="samba_add_server">Додати сервер</string>
+    <string name="samba_server">Вкажіть сервер</string>
+    <string name="samba_share">Вкажіть спільну теку</string>
     <string name="refresh">Оновити</string>
+    <string name="network_timeout">На жаль, віддалена тека недоступна.\nПеревірте підключення до мережі та повторіть спробу.</string>
+    <string name="samba_loading">Будь ласка, зачекайте на завантаження спільної теки&#8230;</string>
+    <string name="samba_reloading">Будь ласка, зачекайте на перезавантаження спільної теки&#8230;</string>
+    <string name="samba_password_request_title">Запит паролю для спільної теки</string>
     <string name="samba_domain">Домен</string>
     <string name="samba_username">Імʼя користувача</string>
     <string name="samba_password">Пароль</string>
-    <string name="samba_show_password">Показувати пароль</string>
+    <string name="samba_show_password">Показати пароль</string>
+    <string name="samba_wrong_password">Невірне ім\'я користувача або пароль</string>
     <string name="preferences">Налаштування</string>
     <string name="shared_folder_credentials">Паролі</string>
+    <string name="no_saved_passwords">Немає збережених паролів</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi Direct</string>
+    <string name="receive_p2p_here">отримати тут через WiFi Direct</string>
+    <string name="empty_message">Виявлення доступних цільових пристроїв&#8230;&lt;br/&gt;Цільовий пристрій повинен активувати опцію &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
+    <string name="wifip2p_waiting">Передача WiFi Direct розпочнеться незабаром</string>
+    <string name="connect_to_target">Підключення до цілі</string>
+    <string name="upload_in_progress">Триває завантаження&#8230;</string>
+    <string name="file_uploading">Ваш файл завантажується</string>
     <string name="back_cancel">Натисніть назад, щоб скасувати</string>
+    <string name="server_wait">Очікування підключення та надсилання файлу від клієнта</string>
+    <string name="download_in_progress">Триває завантаження&#8230;</string>
     <string name="file_downloading">Ваш файл завантажується</string>
+    <string name="server_ready">Готовий до отримання</string>
+    <string name="nonetwork_title" comment="deprecated">З\'єднання WiFi відсутнє</string>
+    <string name="no_network_title">Відсутнє з’єднання з мережею</string>
+    <string name="nonetwork_message">Вам потрібно активувати WiFi для цієї функції</string>
     <!-- FileManager strings -->
+    <string name="storage_busy_message">Ви не можнете використовувати внутрішню пам\'ять, поки вона підключена та змонтована через USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Мережа</string>
+    <string name="external_storage">Зовнішнє</string>
+    <string name="internal_storage">Внутрішнє</string>
     <string name="internal_storage_unified">Сховище</string>
     <string name="sd_card_storage">SD-картка</string>
     <string name="usb_host_storage">USB</string>
+    <string name="other_storage">Диск</string>
+    <string name="usb_ptp_storage">PTP</string>
     <string name="cloud_storage">Хмара</string>
     <string name="directory_empty">Порожня тека</string>
+    <string name="no_server">Сервер не знайдено</string>
+    <string name="loading">Завантаження&#8230;</string>
+    <string name="ssh_error">Неможливо підʼєднатися : будь ласка, перевірте підключення та облікові дані</string>
     <string name="ssh_remote_address">Віддалена адреса</string>
+    <string name="ssh_remote_address_error">Необхідно вказати віддалену адресу</string>
     <string name="ssh_password">Пароль</string>
     <string name="ssh_username">Імʼя користувача</string>
     <string name="ssh_port">Порт (необовʼязково)</string>
@@ -43,19 +85,30 @@
     <string name="ssh_prompt">Тип FTP</string>
     <string name="download_prompt">Завантажити файл у теку:</string>
     <string name="browse_ftp_server">Сервер</string>
+    <string name="cannot_list">Неможливо показати вміст</string>
     <string name="error_listing">Виникла помилка</string>
-    <string name="error_host_not_found">Вузол не знайдено</string>
-    <string name="error_unknown_host">Невідомий вузол</string>
-    <string name="error_no_connection">Не вдалося зʼєднатися з вузлом</string>
+    <string name="error_host_not_found">Хост не знайдено</string>
+    <string name="error_unknown_host">Невідомий хост</string>
+    <string name="error_no_connection">Неможливо зʼєднатися з хостом</string>
+    <string name="error_credentials">Неможливо показати вміст каталогу: перевірте ваші облікові дані</string>
+    <string name="error_no_permission">Цьому обліковому запису не дозволено переглядати цей каталог</string>
     <string name="error_file_not_found">Файл не знайдено</string>
+    <string name="error_time_out">Тайм-аут</string>
     <string name="deleting">Видалення</string>
     <string name="deleting_many">%1$d/%2$d видалених файлів</string>
     <string name="deleting_one">Видалення одного файлу</string>
+    <string name="copying">Копіювання&#8230;</string>
+    <string name="moving">Переміщення&#8230;</string>
     <string name="open_file">Відкрити файл</string>
+    <string name="open_file_after_download">Відкрити файл після закінчення копіювання</string>
     <string name="pasting_copy_one">Копіювання одного файлу (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Копіювання: %1$d/%2$d файлів (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Переміщення одного файлу (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Переміщення: %1$d/%2$d файлів (%3$s/%4$s)</string>
     <string name="pasting_copy_speed">&#160;&#160;%1$s кБ/с</string>
     <string name="delete">Видалити</string>
     <string name="rename">Перейменувати</string>
+    <string name="details">Подробиці</string>
     <string name="refresh_directory">Оновити теку</string>
     <string-array name="folder_or_file">
         <item>Створити теку</item>
@@ -65,12 +118,19 @@
     <string name="new_file">Новий файл</string>
     <string name="new_folder_or_file">Нова тека або файл</string>
     <string name="refresh_servers_list">Оновити список серверів</string>
+    <string name="enable_network_shares">Увімкнути спільні мережеві сховища</string>
     <string name="go_top">На початок</string>
+    <string name="uncheck_impossible">Неможливо змінити вибір, коли батьківську теку також обрана</string>
     <string name="confirm_delete_one">Ви справді бажаєте видалити це?</string>
+    <string name="confirm_delete_parent_folder">Здається, що батьківська тека не містить відео, чи слід її видалити?</string>
+    <string name="confirm_delete_many">Ви дійсно хочете їх видалити?</string>
     <string name="enter_new_name">Назва:</string>
     <string name="file_name">Назва файлу</string>
     <string name="folder_name">Назва теки</string>
     <string name="run_in_background">Згорнути</string>
+    <string name="confirm_deleting_cancellation">Ви дійсно хочете скасувати видалення?</string>
+    <string name="confirm_copying_cancellation">Ви дійсно бажаєте скасувати копіювання?</string>
+    <string name="confirm_moving_cancellation">Ви дійсно бажаєте скасувати переміщення?</string>
     <string name="cannot_create_directory">Не вдалося створити нову теку</string>
     <string name="cannot_create_file">Не вдалося створити новий файл</string>
     <string name="cannot_delete_directory">Не вдалося видалити теку</string>
@@ -79,12 +139,27 @@
     <string name="directory_deleted">Теку видалено</string>
     <string name="file_deleted">Файл видалено</string>
     <string name="files_deleted">Файли видалено</string>
+    <string name="cannot_rename">Не вдається перейменувати</string>
+    <string name="cannot_paste_folder_into_itself">Неможливо копіювати чи переміщувати теки самі у себе або до однієї з їхніх підтек</string>
+    <string name="cannot_paste_file_same_location">Не можна вставити файли туди, де він і був</string>
+    <string name="cannot_paste_over_network">Не можна вставити файл через мережу</string>
     <string name="copy_directory_success_one">Теку скопійовано</string>
     <string name="copy_directory_success_many">Теки скопійовано</string>
     <string name="copy_file_success_one">Файл скопійовано</string>
     <string name="copy_file_success_many">Файли скопійовано</string>
     <string name="copy_directory_failed_one">Теку не скопійовано</string>
     <string name="copy_directory_failed_many">Теки не скопійовано</string>
+    <string name="copy_file_failed_one">Файл не було скопійовано</string>
+    <string name="copy_file_failed_many">Файли не були скопійовані</string>
+    <string name="cut_directory_success_one">Теку переміщено</string>
+    <string name="cut_directory_success_many">Теки переміщені</string>
+    <string name="cut_file_success_one">Файл переміщено</string>
+    <string name="cut_file_success_many">Файли переміщено</string>
+    <string name="cut_directory_failed_one">Теку не було переміщено</string>
+    <string name="cut_directory_failed_many">Теки не було переміщено</string>
+    <string name="cut_file_failed_one">Файл не було переміщено</string>
+    <string name="cut_file_failed_many">Файли не були переміщені</string>
+    <string name="pasting_done">Вставлено</string>
     <string name="copy_done">Скопійовано успішно</string>
     <string name="copy_canceled">Копіювання скасовано</string>
     <string name="cut_done">Вирізано успішно</string>
@@ -92,10 +167,24 @@
     <string name="delete_done">Видалено успішно</string>
     <string name="delete_canceled">Видалення скасовано</string>
     <string name="cannot_open_file">Не вдалося відкрити файл</string>
+    <string name="no_application_to_open_file">На цьому пристрої нема застосунку для відкриття цього файлу</string>
+    <string name="delete_still_ongoing">Видалення все ще триває у фоновому режимі</string>
+    <string name="copy_on_device">Завантажити відео на пристрій</string>
+    <string name="copy_on_device_multi">Завантажити на пристрій</string>
+    <string name="storage_swapped_primary">основне</string>
+    <string name="storage_swapped_secondary">вторинне</string>
     <string name="yes">"Так"</string>
     <string name="no">"Ні"</string>
+    <string name="share">Поділитись</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <string name="send_file">Поділитися файлом через</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <string name="no_way_to_share_file">Немає доступних застосунків, щоб поділитися цим файлом</string>
+    <string name="upnp_not_allowed">Вам не дозволено доступ до цього UPNP-серверу. Будь ласка, спочатку змініть налаштування доступу.</string>
+    <string name="single_mode">Одинарний</string>
+    <string name="double_mode">Подвійний</string>
+    <string name="swap_panel">Поміняти</string>
+    <string name="move">Пересунути</string>
     <!-- Shortcuts -->
     <string name="shortcuts">Скорочення</string>
     <string name="add_to_shortcuts">Створити скорочення</string>
@@ -105,26 +194,64 @@
     <string name="shortcut_created">Скорочення \"%1$s\" створено</string>
     <string name="one_shortcut_removed">Одне скорочення видалено</string>
     <string name="n_shortcut_removed">%1$d скорочень видалено</string>
-    <string name="server_not_available" comment="deprecated">Сервер тимчасово не доступний</string>
+    <string name="server_not_available" comment="deprecated">Сервер наразі недоступний</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s наразі недоступний</string>
+    <string name="cannot_open_shortcut">Вміст цього скорочення наразі недоступний.\nБудь ласка, перевірте, що у вас є необхідні дозволи.</string>
+    <string name="network_shortcuts">Мережеві скорочення</string>
+    <string name="media_servers">Медіа-сервери</string>
+    <string name="shortcut_list_empty">Щоб створити скорочення для улюблених віддалених тек: довгий тап по теці, потім оберіть \"%s\" у верхній панелі дій.</string>
     <!-- DLNA -->
+    <string name="dlna_share">Обмін медіа</string>
+    <string name="video">Відео</string>
+    <string name="audio">Аудіо</string>
+    <string name="picture">Зображення</string>
+    <string name="share_types">Типи обміну</string>
     <!-- ZIP -->
+    <string name="zip_extract_action">Розпакувати тут</string>
+    <string name="zip_extract_success_message">Розпаковано вдало</string>
+    <string name="zip_compress_action">Стиснути у zip-архів</string>
+    <string name="zip_extracting_message">Розпакування файлів з ZIP-архіву..</string>
+    <string name="zip_compressing_message">Стиснення файлів у zip-архів</string>
+    <string name="zip_compressing_many">%1$d/%2$d файлів стиснуто</string>
     <string name="zip_compressing_one">Стиснення одного файлу</string>
     <string name="zip_compressing_success">Стиснення успішне</string>
     <string name="zip_compressing_canceled">Стиснення скасовано</string>
+    <string name="zip_extracting_many">%1$d/%2$d файлів розпаковано</string>
+    <string name="zip_extracting_one">Розпакування одного файлу (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Виникла помилка при розпакуванні архіву.\nМожливо архів пошкоджений, або на диску недостатньо місця.</string>
+    <string name="zip_extract_canceled">Розпакування скасовано</string>
+    <string name="zip_compress_error_message">Виникла помилка при створенні архіву.\nМожливо на диску недостатньо місця.</string>
+    <string name="zip_cannot_open_inner_entry">Неможливо відкрити файл всередині архіву. Спочатку розпакуйте його.</string>
+    <string name="zip_size_limit">Перегляд zip-архіву можливий для файлів менших за 20 МБ</string>
     <!-- Notifications -->
+    <string name="copy_error">Невдале копіювання</string>
+    <string name="cut_error">Невдале вирізання</string>
+    <string name="delete_error">Невдале видалення</string>
     <!-- Network Scanning -->
+    <string name="scan_network_index">Індексувати медіа файли</string>
+    <string name="scan_network_remove">Видалити медіа з індексу</string>
+    <string name="debug_browse_to_root">Огляд кореня сховища пристрою (тільки дебаг)</string>
     <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Вилучити з медіа-бібліотеки</string>
+    <string name="nomedia_remove">Додати до медіа-бібліотеки</string>
+    <string name="nomedia_fail">Помилка, неможливо видалити цю теку з медіа бібліотеки</string>
+    <string name="nomedia_warning">Мультимедійний вміст цієї теки більше не зʼявиться у мультимедійних застосунках.\nВи справді бажаєте продовжити?</string>
     <!-- Folder Picker -->
-    <string name="choose_a_folder">Обрати теку</string>
+    <string name="choose_a_folder">Обреріть теку</string>
+    <string name="choose_a_folder_help">Перейдіть до теки, яку хочете вибрати, та натисніть OK. Використовуйте НАЗАД, щоб перейти на один рівень вище.</string>
     <string name="current_choice">Поточний вибір:</string>
+    <string name="no_selection">нічого не обрано</string>
+    <string name="external_storage_fake_name">Сховище пристрою</string>
     <string name="sdcard_fake_name">SD-картка</string>
     <string name="usb_host_fake_name">USB</string>
-    <string name="navigation_drawer_open">Відкрити шторку переходів</string>
-    <string name="navigation_drawer_close">Закрити шторку переходів</string>
+    <string name="no_directory">(немає теки)</string>
+    <string name="navigation_drawer_open">Відкрити панель навігації</string>
+    <string name="navigation_drawer_close">Закрити панель навігації</string>
     <string name="listing_sort_mode">Режим сортування</string>
     <string name="listing_sort_by_name">Сортувати за назвою</string>
     <string name="listing_sort_by_size">Сортувати за розміром</string>
     <string name="listing_sort_by_date">Сортувати за датою</string>
     <string name="listing_ascending">За зростанням</string>
     <string name="listing_descending">За спаданням</string>
+    <string name="acquire_external_usb_permission">Файловий менеджер потребує спеціального дозволу на доступ до зовнішнього сховища. Будь ласка, оберіть сховище на наступному екрані</string>
 </resources>

@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="file_info_label_name">이름:</string>
+    <string name="file_info_label_size">크기:</string>
+    <string name="file_info_label_size_internal">크기(내장):</string>
+    <string name="file_info_label_size_sd">크기(SD):</string>
+    <string name="file_info_label_permission">권한:</string>
+    <string name="file_info_label_can_read">읽기</string>
+    <string name="file_info_label_cannot_read">읽기 금지</string>
+    <string name="file_info_label_can_write">쓰기</string>
+    <string name="file_info_label_cannot_write">쓰기 금지</string>
+    <string name="file_info_label_last_modified">최종 수정:</string>
+    <string name="file_info_label_mime_type">Mime 형식:</string>
+    <string name="file_info_directory_empty">빈 폴더</string>
+    <string name="file_info_one_directory">1 폴더</string>
+    <string name="file_info_directories">폴더</string>
+    <string name="file_info_one_file">1 파일</string>
+    <string name="file_info_files">파일</string>
+    <string name="usbhost_ptp_storage">외부 카메라</string>
+    <string name="network_media_servers">미디어 서버 (UPnP)</string>
+    <string name="network_shared_folders">공유폴더 (SMB)</string>
     <!-- Archos file manager core -->
+    <string name="file_copy_pattern">복사</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
+    <string name="samba_settings_title">공유 폴더 설정</string>
     <string name="samba_loading">공유폴더에 로딩중입니다</string>
     <string name="samba_reloading">공유폴더에 다시 로딩하는 동안 기다려주십시오.</string>
     <!-- WiFi Direct strings-->
