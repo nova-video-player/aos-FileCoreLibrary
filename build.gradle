@@ -19,7 +19,7 @@ allprojects {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         multiDexEnabled true
     }
 
@@ -99,7 +99,7 @@ dependencies {
     // jcifs-ng depends on bouncycastle (automated when using maven repo)
     api 'org.bouncycastle:bcprov-jdk15to18:1.69'
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'commons-net:commons-net:3.8.0'
     implementation 'org.slf4j:slf4j-api:1.7.32'
