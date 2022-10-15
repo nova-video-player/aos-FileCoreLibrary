@@ -292,6 +292,7 @@ public class FileUtils {
         return "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
     }
 
+    // TODO: when adding new share check also in VideoOpenHelper the _id increment due to 1e9 android 13 change
     public static boolean isNetworkShare(Uri uri) {
         return "smb".equals(uri.getScheme())||
                 "upnp".equals(uri.getScheme())||
