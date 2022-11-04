@@ -18,36 +18,38 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.util.Log;
 
 import com.archos.environment.ArchosUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Created by noury on 22/06/15.
  */
 public class ExtStorageManager {
 
-    private static final String TAG = "ExtStorageManager";
     private static final int TYPE_PRIVATE = 1;
-    private static boolean DBG = false;
+    private static final Logger log = LoggerFactory.getLogger(ExtStorageManager.class);
 
     private static ExtStorageManager mExtStorageManager = new ExtStorageManager();
+
     public static ExtStorageManager getExtStorageManager() {
-        if (DBG) Log.d(TAG,"updateAllVolumes via getExtStorageManager");
+        log.debug("getExtStorageManager: updateAllVolumes");
         mExtStorageManager.updateAllVolumes();
         return mExtStorageManager;
     }
@@ -56,11 +58,34 @@ public class ExtStorageManager {
         return volumesIdMap.get(s);
     }
 
+    public Integer getStorageId(String s) { return volumesHashMap.get(s);}
+    public Integer getStorageId2(String s) { // NOT WORKING since s.startWith(key) is needed not the opposite
+        SortedMap<String, Integer> searchResult = volumesHashTreeMap.subMap(s, s + Character.MAX_VALUE);
+        if (! searchResult.isEmpty()) {
+            return searchResult.get(searchResult.firstKey());
+        } else {
+            return 1;
+        }
+    }
+    public Integer getStorageId3(String s) {
+        Integer volumeId = 1;
+        for (Map.Entry<String, Integer> volume : volumesHashMap.entrySet()) {
+            String volumeName = volume.getKey();
+            if (s.startsWith(volumeName)) {
+                volumeId = volume.getValue();
+                log.debug("getStorageId3: " + s + "->" + volumeName + ", volumeId:" + volumeId);
+            }
+        }
+        return volumeId;
+    }
+
     public enum ExtStorageType {SDCARD, USBHOST, OTHER};
     private static EnumMap<ExtStorageType, List<String>> volumesMap = new EnumMap<>(ExtStorageType.class);
     private static Map<String, String> volumesIdMap = new HashMap<>();
     private static Map<String, String> volumesDescMap = new HashMap<>();
     private static Map<String, String> volumesLabelMap = new HashMap<>();
+    private static Map<String, Integer> volumesHashMap = new HashMap<>();
+    private static TreeMap<String, Integer> volumesHashTreeMap = new TreeMap<String, Integer>();
 
     static {
         volumesMap.put(ExtStorageType.SDCARD, new CopyOnWriteArrayList<String>());
@@ -191,11 +216,11 @@ public class ExtStorageManager {
                             volumesMap.get(volumeType).add(volName);
                             if (getUuid != null) {
                                 volumesIdMap.put(volName, (String) getUuid.invoke(storageVolumesArray[i], noparams));
-                                if (DBG) Log.d(TAG, "Volumes scan result (<N): " + volName + " " + volState);
+                                log.debug("updateAllVolumes: volumes scan result (<N): " + volName + " " + volState);
                             }
                         }
                     } else {
-                        Log.w(TAG, "updateAllVolumes: cannot get volName and volState");
+                        log.warn("updateAllVolumes: cannot get volName and volState");
                     }
                 }
             }
@@ -206,18 +231,26 @@ public class ExtStorageManager {
                 for (StorageVolume storageVolume : storageVolumesList) {
                     if (!storageVolume.isPrimary()) { // >=4.2
                         // retrieve volInfo via uuid and then disk via volInfo
+                        // TODO in the future use these instead of introspections that are required for low API levels
                         String uuid = storageVolume.getUuid(); // >=4.4
+                        Integer hashCode = storageVolume.hashCode(); // API24(N)+
+                        log.debug("updateAllVolumes: NOT USED YET storagevolume uuid=" + uuid + ", hascode=" + hashCode + ", description=" + storageVolume.getDescription(context));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            log.debug("updateAllVolumes: NOT USED YET storagevolume directory=" + storageVolume.getDirectory() + ", mediaStoreVolumeName=" + storageVolume.getMediaStoreVolumeName());
+                        }
+                        //storageVolume.getMediaStoreVolumeName(); // >=30
+                        //String directory = storageVolume.getDirectory().getPath(); // >=30
                         if (uuid != null) {
                             // wait for media to be ready
                             int count = 0;
                             final int maxTries = 10;
-                            if (DBG) Log.d(TAG,"Media state " + storageVolume.getState());
+                            log.debug("updateAllVolumes: media state " + storageVolume.getState());
                             // Only retry if media is checking
                             //while (!mediaReady.contains(storageVolume.getState()) && !mediaBorked.contains(storageVolume.getState()) && count < maxTries) {
                             // to avoid ANR needs to be based on handlers in UI thread
                             /*
                             while (storageVolume.getState().equals(Environment.MEDIA_CHECKING) && count < maxTries) {
-                                if (DBG) Log.d(TAG,"Media checking and not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
+                                log.debug("updateAllVolumes: media checking and not ready yet " + storageVolume.getState() + " try " + String.valueOf(count) + " out of " + String.valueOf(maxTries));
                                 SystemClock.sleep(100);
                                 count++;
                             }
@@ -230,6 +263,7 @@ public class ExtStorageManager {
                                     ExtStorageType volType = null;
                                     String volDescr = (String) getDescription.invoke(disk, noparams); // getDescription is public >=4.4
                                     String volLabel = (String) fsLabel.get(volInfo);
+                                    Integer volHash = volName.hashCode();
                                     volType = ((boolean) isSd.invoke(disk, noparams)) ?
                                             ExtStorageType.SDCARD
                                             : ((boolean) isUsb.invoke(disk, noparams)) ?
@@ -241,7 +275,10 @@ public class ExtStorageManager {
                                             volumesIdMap.put(volName, (String) getFsUuid.invoke(volInfo, noparams));
                                             volumesDescMap.put(volName, volDescr);
                                             volumesLabelMap.put(volName, volLabel);
-                                            if (DBG) Log.d(TAG, "Volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr + " label " + volLabel);
+                                            // for now keep the two
+                                            volumesHashMap.put(volName, volHash);
+                                            volumesHashTreeMap.put(volName, volHash);
+                                            log.debug("updateAllVolumes: volumes scan result (>=N): " + volName + " of type " + volType + " descr: " + volDescr + " label: " + volLabel + " hash: " + volHash);
                                         }
                                     }
                                 }
@@ -251,7 +288,7 @@ public class ExtStorageManager {
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "updateAllVolumes: caught exception ", e);
+            log.error("updateAllVolumes: caught exception ", e);
         }
     }
 
