@@ -234,9 +234,9 @@ public class ExtStorageManager {
                         // TODO in the future use these instead of introspections that are required for low API levels
                         String uuid = storageVolume.getUuid(); // >=4.4
                         Integer hashCode = storageVolume.hashCode(); // API24(N)+
-                        log.debug("updateAllVolumes: NOT USED YET storagevolume uuid=" + uuid + ", hascode=" + hashCode + ", description=" + storageVolume.getDescription(context));
+                        log.trace("updateAllVolumes: NOT USED YET storagevolume uuid=" + uuid + ", hascode=" + hashCode + ", description=" + storageVolume.getDescription(context));
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            log.debug("updateAllVolumes: NOT USED YET storagevolume directory=" + storageVolume.getDirectory() + ", mediaStoreVolumeName=" + storageVolume.getMediaStoreVolumeName());
+                            log.trace("updateAllVolumes: NOT USED YET storagevolume directory=" + storageVolume.getDirectory() + ", mediaStoreVolumeName=" + storageVolume.getMediaStoreVolumeName());
                         }
                         //storageVolume.getMediaStoreVolumeName(); // >=30
                         //String directory = storageVolume.getDirectory().getPath(); // >=30
