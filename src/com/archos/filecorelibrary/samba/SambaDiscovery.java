@@ -472,11 +472,13 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         for (Network n: nets) {
             LinkProperties lp = connMgr.getLinkProperties(n);
             NetworkCapabilities np = connMgr.getNetworkCapabilities(n);
-            String iname =  lp.getInterfaceName();
-            if (iname != null && np != null) {
-                log.debug(">>> " + iname + ": " + np.hasTransport(cap));
-                if (np.hasTransport(cap))
-                    return lp;
+            if (lp != null) {
+                String iname = lp.getInterfaceName();
+                if (iname != null && np != null) {
+                    log.debug(">>> " + iname + ": " + np.hasTransport(cap));
+                    if (np.hasTransport(cap))
+                        return lp;
+                }
             }
         }
         return null;
