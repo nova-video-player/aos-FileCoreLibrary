@@ -87,10 +87,15 @@ public class ExtStorageReceiver extends BroadcastReceiver {
 
                 if (mediaActions.contains(action)) {
                     uri = mIntent.getDataString();
-                    path = uri.substring(7);
-                    //file:// will throw exception from android N
-                    if (uri.startsWith("file://")) uri = ARCHOS_FILE_SCHEME + "://" + path;
-                    log.debug("uri is " + uri);
+                    // uri can be null according to sentry
+                    if (uri != null) {
+                        path = uri.substring(7);
+                        //file:// will throw exception from android N
+                        if (uri.startsWith("file://")) uri = ARCHOS_FILE_SCHEME + "://" + path;
+                        log.debug("onReceive: uri is " + uri);
+                    } else {
+                        log.warn("onReceive: uri is null for action " + action + "!");
+                    }
                 }
 
                 switch (action) {
