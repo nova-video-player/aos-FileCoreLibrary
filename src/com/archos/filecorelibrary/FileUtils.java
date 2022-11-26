@@ -459,8 +459,13 @@ public class FileUtils {
                 log.debug("canReadExternalStorage: API>29 -> " + result);
                 return result;
             } else {
-                result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-                log.debug("canReadExternalStorage: 22<API<30 -> " + result);
+                if(Build.VERSION.SDK_INT<33) {
+                    result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                    log.debug("canReadExternalStorage: 22<API<30 -> " + result);
+                } else {
+                    result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED;
+                    log.debug("canReadExternalStorage: 32<API -> " + result);
+                }
                 return result;
             }
         }
