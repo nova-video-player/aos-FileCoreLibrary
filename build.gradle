@@ -13,8 +13,6 @@ allprojects {
         }
         // to generate the required jar dependencies e.g. cling seamless
         preBuild.dependsOn(ndkBuild)
-        compileDebugJavaWithJavac.dependsOn(ndkBuild)
-        compileReleaseJavaWithJavac.dependsOn(ndkBuild)
     }
 }
 
