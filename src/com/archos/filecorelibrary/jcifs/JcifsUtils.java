@@ -336,7 +336,7 @@ public class JcifsUtils {
         }
         CIFSContext ctx = null;
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        if (cred != null) {
+        if (cred != null && ! cred.getUsername().isEmpty()) {
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             ctx = context.withCredentials(auth);
         } else
