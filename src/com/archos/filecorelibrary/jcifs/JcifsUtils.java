@@ -226,7 +226,7 @@ public class JcifsUtils {
     private static CIFSContext getCifsContext(Uri uri, Boolean isSmbV2) {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
-        if (cred != null) {
+        if (cred != null && ! cred.getUsername().isEmpty()) {
             log.debug("getCifsContext using credentials for " + uri);
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             context = getBaseContext(isSmbV2).withCredentials(auth);
