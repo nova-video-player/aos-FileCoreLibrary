@@ -34,9 +34,14 @@ public final class ArchosFeatures {
     public static boolean isAndroidTV(Context ct) {
         // false on chromeos
         UiModeManager uiModeManager = (UiModeManager) ct.getSystemService(Context.UI_MODE_SERVICE);
-        boolean isATV = (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION);
-        if (DBG) Log.d(TAG, "isAndroidTV: " + isATV);
-        return isATV;
+        if (uiModeManager != null) { // seen issues on MSTAR TVs Android 8
+            boolean isATV = (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION);
+            if (DBG) Log.d(TAG, "isAndroidTV: " + isATV);
+            return isATV;
+        } else {
+            Log.w(TAG, "isAndroidTV: uiModeManager is null, assume ATV!");
+            return true; // assume that phones are more compliant than ATV
+        }
     }
 
     public static boolean isChromeOS(Context context) {
