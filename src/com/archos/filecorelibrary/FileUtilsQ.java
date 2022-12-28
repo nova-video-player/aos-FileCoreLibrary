@@ -46,6 +46,7 @@ public class FileUtilsQ {
     public static String privateAppDirectory = null;
 
     private static final String DEFAULT_PUBLIC_APP_DIR = "/sdcard/Android/data/org.courville.nova/files";
+    private static final File DEFAULT_PUBLIC_APP_FILE = new File(DEFAULT_PUBLIC_APP_DIR);
 
     public static void setDeleteLauncher(ActivityResultLauncher<IntentSenderRequest> launcher) {
         mDeleteLauncher = launcher;
@@ -74,16 +75,7 @@ public class FileUtilsQ {
 
     public FileUtilsQ(Context context) {
         mContext = context;
-        // at this point externalStorageState might not be ready
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File externalFilesDir = mContext.getExternalFilesDir(null);
-            if (externalFilesDir != null) publicAppDirectory = externalFilesDir.getPath();
-            else publicAppDirectory = DEFAULT_PUBLIC_APP_DIR;
-        } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
-            // TOFIX doing wild guess but should in reality wait for result to be available
-            log.warn("FileUtilsQ: getExternalStorageState " + Environment.getExternalStorageState() + " is not mounted!");
-            publicAppDirectory = DEFAULT_PUBLIC_APP_DIR;
-        }
+        publicAppDirectory = getNovaPublicAppDirPath(context);
         privateAppDirectory = mContext.getFilesDir().getPath();
         log.debug("FileUtilsQ: publicAppDirectory " + publicAppDirectory + ", privateAppDirectory " + privateAppDirectory);
     }
@@ -386,5 +378,22 @@ public class FileUtilsQ {
         if (cursor != null) cursor.close();
         log.debug("getContentUri: contentUri " + contentUri);
         return contentUri;
+    }
+
+    public static String getNovaPublicAppDirPath(Context context) {
+        return getNovaPublicAppDirFile(context).getPath();
+    }
+
+    public static File getNovaPublicAppDirFile(Context context) {
+        // at this point externalStorageState might not be ready
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File externalFilesDir = context.getExternalFilesDir(null);
+            if (externalFilesDir != null) return externalFilesDir;
+            else return DEFAULT_PUBLIC_APP_FILE;
+        } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
+            // TOFIX doing wild guess but should in reality wait for result to be available
+            log.warn("FileUtilsQ: getNovaPublicAppDirFile getExternalStorageState " + Environment.getExternalStorageState() + " is not mounted!");
+            return DEFAULT_PUBLIC_APP_FILE;
+        }
     }
 }
