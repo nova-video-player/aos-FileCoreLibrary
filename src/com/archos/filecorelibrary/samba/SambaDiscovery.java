@@ -373,8 +373,10 @@ public class SambaDiscovery implements InternalDiscoveryListener {
      */
     public void abort() {
         mIsAborted = true;
-
-        for (InternalDiscovery discovery : mInternalDiscoveries) {
+        // use iterator to avoid ConcurrentModificationException
+        Iterator<InternalDiscovery> iterator = mInternalDiscoveries.iterator();
+        while (iterator.hasNext()) {
+            InternalDiscovery discovery = iterator.next();
             discovery.abort();
         }
         mInternalDiscoveries.clear();
