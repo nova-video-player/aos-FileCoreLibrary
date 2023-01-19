@@ -95,11 +95,11 @@ dependencies {
      */
     api files('libs/jcifs-ng.jar')
     // jcifs-ng depends on bouncycastle (automated when using maven repo)
-    api 'org.bouncycastle:bcprov-jdk15to18:1.70'
+    api 'org.bouncycastle:bcprov-jdk15to18:1.72'
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.preference:preference:1.2.0'
-    implementation 'commons-net:commons-net:3.8.0'
+    implementation 'commons-net:commons-net:3.9.0'
     implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'com.github.tony19:logback-android:2.0.0'
     // TODO use https://github.com/mwiede/jsch instead of https://sourceforge.net/projects/jsch/files/jsch/
