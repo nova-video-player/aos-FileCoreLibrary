@@ -46,6 +46,7 @@
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">Wi-Fi Direct</string>
     <string name="receive_p2p_here">Λήψη εδώ μέσω WiFi Direct</string>
+    <string name="empty_message">Ανακαλύπτοντας τις διαθέσιμες συσκευές προορισμού&#8230;&lt;br/&gt;Η συσκευή προορισμού πρέπει να ενεργοποιήσει &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; επιλογή</string>
     <string name="wifip2p_waiting">Η μεταφορά WiFi Direct θα ξεκινήσει σύντομα</string>
     <string name="connect_to_target">Σύνδεση στον προορισμό</string>
     <string name="upload_in_progress">Μεταφόρτωση σε εξέλιξη</string>
@@ -229,6 +230,7 @@
     <!-- Network Scanning -->
     <string name="scan_network_index">Δημιουργία ευρετήριου αρχείων πολυμέσων</string>
     <string name="scan_network_remove">Αφαίρεση αρχείων πολυμέσων από το ευρετήριο</string>
+    <string name="debug_browse_to_root">Περιήγηση στη ρίζα της συσκευής (μόνο αποσφαλμάτωση)</string>
     <!-- Hiding from media scanning -->
     <string name="nomedia_create">Αφαίρεση από τη βιβλιοθήκη</string>
     <string name="nomedia_remove">Προσθήκη στη βιβλιοθήκη</string>
