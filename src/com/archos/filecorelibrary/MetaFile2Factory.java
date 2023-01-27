@@ -21,6 +21,7 @@ import com.archos.filecorelibrary.ftp.FTPFile2;
 import com.archos.filecorelibrary.jcifs.JcifsFile2;
 import com.archos.filecorelibrary.localstorage.JavaFile2;
 import com.archos.filecorelibrary.sftp.SFTPFile2;
+import com.archos.filecorelibrary.webdav.WebdavFile2;
 
 /**
  * Created by alexandre on 22/04/15.
@@ -40,6 +41,9 @@ public class MetaFile2Factory {
         }
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
             return ContentFile2.fromUri(uri);
+        }
+        else if ("webdav".equalsIgnoreCase(uri.getScheme())) {
+            return WebdavFile2.fromUri(uri);
         }
         else if (FileUtils.isLocal(uri)) {
             return JavaFile2.fromUri(uri);

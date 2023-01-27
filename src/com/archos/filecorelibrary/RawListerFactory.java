@@ -21,6 +21,7 @@ import com.archos.filecorelibrary.ftp.FTPRawLister;
 import com.archos.filecorelibrary.jcifs.JcifsRawLister;
 import com.archos.filecorelibrary.localstorage.LocalStorageRawLister;
 import com.archos.filecorelibrary.sftp.SFTPRawLister;
+import com.archos.filecorelibrary.webdav.WebdavRawLister;
 import com.archos.filecorelibrary.zip.ZipRawLister;
 
 public class RawListerFactory {
@@ -45,6 +46,9 @@ public class RawListerFactory {
         }
         else if (FileUtils.isLocal(uri)) {
             return new LocalStorageRawLister(uri);
+        }
+        else if("webdav".equals(uri.getScheme())) {
+            return new WebdavRawLister(uri);
         }
         else {
             throw new IllegalArgumentException("not implemented yet for "+uri);

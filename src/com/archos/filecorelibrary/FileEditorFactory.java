@@ -23,6 +23,7 @@ import com.archos.filecorelibrary.jcifs.JcifsFileEditor;
 import com.archos.filecorelibrary.localstorage.LocalStorageFileEditor;
 import com.archos.filecorelibrary.sftp.SftpFileEditor;
 import com.archos.filecorelibrary.zip.ZipFileEditor;
+import com.archos.filecorelibrary.webdav.WebdavFileEditor;
 
 /**
  * create a file editor
@@ -45,6 +46,9 @@ public class FileEditorFactory {
         }
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
             return new ContentStorageFileEditor(uri, ct);
+        }
+        else if ("webdav".equalsIgnoreCase(uri.getScheme())) {
+            return new WebdavFileEditor(uri);
         }
         else if (FileUtils.isLocal(uri)) {
             return new LocalStorageFileEditor(uri, ct);

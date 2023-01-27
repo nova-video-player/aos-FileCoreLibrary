@@ -296,7 +296,8 @@ public class FileUtils {
     public static boolean isNetworkShare(Uri uri) {
         return "smb".equals(uri.getScheme())||
                 "upnp".equals(uri.getScheme())||
-                "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
+                "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme()) ||
+                "webdav".equals(uri.getScheme());
     }
 
     public static boolean isNetworkShare(String path) {
