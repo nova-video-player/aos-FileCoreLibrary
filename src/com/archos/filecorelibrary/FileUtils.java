@@ -300,9 +300,7 @@ public class FileUtils {
     }
 
     public static boolean isNetworkShare(String path) {
-        return path.startsWith("smb://")||
-                path.startsWith("upnp://")||
-                path.startsWith("ftps://")||path.startsWith("ftp://")||path.startsWith("sftp://");
+        return isNetworkShare(Uri.parse(path));
     }
 
     /**
