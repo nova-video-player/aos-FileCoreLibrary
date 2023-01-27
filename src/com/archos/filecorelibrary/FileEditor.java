@@ -36,14 +36,14 @@ public abstract class FileEditor {
     public FileEditor(Uri uri){
         mUri = uri;
     }
-    public abstract boolean touchFile();
-    public abstract boolean mkdir();
+    public boolean touchFile() { return false; };
+    public boolean mkdir() { return false; };
     public abstract InputStream getInputStream() throws Exception;
     public abstract InputStream getInputStream(long from) throws Exception;
-    public abstract OutputStream getOutputStream() throws Exception;
-    public abstract Boolean delete() throws Exception;
-    public abstract boolean rename(String newName);
-    public abstract boolean move(Uri uri);
+    public OutputStream getOutputStream() throws Exception { return null; };
+    public Boolean delete() throws Exception { return null; };
+    public boolean rename(String newName) { return false; };
+    public boolean move(Uri uri) { return false; };
     public abstract boolean exists();
 
     /**
