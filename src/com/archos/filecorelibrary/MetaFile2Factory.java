@@ -52,4 +52,15 @@ public class MetaFile2Factory {
             throw new IllegalArgumentException("not implemented yet for "+uri);
         }
     }
+
+    public static int defaultPortForProtocol(String scheme) {
+        switch(scheme) {
+            case "smb": return 445;
+            case "ftp": return 21;
+            case "ftps": return 21;
+            case "sftp": return 22;
+            case "webdav": return 80;
+            default: throw new IllegalArgumentException("Invalid scheme " + scheme);
+        }
+    }
 }
