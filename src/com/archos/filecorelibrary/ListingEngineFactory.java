@@ -46,7 +46,62 @@ public class ListingEngineFactory {
             return new ZipListingEngine(context, uri);
         }
         else {
-            throw new IllegalArgumentException("not implemented yet for "+uri);
+            try {
+                return new GenericListingEngine(context, uri);
+            } catch(Exception e) {
+                throw new IllegalArgumentException("not implemented yet for " + uri, e);
+            }
         }
+    }
+
+    public static class GenericListingEngine extends ListingEngine {
+        final private Thread mListingThread = new Thread() {
+            public void run() {
+                try {
+                    final var files = mRawLister.getFileList();
+                    if(files == null) throw new Exception();
+                    mUiHandler.post(() -> {
+                        if (mListener != null) { // do not report error if aborted
+                            if (!mAbort) {
+                                mListener.onListingUpdate(files);
+                            }
+                            mListener.onListingEnd();
+                        }
+                    });
+                } catch (Throwable t) {
+                    mUiHandler.post(() -> {
+                        if (!mAbort && mListener != null) { // do not report error if aborted
+                            mListener.onListingFatalError(null, ErrorEnum.ERROR_UNKNOWN);
+                        }
+                    });
+                }
+            }
+        };
+        final private RawLister mRawLister;
+        private boolean mAbort = false;
+
+        public GenericListingEngine(Context context, Uri uri) {
+            super(context);
+
+            mRawLister = RawListerFactory.getRawListerForUrl(uri);
+        }
+
+        @Override
+        public void start() {
+            // Tell ASAP the listener that we are starting discovery
+            mUiHandler.post(() -> {
+                if (mListener != null) {
+                    mListener.onListingStart();
+                }
+            });
+
+            mListingThread.start();
+        }
+
+        @Override
+        public void abort() {
+            mAbort = true;
+        }
+
     }
 }
