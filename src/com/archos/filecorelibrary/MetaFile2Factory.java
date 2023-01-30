@@ -28,8 +28,6 @@ import com.archos.filecorelibrary.webdav.WebdavFile2;
  */
 public class MetaFile2Factory {
     public static MetaFile2 getMetaFileForUrl(Uri uri) throws Exception {
-
-
         if ("smb".equalsIgnoreCase(uri.getScheme())) {
             return JcifsFile2.fromUri(uri);
         }

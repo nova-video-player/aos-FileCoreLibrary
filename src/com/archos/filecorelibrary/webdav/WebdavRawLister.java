@@ -18,7 +18,7 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
-import com.archos.filecorelibrary.ftp.AuthenticationException;
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.thegrizzlylabs.sardineandroid.DavResource;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
@@ -52,6 +52,7 @@ public class WebdavRawLister extends RawLister {
             return files;
         } catch (Throwable t) {
             android.util.Log.d("PHH", "Failed listing webdav files", t);
+            if(t.getMessage().contains("401 Un")) throw new AuthenticationException();
         }
         return null;
     }

@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.List;
 
 
-import com.archos.filecorelibrary.ftp.AuthenticationException;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 

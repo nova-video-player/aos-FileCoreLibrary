@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.archos.filecorelibrary.AuthenticationException;
+
 /**
  * This class handles the threading of the FTP file listing
  * @author vapillon

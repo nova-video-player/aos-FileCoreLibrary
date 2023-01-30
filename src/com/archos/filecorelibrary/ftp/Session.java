@@ -31,6 +31,7 @@ import android.util.Log;
 
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase.Credential;
+import com.archos.filecorelibrary.AuthenticationException;
 
 public class Session {
     private static final Logger log = LoggerFactory.getLogger(Session.class);

@@ -20,7 +20,7 @@ import android.net.Uri;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
-import com.archos.filecorelibrary.ftp.AuthenticationException;
+import com.archos.filecorelibrary.AuthenticationException;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;

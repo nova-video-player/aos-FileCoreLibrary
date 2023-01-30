@@ -27,6 +27,7 @@ import org.apache.commons.net.ftp.FTPSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
 import android.net.Uri;
 

@@ -18,7 +18,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
-import com.archos.filecorelibrary.ftp.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 

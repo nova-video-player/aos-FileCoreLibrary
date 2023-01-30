@@ -18,7 +18,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
-import com.archos.filecorelibrary.ftp.AuthenticationException;
+import com.archos.filecorelibrary.AuthenticationException;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;

@@ -19,7 +19,6 @@ import android.util.Log;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.contentstorage.ContentStorageFileEditor;
-import com.archos.filecorelibrary.ftp.AuthenticationException;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 

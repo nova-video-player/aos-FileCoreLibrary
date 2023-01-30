@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import android.net.Uri;
 import android.util.Log;
 
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 

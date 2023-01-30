@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.archos.filecorelibrary.ftp;
+package com.archos.filecorelibrary;
 
 /**
  * Created by alexandre on 10/09/15.

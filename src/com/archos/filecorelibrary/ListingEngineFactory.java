@@ -25,9 +25,7 @@ import com.archos.filecorelibrary.sftp.SFtpListingEngine;
 import com.archos.filecorelibrary.zip.ZipListingEngine;
 
 public class ListingEngineFactory {
-
     public static ListingEngine getListingEngineForUrl(Context context, Uri uri) {
-
         if (FileUtils.isLocal(uri)&&(uri.getScheme()==null||!uri.getScheme().equals("content"))) {
             return new LocalStorageListingEngine(context, uri);
         }else if(uri.getScheme().equals("content")){
@@ -66,6 +64,12 @@ public class ListingEngineFactory {
                                 mListener.onListingUpdate(files);
                             }
                             mListener.onListingEnd();
+                        }
+                    });
+                } catch(AuthenticationException e) {
+                    mUiHandler.post(() -> {
+                        if (!mAbort && mListener != null) {
+                            mListener.onListingFatalError(null, ErrorEnum.ERROR_AUTHENTICATION);
                         }
                     });
                 } catch (Throwable t) {
