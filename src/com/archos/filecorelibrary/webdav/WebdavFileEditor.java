@@ -15,16 +15,22 @@
 package com.archos.filecorelibrary.webdav;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
 public class WebdavFileEditor extends FileEditor {
+
+    private static final Logger log = LoggerFactory.getLogger(WebdavFileEditor.class);
+
     private OkHttpSardine mSardine;
 
     public WebdavFileEditor(Uri uri) {
@@ -51,9 +57,23 @@ public class WebdavFileEditor extends FileEditor {
     }
 
     @Override
-    //TODO
     public boolean exists() {
-        android.util.Log.w("PHH", "FileEditor exists " + mUri);
-        return true;
+        try {
+            var u = WebdavFile2.uriToHttp(mUri);
+            boolean doesItExist;
+            if (u != null) {
+                doesItExist = mSardine.exists(u.toString());
+                if (log.isTraceEnabled()) {
+                    if (doesItExist) log.trace("exists: " + mUri + " exists");
+                    else log.trace("exists: " + mUri + " does not exist");
+                }
+                return doesItExist;
+            } else {
+                log.warn("exists: uriToHttp returned null!");
+            }
+        } catch (IOException e) {
+            caughtException(e, "exists", "IOException in exists for " + mUri);
+        }
+        return false;
     }
 }
