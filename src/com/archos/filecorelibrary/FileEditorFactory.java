@@ -50,6 +50,9 @@ public class FileEditorFactory {
         else if ("webdav".equalsIgnoreCase(uri.getScheme())) {
             return new WebdavFileEditor(uri);
         }
+        else if ("webdavs".equalsIgnoreCase(uri.getScheme())) {
+            return new WebdavFileEditor(uri);
+        }
         else if (FileUtils.isLocal(uri)) {
             return new LocalStorageFileEditor(uri, ct);
         }

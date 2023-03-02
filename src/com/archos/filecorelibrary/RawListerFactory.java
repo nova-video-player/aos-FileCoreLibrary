@@ -50,6 +50,9 @@ public class RawListerFactory {
         else if("webdav".equals(uri.getScheme())) {
             return new WebdavRawLister(uri);
         }
+        else if("webdavs".equals(uri.getScheme())) {
+            return new WebdavRawLister(uri);
+        }
         else {
             throw new IllegalArgumentException("not implemented yet for "+uri);
         }

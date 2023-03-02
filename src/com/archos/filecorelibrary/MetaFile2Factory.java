@@ -43,6 +43,9 @@ public class MetaFile2Factory {
         else if ("webdav".equalsIgnoreCase(uri.getScheme())) {
             return WebdavFile2.fromUri(uri);
         }
+        else if ("webdavs".equalsIgnoreCase(uri.getScheme())) {
+            return WebdavFile2.fromUri(uri);
+        }
         else if (FileUtils.isLocal(uri)) {
             return JavaFile2.fromUri(uri);
         }
