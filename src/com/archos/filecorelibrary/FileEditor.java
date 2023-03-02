@@ -19,6 +19,10 @@ import java.io.OutputStream;
 
 import android.content.Context;
 import android.net.Uri;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Provides methods to edit files, and everything about metafile2 that requires a connection
  * @author alexandre
@@ -31,6 +35,9 @@ import android.net.Uri;
  * and a custom Exception (used in my case for permission exception)
  */
 public abstract class FileEditor {
+
+    private static final Logger log = LoggerFactory.getLogger(FileEditor.class);
+
     protected Uri mUri;
     private static final int MAX_COUNT = 32768;
     public FileEditor(Uri uri){
@@ -69,5 +76,10 @@ public abstract class FileEditor {
             return true;
         }
         return false;
+    }
+
+    protected void caughtException(Throwable e, String method, String exceptionType) {
+        if (log.isTraceEnabled()) log.error(method + ": caught" + exceptionType, e);
+        else log.warn(method + ": caught "+ exceptionType);
     }
 }

@@ -135,8 +135,4 @@ public class JcifsFileEditor extends FileEditor{
         return false;
     }
 
-    private void caughtException(Throwable e, String method, String exceptionType) {
-        if (log.isTraceEnabled()) log.error(method + ": caught" + exceptionType, e);
-        else log.warn(method + ": caught "+ exceptionType);
-    }
 }
