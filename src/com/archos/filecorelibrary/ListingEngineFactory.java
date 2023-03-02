@@ -22,6 +22,7 @@ import com.archos.filecorelibrary.ftp.FtpListingEngine;
 import com.archos.filecorelibrary.jcifs.JcifListingEngine;
 import com.archos.filecorelibrary.localstorage.LocalStorageListingEngine;
 import com.archos.filecorelibrary.sftp.SFtpListingEngine;
+import com.archos.filecorelibrary.webdav.WebdavListingEngine;
 import com.archos.filecorelibrary.zip.ZipListingEngine;
 
 public class ListingEngineFactory {
@@ -39,6 +40,9 @@ public class ListingEngineFactory {
         }
         else if (uri.getScheme().equals("sftp")) {
             return new SFtpListingEngine(context, uri);
+        }
+        else if (uri.getScheme().equals("webdav")||uri.getScheme().equals("webdavs")) {
+            return new WebdavListingEngine(context, uri);
         }
         else if (uri.getScheme().equals("zip")) {
             return new ZipListingEngine(context, uri);

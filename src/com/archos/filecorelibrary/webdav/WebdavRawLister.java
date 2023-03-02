@@ -23,11 +23,17 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.thegrizzlylabs.sardineandroid.DavResource;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WebdavRawLister extends RawLister {
+
+    private static final Logger log = LoggerFactory.getLogger(WebdavRawLister.class);
+
     public WebdavRawLister(Uri uri) {
         super(uri);
     }
@@ -51,7 +57,7 @@ public class WebdavRawLister extends RawLister {
             }
             return files;
         } catch (Throwable t) {
-            android.util.Log.d("PHH", "Failed listing webdav files", t);
+            log.warn("Failed listing webdav files", t);
             if(t.getMessage().contains("401 Un")) throw new AuthenticationException();
         }
         return null;
