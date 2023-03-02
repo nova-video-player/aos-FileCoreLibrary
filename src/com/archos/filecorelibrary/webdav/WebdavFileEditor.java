@@ -17,6 +17,7 @@ package com.archos.filecorelibrary.webdav;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
@@ -54,6 +55,52 @@ public class WebdavFileEditor extends FileEditor {
         var headers = new HashMap<String, String>();
         headers.put("Range", "bytes=" + from + "-");
         return mSardine.get(u.toString(), headers);
+    }
+
+    @Override
+    public boolean touchFile() {
+        return false;
+    }
+
+    @Override
+    public boolean mkdir() {
+        try {
+            var u = WebdavFile2.uriToHttp(mUri);
+            mSardine.createDirectory(u.toString());
+            return true;
+        } catch (IOException e) {
+            caughtException(e, "mkdir", "IOException in mkdir " + mUri);
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean delete() throws Exception {
+        var u = WebdavFile2.uriToHttp(mUri);
+        mSardine.delete(u.toString());
+        return null;
+    }
+
+    @Override
+    public boolean move(Uri uri) {
+        var origin = WebdavFile2.uriToHttp(mUri);
+        try {
+            if (origin != null) {
+                var destination = WebdavFile2.uriToHttp(uri);
+                if (destination != null) {
+                    mSardine.move(origin.toString(), destination.toString());
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            caughtException(e, "rename", "IOException in move " + mUri + " into " + uri);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean rename(String newName) {
+        return move(Uri.parse(FileUtils.getParentUrl(mUri.toString()) + "/" + newName));
     }
 
     @Override
