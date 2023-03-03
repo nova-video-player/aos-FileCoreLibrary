@@ -61,6 +61,7 @@ public class MetaFile2Factory {
             case "ftps": return 21;
             case "sftp": return 22;
             case "webdav": return 80;
+            case "webdavs": return 443;
             default: throw new IllegalArgumentException("Invalid scheme " + scheme);
         }
     }
