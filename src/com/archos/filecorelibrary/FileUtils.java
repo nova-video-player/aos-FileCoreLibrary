@@ -182,7 +182,6 @@ public class FileUtils {
         return name;
     }
 
-
     public static String getExtension(String filename) {
         if (filename == null)
             return null;
@@ -192,7 +191,6 @@ public class FileUtils {
         }
         return null;
     }
-
 
     //useful for uris in content://
     public static Uri getRealUriFromVideoURI(Context context, Uri contentUri) {
@@ -261,6 +259,7 @@ public class FileUtils {
 
         }
     }
+
     public static String getName(Uri uri){
         if(uri!=null) {
             String name = uri.getLastPathSegment();
