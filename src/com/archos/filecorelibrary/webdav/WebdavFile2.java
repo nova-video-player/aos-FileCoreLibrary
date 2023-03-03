@@ -22,8 +22,14 @@ import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
+import com.thegrizzlylabs.sardineandroid.DavAce;
+import com.thegrizzlylabs.sardineandroid.DavAcl;
 import com.thegrizzlylabs.sardineandroid.DavResource;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
+import com.thegrizzlylabs.sardineandroid.model.Ace;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.UnknownHostException;
@@ -31,6 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WebdavFile2 extends MetaFile2 {
+
+    private static final Logger log = LoggerFactory.getLogger(WebdavFile2.class);
+
     public static Uri uriToHttp(Uri u) {
         if (u.getScheme().equals("webdavs"))
             return u.buildUpon().
@@ -59,7 +68,7 @@ public class WebdavFile2 extends MetaFile2 {
         mIsDirectory = res.isDirectory();
         mIsFile = !res.isDirectory();
         mLastModified = res.getModified().getTime();
-        //TODO : permissions
+        // TODO MARC: permissions
         mCanRead = true;
         mCanWrite = true;
         mLength = res.getContentLength();
@@ -139,8 +148,20 @@ public class WebdavFile2 extends MetaFile2 {
 
         var httpUri = WebdavFile2.uriToHttp(uri);
 
+        // TODO MARC test to remove to check canRead, canWrite
+        var acls = sardine.getAcl(httpUri.toString());
+        log.debug("fromUri owner=" + acls.getOwner() + ", group=" + acls.getGroup());
+        var aces = acls.getAces();
+        var canRead = false;
+        var canWrite = false;
+        if (! aces.isEmpty()) {
+            canRead = (sardine.getAcl(httpUri.toString()).getAces().get(0).getGranted().get(0) == "read");
+            canWrite = (sardine.getAcl(httpUri.toString()).getAces().get(0).getGranted().get(1) == "write");
+        } else {
+            log.warn("fromUri: aces empty for uri=" + httpUri);
+        }
+        log.debug("fromUri: uri=" + httpUri + ", canWrite=" + canWrite + ", canRead=" + canRead);
         var resources = sardine.list(httpUri.toString());
-
         return new WebdavFile2(resources.get(0), uri);
 
     }
