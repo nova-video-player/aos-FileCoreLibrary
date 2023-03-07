@@ -19,9 +19,7 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
-import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.thegrizzlylabs.sardineandroid.DavResource;
-import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,10 +74,7 @@ public class WebdavListingEngine extends ListingEngine {
             try {
                 log.debug("WebdavListingThread: listFiles for: " + mUri.toString());
 
-                var cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
-                var sardine = new OkHttpSardine();
-                sardine.setCredentials(cred.getUsername(), cred.getPassword());
-
+                var sardine = WebdavUtils.peekInstance().getSardine(mUri);
                 var httpUri = WebdavFile2.uriToHttp(mUri);
 
                 var acceptedDavResources = new ArrayList<DavResource>();

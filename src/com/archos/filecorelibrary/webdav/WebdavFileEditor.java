@@ -36,11 +36,7 @@ public class WebdavFileEditor extends FileEditor {
 
     public WebdavFileEditor(Uri uri) {
         super(uri);
-        var cred = NetworkCredentialsDatabase.getInstance().getCredential(mUri.toString());
-        mSardine = new OkHttpSardine();
-        if (cred != null) {
-            mSardine.setCredentials(cred.getUsername(), cred.getPassword());
-        }
+        mSardine = WebdavUtils.peekInstance().getSardine(uri);
     }
 
     @Override
