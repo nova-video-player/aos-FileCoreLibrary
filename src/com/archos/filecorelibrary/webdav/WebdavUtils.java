@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-
 public class WebdavUtils {
 
     private static final Logger log = LoggerFactory.getLogger(WebdavUtils.class);
