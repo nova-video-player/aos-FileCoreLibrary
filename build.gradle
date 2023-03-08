@@ -113,6 +113,8 @@ dependencies {
     // see http://www.matez.de/index.php/2020/06/22/the-future-of-jsch-without-ssh-rsa/
     // implementation 'com.github.mwiede:jsch:0.1.70'
     implementation 'io.sentry:sentry:6.9.2'
-    implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
+    // use our own sardine-android fork instead of thegrizzlylabs to integrate some fixes
+    //implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
+    implementation 'com.github.nova-video-player:sardine-android:0.0.2'
 }
 
