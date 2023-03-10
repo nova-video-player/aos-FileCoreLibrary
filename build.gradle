@@ -74,7 +74,7 @@ task ndkBuild(type:Exec) {
     myCmd.add("make")
     myCmd.add("native_libnativehelper")
     myCmd.add("native_build_FileCoreLibrary")
-    myCmd.add("jcifs-ng")
+    //myCmd.add("jcifs-ng")
     commandLine myCmd
 }
 
