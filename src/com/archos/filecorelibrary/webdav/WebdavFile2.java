@@ -60,7 +60,8 @@ public class WebdavFile2 extends MetaFile2 {
         mName = uri.getLastPathSegment();
         mIsDirectory = res.isDirectory();
         mIsFile = !res.isDirectory();
-        mLastModified = res.getModified().getTime();
+        if (res.getModified() != null) mLastModified = res.getModified().getTime();
+        else mLastModified = 0;
         // TODO MARC: permissions
         mCanRead = true;
         mCanWrite = true;
