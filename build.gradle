@@ -67,7 +67,7 @@ task ndkBuild(type:Exec) {
         file("libs/armeabi-v7a/libc++_shared.so").exists()
         file("libs/x86/libc++_shared.so").exists()
         file("libs/x86_64/libc++_shared.so").exists()
-        file("libs/jcifs-ng.jar").exists()
+        //file("libs/jcifs-ng.jar").exists()
     }
     //OutputFiles/OutputDirectories
     List<String> myCmd = new ArrayList<String>()
@@ -103,6 +103,7 @@ dependencies {
     api 'eu.agno3.jcifs:jcifs-ng:2.1.9'
     // jcifs-ng depends on bouncycastle (automated when using maven repo)
     //api 'org.bouncycastle:bcprov-jdk15to18:1.72'
+    implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'oro:oro:2.0.8'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference:1.2.0'
