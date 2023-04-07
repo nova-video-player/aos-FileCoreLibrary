@@ -21,6 +21,7 @@ import com.archos.filecorelibrary.ftp.FTPFile2;
 import com.archos.filecorelibrary.jcifs.JcifsFile2;
 import com.archos.filecorelibrary.localstorage.JavaFile2;
 import com.archos.filecorelibrary.sftp.SFTPFile2;
+import com.archos.filecorelibrary.smbj.SmbjFile2;
 import com.archos.filecorelibrary.webdav.WebdavFile2;
 
 /**
@@ -46,6 +47,9 @@ public class MetaFile2Factory {
         else if ("webdavs".equalsIgnoreCase(uri.getScheme())) {
             return WebdavFile2.fromUri(uri);
         }
+        else if ("smbj".equalsIgnoreCase(uri.getScheme())) {
+            return SmbjFile2.fromUri(uri);
+        }
         else if (FileUtils.isLocal(uri)) {
             return JavaFile2.fromUri(uri);
         }
@@ -62,6 +66,7 @@ public class MetaFile2Factory {
             case "sftp": return 22;
             case "webdav": return 80;
             case "webdavs": return 443;
+            case "smbj": return 445;
             default: throw new IllegalArgumentException("Invalid scheme " + scheme);
         }
     }
