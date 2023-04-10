@@ -21,15 +21,18 @@ import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.thegrizzlylabs.sardineandroid.DavAce;
-import com.thegrizzlylabs.sardineandroid.DavAcl;
 import com.thegrizzlylabs.sardineandroid.DavResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 public class WebdavFile2 extends MetaFile2 {
+
+    // see https://github.com/lookfirst/sardine/issues/359 to re-enable when issue fixed
+    final static boolean CAN_SARDINE_CHECK_PERM = false;
 
     private static final Logger log = LoggerFactory.getLogger(WebdavFile2.class);
 
@@ -59,12 +62,24 @@ public class WebdavFile2 extends MetaFile2 {
         mUriString = uri.toString();
         mName = uri.getLastPathSegment();
         mIsDirectory = res.isDirectory();
-        mIsFile = !res.isDirectory();
+        mIsFile = ! mIsDirectory;
         if (res.getModified() != null) mLastModified = res.getModified().getTime();
         else mLastModified = 0;
-        // TODO MARC: permissions
         mCanRead = true;
         mCanWrite = true;
+        if (CAN_SARDINE_CHECK_PERM) {
+            final List<DavAce> aces;
+            try {
+                aces = WebdavUtils.peekInstance().getSardine(uri).getAcl(uriToHttp(uri).toString()).getAces();
+                if (!aces.isEmpty()) {
+                    mCanRead = (aces.get(0).getGranted().get(0) == "read");
+                    mCanWrite = (aces.get(0).getGranted().get(1) == "write");
+                }
+            } catch (IOException ioe) {
+                if (log.isTraceEnabled()) log.error("WebdavFile2: caught IOException", ioe);
+                else log.error("WebdavFile2: caught IOException");
+            }
+        }
         mLength = res.getContentLength();
     }
 
@@ -133,27 +148,11 @@ public class WebdavFile2 extends MetaFile2 {
     }
 
     /**
-     * get metafile2 object from a uri (please use this only if absolutely necessary
+     * get metafile2 object from a uri (please use this only if absolutely necessary)
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         var sardine = WebdavUtils.peekInstance().getSardine(uri);
         Uri httpUri = WebdavFile2.uriToHttp(uri);
-
-        // TODO MARC test to remove to check canRead, canWrite
-        /*
-        DavAcl acl= sardine.getAcl(httpUri.toString());
-        log.debug("fromUri owner=" + acl.getOwner() + ", group=" + acl.getGroup());
-        List<DavAce> aces = acl.getAces();
-        boolean canRead = false;
-        boolean canWrite = false;
-        if (! aces.isEmpty()) {
-            canRead = (aces.get(0).getGranted().get(0) == "read");
-            canWrite = (aces.get(0).getGranted().get(1) == "write");
-        } else {
-            log.warn("fromUri: aces empty for uri=" + httpUri);
-        }
-        log.debug("fromUri: uri=" + httpUri + ", canWrite=" + canWrite + ", canRead=" + canRead);
-         */
         List<DavResource> resources = sardine.list(httpUri.toString());
         return new WebdavFile2(resources.get(0), uri);
 
