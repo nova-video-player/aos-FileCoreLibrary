@@ -334,8 +334,8 @@ public class FileUtils {
         List<String> pathSegments = uri.getPathSegments();
         if (pathSegments != null) {
             List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size() - 1);
-            log.debug("getFilePath: uri=" + uri + " -> " + Arrays.toString(pathSegmentsWithoutFirst.toArray()) + " -> " + filePath);
             String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
+            log.debug("getFilePath: uri=" + uri + " -> " + Arrays.toString(pathSegmentsWithoutFirst.toArray()) + " -> " + filePath);
             return filePath;
         }
         return null;

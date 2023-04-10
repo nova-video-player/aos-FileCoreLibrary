@@ -22,6 +22,7 @@ import com.archos.filecorelibrary.jcifs.JcifsRawLister;
 import com.archos.filecorelibrary.localstorage.LocalStorageRawLister;
 import com.archos.filecorelibrary.sftp.SFTPRawLister;
 import com.archos.filecorelibrary.webdav.WebdavRawLister;
+import com.archos.filecorelibrary.smbj.SmbjRawLister;
 import com.archos.filecorelibrary.zip.ZipRawLister;
 
 public class RawListerFactory {

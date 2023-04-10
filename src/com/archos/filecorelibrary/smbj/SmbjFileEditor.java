@@ -30,6 +30,7 @@ import com.hierynomus.smbj.share.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
 
@@ -37,24 +38,17 @@ public class SmbjFileEditor extends FileEditor {
 
     private static final Logger log = LoggerFactory.getLogger(SmbjFileEditor.class);
 
-    private DiskShare mDiskShare;
-    private String mFilePath;
-
-    public SmbjFileEditor(Uri uri) {
-        super(uri);
-        mDiskShare = SmbjUtils.peekInstance().getSmbShare(uri);
-        mFilePath = getFilePath(uri);
-    }
+    public SmbjFileEditor(Uri uri) { super(uri);}
 
     @Override
     public InputStream getInputStream() throws Exception {
-        File smbjFile = mDiskShare.openFile(mFilePath, EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
         return smbjFile.getInputStream();
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        File smbjFile = mDiskShare.openFile(mFilePath, EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
         InputStream is = smbjFile.getInputStream();
         is.skip(from);
         return is;
@@ -68,16 +62,18 @@ public class SmbjFileEditor extends FileEditor {
     @Override
     public boolean mkdir() {
         try {
-            mDiskShare.mkdir(mFilePath);
+            SmbjUtils.peekInstance().getSmbShare(mUri).mkdir(getFilePath(mUri));
             return true;
-        } catch (SMBApiException e) {
-            caughtException(e, "mkdir", "SMBApiException in mkdir " + mUri);
+        } catch (IOException e) {
+            caughtException(e, "mkdir", "IOException in mkdir " + mUri);
         }
         return false;
     }
 
     @Override
     public Boolean delete() throws Exception {
+        DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+        String mFilePath = getFilePath(mUri);
         if(mDiskShare.folderExists(mFilePath)) mDiskShare.rm(mFilePath);
         else mDiskShare.rm(mFilePath);
         return null;
@@ -88,10 +84,15 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public boolean rename(String newName) {
-        File from = mDiskShare.openFile(mFilePath, EnumSet.of(AccessMask.GENERIC_ALL), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
-        if (from != null) {
-            from.rename(getParentDirectoryPath(mFilePath) + "/" + newName);
-            return true;
+        String mFilePath = getFilePath(mUri);
+        try {
+            File from = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(mFilePath, EnumSet.of(AccessMask.GENERIC_ALL), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+            if (from != null) {
+                from.rename(getParentDirectoryPath(mFilePath) + "/" + newName);
+                return true;
+            }
+        } catch (IOException e) {
+            caughtException(e, "rename", "IOException in rename " + mUri + " into " + newName);
         }
         return false;
     }
@@ -100,18 +101,25 @@ public class SmbjFileEditor extends FileEditor {
     public boolean exists() {
         boolean exists = false;
         try {
-            exists = mDiskShare.fileExists(mFilePath);
-            log.trace("exists: " + mFilePath + " as file " + exists);
-            return exists;
-        } catch (SMBApiException e) {
+            DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+            String mFilePath = getFilePath(mUri);
             try {
-                exists = mDiskShare.folderExists(mFilePath);
-                log.trace("exists: " + mFilePath + " as folder " + exists);
+                exists = mDiskShare.fileExists(mFilePath);
+                log.trace("exists: " + mFilePath + " as file " + exists);
                 return exists;
-            } catch (SMBApiException e1) {
-                log.trace("exists: " + mFilePath + " is not a file nor a folder");
-                return false;
+            } catch (SMBApiException e) {
+                try {
+                    exists = mDiskShare.folderExists(mFilePath);
+                    log.trace("exists: " + mFilePath + " as folder " + exists);
+                    return exists;
+                } catch (SMBApiException e1) {
+                    log.trace("exists: " + mFilePath + " is not a file nor a folder");
+                    return false;
+                }
             }
+        } catch (IOException ioe) {
+            caughtException(ioe, "exists", "IOException in exists " + mUri);
         }
+        return false;
     }
 }

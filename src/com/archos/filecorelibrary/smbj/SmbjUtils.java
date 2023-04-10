@@ -81,8 +81,7 @@ public class SmbjUtils {
          */
     }
 
-    // TODO MARC does not throw ioe
-    public synchronized Session getSmbSession(Uri uri) throws IOException {
+    public static synchronized Session getSmbSession(Uri uri) throws IOException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
@@ -94,19 +93,14 @@ public class SmbjUtils {
         if (smbSession == null) {
             //SMBClient smbClient = new SMBClient(smbConfig);
             SMBClient smbClient = new SMBClient();
-            try {
-                Connection connection = smbClient.connect(server);
-                AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
-                smbSession = connection.authenticate(ac);
-                smbjSessions.put(cred, smbSession);
-            } catch(IOException ioe) {
-                // TODO MARC
-            }
+            Connection connection = smbClient.connect(server);
+            AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
+            smbSession = connection.authenticate(ac);
+            smbjSessions.put(cred, smbSession);
         }
         return smbSession;
     }
 
-    // TODO MARC does not throw ioe
     public static synchronized DiskShare getSmbShare(Uri uri) throws IOException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
@@ -116,18 +110,14 @@ public class SmbjUtils {
         if (smbShare == null) {
             Session smbSession = getSmbSession(uri);
             if (smbSession != null) {
-                try {
-                    smbShare = (DiskShare) smbSession.connectShare(shareName);
-                    smbjShares.put(cred, smbShare);
-                } catch (IOException ioe) {
-                    // TODO MARC
-                }
+                smbShare = (DiskShare) smbSession.connectShare(shareName);
+                smbjShares.put(cred, smbShare);
             }
         }
         return smbShare;
     }
 
-    private Uri buildKeyFromUri(Uri uri) {
+    private static Uri buildKeyFromUri(Uri uri) {
         // use Uri without the path segment as key: for example, "smbj://blabla.com:5006/toto/titi" gives a "smbj://blabla.com:5006" key
         return uri.buildUpon().path("").build();
     }
