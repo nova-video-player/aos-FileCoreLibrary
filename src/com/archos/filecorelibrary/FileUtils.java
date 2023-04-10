@@ -39,8 +39,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileUtils {
 
@@ -314,6 +317,37 @@ public class FileUtils {
                 &&!parent.getPath().equals("/")
                 &&!parent.getPath().isEmpty()||
                 !"smb".equals(parent.getScheme());
+    }
+
+    // get sharename for a smb uri i.e. get first path after hostname
+    public static String getShareName(Uri uri) {
+        if (uri == null) return null;
+        List<String> pathSegments = uri.getPathSegments();
+        log.debug("getShareName: uri=" + uri + " -> " + Arrays.toString(pathSegments.toArray()) + " -> " + pathSegments.get(0));
+        if (pathSegments != null) return pathSegments.get(0);
+        return null;
+    }
+
+    // get filePath for a smb uri i.e. get all path after hostname and sharename
+    public static String getFilePath(Uri uri) {
+        if (uri == null) return null;
+        List<String> pathSegments = uri.getPathSegments();
+        if (pathSegments != null) {
+            List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size() - 1);
+            log.debug("getFilePath: uri=" + uri + " -> " + Arrays.toString(pathSegmentsWithoutFirst.toArray()) + " -> " + filePath);
+            String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
+            return filePath;
+        }
+        return null;
+    }
+
+    public static String getParentDirectoryPath(String inputPath) {
+        String parentDirectory = "";
+        String regEx = "(.*\\/)\\S+\\/$";
+        Pattern regexPattern = Pattern.compile(regEx);
+        Matcher match = regexPattern.matcher(inputPath);
+        if(match.find()) parentDirectory = match.group(1);
+        return parentDirectory;
     }
 
     public static Uri encodeUri(Uri uri) {
