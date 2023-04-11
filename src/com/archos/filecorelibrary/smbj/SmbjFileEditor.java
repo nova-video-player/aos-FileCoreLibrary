@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.EnumSet;
 
 public class SmbjFileEditor extends FileEditor {
@@ -52,6 +53,12 @@ public class SmbjFileEditor extends FileEditor {
         InputStream is = smbjFile.getInputStream();
         is.skip(from);
         return is;
+    }
+
+    @Override
+    public OutputStream getOutputStream() throws Exception {
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_WRITE_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        return smbjFile.getOutputStream();
     }
 
     @Override
