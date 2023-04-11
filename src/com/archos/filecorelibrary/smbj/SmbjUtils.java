@@ -31,16 +31,12 @@ import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
-import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class SmbjUtils {
 
@@ -81,7 +77,7 @@ public class SmbjUtils {
          */
     }
 
-    public static synchronized Session getSmbSession(Uri uri) throws IOException {
+    public synchronized Session getSmbSession(Uri uri) throws IOException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
@@ -101,7 +97,7 @@ public class SmbjUtils {
         return smbSession;
     }
 
-    public static synchronized DiskShare getSmbShare(Uri uri) throws IOException {
+    public synchronized DiskShare getSmbShare(Uri uri) throws IOException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
