@@ -25,7 +25,6 @@ import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.protocol.commons.EnumWithValue;
-import com.thegrizzlylabs.sardineandroid.DavResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,18 +99,17 @@ public class SmbjListingEngine extends ListingEngine {
                 //davResources.remove(0);
                 final String shareName = getShareName(mUri);
                 for (FileIdBothDirectoryInformation fileOrDir : diskShareLst) {
-                    // TODO MARC it does not have the full uri...
                     final String filename = fileOrDir.getFileName();
                     final String fullFilename = "/" + shareName + "/" + filename;
                     if (isDirectory(fileOrDir)) {
                         if (keepDirectory(filename)) {
                             log.trace("SmbjListingThread: adding directory " + fullFilename);
-                            directories.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(fullFilename).build()));
+                            directories.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
                             log.trace("SmbjListingThread: adding file " + fullFilename);
-                            files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(fullFilename).build()));
+                            files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     }
                 }
