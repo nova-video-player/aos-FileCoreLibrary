@@ -25,9 +25,7 @@ import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 
 import com.archos.filecorelibrary.contentstorage.DocumentUriBuilder;
 
@@ -323,8 +321,10 @@ public class FileUtils {
     public static String getShareName(Uri uri) {
         if (uri == null) return null;
         List<String> pathSegments = uri.getPathSegments();
-        log.debug("getShareName: uri=" + uri + " -> " + Arrays.toString(pathSegments.toArray()) + " -> " + pathSegments.get(0));
-        if (pathSegments != null) return pathSegments.get(0);
+        if (pathSegments != null) {
+            log.debug("getShareName: uri=" + uri + " -> " + Arrays.toString(pathSegments.toArray()) + " -> " + pathSegments.get(0));
+            return pathSegments.get(0);
+        }
         return null;
     }
 
@@ -333,7 +333,7 @@ public class FileUtils {
         if (uri == null) return null;
         List<String> pathSegments = uri.getPathSegments();
         if (pathSegments != null) {
-            List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size() - 1);
+            List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size());
             String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
             log.debug("getFilePath: uri=" + uri + " -> " + Arrays.toString(pathSegmentsWithoutFirst.toArray()) + " -> " + filePath);
             return filePath;
