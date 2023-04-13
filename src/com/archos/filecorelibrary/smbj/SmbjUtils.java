@@ -14,7 +14,6 @@
 
 package com.archos.filecorelibrary.smbj;
 
-import static com.archos.filecorelibrary.FileUtils.getFilePath;
 import static com.archos.filecorelibrary.FileUtils.getShareName;
 
 import android.content.Context;
@@ -22,13 +21,9 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
-import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
-import com.hierynomus.mssmb2.SMB2CreateDisposition;
-import com.hierynomus.mssmb2.SMB2CreateOptions;
-import com.hierynomus.mssmb2.SMB2Dialect;
-import com.hierynomus.mssmb2.SMB2ShareAccess;
+
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
@@ -36,7 +31,6 @@ import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
-import com.hierynomus.smbj.share.File;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +87,7 @@ public class SmbjUtils {
         String domain = cred.getDomain();
         String server = uri.getHost();
         Session smbSession = smbjSessions.get(cred);
+        // TODO MARC port handling
         if (smbSession == null) {
             //SMBClient smbClient = new SMBClient(smbConfig);
             SMBClient smbClient = new SMBClient();
@@ -110,6 +105,7 @@ public class SmbjUtils {
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
         String shareName = getShareName(uri);
         DiskShare smbShare = smbjShares.get(cred);
+        log.debug("getSmbShare: for uri " + uri + ", sharename=" + shareName + ", smbshare=" + smbShare);
         if (smbShare == null) {
             Session smbSession = getSmbSession(uri);
             if (smbSession != null) {
@@ -122,6 +118,7 @@ public class SmbjUtils {
 
     private static Uri buildKeyFromUri(Uri uri) {
         // use Uri without the path segment as key: for example, "smbj://blabla.com:5006/toto/titi" gives a "smbj://blabla.com:5006" key
+        log.debug("buildKeyFromUri: uri " + uri + " -> " + uri.buildUpon().path("").build());
         return uri.buildUpon().path("").build();
     }
 
