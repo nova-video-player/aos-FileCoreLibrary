@@ -47,10 +47,6 @@ public class SmbjRawLister extends RawLister {
             final String filePath = getFilePath(mUri);
             final String shareName = getShareName(mUri);
             List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
-
-            // TODO MARC remove?
-            // First answer is ourselves, ignore it
-            //resources.remove(0);
             for (var fileOrDir : diskShareLst) {
                 final String filename = fileOrDir.getFileName();
                 final String fullFilename = "/" + shareName + "/" + filename;

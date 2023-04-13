@@ -21,7 +21,9 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
+import com.hierynomus.mssmb2.SMB2CreateOptions;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.smbj.share.DiskShare;
@@ -43,13 +45,24 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        //File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+                EnumSet.of(AccessMask.FILE_READ_DATA),
+                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                SMB2CreateDisposition.FILE_OPEN,
+                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
         return smbjFile.getInputStream();
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+                EnumSet.of(AccessMask.FILE_READ_DATA),
+                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                SMB2CreateDisposition.FILE_OPEN,
+                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
         InputStream is = smbjFile.getInputStream();
         is.skip(from);
         return is;
@@ -57,7 +70,12 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_WRITE_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+                EnumSet.of(AccessMask.FILE_WRITE_DATA),
+                null,
+                SMB2ShareAccess.ALL,
+                SMB2CreateDisposition.FILE_OPEN,
+                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
         return smbjFile.getOutputStream();
     }
 
