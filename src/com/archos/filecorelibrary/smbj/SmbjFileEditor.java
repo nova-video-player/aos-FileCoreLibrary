@@ -124,23 +124,12 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public boolean exists() {
-        boolean exists = false;
         try {
             DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
             String mFilePath = getFilePath(mUri);
-            try {
-                exists = mDiskShare.fileExists(mFilePath);
-                log.trace("exists: " + mFilePath + " as file " + exists);
-                return exists;
-            } catch (SMBApiException e) {
-                try {
-                    exists = mDiskShare.folderExists(mFilePath);
-                    log.trace("exists: " + mFilePath + " as folder " + exists);
-                    return exists;
-                } catch (SMBApiException e1) {
-                    log.trace("exists: " + mFilePath + " is not a file nor a folder");
-                    return false;
-                }
+            if (mDiskShare.fileExists(mFilePath)) return true;
+            else {
+                if (mDiskShare.folderExists(mFilePath)) return true;
             }
         } catch (IOException ioe) {
             caughtException(ioe, "exists", "IOException in exists " + mUri);
