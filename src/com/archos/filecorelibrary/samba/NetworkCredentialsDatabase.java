@@ -17,13 +17,14 @@ package com.archos.filecorelibrary.samba;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Base64;
-import android.util.Log;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -44,7 +45,7 @@ import javax.crypto.spec.SecretKeySpec;
  */     
 public class NetworkCredentialsDatabase {
 
-    private static final String TAG =  "NetworkCredentialsDatabase";
+    private static final Logger log = LoggerFactory.getLogger(NetworkCredentialsDatabase.class);
 
     private static NetworkCredentialsDatabase networkDatabase;
     //useful to keep both temporary and saved credentials
@@ -139,6 +140,7 @@ public class NetworkCredentialsDatabase {
     }
 
     public void saveCredential(Credential cred){
+        log.debug("saveCredential: path " + cred.getUriString() + ", username=" + cred.getUsername());
         mCredentials.put(cred.getUriString(), cred);
         open();
         ContentValues initialValues = new ContentValues(1);
@@ -198,6 +200,7 @@ public class NetworkCredentialsDatabase {
                     if (username.lastIndexOf("/") != -1) {
                         username = username.substring(username.lastIndexOf("/") + 1);
                     }
+                    // TODO MARC change for other network shortcuts...
                     String password = single.getPassword();
                     String path = "smb://" + single.getServer() + (single.getShare() != null ? "/" + single.getShare() : "");
                     saveCredential(new Credential(username, password, path, "",false));
@@ -313,7 +316,7 @@ public class NetworkCredentialsDatabase {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion < DATABASE_CREATE_VERSION) {
-                Log.d(TAG, "Upgrade not supported for version " + oldVersion + ", recreating the database.");
+                log.debug("Upgrade not supported for version " + oldVersion + ", recreating the database.");
                 // triggers database deletion
                 deleteDatabase();
             }
@@ -328,7 +331,7 @@ public class NetworkCredentialsDatabase {
                 return super.getWritableDatabase();
             } catch (SQLiteException e) {
                 // we need to downgrade now.
-                Log.w(TAG, "Database downgrade not supported. Deleting database.");
+                log.warn("Database downgrade not supported. Deleting database.");
             }
             // try to delete the file
             if (mDatabaseFile.delete()) {
