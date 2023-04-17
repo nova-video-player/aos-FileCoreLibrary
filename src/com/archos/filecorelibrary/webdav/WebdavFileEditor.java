@@ -23,8 +23,10 @@ import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 public class WebdavFileEditor extends FileEditor {
@@ -117,5 +119,17 @@ public class WebdavFileEditor extends FileEditor {
             caughtException(e, "exists", "IOException in exists for " + mUri);
         }
         return false;
+    }
+
+    @Override
+    public OutputStream getOutputStream() throws IOException {
+        return new ByteArrayOutputStream() {
+            @Override
+            public void close() throws IOException {
+                var u = WebdavFile2.uriToHttp(mUri);
+                var fileContent = toByteArray();
+                mSardine.put(u.toString(), fileContent);
+            }
+        };
     }
 }
