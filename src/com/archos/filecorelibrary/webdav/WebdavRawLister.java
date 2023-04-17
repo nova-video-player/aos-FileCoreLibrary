@@ -50,7 +50,7 @@ public class WebdavRawLister extends RawLister {
             }
             return files;
         } catch (Throwable t) {
-            log.warn("Failed listing webdav files", t);
+            log.warn("Failed listing webdav files uri=" + mUri, t);
             if(t.getMessage().contains("401 Un")) throw new AuthenticationException();
         }
         return null;
