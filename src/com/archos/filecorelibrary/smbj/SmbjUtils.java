@@ -127,7 +127,6 @@ public class SmbjUtils {
 
     private static Uri buildKeyFromUri(Uri uri) {
         // use Uri without the path segment as key: for example, "smbj://blabla.com:5006/toto/titi" gives a "smbj://blabla.com:5006" key
-        log.debug("buildKeyFromUri: uri " + uri + " -> " + uri.buildUpon().path("").build());
         return uri.buildUpon().path("").build();
     }
 
