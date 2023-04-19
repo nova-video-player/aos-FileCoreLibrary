@@ -26,7 +26,6 @@ import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2CreateOptions;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
-import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 
@@ -71,14 +70,7 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        /*
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
-                EnumSet.of(AccessMask.FILE_WRITE_DATA),
-                null,
-                SMB2ShareAccess.ALL,
-                SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-        */
+        // TODO MARC check
         File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_WRITE_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
