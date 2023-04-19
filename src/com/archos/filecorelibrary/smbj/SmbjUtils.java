@@ -24,6 +24,7 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 
+import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
@@ -36,14 +37,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class SmbjUtils {
 
     private static final Logger log = LoggerFactory.getLogger(SmbjUtils.class);
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, Session> smbjSessions = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, DiskShare> smbjShares = new ConcurrentHashMap<>();
+    static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, Connection> smbjConnections = new ConcurrentHashMap<>();
     private static Context mContext;
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile SmbjUtils sInstance;
@@ -70,46 +72,53 @@ public class SmbjUtils {
     private SmbjUtils(Context context) {
         mContext = context;
         log.debug("SmbjUtils: initializing contexts");
-        /*
         smbConfig = SmbConfig.builder()
                 .withTimeout(120, TimeUnit.SECONDS) // read/write transactions timeout
                 .withSoTimeout(180, TimeUnit.SECONDS) // socket timeout
-                .withDialects(SMB2Dialect.SMB_2_1).build(); // default SMB protocol
-         */
+                .build();
     }
 
-    public synchronized Session getSmbSession(Uri uri) throws IOException {
+    // TODO MARC manage SMBApiException
+    public synchronized Connection getSmbConnection(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
+        String server = uri.getHost();
         String password = cred.getPassword();
         String username = cred.getUsername();
         String domain = cred.getDomain();
-        String server = uri.getHost();
-        Session smbSession = smbjSessions.get(cred);
+        Connection smbConnection = smbjConnections.get(cred);
         // TODO MARC port handling
-        if (smbSession == null) {
-            //SMBClient smbClient = new SMBClient(smbConfig);
-            SMBClient smbClient = new SMBClient();
-            Connection connection = smbClient.connect(server);
+        if (smbConnection == null || !smbConnection.isConnected()) {
+            log.trace("getSmbConnection: smbConnection is null or not connected for " + uri);
+            SMBClient smbClient = new SMBClient(smbConfig);
+            smbConnection = smbClient.connect(server);
+            smbjConnections.put(cred, smbConnection);
+            // need to regenerate smbSession in this case too
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
-            smbSession = connection.authenticate(ac);
+            Session smbSession = smbConnection.authenticate(ac);
             smbjSessions.put(cred, smbSession);
         }
-        return smbSession;
+        return smbConnection;
     }
 
-    public synchronized DiskShare getSmbShare(Uri uri) throws IOException {
+    // TODO MARC getSmbShare crashes after smbj timeout
+    // TODO MARC manage SMBApiException
+    public synchronized DiskShare getSmbShare(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
         String shareName = getShareName(uri);
         DiskShare smbShare = smbjShares.get(cred);
         log.debug("getSmbShare: for uri " + uri + ", sharename=" + shareName + ", smbshare=" + smbShare);
-        if (smbShare == null) {
-            Session smbSession = getSmbSession(uri);
+        if (smbShare == null || !smbShare.isConnected()) {
+            log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
+            // ensures that there is a valid connection and regenerate session if not connected
+            getSmbConnection(uri);
+            Session smbSession = smbjSessions.get(cred);
             if (smbSession != null) {
                 smbShare = (DiskShare) smbSession.connectShare(shareName);
+                log.debug("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
                 smbjShares.put(cred, smbShare);
             }
         }
