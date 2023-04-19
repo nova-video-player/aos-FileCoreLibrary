@@ -23,6 +23,7 @@ import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
+import com.hierynomus.mssmb2.SMBApiException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +55,10 @@ public class SmbjRawLister extends RawLister {
                 files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
             }
             return files;
+        } catch (SMBApiException se) { // most likely an Authentication error
+            throw new AuthenticationException();
         } catch (Throwable t) {
-            // TODO MARC modify
             log.warn("Failed listing smbj files", t);
-            if(t.getMessage().contains("401 Un")) throw new AuthenticationException();
         }
         return null;
     }
