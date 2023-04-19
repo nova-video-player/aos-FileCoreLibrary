@@ -66,7 +66,7 @@ public class WebdavFile2 extends MetaFile2 {
         if (res.getModified() != null) mLastModified = res.getModified().getTime();
         else mLastModified = 0;
         mCanRead = true;
-        mCanWrite = false; // TODO put to true when outputstream implemented
+        mCanWrite = true;
         if (CAN_SARDINE_CHECK_PERM) {
             final List<DavAce> aces;
             try {
