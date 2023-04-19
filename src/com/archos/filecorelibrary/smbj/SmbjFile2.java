@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.smbj;
 
+import static com.archos.filecorelibrary.FileUtils.encodeUri;
 import static com.archos.filecorelibrary.FileUtils.getFilePath;
 import static com.archos.filecorelibrary.FileUtils.getShareName;
 
@@ -76,7 +77,7 @@ public class SmbjFile2 extends MetaFile2 {
 
     public SmbjFile2(FileAllInformation fileInformation, Uri uri) {
         mUriString = uri.toString();
-        mName = uri.getLastPathSegment();
+        mName = encodeUri(uri).getLastPathSegment();
         mIsDirectory = fileInformation.getStandardInformation().isDirectory();
         mIsFile = !mIsDirectory;
         mLastModified = fileInformation.getBasicInformation().getChangeTime().toDate().getTime();

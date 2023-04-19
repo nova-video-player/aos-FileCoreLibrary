@@ -331,7 +331,9 @@ public class FileUtils {
     // get filePath for a smb uri i.e. get all path after hostname and sharename
     public static String getFilePath(Uri uri) {
         if (uri == null) return null;
-        List<String> pathSegments = uri.getPathSegments();
+        // need to encode uri to escape problematic caracters like '#'
+        Uri encodedUri = encodeUri(uri);
+        List<String> pathSegments = encodedUri.getPathSegments();
         if (pathSegments != null) {
             List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size());
             String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
