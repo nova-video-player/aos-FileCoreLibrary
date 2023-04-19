@@ -160,8 +160,6 @@ public class SmbjFile2 extends MetaFile2 {
         var diskShare = SmbjUtils.peekInstance().getSmbShare(uri);
         final String filePath = getFilePath(uri);
         final String shareName = getShareName(uri);
-        //List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
-        //return new SmbjFile2(diskShareLst.get(0), uri);
         DiskEntry file = diskShare.open(filePath,
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
