@@ -24,6 +24,7 @@ import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
+import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 
 import org.slf4j.Logger;
@@ -94,9 +95,6 @@ public class SmbjListingEngine extends ListingEngine {
                 final ArrayList<SmbjFile2> directories = new ArrayList<>();
                 final ArrayList<SmbjFile2> files = new ArrayList<>();
 
-                // TODO MARC remove comment and 0?
-                // First answer is ourselves, ignore it
-                //davResources.remove(0);
                 final String shareName = getShareName(mUri);
                 for (FileIdBothDirectoryInformation fileOrDir : diskShareLst) {
                     final String filename = fileOrDir.getFileName();
@@ -170,21 +168,17 @@ public class SmbjListingEngine extends ListingEngine {
                         }
                     }
                 });
-            }
-            // TODO MARC
-            /*
-            catch (final AuthenticationException e) {
-                if (log.isTraceEnabled()) log.error("SmbjListingThread: SmbAuthException for " + mUri.toString(), e);
-                else log.warn("SmbjListingThread: SmbAuthException for " + mUri.toString());
+            } catch (SMBApiException smbe) { // auth exception most probably
+                if (log.isTraceEnabled()) log.error("SmbjListingThread: SMBApiException for " + mUri.toString(), smbe);
+                else log.warn("SmbjListingThread: SMBApiException for " + mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
-                            mListener.onCredentialRequired(e);
+                            mListener.onCredentialRequired(smbe);
                         }
                     }
                 });
-            } */
-            catch (final IOException e) {
+            } catch (final IOException e) {
                 ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
                 if (e.getCause() instanceof UnknownHostException) {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
