@@ -17,7 +17,6 @@ package com.archos.filecorelibrary.jcifs;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;

@@ -14,6 +14,8 @@
 
 package com.archos.filecorelibrary.webdav;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
+
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;

@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.smbj;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.FileUtils.getFilePath;
 import static com.archos.filecorelibrary.FileUtils.getParentDirectoryPath;
 

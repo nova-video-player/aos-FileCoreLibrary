@@ -32,6 +32,7 @@ import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 public class JcifsFile2 extends MetaFile2 {
@@ -123,11 +124,6 @@ public class JcifsFile2 extends MetaFile2 {
         } else {
             mName = name;
         }
-    }
-
-    private void caughtException(Throwable e, String method, String exceptionType) {
-        if (log.isTraceEnabled()) log.error(method + ": caught" + exceptionType, e);
-        else log.warn(method + ": caught "+ exceptionType);
     }
 
     /**

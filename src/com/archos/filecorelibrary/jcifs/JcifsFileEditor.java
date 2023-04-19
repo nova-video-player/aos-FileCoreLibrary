@@ -34,6 +34,7 @@ import android.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 public class JcifsFileEditor extends FileEditor{
