@@ -56,7 +56,8 @@ public class SmbjRawLister extends RawLister {
             }
             return files;
         } catch (SMBApiException se) { // most likely an Authentication error
-            throw new AuthenticationException();
+            if (se.getMessage().contains("STATUS_ACCESS_DENIED")) throw new AuthenticationException();
+            else log.warn("Caught SMBApiException");
         } catch (Throwable t) {
             log.warn("Failed listing smbj files", t);
         }
