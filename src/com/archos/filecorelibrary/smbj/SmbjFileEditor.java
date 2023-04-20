@@ -45,7 +45,6 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        //File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri), EnumSet.of(AccessMask.FILE_READ_DATA), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
         File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
@@ -57,27 +56,23 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+        InputStream is = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
                 EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
                 SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-        InputStream is = smbjFile.getInputStream();
+                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS)).getInputStream();
         is.skip(from);
         return is;
     }
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        // TODO MARC check
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
-                EnumSet.of(AccessMask.FILE_WRITE_DATA),
-                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
-                EnumSet.of(SMB2ShareAccess.FILE_SHARE_WRITE),
+        return SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+                EnumSet.of(AccessMask.GENERIC_WRITE, AccessMask.GENERIC_READ),
+                null, SMB2ShareAccess.ALL,
                 SMB2CreateDisposition.FILE_OVERWRITE_IF,
-                EnumSet.of(SMB2CreateOptions.FILE_SEQUENTIAL_ONLY));
-        return smbjFile.getOutputStream();
+                null).getOutputStream();
     }
 
     @Override
