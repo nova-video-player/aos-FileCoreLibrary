@@ -135,12 +135,12 @@ public class FileUtils {
     public static Uri removeLastSegment(Uri uri){
         int index;
         String str = uri.toString();
-        log.debug("removeLastSegment input: " + str);
+        log.trace("removeLastSegment input: " + str);
         if (str.endsWith(SEPARATOR))
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
         else index = str.lastIndexOf(SEPARATOR);
         if (index <= 0) return null;
-        log.debug("removeLastSegment output: " + str.substring(0, index + 1));
+        log.trace("removeLastSegment output: " + str.substring(0, index + 1));
         // MUST keep the trailing "/" for samba
         return Uri.parse(str.substring(0, index + 1));
     }
