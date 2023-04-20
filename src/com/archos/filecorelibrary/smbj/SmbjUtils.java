@@ -72,13 +72,14 @@ public class SmbjUtils {
     private SmbjUtils(Context context) {
         mContext = context;
         log.debug("SmbjUtils: initializing contexts");
+        /*
         smbConfig = SmbConfig.builder()
-                .withTimeout(120, TimeUnit.SECONDS) // read/write transactions timeout
-                .withSoTimeout(180, TimeUnit.SECONDS) // socket timeout
+                .withTimeout(0, TimeUnit.SECONDS) // read/write transactions timeout
+                .withSoTimeout(60, TimeUnit.SECONDS) // socket timeout
                 .build();
+         */
     }
 
-    // TODO MARC manage SMBApiException
     public synchronized Connection getSmbConnection(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
@@ -87,12 +88,16 @@ public class SmbjUtils {
         String password = cred.getPassword();
         String username = cred.getUsername();
         String domain = cred.getDomain();
+        int port = uri.getPort();
         Connection smbConnection = smbjConnections.get(cred);
-        // TODO MARC port handling
         if (smbConnection == null || !smbConnection.isConnected()) {
-            log.trace("getSmbConnection: smbConnection is null or not connected for " + uri);
-            SMBClient smbClient = new SMBClient(smbConfig);
-            smbConnection = smbClient.connect(server);
+            log.trace("getSmbConnection: smbConnection is null or not connected for " + uri + ", connecting to " + server);
+            // TODO MARC on ds720p, getting IOException / java.net.UnknownHostException: ds720p but works on smbjcli
+            SMBClient smbClient;
+            if (smbConfig != null) smbClient = new SMBClient(smbConfig);
+            else smbClient = new SMBClient();
+            if (port != -1) smbConnection = smbClient.connect(server, port);
+            else smbConnection = smbClient.connect(server);
             smbjConnections.put(cred, smbConnection);
             // need to regenerate smbSession in this case too
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
@@ -102,15 +107,12 @@ public class SmbjUtils {
         return smbConnection;
     }
 
-    // TODO MARC getSmbShare crashes after smbj timeout
-    // TODO MARC manage SMBApiException
     public synchronized DiskShare getSmbShare(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
         String shareName = getShareName(uri);
         DiskShare smbShare = smbjShares.get(cred);
-        log.debug("getSmbShare: for uri " + uri + ", sharename=" + shareName + ", smbshare=" + smbShare);
         if (smbShare == null || !smbShare.isConnected()) {
             log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
             // ensures that there is a valid connection and regenerate session if not connected
@@ -118,10 +120,11 @@ public class SmbjUtils {
             Session smbSession = smbjSessions.get(cred);
             if (smbSession != null) {
                 smbShare = (DiskShare) smbSession.connectShare(shareName);
-                log.debug("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
+                log.trace("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
                 smbjShares.put(cred, smbShare);
             }
         }
+        log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, smbShare.isConnected());
         return smbShare;
     }
 
@@ -130,7 +133,6 @@ public class SmbjUtils {
         return uri.buildUpon().path("").build();
     }
 
-    // TODO MARC move elswhere
     public static boolean isDirectory(FileIdBothDirectoryInformation fileEntry) {
         return EnumWithValue.EnumUtils.isSet(fileEntry.getFileAttributes(), FileAttributes.FILE_ATTRIBUTE_DIRECTORY);
     }
