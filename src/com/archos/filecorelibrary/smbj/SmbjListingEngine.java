@@ -14,18 +14,18 @@
 
 package com.archos.filecorelibrary.smbj;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.FileUtils.getFilePath;
 import static com.archos.filecorelibrary.FileUtils.getShareName;
+import static com.archos.filecorelibrary.smbj.SmbjUtils.isDirectory;
 
 import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
-import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
-import com.hierynomus.protocol.commons.EnumWithValue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +73,6 @@ public class SmbjListingEngine extends ListingEngine {
     @Override
     public void abort() {
         mAbort = true;
-    }
-
-    // TODO MARC move elswhere
-    public static boolean isDirectory(FileIdBothDirectoryInformation fileEntry) {
-        return EnumWithValue.EnumUtils.isSet(fileEntry.getFileAttributes(), FileAttributes.FILE_ATTRIBUTE_DIRECTORY);
     }
 
     private final class SmbjListingThread extends Thread {
@@ -169,8 +164,7 @@ public class SmbjListingEngine extends ListingEngine {
                     }
                 });
             } catch (SMBApiException smbe) { // auth exception most probably
-                if (log.isTraceEnabled()) log.error("SmbjListingThread: SMBApiException for " + mUri.toString(), smbe);
-                else log.warn("SmbjListingThread: SMBApiException for " + mUri.toString());
+                caughtException(smbe, "SmbjListingThread", "SMBApiException for " + mUri);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -184,8 +178,7 @@ public class SmbjListingEngine extends ListingEngine {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
-                if (log.isTraceEnabled()) log.error("SmbjListingThread: IOException (" + getErrorStringResId(error) + ") for " + mUri.toString(), e);
-                else log.error("SmbjListingThread: IOException (" + getErrorStringResId(error) + ") for " + mUri.toString());
+                caughtException(e, "SmbjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
