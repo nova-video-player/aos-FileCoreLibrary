@@ -20,6 +20,7 @@ import static com.archos.filecorelibrary.samba.SambaDiscovery.getIpFromShareName
 import android.content.Context;
 import android.net.Uri;
 
+import com.archos.filecorelibrary.jcifs.JcifsUtils;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import com.hierynomus.msfscc.FileAttributes;
@@ -99,9 +100,8 @@ public class SmbjUtils {
             SMBClient smbClient;
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
-            // TODO MARC replace by direct reverse lookup?
-            final String serverIP = getIpFromShareName(server);
-            log.trace("getSmbConnection: {} -> {}", server, serverIP);
+            final String serverIP = JcifsUtils.getInstance(mContext).getBaseContextOnly(true).getNameServiceClient().getByName(server).getHostAddress();
+            log.trace("getSmbConnection: {} -> {} and jcifs {}", server, serverIP);
             if (port != -1) smbConnection = smbClient.connect(serverIP, port);
             else smbConnection = smbClient.connect(serverIP);
             smbjConnections.put(cred, smbConnection);
