@@ -20,6 +20,8 @@ import static com.archos.filecorelibrary.FileUtils.getParentDirectoryPath;
 
 import android.net.Uri;
 
+import com.archos.environment.ObservableInputStream;
+import com.archos.environment.ObservableOutputStream;
 import com.archos.filecorelibrary.FileEditor;
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.FileAttributes;
@@ -51,28 +53,38 @@ public class SmbjFileEditor extends FileEditor {
                 EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
                 SMB2CreateDisposition.FILE_OPEN,
                 EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-        return smbjFile.getInputStream();
+        InputStream is = smbjFile.getInputStream();
+        ObservableInputStream ois = new ObservableInputStream(is);
+        ois.onClose(() -> smbjFile.close());
+        return ois;
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        InputStream is = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
                 EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
                 SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS)).getInputStream();
+                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
+        InputStream is = smbjFile.getInputStream();
         is.skip(from);
-        return is;
+        ObservableInputStream ois = new ObservableInputStream(is);
+        ois.onClose(() -> smbjFile.close());
+        return ois;
     }
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        return SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
+        File smbjFile =  SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.GENERIC_WRITE, AccessMask.GENERIC_READ),
                 null, SMB2ShareAccess.ALL,
                 SMB2CreateDisposition.FILE_OVERWRITE_IF,
-                null).getOutputStream();
+                null);
+        OutputStream os = smbjFile.getOutputStream();
+        ObservableOutputStream oos = new ObservableOutputStream(os);
+        oos.onClose(() -> smbjFile.close());
+        return oos;
     }
 
     @Override
