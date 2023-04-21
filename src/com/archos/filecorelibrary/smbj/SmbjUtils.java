@@ -15,6 +15,7 @@
 package com.archos.filecorelibrary.smbj;
 
 import static com.archos.filecorelibrary.FileUtils.getShareName;
+import static com.archos.filecorelibrary.samba.SambaDiscovery.getIpFromShareName;
 
 import android.content.Context;
 import android.net.Uri;
@@ -37,8 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import jcifs.netbios.NbtAddress;
 
 public class SmbjUtils {
 
@@ -92,12 +96,14 @@ public class SmbjUtils {
         Connection smbConnection = smbjConnections.get(cred);
         if (smbConnection == null || !smbConnection.isConnected()) {
             log.trace("getSmbConnection: smbConnection is null or not connected for " + uri + ", connecting to " + server);
-            // TODO MARC on ds720p, getting IOException / java.net.UnknownHostException: ds720p but works on smbjcli
             SMBClient smbClient;
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
-            if (port != -1) smbConnection = smbClient.connect(server, port);
-            else smbConnection = smbClient.connect(server);
+            // TODO MARC replace by direct reverse lookup?
+            final String serverIP = getIpFromShareName(server);
+            log.trace("getSmbConnection: {} -> {}", server, serverIP);
+            if (port != -1) smbConnection = smbClient.connect(serverIP, port);
+            else smbConnection = smbClient.connect(serverIP);
             smbjConnections.put(cred, smbConnection);
             // need to regenerate smbSession in this case too
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
