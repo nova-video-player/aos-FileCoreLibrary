@@ -41,7 +41,7 @@ public class NovaSmbFile {
     public static String getIpUriString(Uri uri) {
         String shareName = uri.getHost();
         log.trace("getIpUriString: uri " + uri + ", shareName " + shareName + ", shareNameIp " + getIpFromShareName(shareName));
-        log.trace("getIpUriString: shareNameResolver hastable " + dumpShareNameResolver());
+        log.trace("getIpUriString: shareNameResolver hashtable " + dumpShareNameResolver());
         String shareNameIP = getIpFromShareName(shareName);
         if (shareNameIP == null) return uri.toString();
         else return uri.toString().replaceFirst(shareName, shareNameIP);
