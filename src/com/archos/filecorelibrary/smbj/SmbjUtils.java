@@ -130,7 +130,7 @@ public class SmbjUtils {
                 smbjShares.put(cred, smbShare);
             }
         }
-        log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, smbShare.isConnected());
+        log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, (smbShare != null)?smbShare.isConnected():"false");
         return smbShare;
     }
 
