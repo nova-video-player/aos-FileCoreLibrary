@@ -55,7 +55,7 @@ public class SmbjFileEditor extends FileEditor {
                 EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
         InputStream is = smbjFile.getInputStream();
         ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> smbjFile.close());
+        ois.onClose(() -> {if (smbjFile != null) smbjFile.closeSilently();});
         return ois;
     }
 
