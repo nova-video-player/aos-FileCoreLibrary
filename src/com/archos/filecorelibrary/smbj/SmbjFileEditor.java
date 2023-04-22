@@ -70,7 +70,7 @@ public class SmbjFileEditor extends FileEditor {
         InputStream is = smbjFile.getInputStream();
         is.skip(from);
         ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {if (smbjFile != null) smbjFile.close();});
+        ois.onClose(() -> {if (smbjFile != null) smbjFile.closeSilently();});
         return ois;
     }
 
@@ -83,7 +83,7 @@ public class SmbjFileEditor extends FileEditor {
                 null);
         OutputStream os = smbjFile.getOutputStream();
         ObservableOutputStream oos = new ObservableOutputStream(os);
-        oos.onClose(() -> {if (smbjFile != null) smbjFile.close();});
+        oos.onClose(() -> {if (smbjFile != null) smbjFile.closeSilently();});
         return oos;
     }
 
