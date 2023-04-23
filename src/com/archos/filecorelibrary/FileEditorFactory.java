@@ -14,6 +14,8 @@
 
 package com.archos.filecorelibrary;
 
+import static com.archos.filecorelibrary.smbj.SmbjUtils.isSMBjEnabled;
+
 import android.content.Context;
 import android.net.Uri;
 
@@ -34,7 +36,8 @@ import com.archos.filecorelibrary.webdav.WebdavFileEditor;
 public class FileEditorFactory {
     public static FileEditor getFileEditorForUrl(Uri uri, Context ct) {
         if ("smb".equalsIgnoreCase(uri.getScheme())) {
-            return new JcifsFileEditor(uri);
+            if (isSMBjEnabled()) return new SmbjFileEditor(uri);
+            else return new JcifsFileEditor(uri);
         }
         else if ("ftp".equalsIgnoreCase(uri.getScheme())||"ftps".equalsIgnoreCase(uri.getScheme())) {
             return new FtpFileEditor(uri);

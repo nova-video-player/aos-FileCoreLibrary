@@ -14,6 +14,8 @@
 
 package com.archos.filecorelibrary;
 
+import static com.archos.filecorelibrary.smbj.SmbjUtils.isSMBjEnabled;
+
 import android.net.Uri;
 
 import com.archos.filecorelibrary.contentstorage.ContentFile2;
@@ -30,7 +32,8 @@ import com.archos.filecorelibrary.webdav.WebdavFile2;
 public class MetaFile2Factory {
     public static MetaFile2 getMetaFileForUrl(Uri uri) throws Exception {
         if ("smb".equalsIgnoreCase(uri.getScheme())) {
-            return JcifsFile2.fromUri(uri);
+            if (isSMBjEnabled()) return SmbjFile2.fromUri(uri);
+            else return JcifsFile2.fromUri(uri);
         }
         else if ("ftp".equalsIgnoreCase(uri.getScheme())||"ftps".equalsIgnoreCase(uri.getScheme())) {
             return FTPFile2.fromUri(uri);

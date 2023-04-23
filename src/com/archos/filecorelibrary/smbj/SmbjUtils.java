@@ -20,6 +20,8 @@ import static com.archos.filecorelibrary.samba.SambaDiscovery.getIpFromShareName
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.preference.PreferenceManager;
+
 import com.archos.filecorelibrary.jcifs.JcifsUtils;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
@@ -141,6 +143,11 @@ public class SmbjUtils {
 
     public static boolean isDirectory(FileIdBothDirectoryInformation fileEntry) {
         return EnumWithValue.EnumUtils.isSet(fileEntry.getFileAttributes(), FileAttributes.FILE_ATTRIBUTE_DIRECTORY);
+    }
+
+    public static boolean isSMBjEnabled() {
+        log.debug("isSMBjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false);
     }
 
 }
