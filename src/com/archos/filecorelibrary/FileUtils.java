@@ -322,7 +322,7 @@ public class FileUtils {
         if (uri == null) return null;
         List<String> pathSegments = uri.getPathSegments();
         if (pathSegments != null && !pathSegments.isEmpty()) {
-            log.debug("getShareName: uri=" + uri + " -> " + Arrays.toString(pathSegments.toArray()) + " -> " +  pathSegments.get(0)));
+            log.debug("getShareName: uri=" + uri + " -> " + Arrays.toString(pathSegments.toArray()) + " -> " +  pathSegments.get(0));
             return pathSegments.get(0);
         }
         return null;
