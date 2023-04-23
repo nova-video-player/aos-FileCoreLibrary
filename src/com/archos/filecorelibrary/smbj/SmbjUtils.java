@@ -120,6 +120,8 @@ public class SmbjUtils {
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
         String shareName = getShareName(uri);
+        // shareName can be null when asking for smbj://server/
+        if (shareName == null) return null;
         DiskShare smbShare = smbjShares.get(cred);
         if (smbShare == null || !smbShare.isConnected()) {
             log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
