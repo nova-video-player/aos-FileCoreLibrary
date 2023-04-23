@@ -31,7 +31,7 @@
     <string name="samba_server">Zdefiniuj serwer</string>
     <string name="samba_share">Zdefiniuj udział sieciowy</string>
     <string name="refresh">Odśwież</string>
-    <string name="network_timeout">Zdalny folder jest niedostępny.\nSprawdź połączenie sieciowe i spróbuj ponownie.</string>
+    <string name="network_timeout">Przepraszamy, zdalny folder jest niedostępny.\nSprawdź połączenie z internetem i spróbuj ponownie.</string>
     <string name="samba_loading">Ładowanie folderu sieciowego w toku&#8230;</string>
     <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego…</string>
     <string name="samba_password_request_title">Dzielony folder wymaga hasła</string>
