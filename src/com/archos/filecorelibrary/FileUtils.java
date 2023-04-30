@@ -289,7 +289,7 @@ public class FileUtils {
     }
 
     public static boolean isSlowRemote(Uri uri) {
-        return "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme());
+        return "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme())||"sshj".equals(uri.getScheme());
     }
 
     // TODO: when adding new share check also in VideoOpenHelper the _id increment due to 1e9 android 13 change
@@ -298,7 +298,7 @@ public class FileUtils {
                 "upnp".equals(uri.getScheme())||
                 "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme()) ||
                 "webdav".equals(uri.getScheme())||"webdavs".equals(uri.getScheme()) ||
-                "smbj".equals(uri.getScheme());
+                "smbj".equals(uri.getScheme()) || "sshj".equals(uri.getScheme());
     }
 
     public static boolean isNetworkShare(String path) {

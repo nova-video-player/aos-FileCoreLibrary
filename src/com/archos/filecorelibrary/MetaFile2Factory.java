@@ -24,6 +24,7 @@ import com.archos.filecorelibrary.jcifs.JcifsFile2;
 import com.archos.filecorelibrary.localstorage.JavaFile2;
 import com.archos.filecorelibrary.sftp.SFTPFile2;
 import com.archos.filecorelibrary.smbj.SmbjFile2;
+import com.archos.filecorelibrary.sshj.SshjFile2;
 import com.archos.filecorelibrary.webdav.WebdavFile2;
 
 /**
@@ -40,6 +41,9 @@ public class MetaFile2Factory {
         }
         else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
             return SFTPFile2.fromUri(uri);
+        }
+        else if ("sshj".equalsIgnoreCase(uri.getScheme())) {
+            return SshjFile2.fromUri(uri);
         }
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
             return ContentFile2.fromUri(uri);
@@ -67,6 +71,7 @@ public class MetaFile2Factory {
             case "ftp": return 21;
             case "ftps": return 21;
             case "sftp": return 22;
+            case "sshj": return 22;
             case "webdav": return 80;
             case "webdavs": return 443;
             case "smbj": return 445;

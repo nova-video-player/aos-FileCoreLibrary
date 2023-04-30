@@ -35,9 +35,7 @@ public class SFTPSession {
         currentSessions = new ConcurrentHashMap<>();
         usedSessions = new ConcurrentHashMap<>();
     }
-	
-	
-	
+
 	public static SFTPSession getInstance(){
 		if(sshSession==null)
 			sshSession= new SFTPSession();
@@ -71,9 +69,7 @@ public class SFTPSession {
                 }
             }
         }
-
         return null;
-
     }
 
     private synchronized void acquireSession(Channel channel){
@@ -87,7 +83,6 @@ public class SFTPSession {
             channels.add(channel);
         } catch (JSchException e) {
         }
-
     }
 
     public synchronized void releaseSession(Channel channel) {
@@ -106,7 +101,6 @@ public class SFTPSession {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /*
@@ -120,7 +114,6 @@ public class SFTPSession {
             Uri uri = Uri.parse(c.getUriString());
             if(!uri.getHost().equals(cred.getHost()) || uri.getPort()!=cred.getPort())
                 continue;
-
             Session s = currentSessions.get(c);
             boolean doNotDisconnect = usedSessions.get(s) != null;
             //If doNotDisconnect is true, it means there are still channels opened
@@ -129,17 +122,14 @@ public class SFTPSession {
             if(!doNotDisconnect) {
                 s.disconnect();
             }
-
             currentSessions.remove(c);
         }
     }
-
 
     private Uri buildKeyFromUri(Uri uri) {
         // We use the Uri without the path segment as key: for example, "ftp://blabla.com:21/toto/titi" gives a "ftp://blabla.com:21" key
         return uri.buildUpon().path("").build();
     }
-
 
     public synchronized Session getSession(Uri path) throws JSchException{
         String username="anonymous";
@@ -149,12 +139,9 @@ public class SFTPSession {
         Credential cred = database.getCredential(path.toString());
         if(cred==null){
             cred = new Credential("anonymous","",buildKeyFromUri(path).toString(),"",true);
-
         }
-
         password= cred.getPassword();
         username = cred.getUsername();
-
         Session session = currentSessions.get(cred);
         if(session!=null){
             if(!session.isConnected())
@@ -166,7 +153,6 @@ public class SFTPSession {
                 }
             return session;
         }
-
         JSch jsch=new JSch();
         try {
             session = jsch.getSession(username, path.getHost(), path.getPort());
@@ -182,7 +168,5 @@ public class SFTPSession {
             throw e;
 
         }
-        
-
     }
 }

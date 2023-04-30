@@ -25,6 +25,7 @@ import com.archos.filecorelibrary.jcifs.JcifsFileEditor;
 import com.archos.filecorelibrary.localstorage.LocalStorageFileEditor;
 import com.archos.filecorelibrary.sftp.SftpFileEditor;
 import com.archos.filecorelibrary.smbj.SmbjFileEditor;
+import com.archos.filecorelibrary.sshj.SshjFileEditor;
 import com.archos.filecorelibrary.zip.ZipFileEditor;
 import com.archos.filecorelibrary.webdav.WebdavFileEditor;
 
@@ -44,6 +45,9 @@ public class FileEditorFactory {
         }
         else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
             return new SftpFileEditor(uri);
+        }
+        else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
+            return new SshjFileEditor(uri);
         }
         else if ("zip".equalsIgnoreCase(uri.getScheme())) {
             return new ZipFileEditor(uri);

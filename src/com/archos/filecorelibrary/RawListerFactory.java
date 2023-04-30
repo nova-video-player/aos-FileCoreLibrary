@@ -25,6 +25,7 @@ import com.archos.filecorelibrary.jcifs.JcifsRawLister;
 import com.archos.filecorelibrary.localstorage.LocalStorageRawLister;
 import com.archos.filecorelibrary.sftp.SFTPRawLister;
 import com.archos.filecorelibrary.smbj.SmbjFile2;
+import com.archos.filecorelibrary.sshj.SshjRawLister;
 import com.archos.filecorelibrary.webdav.WebdavRawLister;
 import com.archos.filecorelibrary.smbj.SmbjRawLister;
 import com.archos.filecorelibrary.zip.ZipRawLister;
@@ -43,6 +44,9 @@ public class RawListerFactory {
         }
         else if ("sftp".equals(uri.getScheme())) {
             return new SFTPRawLister(uri);
+        }
+        else if ("sshj".equals(uri.getScheme())) {
+            return new SshjRawLister(uri);
         }
         else if ("zip".equals(uri.getScheme())) {
             return new ZipRawLister(uri);
