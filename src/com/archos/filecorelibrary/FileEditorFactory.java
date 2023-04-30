@@ -46,7 +46,7 @@ public class FileEditorFactory {
         else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
             return new SftpFileEditor(uri);
         }
-        else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
+        else if ("sshj".equalsIgnoreCase(uri.getScheme())) {
             return new SshjFileEditor(uri);
         }
         else if ("zip".equalsIgnoreCase(uri.getScheme())) {
