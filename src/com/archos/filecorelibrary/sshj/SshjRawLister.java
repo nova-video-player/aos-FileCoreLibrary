@@ -23,6 +23,7 @@ import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
+import net.schmizz.sshj.sftp.SFTPClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +38,16 @@ public class SshjRawLister extends RawLister {
 
     public SshjRawLister(Uri uri) {
         super(uri);
+        log.trace("SshjRawLister: " + mUri);
     }
 
     @Override
-    public ArrayList<MetaFile2> getFileList() throws AuthenticationException {
+    public ArrayList<MetaFile2> getFileList() throws AuthenticationException, IOException {
+        log.trace("getFileList: " + mUri);
+        SFTPClient sftpClient = null;
         try {
             var files = new ArrayList<MetaFile2>();
-            var sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
+            sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
             final String filePath = getSftpPath(mUri);
             List<RemoteResourceInfo> remoteResourceInfos = sftpClient.ls(filePath);
             for (var fileOrDir : remoteResourceInfos) {
@@ -54,11 +58,23 @@ public class SshjRawLister extends RawLister {
             return files;
         } catch (IOException ioe) { // most likely an Authentication error
             if (ioe.getMessage().contains("Permission denied")) throw new AuthenticationException();
-            else log.warn("Caught IOException");
+            else {
+                log.warn("Caught IOException");
+                if(sftpClient!=null) {
+                    SshjUtils.closeSFTPClient(mUri);
+                    SshjUtils.disconnectSshClient(mUri);
+                }
+                throw ioe;
+            }
         } catch (Throwable t) {
             log.warn("Failed listing sshj files", t);
+            if(sftpClient!=null) {
+                SshjUtils.closeSFTPClient(mUri);
+                SshjUtils.disconnectSshClient(mUri);
+            }
+            throw t;
         }
-        return null;
+        //return null;
     }
 
 }

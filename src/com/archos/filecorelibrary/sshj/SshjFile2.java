@@ -23,8 +23,6 @@ import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.FileMode;
@@ -58,6 +56,7 @@ public class SshjFile2 extends MetaFile2 {
         final FileAttributes fileAttributes = fileOrDir.getAttributes();
         mUriString = uri.toString();
         mName = uri.getLastPathSegment();
+        if (fileAttributes == null) log.error("SshjFile2: fileAttributes is null for " + uri);
         final FileMode.Type type = fileAttributes.getType();
         mIsDirectory = (type == FileMode.Type.DIRECTORY);
         mIsFile = (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK);
@@ -81,6 +80,7 @@ public class SshjFile2 extends MetaFile2 {
     }
 
     public SshjFile2(FileAttributes fileAttributes, Uri uri) {
+        if (fileAttributes == null) log.error("SshjFile2: argument fileAttributes is null for " + uri);
         log.trace("SshjFile2: " + uri);
         mUriString = uri.toString();
         mName = uri.getLastPathSegment();
@@ -178,9 +178,11 @@ public class SshjFile2 extends MetaFile2 {
             sftpClient = SshjUtils.peekInstance().getSFTPClient(uri);
             final String filePath = getSftpPath(uri);
             var fileAttributes = sftpClient.lstat(filePath);
+            if (fileAttributes == null) log.error("fromUri: file does not exist " + uri);
+            // throw perm if null!
             return new SshjFile2(fileAttributes, uri);
         } catch (IOException e) {
-            log.warn("Caught IOException");
+            log.warn("fromUri: caught IOException");
             SshjUtils.closeSFTPClient(uri);
             SshjUtils.disconnectSshClient(uri);
             if (e.getCause() instanceof java.net.UnknownHostException)

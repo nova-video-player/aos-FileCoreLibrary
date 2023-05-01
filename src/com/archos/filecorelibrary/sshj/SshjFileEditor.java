@@ -48,9 +48,8 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        log.debug("getInputStream: " + mUri);
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
-        final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16, 0);
+        final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16);
         final ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {
             try {
@@ -63,7 +62,6 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        log.debug("getInputStream: {} skip {}", mUri, from);
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
         final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16, from);
         final ObservableInputStream ois = new ObservableInputStream(is);
@@ -78,7 +76,6 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        log.debug("getOutputStream: " + mUri);
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.WRITE));
         final OutputStream os = sshjFile.new RemoteFileOutputStream();
         final ObservableOutputStream oos = new ObservableOutputStream(os);
@@ -109,10 +106,10 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public Boolean delete() throws Exception {
-        log.debug("delete: " + mUri);
         final SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
         final String mFilePath = getSftpPath(mUri);
         final FileAttributes fileAttributes = sftpClient.lstat(mFilePath);
+        if (fileAttributes == null) return null;
         final FileMode.Type type = fileAttributes.getType();
         if (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK) {
             sftpClient.rm(mFilePath);
@@ -130,7 +127,6 @@ public class SshjFileEditor extends FileEditor {
     @Override
     public boolean rename(String newName) {
         try {
-            log.debug("rename: " + mUri);
             final String mFilePath = getSftpPath(mUri);
             final SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
             sftpClient.rename(getSftpPath(mUri), getParentDirectoryPath(mFilePath) + "/" + newName);
@@ -145,10 +141,10 @@ public class SshjFileEditor extends FileEditor {
     public boolean exists() {
         SFTPClient sftpClient;
         try {
-            log.debug("exists: " + mUri);
             sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
             final String mFilePath = getSftpPath(mUri);
             final FileAttributes fileAttributes = sftpClient.statExistence(mFilePath);
+            if (fileAttributes == null) return false;
             final FileMode.Type type = fileAttributes.getType();
             if (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK || type == FileMode.Type.DIRECTORY)
                 return true;
