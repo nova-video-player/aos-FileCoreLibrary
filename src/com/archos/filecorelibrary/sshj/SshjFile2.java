@@ -19,16 +19,24 @@ import static com.archos.filecorelibrary.sshj.SshjUtils.getSftpPath;
 import android.content.Context;
 import android.net.Uri;
 
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.FileMode;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
+import net.schmizz.sshj.sftp.SFTPClient;
+import net.schmizz.sshj.xfer.FilePermission;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 public class SshjFile2 extends MetaFile2 {
 
@@ -46,15 +54,25 @@ public class SshjFile2 extends MetaFile2 {
     private final String mUriString;
 
     public SshjFile2(RemoteResourceInfo fileOrDir, Uri uri) {
+        log.trace("SshjFile2: " + uri);
         final FileAttributes fileAttributes = fileOrDir.getAttributes();
         mUriString = uri.toString();
         mName = uri.getLastPathSegment();
-        mIsDirectory = fileOrDir.isDirectory();
-        // TODO MARC check should work with link
-        mIsFile = fileOrDir.isRegularFile();
+        final FileMode.Type type = fileAttributes.getType();
+        mIsDirectory = (type == FileMode.Type.DIRECTORY);
+        mIsFile = (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK);
         mLastModified = fileAttributes.getMtime();
-        //mCanRead = fileAttributes.getPermissions(); // TODO assume true for now
-        // TODO MARC
+        // TODO proper implementation of mCanRead/mCanWrite (would involve ssh session)
+        /*
+        // instead of saying true, assume if U/G/O is set to W that it is writeable
+        // proper implementation would require to identify uid/gid of session
+        mCanRead = fileAttributes.getPermissions().contains(FilePermission.USR_R) ||
+                fileAttributes.getPermissions().contains(FilePermission.GRP_R) ||
+                fileAttributes.getPermissions().contains(FilePermission.OTH_R);
+        mCanWrite = fileAttributes.getPermissions().contains(FilePermission.USR_W) ||
+                fileAttributes.getPermissions().contains(FilePermission.GRP_W) ||
+                fileAttributes.getPermissions().contains(FilePermission.OTH_W);
+         */
         mCanRead = true;
         mCanWrite = true;
         mLength = fileAttributes.getSize();
@@ -63,14 +81,22 @@ public class SshjFile2 extends MetaFile2 {
     }
 
     public SshjFile2(FileAttributes fileAttributes, Uri uri) {
+        log.trace("SshjFile2: " + uri);
         mUriString = uri.toString();
         mName = uri.getLastPathSegment();
         final FileMode.Type type = fileAttributes.getType();
         mIsDirectory = (type == FileMode.Type.DIRECTORY);
         mIsFile = (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK);
         mLastModified = fileAttributes.getMtime();
-        //mCanRead = fileAttributes.getPermissions(); // TODO assume true for now
-        // TODO MARC
+        // TODO proper implementation of mCanRead/mCanWrite (would involve ssh session)
+        /*
+        mCanRead = fileAttributes.getPermissions().contains(FilePermission.USR_R) ||
+                fileAttributes.getPermissions().contains(FilePermission.GRP_R) ||
+                fileAttributes.getPermissions().contains(FilePermission.OTH_R);
+        mCanWrite = fileAttributes.getPermissions().contains(FilePermission.USR_W) ||
+                fileAttributes.getPermissions().contains(FilePermission.GRP_W) ||
+                fileAttributes.getPermissions().contains(FilePermission.OTH_W);
+         */
         mCanRead = true;
         mCanWrite = true;
         mLength = fileAttributes.getSize();
@@ -146,10 +172,24 @@ public class SshjFile2 extends MetaFile2 {
      * get metafile2 object from a uri (please use this only if absolutely necessary)
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        var sftpClient = SshjUtils.peekInstance().getSFTPClient(uri);
-        final String filePath = getSftpPath(uri);
-        var fileInformation =  sftpClient.lstat(filePath);
-        return new SshjFile2(fileInformation, uri);
+        SFTPClient sftpClient = null;
+        try {
+            log.trace("fromUri: " + uri);
+            sftpClient = SshjUtils.peekInstance().getSFTPClient(uri);
+            final String filePath = getSftpPath(uri);
+            var fileAttributes = sftpClient.lstat(filePath);
+            return new SshjFile2(fileAttributes, uri);
+        } catch (IOException e) {
+            log.warn("Caught IOException");
+            SshjUtils.closeSFTPClient(uri);
+            SshjUtils.disconnectSshClient(uri);
+            if (e.getCause() instanceof java.net.UnknownHostException)
+                throw new UnknownHostException();
+            else
+                throw new AuthenticationException();
+            // TODO MARC could be perm too? cf. sftpfile2
+            //throw e;
+        }
     }
 
 }
