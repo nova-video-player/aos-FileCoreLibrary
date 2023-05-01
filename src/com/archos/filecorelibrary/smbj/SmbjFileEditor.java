@@ -98,7 +98,7 @@ public class SmbjFileEditor extends FileEditor {
             SmbjUtils.peekInstance().getSmbShare(mUri).mkdir(getFilePath(mUri));
             return true;
         } catch (IOException e) {
-            caughtException(e, "mkdir", "IOException in mkdir " + mUri);
+            caughtException(e, "SmbjFileEditor:mkdir", "IOException in mkdir " + mUri);
         }
         return false;
     }
@@ -125,7 +125,7 @@ public class SmbjFileEditor extends FileEditor {
                 return true;
             }
         } catch (IOException e) {
-            caughtException(e, "rename", "IOException in rename " + mUri + " into " + newName);
+            caughtException(e, "SmbjFileEditor:rename", "IOException in rename " + mUri + " into " + newName);
         }
         return false;
     }
@@ -141,7 +141,7 @@ public class SmbjFileEditor extends FileEditor {
                 if (mDiskShare.folderExists(mFilePath)) return true;
             }
         } catch (IOException ioe) {
-            caughtException(ioe, "exists", "IOException in exists " + mUri);
+            caughtException(ioe, "SmbjFileEditor:exists", "IOException in exists " + mUri);
         }
         return false;
     }

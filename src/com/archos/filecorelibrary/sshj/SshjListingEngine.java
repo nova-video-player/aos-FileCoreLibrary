@@ -178,7 +178,7 @@ public class SshjListingEngine extends ListingEngine {
                         error = ErrorEnum.ERROR_UNKNOWN_HOST;
                     }
                     final ErrorEnum fError = error;
-                    caughtException(ioe, "SshjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
+                    caughtException(ioe, "SshjListingEngine:SshjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (!mAbort && mListener != null) { // do not report error if aborted

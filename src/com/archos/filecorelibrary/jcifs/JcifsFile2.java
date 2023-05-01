@@ -112,9 +112,9 @@ public class JcifsFile2 extends MetaFile2 {
                 mCanWrite = file.canWrite();
                 if (mIsFile) mLength = file.length();
             } catch (SmbAuthException e) {
-                caughtException(e, "JfisFile2 " + file.getPath(), "SmbAuthException");
+                caughtException(e, "JfisFile2:buildJcifsFile2 " + file.getPath(), "SmbAuthException");
             } catch (SmbException e) {
-                caughtException(e, "JfisFile2 " + file.getPath(), "SmbException");
+                caughtException(e, "JfisFile2:buildJcifsFile2 " + file.getPath(), "SmbException");
             }
         }
 

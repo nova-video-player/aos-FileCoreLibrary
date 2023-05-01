@@ -50,7 +50,7 @@ import jcifs.util.transport.TransportException;
  * This is simple HTTP local server for streaming InputStream to apps which are capable to read data from url.
  * Random access input stream is optionally supported, depending if file can be opened in this mode. 
  */
-public class StreamOverHttp{
+public class StreamOverHttp {
 	private static final Logger log = LoggerFactory.getLogger(StreamOverHttp.class);
 
 	private final Uri mUri;
@@ -88,7 +88,7 @@ public class StreamOverHttp{
 						new HttpSession(accept,fileMimeType);
 					}
 				} catch(IOException e) {
-					caughtException(e, "StreamOverHttp", "IOException for " + mUri);
+					caughtException(e, "StreamOverHttp:StreamOverHttp", "IOException for " + mUri);
 				}
 			}
 
@@ -110,7 +110,7 @@ public class StreamOverHttp{
                         new HttpSession(accept,fileMimeType);
                     }
                 } catch(IOException e) {
-					caughtException(e, "StreamOverHttp", "IOException for " + mUri);
+					caughtException(e, "StreamOverHttp:StreamOverHttp", "IOException for " + mUri);
 				}
             }
 
@@ -202,18 +202,18 @@ public class StreamOverHttp{
 				openInputStream();
 				handleResponse(socket);
 			} catch(IOException e) {
-				caughtException(e, "HttpSession", "IOException while running for " + mUri);
+				caughtException(e, "StreamOverHttp:HttpSession", "IOException while running for " + mUri);
 			} finally {
 				try {
 					socket.close();
 				} catch(Exception e) {
-					caughtException(e, "HttpSession", "Exception closing socket with " + mUri);
+					caughtException(e, "StreamOverHttp:HttpSession", "Exception closing socket with " + mUri);
 				}
 				if(is!=null) {
 					try {
 						is.close();
 					} catch(IOException e) {
-						caughtException(e, "HttpSession", "IOException closing input stream with " + mUri);
+						caughtException(e, "StreamOverHttp:HttpSession", "IOException closing input stream with " + mUri);
 					}
 				}
 			}
@@ -246,7 +246,7 @@ public class StreamOverHttp{
 						path = Uri.decode(encodedPath);
 					}
 				} catch (InterruptedException e) {
-					caughtException(e, "openInputStream", "InterruptedException");
+					caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException");
 				}
 			}
 
@@ -259,7 +259,7 @@ public class StreamOverHttp{
 					try {
 						mMetaFile = MetaFile2Factory.getMetaFileForUrl(mUri);
 					} catch(Exception e) {
-						caughtException(e, "openInputStream", "InterruptedException retrieving metafile");
+						caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException retrieving metafile");
 					}
 				}
 				/*
@@ -348,7 +348,7 @@ public class StreamOverHttp{
 					length = ((ContentStorageFileEditor)FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext())).getSize();
 
 			} catch (Exception e) {
-				caughtException(e, "openInputStream", "Exception");
+				caughtException(e, "StreamOverHttp:openInputStream", "Exception");
 			}
 		}
 
@@ -408,7 +408,7 @@ public class StreamOverHttp{
 							String endR = range.substring(minus + 1);
 							if (endR.length() > 0) endAt = Long.parseLong(endR);
 						} catch(NumberFormatException nfe) {
-							caughtException(nfe, "handleResponse", "NumberFormatException");
+							caughtException(nfe, "StreamOverHttp:handleResponse", "NumberFormatException");
 						}
 					}
 					if(startFrom >= length){
@@ -435,15 +435,15 @@ public class StreamOverHttp{
 				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null);
 				log.debug("Http stream finished");
 			} catch(IOException ioe) {
-				caughtException(ioe, "handleResponse", "IOException");
+				caughtException(ioe, "StreamOverHttp:handleResponse", "IOException");
 				try{
 					sendError(socket, HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
 				} catch(Throwable t) {
-					caughtException(t, "handleResponse", "Throwable");
+					caughtException(t, "StreamOverHttp:handleResponse", "Throwable");
 				}
 			} catch(InterruptedException ie) {
 				// thrown by sendError, ignore and exit the thread
-				caughtException(ie, "handleResponse", "InterruptedException");
+				caughtException(ie, "StreamOverHttp:handleResponse", "InterruptedException");
 			}
 		}
 
@@ -487,7 +487,7 @@ public class StreamOverHttp{
 					pre.put(atr, val);
 				}
 			}catch(IOException ioe){
-				caughtException(ioe, "decodeHeader", "IOException");
+				caughtException(ioe, "StreamOverHttp:decodeHeader", "IOException");
 				sendError(socket, HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
 			}
 			return path;
@@ -516,7 +516,7 @@ public class StreamOverHttp{
 		try{
 			serverSocket.close();
 		} catch(Exception e) {
-			caughtException(e, "close", "Exception");
+			caughtException(e, "StreamOverHttp:close", "Exception");
 		}
 	}
 
@@ -528,7 +528,7 @@ public class StreamOverHttp{
 		try {
 			sendResponse(socket, status, "text/plain", null, null, 0, null, msg);
 		} catch (IOException e) {
-			caughtException(e, "sendError", "IOException");
+			caughtException(e, "StreamOverHttp:sendError", "IOException");
 		}
 	}
 
@@ -589,18 +589,18 @@ public class StreamOverHttp{
 			out.flush();
 			out.close();
 		} catch(IOException e) {
-			caughtException(e, "sendResponse", "IOException");
+			caughtException(e, "StreamOverHttp:sendResponse", "IOException");
 		} finally {
 			try {
 				socket.close();
 			} catch(Throwable t) {
-				caughtException(t, "sendResponse", "Throwable closing socket");
+				caughtException(t, "StreamOverHttp:sendResponse", "Throwable closing socket");
 			}
 			if (bin != null)
 				try{
 					bin.close();
 				} catch(Throwable t) {
-					caughtException(t, "sendResponse", "Throwable closing bin");
+					caughtException(t, "StreamOverHttp:sendResponse", "Throwable closing bin");
 				}
 		}
 	}

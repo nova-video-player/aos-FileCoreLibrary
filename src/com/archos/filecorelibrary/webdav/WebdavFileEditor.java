@@ -68,7 +68,7 @@ public class WebdavFileEditor extends FileEditor {
             mSardine.createDirectory(u.toString());
             return true;
         } catch (IOException e) {
-            caughtException(e, "mkdir", "IOException in mkdir " + mUri);
+            caughtException(e, "WebdavFileEditor:mkdir", "IOException in mkdir " + mUri);
         }
         return false;
     }
@@ -92,7 +92,7 @@ public class WebdavFileEditor extends FileEditor {
                 }
             }
         } catch (IOException e) {
-            caughtException(e, "rename", "IOException in move " + mUri + " into " + uri);
+            caughtException(e, "WebdavFileEditor:rename", "IOException in move " + mUri + " into " + uri);
         }
         return false;
     }
@@ -118,7 +118,7 @@ public class WebdavFileEditor extends FileEditor {
                 log.warn("exists: uriToHttp returned null!");
             }
         } catch (IOException e) {
-            caughtException(e, "exists", "IOException in exists for " + mUri);
+            caughtException(e, "WebdavFileEditor:exists", "IOException in exists for " + mUri);
         }
         return false;
     }

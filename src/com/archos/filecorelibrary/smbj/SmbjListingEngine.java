@@ -164,7 +164,7 @@ public class SmbjListingEngine extends ListingEngine {
                     }
                 });
             } catch (SMBApiException smbe) { // auth exception most probably
-                caughtException(smbe, "SmbjListingThread", "SMBApiException for " + mUri);
+                caughtException(smbe, "SmbjListingEngine:SmbjListingThread", "SMBApiException for " + mUri);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -178,7 +178,7 @@ public class SmbjListingEngine extends ListingEngine {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
-                caughtException(e, "SmbjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
+                caughtException(e, "SmbjListingEngine:SmbjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted

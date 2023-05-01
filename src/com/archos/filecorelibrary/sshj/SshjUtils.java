@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.sshj;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.FileUtils.encodeUri;
 
 import android.content.Context;
