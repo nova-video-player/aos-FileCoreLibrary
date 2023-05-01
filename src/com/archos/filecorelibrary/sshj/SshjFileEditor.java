@@ -22,6 +22,7 @@ import android.net.Uri;
 
 import com.archos.environment.ObservableInputStream;
 import com.archos.environment.ObservableOutputStream;
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
 
 import net.schmizz.sshj.sftp.FileAttributes;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.UnknownHostException;
 import java.util.EnumSet;
 
 public class SshjFileEditor extends FileEditor {
@@ -46,8 +48,9 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream() throws Exception {
+        log.debug("getInputStream: " + mUri);
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
-        final InputStream is = sshjFile.new RemoteFileInputStream();
+        final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16, 0);
         final ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {
             try {
@@ -60,9 +63,9 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
+        log.debug("getInputStream: {} skip {}", mUri, from);
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
-        final InputStream is = sshjFile.new RemoteFileInputStream();
-        is.skip(from);
+        final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16, from);
         final ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {
             try {
@@ -75,6 +78,7 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public OutputStream getOutputStream() throws Exception {
+        log.debug("getOutputStream: " + mUri);
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.WRITE));
         final OutputStream os = sshjFile.new RemoteFileOutputStream();
         final ObservableOutputStream oos = new ObservableOutputStream(os);
@@ -98,13 +102,14 @@ public class SshjFileEditor extends FileEditor {
             SshjUtils.peekInstance().getSFTPClient(mUri).mkdir(getSftpPath(mUri));
             return true;
         } catch (IOException e) {
-            caughtException(e, "mkdir", "IOException in mkdir " + mUri);
+            caughtException(e, "SshjFileEditor:mkdir", "IOException in mkdir " + mUri);
         }
         return false;
     }
 
     @Override
     public Boolean delete() throws Exception {
+        log.debug("delete: " + mUri);
         final SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
         final String mFilePath = getSftpPath(mUri);
         final FileAttributes fileAttributes = sftpClient.lstat(mFilePath);
@@ -125,27 +130,32 @@ public class SshjFileEditor extends FileEditor {
     @Override
     public boolean rename(String newName) {
         try {
+            log.debug("rename: " + mUri);
             final String mFilePath = getSftpPath(mUri);
             final SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
             sftpClient.rename(getSftpPath(mUri), getParentDirectoryPath(mFilePath) + "/" + newName);
             return true;
         } catch (IOException e) {
-            caughtException(e, "rename", "IOException in rename " + mUri + " into " + newName);
+            caughtException(e, "SshjFileEditor:rename", "IOException in rename " + mUri + " into " + newName);
         }
         return false;
     }
 
     @Override
     public boolean exists() {
+        SFTPClient sftpClient;
         try {
-            final SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
+            log.debug("exists: " + mUri);
+            sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
             final String mFilePath = getSftpPath(mUri);
             final FileAttributes fileAttributes = sftpClient.statExistence(mFilePath);
             final FileMode.Type type = fileAttributes.getType();
             if (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK || type == FileMode.Type.DIRECTORY)
                 return true;
         } catch (IOException ioe) {
-            caughtException(ioe, "exists", "IOException in exists " + mUri);
+            caughtException(ioe, "SshjFileEditor:exists", "IOException in exists " + mUri);
+        } finally {
+            //SshjUtils.closeSFTPClient(mUri);
         }
         return false;
     }
