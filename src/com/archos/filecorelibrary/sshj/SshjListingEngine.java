@@ -21,6 +21,7 @@ import static com.archos.filecorelibrary.FileUtils.getShareName;
 import android.content.Context;
 import android.net.Uri;
 
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
@@ -162,34 +163,31 @@ public class SshjListingEngine extends ListingEngine {
                         }
                     }
                 });
-                // TODO MARC NOK
             } catch (IOException ioe) { // auth exception most probably
-                if (ioe.getMessage().contains("Permission denied")) {
-                    mUiHandler.post(new Runnable() {
-                        public void run() {
-                            if (!mAbort && mListener != null) { // do not report error if aborted
-                                mListener.onCredentialRequired(ioe);
-                            }
-                        }
-                    });
-                } else {
-                    ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
-                    if (ioe.getCause() instanceof UnknownHostException) {
-                        error = ErrorEnum.ERROR_UNKNOWN_HOST;
-                    }
-                    final ErrorEnum fError = error;
-                    caughtException(ioe, "SshjListingEngine:SshjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
-                    mUiHandler.post(new Runnable() {
-                        public void run() {
-                            if (!mAbort && mListener != null) { // do not report error if aborted
-                                mListener.onListingFatalError(ioe, fError);
-                            }
-                        }
-                    });
+                ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
+                if (ioe.getCause() instanceof UnknownHostException) {
+                    error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
+                final ErrorEnum fError = error;
+                caughtException(ioe, "SshjListingEngine:SshjListingThread", "IOException (" + getErrorStringResId(error) + ") for " + mUri);
+                mUiHandler.post(new Runnable() {
+                    public void run() {
+                        if (!mAbort && mListener != null) { // do not report error if aborted
+                            mListener.onListingFatalError(ioe, fError);
+                        }
+                    }
+                });
+            } catch (final AuthenticationException ae) {
+                caughtException(ae, "SshjListingEngine:SshjListingThread", "AuthenticationException for " + mUri);
+                mUiHandler.post(new Runnable() {
+                    public void run() {
+                        if (mListener != null) {
+                            mListener.onCredentialRequired(ae);
+                        }
+                    }
+                });
             } finally {
                 noTimeOut(); // be sure there is no time out triggered after an error
-
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (mListener != null) { // always report end even when aborted

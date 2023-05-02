@@ -183,14 +183,12 @@ public class SshjFile2 extends MetaFile2 {
             return new SshjFile2(fileAttributes, uri);
         } catch (IOException e) {
             log.warn("fromUri: caught IOException");
-            SshjUtils.closeSFTPClient(uri);
-            SshjUtils.disconnectSshClient(uri);
+            //SshjUtils.closeSFTPClient(uri);
+            //SshjUtils.disconnectSshClient(uri);
             if (e.getCause() instanceof java.net.UnknownHostException)
                 throw new UnknownHostException();
             else
                 throw new AuthenticationException();
-            // TODO MARC could be perm too? cf. sftpfile2
-            //throw e;
         }
     }
 

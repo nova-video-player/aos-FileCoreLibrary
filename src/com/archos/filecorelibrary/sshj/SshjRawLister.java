@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.sshj;
 
+import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.sshj.SshjUtils.getSftpPath;
 
 import android.net.Uri;
@@ -24,6 +25,7 @@ import com.archos.filecorelibrary.AuthenticationException;
 
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
+import net.schmizz.sshj.sftp.SFTPException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,25 +58,22 @@ public class SshjRawLister extends RawLister {
                 files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
             }
             return files;
-        } catch (IOException ioe) { // most likely an Authentication error
-            if (ioe.getMessage().contains("Permission denied")) throw new AuthenticationException();
-            else {
-                log.warn("Caught IOException");
-                if(sftpClient!=null) {
-                    SshjUtils.closeSFTPClient(mUri);
-                    SshjUtils.disconnectSshClient(mUri);
-                }
-                throw ioe;
-            }
+        } catch (IOException ioe) {
+            caughtException(ioe, "SshjRawLister:getFileList", "IOException for " + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+            //SshjUtils.disconnectSshClient(mUri);
+            throw ioe;
+        } catch (AuthenticationException ae) {
+            caughtException(ae, "SshjRawLister:getFileList", "AuthenticationException for " + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+            //SshjUtils.disconnectSshClient(mUri);
+            throw ae;
         } catch (Throwable t) {
-            log.warn("Failed listing sshj files", t);
-            if(sftpClient!=null) {
-                SshjUtils.closeSFTPClient(mUri);
-                SshjUtils.disconnectSshClient(mUri);
-            }
+            caughtException(t, "SshjRawLister:getFileList", "Exception for " + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+            //SshjUtils.disconnectSshClient(mUri);
             throw t;
         }
-        //return null;
     }
 
 }

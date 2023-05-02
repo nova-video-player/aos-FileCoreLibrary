@@ -20,16 +20,20 @@ import static com.archos.filecorelibrary.FileUtils.encodeUri;
 import android.content.Context;
 import android.net.Uri;
 
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.userauth.UserAuthException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SshjUtils {
@@ -63,27 +67,43 @@ public class SshjUtils {
         log.debug("SshjUtils: initializing contexts");
     }
 
-    public synchronized SSHClient getSshClient(Uri uri) throws IOException {
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        if (cred == null)
-            cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
-        String server = uri.getHost();
-        String password = cred.getPassword();
-        String username = cred.getUsername();
-        int port = uri.getPort();
-        SSHClient sshClient = sshClients.get(cred);
-        if (sshClient == null || !sshClient.isConnected()) {
-            log.trace("getSshClient: sshClient is null or not connected for " + uri + ", connecting to " + server);
-            sshClient = new SSHClient();
-            sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-            if (port != -1) sshClient.connect(server, port);
-            else sshClient.connect(server);
-            sshClient.authPassword(username, password.toCharArray());
-            sshClients.put(cred, sshClient);
+    public synchronized SSHClient getSshClient(Uri uri) throws IOException, AuthenticationException {
+        try {
+            NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+            if (cred == null)
+                cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
+            String server = uri.getHost();
+            String password = cred.getPassword();
+            String username = cred.getUsername();
+            int port = uri.getPort();
+            SSHClient sshClient = sshClients.get(cred);
+            if (sshClient == null || !sshClient.isConnected()) {
+                log.trace("getSshClient: sshClient is null or not connected for " + uri + ", connecting to " + server);
+                sshClient = new SSHClient();
+                sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+                if (port != -1) sshClient.connect(server, port);
+                else sshClient.connect(server);
+                sshClient.authPassword(username, password.toCharArray());
+                sshClients.put(cred, sshClient);
+            }
+            return sshClient;
+        } catch (UserAuthException uae) {
+            // E/com.archos.filecorelibrary.FileUtils: SshjListingEngine:SshjListingThread: caught IOException (2131886387) for sshj://192.168.234.14:22/volume1/video/
+            //    net.schmizz.sshj.userauth.UserAuthException: Exhausted available authentication methods
+            caughtException(uae, "SshjUtils:getSshClient", "UserAuthException, throwing AuthenticationException");
+            throw new AuthenticationException();
+        } catch (IOException ioe) {
+            // java.net.ConnectException: failed to connect to /192.168.0.10 (port 22) from /:: (port 47948): connect failed: ECONNREFUSED (Connection refused)
+            if (ioe instanceof ConnectionException) {
+                caughtException(ioe, "SshjUtils:getSshClient", "ConnectionException, throwing AuthenticationException");
+                throw new AuthenticationException();
+            } else {
+                caughtException(ioe, "SshjUtils:getSshClient", "IOException, throwing IOException");
+                throw ioe;
+            }
         }
-        return sshClient;
     }
-
+    
     public static synchronized void disconnectSshClient(Uri uri) {
         try {
             NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
@@ -100,10 +120,11 @@ public class SshjUtils {
         }
     }
 
-    public synchronized SFTPClient getSFTPClient(Uri uri) throws IOException {
+    public synchronized SFTPClient getSFTPClient(Uri uri) throws IOException, AuthenticationException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
+        getSshClient(uri); // be sure to be connected
         SFTPClient sftpClient = sftpClients.get(cred);
         if (sftpClient == null) {
             log.trace("getSFTPClient: sftpClient is null or not connected for " + sftpClient);

@@ -50,42 +50,60 @@ public class SshjFileEditor extends FileEditor {
     public InputStream getInputStream() throws Exception {
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
         final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16);
+        /*
         final ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {
             try {
                 if (sshjFile != null) sshjFile.close();
             } catch (IOException ioe) {
+                caughtException(ioe, "SshjFileEditor:getInputStream", "IOException" + mUri);
+                //SshjUtils.closeSFTPClient(mUri);
+                //SshjUtils.disconnectSshClient(mUri);
             }
         });
         return ois;
+         */
+        return is;
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
         final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
         final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16, from);
+        /*
         final ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {
             try {
                 if (sshjFile != null) sshjFile.close();
             } catch (IOException ioe) {
+                caughtException(ioe, "SshjFileEditor:getInputStream", "IOException" + mUri);
+                //SshjUtils.closeSFTPClient(mUri);
+                //SshjUtils.disconnectSshClient(mUri);
             }
         });
         return ois;
+         */
+        return is;
     }
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.WRITE));
+        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
         final OutputStream os = sshjFile.new RemoteFileOutputStream();
+        /*
         final ObservableOutputStream oos = new ObservableOutputStream(os);
         oos.onClose(() -> {
             try {
                 if (sshjFile != null) sshjFile.close();
             } catch (IOException ioe) {
+                caughtException(ioe, "SshjFileEditor:getOutputStream", "IOException" + mUri);
+                //SshjUtils.closeSFTPClient(mUri);
+                //SshjUtils.disconnectSshClient(mUri);
             }
         });
         return oos;
+         */
+        return os;
     }
 
     @Override
@@ -99,7 +117,12 @@ public class SshjFileEditor extends FileEditor {
             SshjUtils.peekInstance().getSFTPClient(mUri).mkdir(getSftpPath(mUri));
             return true;
         } catch (IOException e) {
-            caughtException(e, "SshjFileEditor:mkdir", "IOException in mkdir " + mUri);
+            caughtException(e, "SshjFileEditor:mkdir", "IOException" + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+        } catch (AuthenticationException e) {
+            caughtException(e, "SshjFileEditor:mkdir", "AuthenticationException" + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+            //SshjUtils.disconnectSshClient(mUri);
         }
         return false;
     }
@@ -132,7 +155,12 @@ public class SshjFileEditor extends FileEditor {
             sftpClient.rename(getSftpPath(mUri), getParentDirectoryPath(mFilePath) + "/" + newName);
             return true;
         } catch (IOException e) {
-            caughtException(e, "SshjFileEditor:rename", "IOException in rename " + mUri + " into " + newName);
+            caughtException(e, "SshjFileEditor:rename", "IOException" + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+        } catch (AuthenticationException e) {
+            caughtException(e, "SshjFileEditor:rename", "AuthenticationException" + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+            //SshjUtils.disconnectSshClient(mUri);
         }
         return false;
     }
@@ -148,10 +176,13 @@ public class SshjFileEditor extends FileEditor {
             final FileMode.Type type = fileAttributes.getType();
             if (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK || type == FileMode.Type.DIRECTORY)
                 return true;
-        } catch (IOException ioe) {
-            caughtException(ioe, "SshjFileEditor:exists", "IOException in exists " + mUri);
-        } finally {
+        } catch (IOException e) {
+            caughtException(e, "SshjFileEditor:exists", "IOException" + mUri);
             //SshjUtils.closeSFTPClient(mUri);
+        } catch (AuthenticationException e) {
+            caughtException(e, "SshjFileEditor:exists", "AuthenticationException" + mUri);
+            //SshjUtils.closeSFTPClient(mUri);
+            //SshjUtils.disconnectSshClient(mUri);
         }
         return false;
     }
