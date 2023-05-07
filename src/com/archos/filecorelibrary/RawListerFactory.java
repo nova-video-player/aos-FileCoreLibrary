@@ -15,6 +15,7 @@
 package com.archos.filecorelibrary;
 
 import static com.archos.filecorelibrary.smbj.SmbjUtils.isSMBjEnabled;
+import static com.archos.filecorelibrary.sshj.SshjUtils.isSSHjEnabled;
 
 import android.net.Uri;
 
@@ -23,8 +24,10 @@ import com.archos.filecorelibrary.ftp.FTPRawLister;
 import com.archos.filecorelibrary.jcifs.JcifsFile2;
 import com.archos.filecorelibrary.jcifs.JcifsRawLister;
 import com.archos.filecorelibrary.localstorage.LocalStorageRawLister;
+import com.archos.filecorelibrary.sftp.SFTPFile2;
 import com.archos.filecorelibrary.sftp.SFTPRawLister;
 import com.archos.filecorelibrary.smbj.SmbjFile2;
+import com.archos.filecorelibrary.sshj.SshjFile2;
 import com.archos.filecorelibrary.sshj.SshjRawLister;
 import com.archos.filecorelibrary.webdav.WebdavRawLister;
 import com.archos.filecorelibrary.smbj.SmbjRawLister;
@@ -43,7 +46,8 @@ public class RawListerFactory {
             };
         }
         else if ("sftp".equals(uri.getScheme())) {
-            return new SFTPRawLister(uri);
+            if (isSSHjEnabled()) return new SshjRawLister(uri);
+            else return new SFTPRawLister(uri);
         }
         else if ("sshj".equals(uri.getScheme())) {
             return new SshjRawLister(uri);

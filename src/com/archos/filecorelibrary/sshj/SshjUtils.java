@@ -20,6 +20,8 @@ import static com.archos.filecorelibrary.FileUtils.encodeUri;
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.preference.PreferenceManager;
+
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
@@ -171,6 +173,11 @@ public class SshjUtils {
 
     public static String getSftpPath(Uri uri) {
         return encodeUri(uri).getPath();
+    }
+
+    public static boolean isSSHjEnabled() {
+        log.debug("isSSHjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false));
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false);
     }
 
 }

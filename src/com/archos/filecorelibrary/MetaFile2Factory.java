@@ -15,6 +15,7 @@
 package com.archos.filecorelibrary;
 
 import static com.archos.filecorelibrary.smbj.SmbjUtils.isSMBjEnabled;
+import static com.archos.filecorelibrary.sshj.SshjUtils.isSSHjEnabled;
 
 import android.net.Uri;
 
@@ -23,8 +24,10 @@ import com.archos.filecorelibrary.ftp.FTPFile2;
 import com.archos.filecorelibrary.jcifs.JcifsFile2;
 import com.archos.filecorelibrary.localstorage.JavaFile2;
 import com.archos.filecorelibrary.sftp.SFTPFile2;
+import com.archos.filecorelibrary.sftp.SftpFileEditor;
 import com.archos.filecorelibrary.smbj.SmbjFile2;
 import com.archos.filecorelibrary.sshj.SshjFile2;
+import com.archos.filecorelibrary.sshj.SshjFileEditor;
 import com.archos.filecorelibrary.webdav.WebdavFile2;
 
 /**
@@ -40,7 +43,8 @@ public class MetaFile2Factory {
             return FTPFile2.fromUri(uri);
         }
         else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
-            return SFTPFile2.fromUri(uri);
+            if (isSSHjEnabled()) return SshjFile2.fromUri(uri);
+            else return SFTPFile2.fromUri(uri);
         }
         else if ("sshj".equalsIgnoreCase(uri.getScheme())) {
             return SshjFile2.fromUri(uri);
