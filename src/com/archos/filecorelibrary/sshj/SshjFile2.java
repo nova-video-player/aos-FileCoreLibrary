@@ -24,6 +24,7 @@ import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
+import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.FileMode;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
@@ -183,8 +184,10 @@ public class SshjFile2 extends MetaFile2 {
             return new SshjFile2(fileAttributes, uri);
         } catch (IOException e) {
             log.warn("fromUri: caught IOException");
-            //SshjUtils.closeSFTPClient(uri);
-            //SshjUtils.disconnectSshClient(uri);
+            if (e instanceof SSHException) {
+                SshjUtils.closeSFTPClient(uri);
+                SshjUtils.disconnectSshClient(uri);
+            }
             if (e.getCause() instanceof java.net.UnknownHostException)
                 throw new UnknownHostException();
             else

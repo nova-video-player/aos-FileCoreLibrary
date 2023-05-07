@@ -25,6 +25,7 @@ import com.archos.environment.ObservableOutputStream;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
 
+import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.FileMode;
 import net.schmizz.sshj.sftp.OpenMode;
@@ -57,8 +58,10 @@ public class SshjFileEditor extends FileEditor {
                 if (sshjFile != null) sshjFile.close();
             } catch (IOException ioe) {
                 caughtException(ioe, "SshjFileEditor:getInputStream", "IOException" + mUri);
-                //SshjUtils.closeSFTPClient(mUri);
-                //SshjUtils.disconnectSshClient(mUri);
+                if (ioe instanceof SSHException) {
+                    SshjUtils.closeSFTPClient(mUri);
+                    SshjUtils.disconnectSshClient(mUri);
+                }
             }
         });
         return ois;
@@ -77,8 +80,10 @@ public class SshjFileEditor extends FileEditor {
                 if (sshjFile != null) sshjFile.close();
             } catch (IOException ioe) {
                 caughtException(ioe, "SshjFileEditor:getInputStream", "IOException" + mUri);
-                //SshjUtils.closeSFTPClient(mUri);
-                //SshjUtils.disconnectSshClient(mUri);
+                if (ioe instanceof SSHException) {
+                    SshjUtils.closeSFTPClient(mUri);
+                    SshjUtils.disconnectSshClient(mUri);
+                }
             }
         });
         return ois;
@@ -97,8 +102,10 @@ public class SshjFileEditor extends FileEditor {
                 if (sshjFile != null) sshjFile.close();
             } catch (IOException ioe) {
                 caughtException(ioe, "SshjFileEditor:getOutputStream", "IOException" + mUri);
-                //SshjUtils.closeSFTPClient(mUri);
-                //SshjUtils.disconnectSshClient(mUri);
+                if (ioe instanceof SSHException) {
+                    SshjUtils.closeSFTPClient(mUri);
+                    SshjUtils.disconnectSshClient(mUri);
+                }
             }
         });
         return oos;
@@ -118,11 +125,14 @@ public class SshjFileEditor extends FileEditor {
             return true;
         } catch (IOException e) {
             caughtException(e, "SshjFileEditor:mkdir", "IOException" + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
+            if (e instanceof SSHException) {
+                SshjUtils.closeSFTPClient(mUri);
+                SshjUtils.disconnectSshClient(mUri);
+            }
         } catch (AuthenticationException e) {
             caughtException(e, "SshjFileEditor:mkdir", "AuthenticationException" + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
-            //SshjUtils.disconnectSshClient(mUri);
+            SshjUtils.closeSFTPClient(mUri);
+            SshjUtils.disconnectSshClient(mUri);
         }
         return false;
     }
@@ -156,11 +166,14 @@ public class SshjFileEditor extends FileEditor {
             return true;
         } catch (IOException e) {
             caughtException(e, "SshjFileEditor:rename", "IOException" + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
+            if (e instanceof SSHException) {
+                SshjUtils.closeSFTPClient(mUri);
+                SshjUtils.disconnectSshClient(mUri);
+            }
         } catch (AuthenticationException e) {
             caughtException(e, "SshjFileEditor:rename", "AuthenticationException" + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
-            //SshjUtils.disconnectSshClient(mUri);
+            SshjUtils.closeSFTPClient(mUri);
+            SshjUtils.disconnectSshClient(mUri);
         }
         return false;
     }
@@ -178,11 +191,14 @@ public class SshjFileEditor extends FileEditor {
                 return true;
         } catch (IOException e) {
             caughtException(e, "SshjFileEditor:exists", "IOException" + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
+            if (e instanceof SSHException) {
+                SshjUtils.closeSFTPClient(mUri);
+                SshjUtils.disconnectSshClient(mUri);
+            }
         } catch (AuthenticationException e) {
             caughtException(e, "SshjFileEditor:exists", "AuthenticationException" + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
-            //SshjUtils.disconnectSshClient(mUri);
+            SshjUtils.closeSFTPClient(mUri);
+            SshjUtils.disconnectSshClient(mUri);
         }
         return false;
     }

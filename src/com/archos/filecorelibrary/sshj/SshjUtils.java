@@ -85,6 +85,8 @@ public class SshjUtils {
                 else sshClient.connect(server);
                 sshClient.authPassword(username, password.toCharArray());
                 sshClients.put(cred, sshClient);
+            } else {
+                log.trace("getSshClient: found non null connected sshClient for " + uri);
             }
             return sshClient;
         } catch (UserAuthException uae) {
@@ -103,20 +105,22 @@ public class SshjUtils {
             }
         }
     }
-    
+
     public static synchronized void disconnectSshClient(Uri uri) {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         try {
-            NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
             if (cred == null)
                 cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient != null && sshClient.isConnected()) {
                 sshClient.disconnect();
-                sshClients.remove(cred);
                 log.trace("disconnectSshClient: sshClient disconnected for " + uri);
             }
         } catch (IOException e) {
             caughtException(e, "SshjUtils:disconnectSshClient", "IOException " + uri);
+        } finally {
+            log.trace("closeSFTPClient: remove sshClient from known sshClients for " + uri);
+            sshClients.remove(cred);
         }
     }
 
@@ -136,24 +140,27 @@ public class SshjUtils {
                 log.trace("getSFTPClient: saving sftpClient " + sftpClient);
                 sftpClients.put(cred, sftpClient);
             }
+        } else {
+            log.trace("getSFTPClient: sftpClient is not null reusing it for " + uri);
         }
-        log.debug("getSFTPClient: for uri {}, sftpClient={}", uri, sftpClient);
         return sftpClient;
     }
 
     public static synchronized void closeSFTPClient(Uri uri)  {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         try {
-            NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
             if (cred == null)
                 cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
             SFTPClient sftpClient = sftpClients.get(cred);
             if (sftpClient != null) {
                 sftpClient.close();
-                sftpClients.remove(cred);
                 log.trace("closeSFTPClient: sftpClient disconnected for " + uri);
             }
         } catch (IOException e) {
             caughtException(e, "SshjUtils:closeSFTPClient", "IOException " + uri);
+        } finally {
+            log.trace("closeSFTPClient: remove sftpClient from known sftpClients for " + uri);
+            sftpClients.remove(cred);
         }
     }
 

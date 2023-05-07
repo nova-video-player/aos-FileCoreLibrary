@@ -23,6 +23,7 @@ import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 
+import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPException;
@@ -60,8 +61,10 @@ public class SshjRawLister extends RawLister {
             return files;
         } catch (IOException ioe) {
             caughtException(ioe, "SshjRawLister:getFileList", "IOException for " + mUri);
-            //SshjUtils.closeSFTPClient(mUri);
-            //SshjUtils.disconnectSshClient(mUri);
+            if (ioe instanceof SSHException) {
+                SshjUtils.closeSFTPClient(mUri);
+                SshjUtils.disconnectSshClient(mUri);
+            }
             throw ioe;
         } catch (AuthenticationException ae) {
             caughtException(ae, "SshjRawLister:getFileList", "AuthenticationException for " + mUri);

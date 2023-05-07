@@ -26,6 +26,7 @@ import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 
+import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 
 import org.slf4j.Logger;
@@ -177,6 +178,10 @@ public class SshjListingEngine extends ListingEngine {
                         }
                     }
                 });
+                if (ioe instanceof SSHException) {
+                    SshjUtils.closeSFTPClient(mUri);
+                    SshjUtils.disconnectSshClient(mUri);
+                }
             } catch (final AuthenticationException ae) {
                 caughtException(ae, "SshjListingEngine:SshjListingThread", "AuthenticationException for " + mUri);
                 mUiHandler.post(new Runnable() {
@@ -187,6 +192,7 @@ public class SshjListingEngine extends ListingEngine {
                     }
                 });
             } finally {
+                log.trace("SshjListingEngine:SshjListingThread: onListingEnd");
                 noTimeOut(); // be sure there is no time out triggered after an error
                 mUiHandler.post(new Runnable() {
                     public void run() {
