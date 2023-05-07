@@ -15,6 +15,7 @@
 package com.archos.filecorelibrary;
 
 import static com.archos.filecorelibrary.smbj.SmbjUtils.isSMBjEnabled;
+import static com.archos.filecorelibrary.sshj.SshjUtils.isSSHjEnabled;
 
 import android.content.Context;
 import android.net.Uri;
@@ -44,7 +45,8 @@ public class FileEditorFactory {
             return new FtpFileEditor(uri);
         }
         else if ("sftp".equalsIgnoreCase(uri.getScheme())) {
-            return new SftpFileEditor(uri);
+            if (isSSHjEnabled()) return new SshjFileEditor(uri);
+            else return new SftpFileEditor(uri);
         }
         else if ("sshj".equalsIgnoreCase(uri.getScheme())) {
             return new SshjFileEditor(uri);
