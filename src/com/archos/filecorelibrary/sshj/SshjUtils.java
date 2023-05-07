@@ -172,7 +172,9 @@ public class SshjUtils {
     }
 
     public static String getSftpPath(Uri uri) {
-        return encodeUri(uri).getPath();
+        String filePath = encodeUri(uri).getPath();
+        if(filePath.equals("")) filePath = "/";
+        return filePath;
     }
 
     public static boolean isSSHjEnabled() {

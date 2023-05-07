@@ -15,8 +15,8 @@
 package com.archos.filecorelibrary.sshj;
 
 import static com.archos.filecorelibrary.FileUtils.caughtException;
-import static com.archos.filecorelibrary.FileUtils.encodeUri;
 import static com.archos.filecorelibrary.FileUtils.getShareName;
+import static com.archos.filecorelibrary.sshj.SshjUtils.getSftpPath;
 
 import android.content.Context;
 import android.net.Uri;
@@ -84,7 +84,7 @@ public class SshjListingEngine extends ListingEngine {
                 log.debug("SshjListingThread: listFiles for: " + mUri.toString());
 
                 var sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
-                String filePath = encodeUri(mUri).getPath();
+                String filePath = getSftpPath(mUri);
 
                 var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
                 List<RemoteResourceInfo> lst = sftpClient.ls(filePath);
