@@ -86,8 +86,8 @@ public class SmbjUtils {
                 .build();
          */
     }
-
-    public synchronized Connection getSmbConnection(Uri uri) throws IOException, SMBApiException {
+    
+    public synchronized void getSmbConnection(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
@@ -103,7 +103,7 @@ public class SmbjUtils {
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
             final String serverIP = JcifsUtils.getInstance(mContext).getBaseContextOnly(true).getNameServiceClient().getByName(server).getHostAddress();
-            log.trace("getSmbConnection: {} -> {} and jcifs {}", server, serverIP);
+            log.trace("getSmbConnection: {} -> {}", server, serverIP);
             if (port != -1) smbConnection = smbClient.connect(serverIP, port);
             else smbConnection = smbClient.connect(serverIP);
             smbjConnections.put(cred, smbConnection);
@@ -112,7 +112,6 @@ public class SmbjUtils {
             Session smbSession = smbConnection.authenticate(ac);
             smbjSessions.put(cred, smbSession);
         }
-        return smbConnection;
     }
 
     public synchronized DiskShare getSmbShare(Uri uri) throws IOException, SMBApiException {
@@ -124,7 +123,7 @@ public class SmbjUtils {
         // shareName can be null when asking for smbj://server/
         if (shareName == null) return null;
         DiskShare smbShare = smbjShares.get(cred);
-        if (smbShare == null || !smbShare.isConnected()) {
+        if (smbShare == null || !smbShare.isConnected() || !shareName.equals(getShareName(Uri.parse(cred.getUriString())))) {
             log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
             // ensures that there is a valid connection and regenerate session if not connected
             getSmbConnection(uri);
