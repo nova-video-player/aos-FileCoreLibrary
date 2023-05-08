@@ -178,7 +178,7 @@ public class SshjUtils {
     }
 
     public static boolean isSSHjEnabled() {
-        log.debug("isSSHjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false));
+        log.trace("isSSHjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false);
     }
 

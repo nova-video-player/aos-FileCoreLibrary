@@ -148,7 +148,7 @@ public class SmbjUtils {
     }
 
     public static boolean isSMBjEnabled() {
-        log.debug("isSMBjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
+        log.trace("isSMBjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false);
     }
 
