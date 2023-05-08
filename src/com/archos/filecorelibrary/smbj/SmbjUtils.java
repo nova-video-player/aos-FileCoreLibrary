@@ -86,7 +86,7 @@ public class SmbjUtils {
                 .build();
          */
     }
-    
+
     public synchronized void getSmbConnection(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
@@ -123,7 +123,7 @@ public class SmbjUtils {
         // shareName can be null when asking for smbj://server/
         if (shareName == null) return null;
         DiskShare smbShare = smbjShares.get(cred);
-        if (smbShare == null || !smbShare.isConnected() || !shareName.equals(getShareName(Uri.parse(cred.getUriString())))) {
+        if (smbShare == null || !shareName.equals(getShareName(Uri.parse(cred.getUriString()))) || !smbShare.isConnected()) {
             log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
             // ensures that there is a valid connection and regenerate session if not connected
             getSmbConnection(uri);
