@@ -334,12 +334,13 @@ public class FileUtils {
         // need to encode uri to escape problematic caracters like '#'
         Uri encodedUri = encodeUri(uri);
         List<String> pathSegments = encodedUri.getPathSegments();
-        if (pathSegments != null) {
+        if (pathSegments != null && !pathSegments.isEmpty()) {
             List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size());
             String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
             log.debug("getFilePath: uri=" + uri + " -> " + Arrays.toString(pathSegmentsWithoutFirst.toArray()) + " -> " + filePath);
             return filePath;
         }
+        if (pathSegments != null && pathSegments.isEmpty()) return "/";
         return null;
     }
 

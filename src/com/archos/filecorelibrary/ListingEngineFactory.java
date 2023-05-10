@@ -49,8 +49,10 @@ public class ListingEngineFactory {
         else if (uri.getScheme().equals("webdav")||uri.getScheme().equals("webdavs")) {
             return new WebdavListingEngine(context, uri);
         }
+        // use jcifs-ng if no smbshare is provided i.e. uri is "/"
         else if (uri.getScheme().equals("smbj")) {
-            return new SmbjListingEngine(context, uri);
+            if (uri.getPath().equals("/")) return new JcifListingEngine(context, uri);
+            else return new SmbjListingEngine(context, uri);
         }
         else if (uri.getScheme().equals("zip")) {
             return new ZipListingEngine(context, uri);
