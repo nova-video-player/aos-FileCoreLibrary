@@ -30,6 +30,8 @@ import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
+import com.hierynomus.security.bc.BCSecurityProvider;
+import com.hierynomus.security.jce.JceSecurityProvider;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -79,12 +81,10 @@ public class SmbjUtils {
     private SmbjUtils(Context context) {
         mContext = context;
         log.debug("SmbjUtils: initializing contexts");
-        /*
-        smbConfig = SmbConfig.builder()
-                .withTimeout(0, TimeUnit.SECONDS) // read/write transactions timeout
+        smbConfig = SmbConfig.builder().withSecurityProvider(new BCSecurityProvider())
+                .withTimeout(60, TimeUnit.SECONDS) // read/write transactions timeout
                 .withSoTimeout(60, TimeUnit.SECONDS) // socket timeout
                 .build();
-         */
     }
 
     public synchronized void getSmbConnection(Uri uri) throws IOException, SMBApiException {
