@@ -107,7 +107,7 @@ public class SmbjFileEditor extends FileEditor {
     public Boolean delete() throws Exception {
         DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
         String mFilePath = getFilePath(mUri);
-        if(mDiskShare.folderExists(mFilePath)) mDiskShare.rm(mFilePath);
+        if(mDiskShare.folderExists(mFilePath)) mDiskShare.rmdir(mFilePath, true);
         else mDiskShare.rm(mFilePath);
         return null;
     }
