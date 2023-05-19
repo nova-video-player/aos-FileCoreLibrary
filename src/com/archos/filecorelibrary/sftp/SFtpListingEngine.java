@@ -187,13 +187,33 @@ public class SFtpListingEngine extends ListingEngine {
                     }
                 }
 
-                // Put directories first, then files
+                // sorting entries
                 final Comparator<? super SFTPFile2> comparator = new FileComparator().selectFileComparator(mSortOrder);
-                Collections.sort(directories, comparator);
-                Collections.sort(files, comparator);
-                final ArrayList<SFTPFile2> allFiles = new ArrayList<SFTPFile2>(directories.size() + files.size());
-                allFiles.addAll(directories);
-                allFiles.addAll(files);
+                final ArrayList<SFTPFile2> allFiles = new ArrayList<>(directories.size() + files.size());
+
+                if (mSortOrder.ordinal() == 0 || mSortOrder.ordinal() == 1) { // sort by URI
+                    // by size: directories displayed first, then files
+                    Collections.sort(directories, comparator);
+                    Collections.sort(files, comparator);
+                    allFiles.addAll(directories);
+                    allFiles.addAll(files);
+                } else if (mSortOrder.ordinal() == 2 || mSortOrder.ordinal() == 3) { // sort by NAME
+                    // by name: both files and directories are sorted
+                    allFiles.addAll(directories);
+                    allFiles.addAll(files);
+                    Collections.sort(allFiles, comparator);
+                } else if (mSortOrder.ordinal() == 4 || mSortOrder.ordinal() == 5) { // sort by SIZE
+                    // by size: files displayed first, then directories
+                    Collections.sort(files, comparator);
+                    allFiles.addAll(files);
+                    Collections.sort(directories, comparator);
+                    allFiles.addAll(directories);
+                } else if (mSortOrder.ordinal() == 6 || mSortOrder.ordinal() == 7) { // sort by DATE
+                    // by date: both files and directories are sorted
+                    allFiles.addAll(directories);
+                    allFiles.addAll(files);
+                    Collections.sort(allFiles, comparator);
+                }
 
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {

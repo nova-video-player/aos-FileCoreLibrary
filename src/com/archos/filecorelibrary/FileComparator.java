@@ -18,7 +18,6 @@ import java.util.Comparator;
 
 import com.archos.filecorelibrary.ListingEngine.SortOrder;
 
-
 public class FileComparator {
 
     public Comparator<MetaFile2> selectFileComparator(SortOrder order) {

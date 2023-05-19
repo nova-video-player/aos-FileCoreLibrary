@@ -107,6 +107,7 @@ public class SmbjFileEditor extends FileEditor {
     public Boolean delete() throws Exception {
         DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
         String mFilePath = getFilePath(mUri);
+        // TODO MARC check if need to be recursive
         if(mDiskShare.folderExists(mFilePath)) mDiskShare.rmdir(mFilePath, true);
         else mDiskShare.rm(mFilePath);
         return null;
