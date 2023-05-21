@@ -25,6 +25,8 @@ import androidx.preference.PreferenceManager;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
+import net.schmizz.sshj.AndroidConfig;
+import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -35,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SshjUtils {
@@ -81,7 +82,7 @@ public class SshjUtils {
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient == null || !sshClient.isConnected()) {
                 log.trace("getSshClient: sshClient is null or not connected for " + uri + ", connecting to " + server);
-                sshClient = new SSHClient();
+                sshClient = new SSHClient(new AndroidConfig());
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
                 if (port != -1) sshClient.connect(server, port);
                 else sshClient.connect(server);
