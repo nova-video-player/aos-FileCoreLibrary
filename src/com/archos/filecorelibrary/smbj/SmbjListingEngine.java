@@ -85,10 +85,6 @@ public class SmbjListingEngine extends ListingEngine {
                 String filePath = getFilePath(mUri);
 
                 var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
-                if (filePath.equals("/")) {
-                    log.warn("SmbjListingThread: no smbShare... filePath is /");
-                    return;
-                }
                 List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
 
                 final ArrayList<SmbjFile2> directories = new ArrayList<>();
