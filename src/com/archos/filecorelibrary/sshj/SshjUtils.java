@@ -82,7 +82,8 @@ public class SshjUtils {
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient == null || !sshClient.isConnected()) {
                 log.trace("getSshClient: sshClient is null or not connected for " + uri + ", connecting to " + server);
-                sshClient = new SSHClient(new AndroidConfig());
+                DefaultConfig sshjConfig = new DefaultConfig();
+                sshClient = new SSHClient(sshjConfig);
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
                 if (port != -1) sshClient.connect(server, port);
                 else sshClient.connect(server);
