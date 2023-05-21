@@ -15,7 +15,6 @@
 package com.archos.filecorelibrary.smbj;
 
 import static com.archos.filecorelibrary.FileUtils.getShareName;
-import static com.archos.filecorelibrary.samba.SambaDiscovery.getIpFromShareName;
 
 import android.content.Context;
 import android.net.Uri;
@@ -31,7 +30,6 @@ import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.security.bc.BCSecurityProvider;
-import com.hierynomus.security.jce.JceSecurityProvider;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -43,11 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import jcifs.netbios.NbtAddress;
 
 public class SmbjUtils {
 
