@@ -77,8 +77,6 @@ public class SmbjUtils {
         mContext = context;
         log.debug("SmbjUtils: initializing contexts");
         smbConfig = SmbConfig.builder().withSecurityProvider(new BCSecurityProvider())
-                .withTimeout(60, TimeUnit.SECONDS) // read/write transactions timeout
-                .withSoTimeout(60, TimeUnit.SECONDS) // socket timeout
                 .build();
     }
 
