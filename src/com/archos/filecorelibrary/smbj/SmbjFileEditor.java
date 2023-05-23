@@ -131,7 +131,6 @@ public class SmbjFileEditor extends FileEditor {
         return false;
     }
 
-    // TODO make it works with server only smbj://server/ without share
     @Override
     public boolean exists() {
         try {
