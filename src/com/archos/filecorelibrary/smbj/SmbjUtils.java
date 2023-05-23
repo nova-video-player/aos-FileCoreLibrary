@@ -116,6 +116,8 @@ public class SmbjUtils {
         // shareName can be null when asking for smbj://server/
         if (shareName == null) return null;
         DiskShare smbShare = smbjShares.get(cred);
+        if (smbShare == null) log.trace("getSmbShare: smbShare is null");
+        else log.trace("getSmbShare: cred.getUriString={} -> shareName={} =? shareName={}", cred.getUriString(), getShareName(Uri.parse(cred.getUriString())), shareName);
         if (smbShare == null || !shareName.equals(getShareName(Uri.parse(cred.getUriString()))) || !smbShare.isConnected()) {
             log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
             // ensures that there is a valid connection and regenerate session if not connected
@@ -125,7 +127,7 @@ public class SmbjUtils {
                 smbShare = (DiskShare) smbSession.connectShare(shareName);
                 log.trace("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
                 smbjShares.put(cred, smbShare);
-            }
+            } else log.warn("getSmbShare: smbSession is null!");
         }
         log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, (smbShare != null)?smbShare.isConnected():"false");
         return smbShare;
