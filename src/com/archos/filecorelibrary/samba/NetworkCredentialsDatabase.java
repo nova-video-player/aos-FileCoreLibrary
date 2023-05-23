@@ -243,10 +243,10 @@ public class NetworkCredentialsDatabase {
         close();
         mCredentials.remove(uriString);
     }
+
     public Credential getCredential(String uriString){
         if(mCredentials.containsKey(uriString)) {
             return mCredentials.get(uriString);
-
         }
         if(uriString.endsWith("/")&&uriString.length()>1&&mCredentials.containsKey(uriString.substring(0, uriString.length()-1))){
             return mCredentials.get(uriString.substring(0, uriString.length()-1));
@@ -261,7 +261,7 @@ public class NetworkCredentialsDatabase {
                     ret = mCredentials.get(parent);
                 }
                 else{
-                    //we have to check if the caracter after the string "parent" is a / or nothing
+                    //we have to check if the character after the string "parent" is a / or nothing
                     // to avoid these cases :
                     // credential for /this/is/a/path
                     // uriString : /this/is/a/pathbutdifferent
@@ -271,9 +271,9 @@ public class NetworkCredentialsDatabase {
                 }
             }
         }
-
+        if (ret != null) log.debug("getCredential: found credential user {} for {} while searching for {}", ret.getUsername(), ret.getUriString(), uriString);
+        else log.trace("getCredential: no credential found");
         return ret;
-
     }
 
     private static String encrypt(String password){
