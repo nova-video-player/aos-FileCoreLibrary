@@ -48,6 +48,7 @@ public class SmbjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream() throws Exception {
+        log.trace("getInputStream: opening " + mUri);
         File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
@@ -56,12 +57,16 @@ public class SmbjFileEditor extends FileEditor {
                 EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
         InputStream is = smbjFile.getInputStream();
         ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {if (smbjFile != null) smbjFile.closeSilently();});
+        ois.onClose(() -> {if (smbjFile != null) {
+            log.trace("getInputStream: closing " + mUri);
+            smbjFile.closeSilently();
+        }});
         return ois;
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
+        log.trace("getInputStream: opening " + mUri);
         File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
@@ -71,12 +76,16 @@ public class SmbjFileEditor extends FileEditor {
         InputStream is = smbjFile.getInputStream();
         is.skip(from);
         ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {if (smbjFile != null) smbjFile.closeSilently();});
+        ois.onClose(() -> {if (smbjFile != null) {
+            log.trace("getInputStream: closing " + mUri);
+            smbjFile.closeSilently();
+        }});
         return ois;
     }
 
     @Override
     public OutputStream getOutputStream() throws Exception {
+        log.trace("getOutputStream: opening " + mUri);
         File smbjFile =  SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.GENERIC_WRITE, AccessMask.GENERIC_READ),
                 null, SMB2ShareAccess.ALL,
@@ -84,7 +93,10 @@ public class SmbjFileEditor extends FileEditor {
                 null);
         OutputStream os = smbjFile.getOutputStream();
         ObservableOutputStream oos = new ObservableOutputStream(os);
-        oos.onClose(() -> {if (smbjFile != null) smbjFile.closeSilently();});
+        oos.onClose(() -> {if (smbjFile != null) {
+            log.trace("getOutputStream: closing " + mUri);
+            smbjFile.closeSilently();
+        }});
         return oos;
     }
 
