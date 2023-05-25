@@ -28,6 +28,7 @@ import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2CreateOptions;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 
@@ -99,6 +100,8 @@ public class SmbjFileEditor extends FileEditor {
             return true;
         } catch (IOException e) {
             caughtException(e, "SmbjFileEditor:mkdir", "IOException in mkdir " + mUri);
+        }  catch (SMBApiException se) {
+            caughtException(se, "SMBApiException:mkdir", "IOException in mkdir " + mUri);
         }
         return false;
     }
@@ -127,6 +130,8 @@ public class SmbjFileEditor extends FileEditor {
             }
         } catch (IOException e) {
             caughtException(e, "SmbjFileEditor:rename", "IOException in rename " + mUri + " into " + newName);
+        } catch (SMBApiException se) {
+            caughtException(se, "SmbjFileEditor:rename", "SMBApiException in rename " + mUri + " into " + newName);
         }
         return false;
     }
@@ -142,6 +147,8 @@ public class SmbjFileEditor extends FileEditor {
             }
         } catch (IOException ioe) {
             caughtException(ioe, "SmbjFileEditor:exists", "IOException in exists " + mUri);
+        } catch (SMBApiException se) {
+            caughtException(se, "SmbjFileEditor:exists", "SMBApiException in exists " + mUri);
         }
         return false;
     }
