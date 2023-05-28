@@ -110,12 +110,12 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
     // update to 3.9.0 breaks ftp on firestick4k (not max)
     implementation 'commons-net:commons-net:3.8.0'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'com.github.tony19:logback-android:2.0.0'
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'com.github.tony19:logback-android:3.0.0'
     // TODO use https://github.com/mwiede/jsch instead of https://sourceforge.net/projects/jsch/files/jsch/
     // see http://www.matez.de/index.php/2020/06/22/the-future-of-jsch-without-ssh-rsa/
     // implementation 'com.github.mwiede:jsch:0.1.70'
-    implementation 'io.sentry:sentry:6.16.0'
+    implementation 'io.sentry:sentry:6.20.0'
     // use our own sardine-android fork instead of thegrizzlylabs to integrate some fixes
     //implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
     implementation 'com.github.nova-video-player:sardine-android:0.0.2'
