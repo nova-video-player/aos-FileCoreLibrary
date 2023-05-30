@@ -18,6 +18,7 @@ allprojects {
 }
 
 android {
+    namespace 'com.archos.filecorelibrary'
     compileSdkVersion 33
     sourceSets {
         main {
@@ -54,8 +55,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        renderScript true
+        aidl true
     }
 }
 
@@ -99,9 +105,9 @@ dependencies {
         exclude group: "org.bouncycastle", module: "bcprov-jdk15on"
     }
      */
-    //api files('libs/jcifs-ng.jar')
     api 'eu.agno3.jcifs:jcifs-ng:2.1.9'
     // jcifs-ng depends on bouncycastle (automated when using maven repo)
+    //api files('libs/jcifs-ng.jar')
     //api 'org.bouncycastle:bcprov-jdk15to18:1.72'
     implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'com.hierynomus:sshj:0.35.0'
@@ -112,9 +118,8 @@ dependencies {
     implementation 'commons-net:commons-net:3.8.0'
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation 'com.github.tony19:logback-android:3.0.0'
-    // TODO use https://github.com/mwiede/jsch instead of https://sourceforge.net/projects/jsch/files/jsch/
-    // see http://www.matez.de/index.php/2020/06/22/the-future-of-jsch-without-ssh-rsa/
-    // implementation 'com.github.mwiede:jsch:0.1.70'
+    // replace embedded old jsch: see first attempt and why it is currently impossible https://github.com/nova-video-player/aos-AVP/issues/530
+    //api 'com.github.mwiede:jsch:0.2.9'
     implementation 'io.sentry:sentry:6.20.0'
     // use our own sardine-android fork instead of thegrizzlylabs to integrate some fixes
     //implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
