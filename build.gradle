@@ -111,7 +111,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation 'com.github.tony19:logback-android:3.0.0'
     // replace embedded old jsch: see first attempt and why it is currently impossible https://github.com/nova-video-player/aos-AVP/issues/530
-    //api 'com.github.mwiede:jsch:0.2.9'
+    api 'com.github.mwiede:jsch:0.2.9'
     implementation 'io.sentry:sentry:6.20.0'
     implementation 'com.github.nova-video-player:sardine-android:0.0.2'
 }
