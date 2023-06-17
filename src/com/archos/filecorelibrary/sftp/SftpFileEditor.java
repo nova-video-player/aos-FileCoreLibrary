@@ -54,6 +54,7 @@ public class SftpFileEditor  extends FileEditor{
             ChannelSftp channelSftp = (ChannelSftp)channel;
             channelSftp.mkdir(mUri.getPath());
             channel.disconnect();
+            SFTPSession.getInstance().releaseSession(channel);
             return true;
         }
         catch (SftpException e) {
@@ -61,8 +62,10 @@ public class SftpFileEditor  extends FileEditor{
         } catch (JSchException e) {
             e.printStackTrace();
         } finally {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
         }
         return false;
     }
@@ -73,6 +76,7 @@ public class SftpFileEditor  extends FileEditor{
             public void close() throws IOException {
                 is.close();
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
             }
 
             @Override
@@ -140,6 +144,7 @@ public class SftpFileEditor  extends FileEditor{
             public void close() throws IOException {
                 sftpOS.close();
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
             }
 
             @Override
@@ -171,8 +176,10 @@ public class SftpFileEditor  extends FileEditor{
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
             ((ChannelSftp)channel).rm(mUri.getPath());
         } catch (JSchException e) {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
             if(e.getCause() instanceof java.net.UnknownHostException)
                 throw new UnknownHostException();
             else
@@ -180,8 +187,10 @@ public class SftpFileEditor  extends FileEditor{
         } catch (SftpException e) {
             throw new Exception("permission");
         } finally {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
         }
         return null;
     }
@@ -193,12 +202,15 @@ public class SftpFileEditor  extends FileEditor{
              channel = SFTPSession.getInstance().getSFTPChannel(mUri);
             ((ChannelSftp)channel).rename(mUri.getPath(), new File(new File(mUri.getPath()).getParentFile(), newName).getAbsolutePath());
             channel.disconnect();
+            SFTPSession.getInstance().releaseSession(channel);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
         }
         return false;
     }
@@ -212,12 +224,15 @@ public class SftpFileEditor  extends FileEditor{
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
             ((ChannelSftp)channel).rename(mUri.getPath(),uri.getPath());
             channel.disconnect();
+            SFTPSession.getInstance().releaseSession(channel);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
         }
         return false;
     }
@@ -230,6 +245,7 @@ public class SftpFileEditor  extends FileEditor{
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
             SftpATTRS attrs =  ((ChannelSftp)channel).stat(mUri.getPath());
             channel.disconnect();
+            SFTPSession.getInstance().releaseSession(channel);
             return attrs !=null;
         } catch (Exception e) {
             if(channel!=null&&channel.isConnected())
@@ -238,8 +254,10 @@ public class SftpFileEditor  extends FileEditor{
             //generating an exception is the way to check if the file/dir exists thus silence the stacktrace
             //e.printStackTrace();
         }finally {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
         }
         return false;
     }

@@ -81,10 +81,13 @@ public class SFTPRawLister extends RawLister {
                 }
             }
             channel.disconnect();
+            SFTPSession.getInstance().releaseSession(channel);
             return files;
         }catch (Exception e){
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
             throw e;
         }
 

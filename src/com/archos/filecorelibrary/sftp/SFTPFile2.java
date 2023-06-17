@@ -147,17 +147,22 @@ public class SFTPFile2 extends MetaFile2 {
             channel = SFTPSession.getInstance().getSFTPChannel(uri);
             SftpATTRS attrs = ((ChannelSftp)channel).stat(uri.getPath());
             channel.disconnect();
+            SFTPSession.getInstance().releaseSession(channel);
             return new SFTPFile2(attrs,uri.getLastPathSegment(), uri);
         } catch (JSchException e) {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
             if(e.getCause() instanceof java.net.UnknownHostException)
                 throw new UnknownHostException();
             else
                 throw new AuthenticationException();
         } catch (SftpException e) {
-            if(channel!=null&&channel.isConnected())
+            if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
+            }
             throw new Exception("permission");
         }
     }

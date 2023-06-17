@@ -99,13 +99,16 @@ public class SFtpListingEngine extends ListingEngine {
         };
 
         channelSftp.ls(path, selector);
+        channelSftp.disconnect();
+        SFTPSession.getInstance().releaseSession(channelSftp);
         return vector;
     }
 
     private final class SFtpListingThread extends Thread {
-        public void run(){     
+        public void run(){
+            Channel channel = null;
             try {
-                Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
+                channel = SFTPSession.getInstance().getSFTPChannel(mUri);
                 if(channel==null&&!mAbort ){
                     mUiHandler.post(new Runnable() {
                         public void run() {
@@ -242,7 +245,13 @@ public class SFtpListingEngine extends ListingEngine {
                         }
                     }
                 });
+                channel.disconnect();
+                SFTPSession.getInstance().releaseSession(channel);
             } catch (final SftpException e) {
+                if(channel!=null&&channel.isConnected()) {
+                    channel.disconnect();
+                    SFTPSession.getInstance().releaseSession(channel);
+                }
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (mListener != null) {
@@ -252,6 +261,10 @@ public class SFtpListingEngine extends ListingEngine {
                 });
             }  
             catch (final JSchException e1) {
+                if(channel!=null&&channel.isConnected()) {
+                    channel.disconnect();
+                    SFTPSession.getInstance().releaseSession(channel);
+                }
                 if(e1.getCause() instanceof java.net.UnknownHostException)
                     mUiHandler.post(new Runnable() {
                         public void run() {
