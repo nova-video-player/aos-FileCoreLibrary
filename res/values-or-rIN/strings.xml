@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_last_modified">ଗତ ସଂଶୋଧନ:</string>
+    <string name="usbhost_ptp_storage">ବହିଃ କ୍ୟାମେରା</string>
+    <string name="network_media_servers">ମିଡ଼ିଆ ସର୍ଵର୍ (UPnP)</string>
+    <!-- Archos file manager core -->
+    <!-- Samba share settings -->
+    <string name="samba_username">ଉପଭୋକ୍ତା ନାମ</string>
+    <string name="samba_password">ପାସ୍‌ୱର୍ଡ଼</string>
+    <string name="samba_show_password">ପାସ୍‌ୱର୍ଡ଼ ଦେଖାଅ</string>
+    <string name="shared_folder_credentials">ପାସ୍‌ୱର୍ଡ଼</string>
+    <!-- WiFi Direct strings-->
+    <!-- FileManager strings -->
+    <string name="ssh_password">ପାସ୍‌ୱର୍ଡ଼</string>
+    <string name="ssh_username">ଉପଭୋକ୍ତା ନାମ</string>
+    <string name="browse_ftp_server">ସର୍ଵର୍</string>
+    <string name="rename">ନାମ ବଦଳାନ୍ତୁ</string>
+    <string name="details">ଵିଵରଣୀ</string>
+    <string name="new_directory">ନୂଆ ଫୋଲ୍ଡର୍</string>
+    <string name="new_file">ନୂଆ ଫାଇଲ୍</string>
+    <string name="new_folder_or_file">ନୂଆ ଫୋଲ୍ଡର୍ ବା ଫାଇଲ୍</string>
+    <string name="storage_swapped_primary">ପ୍ରାଥମିକ</string>
+    <string name="storage_swapped_secondary">ପରୋକ୍ଷ</string>
+    <string name="yes">"ହଁ"</string>
+    <string name="no">"ନାହିଁ"</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <!-- Shortcuts -->
+    <string name="media_servers">ମିଡ଼ିଆ ସର୍ଵର୍</string>
+    <!-- DLNA -->
+    <string name="video">ଵିଡ଼ିଓ</string>
+    <string name="audio">ଅଡ଼ିଓ</string>
+    <string name="picture">ଛଵି</string>
+    <!-- ZIP -->
+    <!-- Notifications -->
+    <!-- Network Scanning -->
+    <!-- Hiding from media scanning -->
+    <!-- Folder Picker -->
+    <string name="external_storage_fake_name">ଡିଵାଇସ୍ ଷ୍ଟୋରେଜ୍</string>
+    <string name="listing_ascending">ଆରୋହଣ</string>
+    <string name="listing_descending">ଅବରୋହଣ</string>
+</resources>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">Atı:</string>
+    <string name="file_info_label_size">Kólemi:</string>
+    <string name="file_info_label_size_internal">Kólemi (ishki):</string>
+    <string name="file_info_label_size_sd">Kólemi (SD):</string>
+    <string name="file_info_label_permission">Ruxsat:</string>
+    <string name="file_info_label_can_read">oqıw</string>
+    <string name="file_info_label_cannot_read">oqıw múmkin emes</string>
+    <string name="file_info_label_can_write">jazıw</string>
+    <string name="file_info_label_cannot_write">jazıw múmkin emes</string>
+    <string name="file_info_label_last_modified">aqırģı ózgertiw</string>
+    <string name="file_info_label_mime_type">mimika túri</string>
+    <string name="file_info_directory_empty">Papka bos</string>
+    <string name="file_info_one_directory">1 papka</string>
+    <string name="file_info_directories">papkalar</string>
+    <string name="file_info_one_file">1 fayl</string>
+    <string name="file_info_files">fayllar</string>
+    <string name="network_shared_folders">ulıwma papkalar</string>
+    <!-- Archos file manager core -->
+    <string name="file_copy_pattern">kóshirip alıw</string>
+    <!-- Samba share settings -->
+    <string name="samba_add_server">Server qosıw</string>
+    <string name="samba_server">Serverdi anıqlaw</string>
+    <string name="refresh">Jańalaw</string>
+    <string name="network_timeout">keshirersiz, joq etilgen papkaģa kiriw imkani joq. jalģanģan  tarmaģıńızdı tekseriń hám jáne urınıp kóriń</string>
+    <string name="samba_loading">&#8230; ulıwma papkası júklenip atır, iltimas kútiń</string>
+    <string name="samba_reloading">&#8230; ulıwma papkası qayta júklenip atır, iltimas kútiń</string>
+    <string name="samba_username">Paydalanıwshı atı</string>
+    <string name="samba_password">Parol</string>
+    <string name="samba_show_password">Paroldı kórsetiw</string>
+    <string name="samba_wrong_password">paydalanıwshı atı yamasa jasırın sóz ( parol ) nadurıs</string>
+    <string name="preferences">Sazlawlar</string>
+    <string name="shared_folder_credentials">Parollar</string>
+    <string name="no_saved_passwords">jasırın sózler saqlanbaģan</string>
+    <!-- WiFi Direct strings-->
+    <string name="file_downloading">Faylıńız júklep alınbaqta</string>
+    <string name="server_ready">qabıllawģa tayın</string>
+    <string name="no_network_title">tarmaq baylanısı joq</string>
+    <!-- FileManager strings -->
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">Tarmaq</string>
+    <string name="external_storage">Sırtqı</string>
+    <string name="internal_storage">Ishki</string>
+    <string name="sd_card_storage">SD karta</string>
+    <string name="usb_host_storage">USB</string>
+    <string name="usb_ptp_storage">PTP</string>
+    <string name="cloud_storage">mashqala</string>
+    <string name="directory_empty">Papka bos</string>
+    <string name="no_server">Server tabılmadı</string>
+    <string name="loading">Júklenbekte&#8230;</string>
+    <string name="ssh_remote_address">joq etilgen adres</string>
+    <string name="ssh_remote_address_error">joq etilgen adresti kórsetiwińiz kerek</string>
+    <string name="ssh_password">jasırın sóz</string>
+    <string name="ssh_username">paylanıwshı atı</string>
+    <string name="ssh_prompt">FTP túri</string>
+    <string name="download_prompt">papkaģa fayl júklew</string>
+    <string name="browse_ftp_server">Server</string>
+    <string name="error_file_not_found">Fayl tabılmadı</string>
+    <string name="error_time_out">waqıt tawsıldı</string>
+    <string name="deleting">Óshirilmekte</string>
+    <string name="open_file">Fayldı ashıw</string>
+    <string name="delete">Óshiriw</string>
+    <string name="rename">Qayta ataw</string>
+    <string name="details">Qosımsha</string>
+    <string name="refresh_directory">Papkanı jańalaw</string>
+    <string-array name="folder_or_file">
+        <item>Papka jaratıw</item>
+        <item>Bos fayl jaratıw</item>
+    </string-array>
+    <string name="new_directory">Jańa papka</string>
+    <string name="new_file">Jańa fayl</string>
+    <string name="new_folder_or_file">Jańa papka yamasa fayl</string>
+    <string name="refresh_servers_list">Serverler dizimin jańalaw</string>
+    <string name="go_top">joqarıģa qaytıw</string>
+    <string name="uncheck_impossible">tiykarģı papka tańlanģan waqıtta tańlawdı ózgertiw múmkin emes</string>
+    <string name="confirm_delete_one">haqıyqattan da onı óshiriwdi qáleysizbe?</string>
+    <string name="confirm_delete_many">haqıyqattan da olardı óshiriwdi qáleysizbe?</string>
+    <string name="file_name">Fayl ataması</string>
+    <string name="folder_name">Papka ataması</string>
+    <string name="confirm_deleting_cancellation">haqıyqattan da óshiriwdi biykarlawdı qáleysizbe</string>
+    <string name="cannot_create_directory">jańa papka jarata almaysız</string>
+    <string name="cannot_create_file">jańa fayl jarata almaysız</string>
+    <string name="cannot_delete_directory">papkanı óshire almaysız</string>
+    <string name="cannot_delete_file">fayldı óshire almaysız</string>
+    <string name="cannot_delete_files">fayllardı óshire almaysız</string>
+    <string name="directory_deleted">papka óshirildi</string>
+    <string name="file_deleted">fayl óshirilgen</string>
+    <string name="files_deleted">fayllar óshirilgen</string>
+    <string name="cannot_rename">qayta at bere almaysız</string>
+    <string name="copy_directory_success_one">Papka kóshirip alındı</string>
+    <string name="copy_directory_success_many">Papkalar kóshirip alındı</string>
+    <string name="copy_file_success_one">Fayl kóshirip alındı</string>
+    <string name="copy_file_success_many">Fayllar kóshirip alındı</string>
+    <string name="copy_directory_failed_one">papka nusqalanbaģan</string>
+    <string name="copy_directory_failed_many">papkalar nusqalanbaģan</string>
+    <string name="copy_file_failed_one">fayl nusqalanbaģan</string>
+    <string name="copy_file_failed_many">fayllar nusqalanbaģan</string>
+    <string name="storage_swapped_primary">tiykarģı</string>
+    <string name="yes">"Awa"</string>
+    <string name="no">"Yaq"</string>
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <!-- Shortcuts -->
+    <!-- DLNA -->
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="picture">Súwret</string>
+    <!-- ZIP -->
+    <!-- Notifications -->
+    <string name="copy_error">Kóshirip alıw ámelge aspadı</string>
+    <string name="delete_error">Óshiriw ámelge aspadı</string>
+    <!-- Network Scanning -->
+    <!-- Hiding from media scanning -->
+    <!-- Folder Picker -->
+    <string name="choose_a_folder">Papkanı tańlań</string>
+    <string name="usb_host_fake_name">USB</string>
+    <string name="no_directory">(papka joq)</string>
+</resources>
