@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jcifs.netbios.UdpDiscovery;
 
@@ -373,10 +374,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
      */
     public void abort() {
         mIsAborted = true;
-        // use iterator to avoid ConcurrentModificationException
-        Iterator<InternalDiscovery> iterator = mInternalDiscoveries.iterator();
+        // use iterator and copy to avoid ConcurrentModificationException
+        List<InternalDiscovery> copyInternalDiscovery = new CopyOnWriteArrayList(mInternalDiscoveries);
+        Iterator<InternalDiscovery> iterator = copyInternalDiscovery.iterator();
         while (iterator.hasNext()) {
-            InternalDiscovery discovery = iterator.next();
+            InternalDiscovery discovery = iterator.next(); // java.util.ConcurrentModificationException
             discovery.abort();
         }
         mInternalDiscoveries.clear();
