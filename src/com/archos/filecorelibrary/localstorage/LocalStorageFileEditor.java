@@ -373,7 +373,10 @@ public class LocalStorageFileEditor extends FileEditor {
     @Override
     public boolean exists() {
         String path = mUri.getPath();
-        return path != null && new File(path).exists();
+        if (path == null) return false;
+        File f = new File(path);
+        if (f.exists()) return true;
+        else return false;
     }
 
 }
