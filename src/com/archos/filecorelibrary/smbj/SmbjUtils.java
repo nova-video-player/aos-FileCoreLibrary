@@ -114,7 +114,10 @@ public class SmbjUtils {
         String shareName = getShareName(uri);
         getSmbConnection(uri); // be sure to be connected
         // shareName can be null when asking for smbj://server/
-        if (shareName == null) return null;
+        if (shareName == null) {
+            log.warn("getSmbShare: returning null shareName for uri " + uri);
+            return null;
+        }
         DiskShare smbShare = smbjShares.get(cred);
         if (smbShare == null) log.trace("getSmbShare: smbShare is null");
         else log.trace("getSmbShare: cred.getUriString={} -> shareName={} =? shareName={}", cred.getUriString(), getShareName(Uri.parse(cred.getUriString())), shareName);

@@ -44,7 +44,7 @@ public class SmbjFileEditor extends FileEditor {
 
     private static final Logger log = LoggerFactory.getLogger(SmbjFileEditor.class);
 
-    public SmbjFileEditor(Uri uri) { super(uri);}
+    public SmbjFileEditor(Uri uri) { super(uri); }
 
     @Override
     public InputStream getInputStream() throws Exception {
