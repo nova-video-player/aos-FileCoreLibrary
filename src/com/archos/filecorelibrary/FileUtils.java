@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.provider.Settings;
 
 import androidx.core.content.ContextCompat;
 
@@ -469,18 +470,19 @@ public class FileUtils {
     }
 
     // canManageExternalStorage does say if it can have full storage access but not if read/write permission is granted!
+    // do not rely only on hasManageExternalStoragePermission since on ADTV12 you can have MANAGE_EXTERNAL_STORAGE in manifest but no way to grant it via ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
     public static boolean canManageExternalStorage() {
         boolean result;
         if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
             log.debug("canManageExternalStorage: API<23 -> true");
             return true;
         } else {
-            if(Build.VERSION.SDK_INT>29) {
+            if(Build.VERSION.SDK_INT>=30) {
                 result = Environment.isExternalStorageManager();
-                log.debug("canManageExternalStorage: API>29 -> " + result);
+                log.debug("canManageExternalStorage: API>=30 -> " + result);
                 return result;
             } else {
-                log.debug("canManageExternalStorage: 22<API<30 -> true");
+                log.debug("canManageExternalStorage: 23<=API<=29 -> true");
                 return true;
             }
         }
@@ -488,11 +490,13 @@ public class FileUtils {
 
     public static boolean canReadExternalStorage(Context context) {
         boolean result = false;
+        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + context.getPackageName()));
+        boolean externalStoragePermissionGrantable = intent.resolveActivity(context.getPackageManager()) != null;
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
             log.debug("canReadExternalStorage: API<23 -> true");
             return true;
         } else {
-            if (Build.VERSION.SDK_INT>29 && hasManageExternalStoragePermission(context)) {
+            if (Build.VERSION.SDK_INT>29 && hasManageExternalStoragePermission(context) && externalStoragePermissionGrantable) {
                 result = Environment.isExternalStorageManager();
                 log.debug("canReadExternalStorage: API>29 -> " + result);
                 return result;
