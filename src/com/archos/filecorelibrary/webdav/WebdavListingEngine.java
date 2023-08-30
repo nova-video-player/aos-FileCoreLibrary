@@ -78,7 +78,7 @@ public class WebdavListingEngine extends ListingEngine {
                 var httpUri = WebdavFile2.uriToHttp(mUri);
 
                 var acceptedDavResources = new ArrayList<DavResource>();
-                var davResources = sardine.list(httpUri.toString());
+                var davResources = sardine.list(httpUri.toString()); // can generate IllegalArgumentException Invalid URL port: ":7802"
 
                 final ArrayList<WebdavFile2> directories = new ArrayList<>();
                 final ArrayList<WebdavFile2> files = new ArrayList<>();
@@ -191,13 +191,13 @@ public class WebdavListingEngine extends ListingEngine {
                     }
                 });
             } */
-            catch (final IOException e) {
+            catch (final IOException | IllegalArgumentException e) {
                 ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
                 if (e.getCause() instanceof UnknownHostException) {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
-                if (log.isTraceEnabled()) log.error("WebdavListingThread: IOException (" + getErrorStringResId(error) + ") for " + mUri.toString(), e);
+                if (log.isTraceEnabled()) log.error("WebdavListingThread: IOException or IllegalArgumentException (" + getErrorStringResId(error) + ") for " + mUri.toString(), e);
                 else log.error("WebdavListingThread: IOException (" + getErrorStringResId(error) + ") for " + mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
