@@ -152,6 +152,10 @@ public class SmbjFileEditor extends FileEditor {
     public boolean exists() {
         try {
             DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+            if (mDiskShare == null) {
+                log.error("exists: mDiskShare is null for " + mUri + " returning false");
+                return false;
+            }
             String mFilePath = getFilePath(mUri);
             if (mDiskShare.fileExists(mFilePath)) return true;
             else {
