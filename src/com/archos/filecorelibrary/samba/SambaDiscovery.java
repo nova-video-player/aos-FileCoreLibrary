@@ -457,7 +457,6 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     private static native int findDoubleNatIp();
     private static native int findLocalIp();
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private String getIp(LinkProperties lp) {
         List<LinkAddress> las = lp.getLinkAddresses();
         for(LinkAddress la: las) {
@@ -470,9 +469,8 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         return null;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private LinkProperties getLP(ConnectivityManager connMgr, int cap) {
-        Network nets[] = connMgr.getAllNetworks();
+        Network[] nets = connMgr.getAllNetworks();
         for (Network n: nets) {
             LinkProperties lp = connMgr.getLinkProperties(n);
             NetworkCapabilities np = connMgr.getNetworkCapabilities(n);
