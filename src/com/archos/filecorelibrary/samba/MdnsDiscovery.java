@@ -20,6 +20,7 @@ public class MdnsDiscovery implements InternalDiscovery {
     private MdnsListener mMdnsListener;
     private boolean mAlive = false;
     private InternalDiscoveryListener mSmbListener;
+    private boolean mMdnsListenerRegistered = false;
 
     private class MdnsResolveListener implements  NsdManager.ResolveListener {
         private int mFailCount;
@@ -103,6 +104,7 @@ public class MdnsDiscovery implements InternalDiscovery {
     public void start() {
         log.debug("start: starting discovering...");
         mNsdManager.discoverServices("_smb._tcp", NsdManager.PROTOCOL_DNS_SD, mMdnsListener);
+        mMdnsListenerRegistered = true;
     }
 
     @Override
@@ -112,7 +114,8 @@ public class MdnsDiscovery implements InternalDiscovery {
 
     @Override
     public void abort() {
-        mNsdManager.stopServiceDiscovery(mMdnsListener);
+        if (mMdnsListenerRegistered) mNsdManager.stopServiceDiscovery(mMdnsListener);
+        mMdnsListenerRegistered = false;
     }
 
     @Override
