@@ -86,7 +86,7 @@
 
     <string name="ssh_error">Unable to connect : please, check your connection and credentials</string>
     <string name="ssh_remote_address">Remote address</string>
-    <string name="ssh_remote_address_error">You must specify a remote address</string>
+    <string name="ssh_remote_address_error">You must specify a valid remote address</string>
     <string name="ssh_password">Password</string>
     <string name="ssh_username">Username</string>
     <string name="ssh_port">Port (optional)</string>
