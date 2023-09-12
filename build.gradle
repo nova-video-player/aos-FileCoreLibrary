@@ -108,7 +108,7 @@ dependencies {
     implementation ('com.hierynomus:smbj:0.12.2') {
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
     }
-    implementation 'com.hierynomus:sshj:0.35.0'
+    implementation 'com.hierynomus:sshj:0.36.0'
     implementation 'oro:oro:2.0.8'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference:1.2.1'
