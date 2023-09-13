@@ -19,7 +19,7 @@ allprojects {
 
 android {
     namespace 'com.archos.filecorelibrary'
-    compileSdkVersion 34
+    compileSdkVersion 33
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 33
         multiDexEnabled true
     }
 
