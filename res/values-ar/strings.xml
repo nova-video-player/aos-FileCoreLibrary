@@ -35,8 +35,29 @@
     <string name="samba_loading"> الرجاء الانتظار حتى يتم تحميل الحافظات…</string>
     <string name="samba_reloading"> برجاء الانتظار حتى يتم اعادة تحميل الحافظات…</string>
     <string name="samba_password_request_title">طلب كلمة مرور المجلد المشترك</string>
+    <string name="samba_domain">النطاق</string>
+    <string name="samba_username">اسم المستخدم</string>
+    <string name="samba_password">كلمة المرور</string>
+    <string name="samba_show_password">عرض كلمة المرور</string>
     <string name="samba_wrong_password">اسم المستخدم أو كلمة المرور غير صحيحة.</string>
+    <string name="preferences">التفضيلات</string>
+    <string name="shared_folder_credentials">كلمات المرور</string>
+    <string name="no_saved_passwords">لا توجد كلمات مرور محفوظة</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">WiFi مباشر</string>
+    <string name="receive_p2p_here">استقبال بواسطة WiFi مباشر</string>
+    <string name="empty_message">جاري البحث عن الأجهزة المتاحة&#8230;&lt;br/&gt;يجب على الجهاز المستهدف تفعيل خِيار &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
+    <string name="wifip2p_waiting">سيبدأ النقل بواسطة WiFi مباشر قريبًا</string>
+    <string name="connect_to_target">جاري الاتصال بالهدف</string>
+    <string name="upload_in_progress">جاري الرفع&#8230;</string>
+    <string name="file_uploading">جاري رفع المِلَفّ الخاص بك</string>
+    <string name="back_cancel">اضغط على زر الرجوع للإلغاء</string>
+    <string name="server_wait">في انتظار قيام العميل بالاتصال وإرسال الملف</string>
+    <string name="download_in_progress">جاري التحميل&#8230;</string>
+    <string name="file_downloading">جاري تحميل الملف الخاص بك</string>
+    <string name="server_ready">جاهز للاستلام</string>
+    <string name="nonetwork_title" comment="deprecated">لا يوجد اتصال بالواي فاي</string>
+    <string name="no_network_title">لا يوجد اتصال بالشبكة</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">لا يمكنك استخدام التخزين الداخلى عندما تكون متصلة من خلال USB</string>
     <string name="network_storage">شبكة</string>

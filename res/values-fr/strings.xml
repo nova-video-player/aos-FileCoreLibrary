@@ -76,7 +76,7 @@
     <string name="loading">Chargement&#8230;</string>
     <string name="ssh_error">Non autorisé à se connecter : vérifier votre connection et vos droits d\'accès</string>
     <string name="ssh_remote_address">Adresse distante</string>
-    <string name="ssh_remote_address_error">Vous devez spécifier une adresse distante</string>
+    <string name="ssh_remote_address_error">Vous devez spécifier une adresse distante valide</string>
     <string name="ssh_password">Mot de passe</string>
     <string name="ssh_username">Nom d\'utilisateur</string>
     <string name="ssh_port">Port (optionnel)</string>
