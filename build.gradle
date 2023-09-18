@@ -103,7 +103,7 @@ dependencies {
     api 'eu.agno3.jcifs:jcifs-ng:2.1.9'
     api 'com.github.mwiede:jsch:0.2.11'
     // update to 3.9.0 breaks ftp on firestick4k (not max)
-    implementation 'commons-net:commons-net:3.8.0'
+    implementation 'commons-net:commons-net:3.9.0'
     implementation 'com.github.nova-video-player:sardine-android:0.0.2'
     implementation ('com.hierynomus:smbj:0.12.2') {
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
