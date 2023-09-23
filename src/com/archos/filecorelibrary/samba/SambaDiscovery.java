@@ -35,6 +35,7 @@ import jcifs.netbios.UdpDiscovery;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
@@ -102,7 +103,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     private boolean mUpdateDelayed = false;
 
     /**
-     * We have several (2 as of today...) discovery engine internally
+     * We have several (3 as of today...) discovery engine internally
      */
     private List<InternalDiscovery> mInternalDiscoveries = new ArrayList<InternalDiscovery>(3);
 
@@ -339,12 +340,17 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         mLastListenerUpdate = SystemClock.elapsedRealtime();
         mThereIsAnUpdate = false;
 
+        // TODO MARC which is the one for chromecast NAT transversal?
         // Init the TCP and UDP discoveries
-        mInternalDiscoveries.add(new UdpDiscovery(this, ipAddress, mSocketReadDurationMs));
-        if (ENABLE_MDNS_DISCOVERY) mInternalDiscoveries.add(new MdnsDiscovery(this, mContext, mSocketReadDurationMs));
+        if (! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_disable_udp_discovery", false))
+            mInternalDiscoveries.add(new UdpDiscovery(this, ipAddress, mSocketReadDurationMs));
+        // TODO MARC
+        if (ENABLE_MDNS_DISCOVERY &&
+                ! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_disable_mdns_discovery", false))
+            mInternalDiscoveries.add(new MdnsDiscovery(this, mContext, mSocketReadDurationMs));
         //tcp is quicker than udp sometimes, but we only use it as fallback, so we delay it 1 sec
-        mInternalDiscoveries.add(new TcpDiscovery(this, ipAddress, mSocketReadDurationMs, 1000));
-
+        if (! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_disable_tcp_discovery", false))
+            mInternalDiscoveries.add(new TcpDiscovery(this, ipAddress, mSocketReadDurationMs, 1000));
         // Start all the discoveries
         log.debug("Start discovery");
         for (InternalDiscovery discovery : mInternalDiscoveries) {
@@ -617,6 +623,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
     static {
         System.loadLibrary("filecoreutils");
+    }
+
+    public void notifyPrefChange() {
+        log.debug("notifyPrefChange: preference changed");
+        start();
     }
 
 }
