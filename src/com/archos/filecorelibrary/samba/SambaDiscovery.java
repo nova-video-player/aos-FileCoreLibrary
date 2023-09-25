@@ -342,12 +342,14 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
         // TODO MARC which is the one for chromecast NAT transversal?
         // Init the TCP and UDP discoveries
-        if (! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_limit_to_mdns_discovery", false))
+        if (! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_disable_udp_discovery", false))
             mInternalDiscoveries.add(new UdpDiscovery(this, ipAddress, mSocketReadDurationMs));
-        if (ENABLE_MDNS_DISCOVERY)
+        // TODO MARC
+        if (ENABLE_MDNS_DISCOVERY &&
+                ! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_disable_mdns_discovery", false))
             mInternalDiscoveries.add(new MdnsDiscovery(this, mContext, mSocketReadDurationMs));
         //tcp is quicker than udp sometimes, but we only use it as fallback, so we delay it 1 sec
-        if (! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_limit_to_mdns_discovery", false))
+        if (! PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_disable_tcp_discovery", false))
             mInternalDiscoveries.add(new TcpDiscovery(this, ipAddress, mSocketReadDurationMs, 1000));
         // Start all the discoveries
         log.debug("Start discovery");
