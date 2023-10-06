@@ -211,6 +211,7 @@ public class JcifListingEngine extends ListingEngine {
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
+                            log.warn("JcifListingThread: reporting SmbAuthException via onCredentialRequired to listener");
                             mListener.onCredentialRequired(e);
                         }
                     }
