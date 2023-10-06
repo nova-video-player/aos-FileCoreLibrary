@@ -201,10 +201,15 @@ public class SFtpListingEngine extends ListingEngine {
                     allFiles.addAll(directories);
                     allFiles.addAll(files);
                 } else if (mSortOrder.ordinal() == 2 || mSortOrder.ordinal() == 3) { // sort by NAME
-                    // by name: both files and directories are sorted
+                    // keep directories first then files (legacy behavior)
+                    Collections.sort(directories, comparator);
+                    Collections.sort(files, comparator);
                     allFiles.addAll(directories);
                     allFiles.addAll(files);
-                    Collections.sort(allFiles, comparator);
+                    // by name: both files and directories are sorted: better when files are mixed with directories in download folder but changes habits
+                    //allFiles.addAll(directories);
+                    //allFiles.addAll(files);
+                    //Collections.sort(allFiles, comparator);
                 } else if (mSortOrder.ordinal() == 4 || mSortOrder.ordinal() == 5) { // sort by SIZE
                     // by size: files displayed first, then directories
                     Collections.sort(files, comparator);
