@@ -107,7 +107,7 @@ dependencies {
     implementation 'commons-net:commons-net:3.10.0'
     implementation 'com.github.nova-video-player:sardine-android:0.0.2'
     implementation 'com.hierynomus:smbj:0.12.2'
-    implementation 'com.hierynomus:sshj:0.36.0'
+    implementation 'com.hierynomus:sshj:0.37.0'
     implementation 'oro:oro:2.0.8'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference:1.2.1'
