@@ -113,6 +113,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'org.slf4j:slf4j-api:2.0.9'
     implementation 'com.github.tony19:logback-android:3.0.0'
-    implementation 'io.sentry:sentry:6.31.0'
+    implementation 'io.sentry:sentry:6.32.0'
 }
 
