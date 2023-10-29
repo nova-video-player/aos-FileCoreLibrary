@@ -37,6 +37,8 @@
     <!-- Hiding from media scanning -->
     <!-- Folder Picker -->
     <string name="external_storage_fake_name">ଡିଵାଇସ୍ ଷ୍ଟୋରେଜ୍</string>
+    <string name="navigation_drawer_open">ଦିଗଚଳନ ଡ୍ରର୍ ଖୋଲିବା</string>
+    <string name="navigation_drawer_close">ଦିଗଚଳନ ଡ୍ରର୍ ବନ୍ଦ କରିବା</string>
     <string name="listing_ascending">ଆରୋହଣ</string>
     <string name="listing_descending">ଅବରୋହଣ</string>
 </resources>

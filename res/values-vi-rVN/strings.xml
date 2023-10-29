@@ -3,7 +3,8 @@
     <string name="file_info_label_name">Tên:</string>
     <string name="file_info_label_size">Kích cỡ:</string>
     <string name="file_info_label_size_internal">Kích cỡ (bộ nhớ trong):</string>
-    <string name="file_info_label_size_sd">Kích cỡ (Thẻ nhớ):</string>
+    <string name="file_info_label_size_sd">Kích thước (SD):</string>
+    <string name="file_info_label_permission">Cấp quyền:</string>
     <string name="file_info_label_can_read">đọc</string>
     <string name="file_info_label_cannot_read">không thể đọc</string>
     <string name="file_info_label_can_write">ghi</string>
@@ -13,7 +14,8 @@
     <string name="file_info_one_directory">1 thư mục</string>
     <string name="file_info_directories">thư mục</string>
     <string name="file_info_one_file">1 tập tin</string>
-    <string name="file_info_files">tập tin</string>
+    <string name="file_info_files">các tập tin</string>
+    <string name="usbhost_ptp_storage">Camera ngoài</string>
     <string name="network_media_servers">Media servers (UPnP)</string>
     <string name="network_shared_folders">Thư mục chia sẻ (SMB)</string>
     <!-- Archos file manager core -->
@@ -22,7 +24,7 @@
     <!-- Samba share settings -->
     <string name="samba_settings_title">Cài đặt thư mục chia sẻ</string>
     <string name="samba_settings_summary">Thiết lập tên người dùng và mật khẩu để truy cập thư mục chia sẻ trên mạng riêng của bạn</string>
-    <string name="samba_profiles">Hồ sơ thư mục chia sẻ</string>
+    <string name="samba_profiles">Hồ sơ thư mục đã chia sẻ</string>
     <string name="samba_delete_settings">Bạn có thực sự muốn xóa cài đặt này không?</string>
     <string name="samba_add_server">Thêm 1 máy chủ</string>
     <string name="samba_server">Xác định máy chủ</string>
@@ -47,11 +49,11 @@
     <string name="wifip2p_waiting">Truyền trực tiếp qua WiFi sẽ sớm bắt đầu</string>
     <string name="connect_to_target">Đang kết nối với mục tiêu</string>
     <string name="upload_in_progress">Đang tải lên&#8230;</string>
-    <string name="file_uploading">Tệp của bạn đang tải lên</string>
+    <string name="file_uploading">Đang tải tập tin của bạn lên</string>
     <string name="back_cancel">Nhấn Back để hủy</string>
-    <string name="server_wait">Đang đợi ứng dụng khách kết nối và gửi tệp</string>
+    <string name="server_wait">Đang đợi máy khách kết nối và gửi một tập tin</string>
     <string name="download_in_progress">Đang tải xuống&#8230;</string>
-    <string name="file_downloading">Tệp của bạn đang tải xuống</string>
+    <string name="file_downloading">Đang tải xuống tập tin của bạn</string>
     <string name="server_ready">Sẵn sàng nhận</string>
     <string name="nonetwork_title" comment="deprecated">Không có kết nối WiFi</string>
     <string name="no_network_title">Không có kết nối mạng</string>
@@ -76,10 +78,11 @@
     <string name="ssh_remote_address_error">Bạn phải chỉ định một remote address</string>
     <string name="ssh_password">Mật khẩu</string>
     <string name="ssh_username">Tên người dùng</string>
+    <string name="ssh_port">Cổng (tùy chọn)</string>
     <string name="ssh_path">Đường dẫn (tùy chọn)</string>
     <string name="save_password">Lưu mật khẩu</string>
     <string name="ssh_prompt">Kiểu FTP</string>
-    <string name="download_prompt">Tải tệp xuống thư mục:</string>
+    <string name="download_prompt">Tải tập tin xuống thư mục:</string>
     <string name="browse_ftp_server">Máy chủ</string>
     <string name="cannot_list">Không thể liệt kê nội dung</string>
     <string name="error_listing">Đã xảy ra lỗi</string>
@@ -88,18 +91,23 @@
     <string name="error_no_connection">Không kết nối được với máy chủ</string>
     <string name="error_credentials">Không thể liệt kê thư mục: hãy kiểm tra thông tin xác thực của bạn</string>
     <string name="error_no_permission">Tài khoản này không được phép liệt kê danh sách này</string>
-    <string name="error_file_not_found">Không tìm thấy tệp</string>
+    <string name="error_file_not_found">Không tìm thấy tập tin</string>
     <string name="error_time_out">Kết Nối Quá Lâu</string>
     <string name="deleting">Đang xóa</string>
-    <string name="deleting_many">đã xóa %1$d/%2$d</string>
-    <string name="deleting_one">Xóa một tệp</string>
+    <string name="deleting_many">%1$d/%2$d tập tin đã bị xóa</string>
+    <string name="deleting_one">Xóa một tập tin</string>
     <string name="copying">Đang sao chép %s&#8230;</string>
     <string name="moving">Đang di chuyển %s&#8230;</string>
-    <string name="open_file">Mở tệp</string>
-    <string name="open_file_after_download">Mở tệp sau khi sao chép hoàn tất</string>
+    <string name="open_file">Mở tập tin</string>
+    <string name="open_file_after_download">Mở tập tin sau khi sao chép hoàn tất</string>
+    <string name="pasting_copy_one">Đang sao chép một tập tin (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">Đang sao chép: %1$d/%2$d các tập tin (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">Đang chuyển một tập tin (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">Đang chuyển: %1$d/%2$d các tập tin (%3$s/%4$s)</string>
     <string name="delete">Xóa</string>
     <string name="rename">Đổi tên</string>
     <string name="details">Chi tiết</string>
+    <string name="refresh_directory">Làm mới thư mục</string>
     <string-array name="folder_or_file">
         <item>Tạo một thư mục</item>
         <item>Tạo một tập tin rỗng</item>
@@ -107,6 +115,13 @@
     <string name="new_directory">Thư mục mới</string>
     <string name="new_file">Tập tin mới</string>
     <string name="new_folder_or_file">Thư mục hoặc tập tin mới</string>
+    <string name="refresh_servers_list">Làm mới danh sách máy chủ</string>
+    <string name="enable_network_shares">Bật chia sẻ mạng</string>
+    <string name="go_top">Quay lại đầu trang</string>
+    <string name="uncheck_impossible">Không thể thay đổi lựa chọn khi thư mục mẹ được chọn</string>
+    <string name="confirm_delete_one">Bạn có thực sự muốn xóa nó?</string>
+    <string name="confirm_delete_parent_folder">Có vẻ như thư mục mẹ không chứa bất kỳ video nào khác, chúng ta có nên xóa nó không?</string>
+    <string name="confirm_delete_many">Bạn có thực sự muốn xóa chúng?</string>
     <string name="enter_new_name">Tên:</string>
     <string name="file_name">Tên tập tin</string>
     <string name="folder_name">Tên thư mục</string>
@@ -118,31 +133,72 @@
     <string name="cannot_create_file">Không thể tạo tập tin mới</string>
     <string name="cannot_delete_directory">Không thể xóa thư mục</string>
     <string name="cannot_delete_file">Không thể xóa tập tin</string>
-    <string name="cannot_delete_files">Không thể xóa tập tin</string>
-    <string name="directory_deleted">Thư mục đã được xóa</string>
-    <string name="file_deleted">Tập tin đã được xóa</string>
-    <string name="files_deleted">Tập tin đã được xóa</string>
+    <string name="cannot_delete_files">Không thể xóa các tập tin</string>
+    <string name="directory_deleted">Thư mục đã bị xóa</string>
+    <string name="file_deleted">Đã xóa tập tin</string>
+    <string name="files_deleted">Đã xóa các tập tin</string>
     <string name="cannot_rename">Không thể đổi tên</string>
+    <string name="cannot_paste_folder_into_itself">Không thể sao chép hoặc di dời thư mục vào chính chúng hoặc một trong các thư mục con của chúng</string>
+    <string name="cannot_paste_file_same_location">Không thể dán tập tin vào vị trí ban đầu của chúng</string>
+    <string name="cannot_paste_over_network">Không thể dán tập tin qua mạng</string>
+    <string name="copy_directory_success_one">Đã sao chép thư mục</string>
+    <string name="copy_directory_success_many">Đã sao chép các thư mục</string>
+    <string name="copy_file_success_one">Đã sao chép tập tin</string>
+    <string name="copy_file_success_many">Đã sao chép các tập tin</string>
+    <string name="copy_directory_failed_one">Thư mục không được sao chép</string>
+    <string name="copy_directory_failed_many">Các thư mục không được sao chép</string>
+    <string name="copy_file_failed_one">Không sao chép được tập tin</string>
+    <string name="copy_file_failed_many">Không sao chép được các tập tin</string>
+    <string name="cut_directory_success_one">Đã dời thư mục</string>
+    <string name="cut_directory_success_many">Đã dời các thư mục</string>
+    <string name="cut_file_success_one">Đã dời tập tin</string>
+    <string name="cut_file_success_many">Đã dời các tập tin</string>
+    <string name="cut_directory_failed_one">Không dời được thư mục</string>
+    <string name="cut_directory_failed_many">Không dời được các thư mục</string>
+    <string name="cut_file_failed_one">Không dời được tập tin</string>
+    <string name="cut_file_failed_many">Không dời được các tập tin</string>
+    <string name="pasting_done">Dán xong</string>
+    <string name="copy_done">Sao chép thành công</string>
+    <string name="copy_canceled">Sao chép bị hủy</string>
+    <string name="cut_done">Cắt thành công</string>
+    <string name="delete_done">Xóa thành công</string>
+    <string name="delete_canceled">Đã hủy xóa</string>
+    <string name="delete_still_ongoing">Quá trình xóa vẫn đang diễn ra trong nền</string>
     <string name="yes">"Đồng ý"</string>
     <string name="no">"Không"</string>
     <string name="share">Chia sẻ</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
-    <string name="send_file">Chia sẻ tệp qua</string>
+    <string name="send_file">Chia sẻ tập tin qua</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
-    <string name="no_way_to_share_file">Không có ứng dụng nào để chia sẻ tệp</string>
+    <string name="no_way_to_share_file">Không có ứng dụng nào để chia sẻ tập tin</string>
     <string name="upnp_not_allowed">Bạn không được phép truy cập vào máy chủ UPnP này. Vui lòng thay đổi cấu hình truy cập của bạn trước.</string>
     <string name="single_mode">Đĩa đơn</string>
     <string name="double_mode">Nhân bản</string>
     <string name="swap_panel">Chuyển đổi</string>
-    <string name="move">Di chuyển</string>
+    <string name="move">Di dời</string>
     <!-- Shortcuts -->
     <string name="shortcuts">Lối tắt</string>
-    <string name="add_to_shortcuts">Tạo lối tắt</string>
-    <string name="remove_from_shortcuts">Xóa lối tắt</string>
+    <string name="add_to_shortcuts">Tạo một lối tắt</string>
+    <string name="remove_from_shortcuts">Loại bỏ lối tắt</string>
+    <string name="shortcut_added" comment="deprecated">Đã tạo lối tắt %s</string>
+    <string name="shortcut_removed" comment="deprecated">Đã loại bỏ lối tắt %s</string>
+    <string name="shortcut_created">Đã tạo lối tắt \"%1$s\"</string>
+    <string name="one_shortcut_removed">Đã xóa một lối tắt</string>
+    <string name="n_shortcut_removed">Đã xóa %1$d lối tắt</string>
+    <string name="cannot_open_shortcut">Nội dung của lối tắt này hiện không có sẵn.\nHãy kiểm tra xem bạn có các quyền cần thiết hay không.</string>
+    <string name="network_shortcuts">Lối tắt mạng</string>
+    <string name="shortcut_list_empty">Để tạo lối tắt đến các thư mục từ xa yêu thích của bạn, hãy nhấp lâu vào thư mục đích và chọn \"%s\" ở thanh tác vụ trên cùng.</string>
     <!-- DLNA -->
     <!-- ZIP -->
     <!-- Notifications -->
+    <string name="delete_error">Xóa thất bại</string>
     <!-- Network Scanning -->
+    <string name="scan_network_remove">Loại bỏ phương tiện khỏi chỉ mục</string>
     <!-- Hiding from media scanning -->
+    <string name="nomedia_create">Loại bỏ khỏi thư viện phương tiện</string>
+    <string name="nomedia_remove">Thêm vào thư viện phương tiện</string>
+    <string name="nomedia_fail">Lỗi, không thể loại bỏ thư mục này khỏi thư viện phương tiện</string>
     <!-- Folder Picker -->
+    <string name="current_choice">Lựa chọn hiện tại:</string>
+    <string name="sdcard_fake_name">Thẻ SD</string>
 </resources>
