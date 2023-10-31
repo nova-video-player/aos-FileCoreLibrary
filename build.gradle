@@ -9,7 +9,7 @@ repositories {
 
 allprojects {
     gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
+        tasks.withType(JavaCompile).configureEach {
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         }
         // to generate the required jar dependencies e.g. cling seamless
@@ -19,7 +19,7 @@ allprojects {
 
 android {
     namespace 'com.archos.filecorelibrary'
-    compileSdkVersion 34
+    compileSdk 34
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -42,7 +42,7 @@ android {
         multiDexEnabled true
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         compileTask -> compileTask.dependsOn ndkBuild
     }
     clean.dependsOn 'ndkClean'
@@ -65,7 +65,7 @@ android {
     }
 }
 
-task ndkBuild(type:Exec) {
+tasks.register('ndkBuild', Exec) {
     workingDir = "../"
 
     outputs.upToDateWhen {
@@ -84,7 +84,7 @@ task ndkBuild(type:Exec) {
     commandLine myCmd
 }
 
-task ndkClean(type:Exec) {
+tasks.register('ndkClean', Exec) {
     workingDir = "../"
     List<String> myCmd = new ArrayList<String>()
     myCmd.add("make")
@@ -94,7 +94,7 @@ task ndkClean(type:Exec) {
 }
 
 // ensure there is no loggers other than logback
-configurations.all {
+configurations.configureEach {
     exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "log4j", module: "log4j"
 }
