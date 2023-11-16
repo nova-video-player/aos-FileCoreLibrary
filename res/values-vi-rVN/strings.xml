@@ -10,6 +10,7 @@
     <string name="file_info_label_can_write">ghi</string>
     <string name="file_info_label_cannot_write">không thể ghi</string>
     <string name="file_info_label_last_modified">Sửa đổi lần cuối:</string>
+    <string name="file_info_label_mime_type">Kiểu Mime:</string>
     <string name="file_info_directory_empty">Thư mục trống</string>
     <string name="file_info_one_directory">1 thư mục</string>
     <string name="file_info_directories">thư mục</string>
@@ -209,13 +210,13 @@
     <string name="zip_extract_action">Giải nén tại đây</string>
     <string name="zip_extract_success_message">Giải nén thành công</string>
     <string name="zip_compress_action">Nén dưới dạng lưu trữ Zip</string>
-    <string name="zip_extracting_message">Giải nén các tập tin từ kho lưu trữ ZIP..</string>
+    <string name="zip_extracting_message">Giải nén các tệp từ kho lưu trữ ZIP..</string>
     <string name="zip_compressing_message">Nén tệp vào kho lưu trữ Zip</string>
     <string name="zip_compressing_many">%1$d/%2$d tệp nén</string>
     <string name="zip_compressing_one">Nén một tệp</string>
     <string name="zip_compressing_success">Nén thành công</string>
     <string name="zip_compressing_canceled">Nén bị hủy</string>
-    <string name="zip_extracting_many">%1$d/%2$d tập tin được giải nén</string>
+    <string name="zip_extracting_many">%1$d/%2$d tệp được giải nén</string>
     <string name="zip_extracting_one">Đang giải nén một tệp (%1$s/%2$s)</string>
     <string name="zip_extract_error_message">Đã xảy ra lỗi trong khi giải nén kho lưu trữ của bạn.\nCó thể tệp lưu trữ của bạn bị hỏng hoặc dung lượng đĩa trống của bạn không đủ.</string>
     <string name="zip_extract_canceled">Giải nén bị hủy</string>
