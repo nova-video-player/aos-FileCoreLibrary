@@ -102,7 +102,7 @@ configurations.configureEach {
 
 dependencies {
     api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
-    api 'com.github.mwiede:jsch:0.2.12'
+    api 'com.github.mwiede:jsch:0.2.13'
     // update to 3.9.0 (java 7->8) breaks ftp on firestick4k (not max) had to use 3.8.0
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
     implementation 'commons-net:commons-net:3.10.0'
