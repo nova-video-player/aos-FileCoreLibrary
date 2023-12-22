@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import okhttp3.OkHttpClient;
+
 public class WebdavUtils {
 
     private static final Logger log = LoggerFactory.getLogger(WebdavUtils.class);
@@ -66,7 +68,12 @@ public class WebdavUtils {
         username = cred.getUsername();
         OkHttpSardine sardine = sardines.get(cred);
         if (sardine == null) {
-            sardine = new OkHttpSardine();
+            // configure OkHttpClient to support 302 redirects
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.followRedirects(true);
+            builder.followSslRedirects(true); // Handle SSL redirect
+            // Set the custom client to the Sardine instance
+            sardine = new OkHttpSardine(builder.build());
             sardine.setCredentials(username, password);
             sardines.put(cred, sardine);
             return sardine;
