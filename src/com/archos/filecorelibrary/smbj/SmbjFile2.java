@@ -64,7 +64,7 @@ public class SmbjFile2 extends MetaFile2 {
         else mLastModified = 0;
         mCanRead = true; // TODO assume true for now
         mCanWrite = ! EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_READONLY);
-        mLength = fileOrDir.getAllocationSize();
+        mLength = fileOrDir.getEaSize();
         log.trace("SmbjFile2: uri=" + mUriString + ", mName=" + mName + ", isDirectory=" + isDirectory() +
                 ", lastModified=" + mLastModified + ", canWrite=" + canWrite() + ", length=" + mLength);
     }
