@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class WebdavFile2 extends MetaFile2 {
 
@@ -72,8 +73,8 @@ public class WebdavFile2 extends MetaFile2 {
             try {
                 aces = WebdavUtils.peekInstance().getSardine(uri).getAcl(uriToHttp(uri).toString()).getAces();
                 if (!aces.isEmpty()) {
-                    mCanRead = (aces.get(0).getGranted().get(0) == "read");
-                    mCanWrite = (aces.get(0).getGranted().get(1) == "write");
+                    mCanRead = (Objects.equals(aces.get(0).getGranted().get(0), "read"));
+                    mCanWrite = (Objects.equals(aces.get(0).getGranted().get(1), "write"));
                 }
             } catch (IOException ioe) {
                 if (log.isTraceEnabled()) log.error("WebdavFile2: caught IOException", ioe);
