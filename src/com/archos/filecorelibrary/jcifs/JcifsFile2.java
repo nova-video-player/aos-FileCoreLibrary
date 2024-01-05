@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
@@ -109,12 +110,24 @@ public class JcifsFile2 extends MetaFile2 {
             // generates an exception in case of a directory not accessible but need this information for deletion
             try {
                 mCanRead = file.canRead();
-                mCanWrite = file.canWrite();
+                mCanWrite = file.canWrite(); // /!\ does not work on directories
+                log.debug("JcifsFile2:buildJcifsFile2 " + file.getPath() + " canRead=" + mCanRead + " canWrite=" + mCanWrite);
                 if (mIsFile) mLength = file.length();
             } catch (SmbAuthException e) {
                 caughtException(e, "JfisFile2:buildJcifsFile2 " + file.getPath(), "SmbAuthException");
             } catch (SmbException e) {
                 caughtException(e, "JfisFile2:buildJcifsFile2 " + file.getPath(), "SmbException");
+            }
+        }
+
+        if (mIsDirectory) { // for a directory canWrite can only be tested by creating a file
+            try {
+                SmbFile tempFile = new SmbFile(file, "testCanWriteNova.tmp");
+                tempFile.createNewFile();
+                tempFile.delete();
+                mCanWrite = true;
+            } catch (MalformedURLException | SmbException | UnknownHostException e) {
+                mCanWrite = false;
             }
         }
 
