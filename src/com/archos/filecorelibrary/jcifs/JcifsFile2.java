@@ -121,6 +121,8 @@ public class JcifsFile2 extends MetaFile2 {
         }
 
         if (mIsDirectory) { // for a directory canWrite can only be tested by creating a file
+            // clutters #1048 NAS recycle folders... thus assume canWrite=true
+            /*
             try {
                 SmbFile tempFile = new SmbFile(file, "testCanWriteNova.tmp");
                 tempFile.createNewFile();
@@ -129,6 +131,8 @@ public class JcifsFile2 extends MetaFile2 {
             } catch (MalformedURLException | SmbException | UnknownHostException e) {
                 mCanWrite = false;
             }
+             */
+            mCanWrite = true;
         }
 
         // remove the '/' at the end of directory name (Jcifs adds it)
