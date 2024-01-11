@@ -143,6 +143,10 @@ public abstract class ListingEngine {
         mListener = listener;
     }
 
+    public final Listener getListener() {
+        return mListener;
+    }
+
     public void setFilter(String[] mimeTypeFilter, String[] extensionFilter) {
         mMimeTypeFilter = mimeTypeFilter;
         mExtensionFilter = extensionFilter;
