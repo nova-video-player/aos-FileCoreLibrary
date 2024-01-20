@@ -21,6 +21,7 @@ import android.net.Uri;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.FileUtils;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
+import com.thegrizzlylabs.sardineandroid.impl.SardineException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,29 +32,53 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+import okhttp3.Request;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+
 public class WebdavFileEditor extends FileEditor {
 
     private static final Logger log = LoggerFactory.getLogger(WebdavFileEditor.class);
 
     private OkHttpSardine mSardine;
+    private OkHttpClient mHttpClient;
+    private long mLength = -1;
 
     public WebdavFileEditor(Uri uri) {
         super(uri);
         mSardine = WebdavUtils.peekInstance().getSardine(uri);
+        mHttpClient = WebdavUtils.peekInstance().getHttpClient(uri);
     }
 
     @Override
     public InputStream getInputStream() throws Exception {
-        var u = WebdavFile2.uriToHttp(mUri);
-        return mSardine.get(u.toString());
+        return getInputStream(-1);
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        var u = WebdavFile2.uriToHttp(mUri);
-        var headers = new HashMap<String, String>();
-        headers.put("Range", "bytes=" + from + "-");
-        return mSardine.get(u.toString(), headers);
+        var uri = WebdavFile2.uriToHttp(mUri);
+        log.trace("getInputStream: requesting length for " + uri);
+        var reqBuilder = new Request.Builder()
+            .url(uri.toString())
+            .get();
+        if (from >= 0) {
+            var headers = new HashMap<String, String>();
+            headers.put("Range", "bytes=" + from + "-");
+            reqBuilder.headers(Headers.of(headers));
+        }
+        var req = reqBuilder.build();
+        var resp = mHttpClient.newCall(req).execute();
+        var length = resp.header("Content-Length");
+        log.trace("getInputStream: got length " + length);
+        mLength = Long.parseLong(length);
+
+        return resp.body().byteStream();
+    }
+
+    @Override
+    public long length() throws Exception {
+        return mLength;
     }
 
     @Override

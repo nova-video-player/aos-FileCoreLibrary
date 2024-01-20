@@ -317,7 +317,11 @@ public class StreamOverHttp {
 					if(metaFile2.length()!=0)
 						length = metaFile2.length();
 					try {
-						is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream(startFrom);
+						var fe = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext());
+						is = fe.getInputStream(startFrom);
+						var l = fe.length();
+						log.trace("HttpSession:openInputStream: got length " + l);
+						if (l > 0 && length <=0) length = l;
 					 } catch (IOException ioexception) {
 						log.debug("openInputStream: caught IOException ", ioexception);
 						if (ioexception.getMessage().equals("Illegal seek")){

@@ -52,6 +52,7 @@ public abstract class FileEditor {
     public boolean rename(String newName) { return false; };
     public boolean move(Uri uri) { return false; };
     public abstract boolean exists();
+    public long length() throws Exception { return -1; }
 
     /**
      * Use it for file (and just file) copy

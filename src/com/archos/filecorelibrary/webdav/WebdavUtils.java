@@ -25,14 +25,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.IOException;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Authenticator;
+import okhttp3.Credentials;
+import okhttp3.Request;
+import okhttp3.Route;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class WebdavUtils {
 
     private static final Logger log = LoggerFactory.getLogger(WebdavUtils.class);
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpSardine> sardines = new ConcurrentHashMap<>();
+    static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpClient> httpClients = new ConcurrentHashMap<>();
     private static Context mContext;
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile WebdavUtils sInstance;
@@ -60,31 +67,52 @@ public class WebdavUtils {
     }
 
     public synchronized OkHttpSardine getSardine(Uri uri) {
-        String username = "anonymous";
-        String password = "";
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
-        password = cred.getPassword();
-        username = cred.getUsername();
+        final String password = cred.getPassword();
+        final String username = cred.getUsername();
         OkHttpSardine sardine = sardines.get(cred);
         if (sardine == null) {
             // configure OkHttpClient to support 302 redirects
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
             if (log.isTraceEnabled()) {
-                HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+                HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                    @Override
+                    public void log(String msg) {
+                        log.trace("OkHttpSardine: webdav " + msg);
+                    }});
                 logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
                 builder.addInterceptor(logging);
             }
+            builder.authenticator(new Authenticator() {
+                @Override
+                public Request authenticate(Route route, Response response) throws IOException {
+                    if (response.request().header("Authorization") != null) {
+                        return null;
+                    }
+                    String credential = Credentials.basic(username, password);
+                    return response.request().newBuilder().header("Authorization", credential).build();
+                }
+            });
             builder.followRedirects(true);
             builder.followSslRedirects(true); // Handle SSL redirect
             // Set the custom client to the Sardine instance
-            sardine = new OkHttpSardine(builder.build());
+            var client = builder.build();
+            sardine = new OkHttpSardine(client);
             sardine.setCredentials(username, password);
+            httpClients.put(cred, client);
             sardines.put(cred, sardine);
             return sardine;
         }
         return sardine;
+    }
+
+    public synchronized OkHttpClient getHttpClient(Uri uri) {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        if (cred == null)
+            cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
+        return httpClients.get(cred);
     }
 
     private Uri buildKeyFromUri(Uri uri) {
