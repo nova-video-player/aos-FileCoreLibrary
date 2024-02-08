@@ -151,7 +151,12 @@ public class SmbjFileEditor extends FileEditor {
     @Override
     public boolean exists() {
         try {
-            DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+            SmbjUtils smbjUtilsInstance = SmbjUtils.peekInstance();
+            if (smbjUtilsInstance == null) {
+                throw new IllegalStateException("SmbjUtils instance is null");
+            }
+            DiskShare mDiskShare = smbjUtilsInstance.getSmbShare(mUri);
+            // at this stage, mDiskShare if not null should be connected i.e. .isConnected() should be true granted by getSmbShare
             if (mDiskShare == null) {
                 log.error("exists: mDiskShare is null for " + mUri + " returning false");
                 return false;
