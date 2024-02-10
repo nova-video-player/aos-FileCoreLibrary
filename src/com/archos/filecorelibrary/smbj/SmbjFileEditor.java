@@ -157,8 +157,8 @@ public class SmbjFileEditor extends FileEditor {
             }
             DiskShare mDiskShare = smbjUtilsInstance.getSmbShare(mUri);
             // at this stage, mDiskShare if not null should be connected i.e. .isConnected() should be true granted by getSmbShare
-            if (mDiskShare == null) {
-                log.error("exists: mDiskShare is null for " + mUri + " returning false");
+            if (mDiskShare == null || ! mDiskShare.isConnected()) {
+                log.error("exists: mDiskShare is null or not connected for " + mUri + " returning false");
                 return false;
             }
             String mFilePath = getFilePath(mUri);
