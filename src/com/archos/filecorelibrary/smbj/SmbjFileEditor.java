@@ -59,7 +59,8 @@ public class SmbjFileEditor extends FileEditor {
         ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {if (smbjFile != null) {
             log.trace("getInputStream: closing " + mUri);
-            smbjFile.closeSilently();
+            // check that DiskShare has not already been closed (seen on sentry)
+            if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
         }});
         return ois;
     }
@@ -78,7 +79,8 @@ public class SmbjFileEditor extends FileEditor {
         ObservableInputStream ois = new ObservableInputStream(is);
         ois.onClose(() -> {if (smbjFile != null) {
             log.trace("getInputStream: closing " + mUri);
-            smbjFile.closeSilently();
+            // check that DiskShare has not already been closed (seen on sentry)
+            if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
         }});
         return ois;
     }
@@ -95,7 +97,8 @@ public class SmbjFileEditor extends FileEditor {
         ObservableOutputStream oos = new ObservableOutputStream(os);
         oos.onClose(() -> {if (smbjFile != null) {
             log.trace("getOutputStream: closing " + mUri);
-            smbjFile.closeSilently();
+            // check that DiskShare has not already been closed (seen on sentry)
+            if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
         }});
         return oos;
     }
