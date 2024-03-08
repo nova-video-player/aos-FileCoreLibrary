@@ -101,7 +101,7 @@ configurations.configureEach {
 
 dependencies {
     api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
-    api 'com.github.mwiede:jsch:0.2.16'
+    api 'com.github.mwiede:jsch:0.2.17'
     // update to 3.9.0 (java 7->8) breaks ftp on firestick4k (not max) had to use 3.8.0
     // https://commons.apache.org/proper/commons-net/release-notes.html need to stick with java7: max 3.8.0
     // versions of commons-net otherwise we get java.time.Duration ClassNotFoundException even with threetenabp
@@ -115,6 +115,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.11'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    implementation 'io.sentry:sentry:7.0.0'
+    implementation 'io.sentry:sentry:7.5.0'
 }
 
