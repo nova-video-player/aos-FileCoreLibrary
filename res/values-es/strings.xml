@@ -24,7 +24,7 @@
     <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
     <string name="samba_settings_title">Ajustes de carpetas compartidas</string>
-    <string name="samba_settings_summary">Configurar nombres de usuario y contraseñas para acceder a carpetas compartidas de su red privada</string>
+    <string name="samba_settings_summary">Configura nombres de usuario y contraseñas para acceder a carpetas compartidas de su red privada</string>
     <string name="samba_profiles">Perfiles de carpetas compartidas</string>
     <string name="samba_delete_settings">¿Realmente desea eliminar esta configuración?</string>
     <string name="samba_add_server">Añadir un servidor</string>
@@ -58,7 +58,7 @@
     <string name="server_ready">Listo para recibir</string>
     <string name="nonetwork_title" comment="deprecated">Sin conexión WiFi</string>
     <string name="no_network_title">Sin conexión de red</string>
-    <string name="nonetwork_message">Necesitas activar la WiFi para esta función</string>
+    <string name="nonetwork_message">Necesitas activar el WiFi para esta función</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">No se puede utilizar el almacenamiento interno mientras está conectado y montado a través de USB.</string>
     <string name="ssh_storage">FTP</string>
@@ -163,9 +163,9 @@
     <string name="copy_done">Copiado</string>
     <string name="copy_canceled">Copia cancelada</string>
     <string name="cut_done">Cortado</string>
-    <string name="cut_canceled">Corte cancelado</string>
+    <string name="cut_canceled">Cortar cancelado</string>
     <string name="delete_done">Eliminado correctamente</string>
-    <string name="delete_canceled">Eliminación cancelada</string>
+    <string name="delete_canceled">Eliminar cancelado</string>
     <string name="cannot_open_file">No se puede abrir el archivo</string>
     <string name="no_application_to_open_file">Ninguna aplicación en este dispositivo puede abrir este archivo</string>
     <string name="delete_still_ongoing">La eliminación aún continúa en segundo plano</string>
@@ -211,7 +211,7 @@
     <string name="zip_extract_success_message">Extraído correctamente</string>
     <string name="zip_compress_action">Comprimir como archivo Zip</string>
     <string name="zip_extracting_message">Extrayendo ficheros del archivo Zip..</string>
-    <string name="zip_compressing_message">Comprimiendo ficheros en un archivo Zip</string>
+    <string name="zip_compressing_message">Comprimiendo archivos en un archivo Zip</string>
     <string name="zip_compressing_many">%1$d/%2$d archivos comprimidos</string>
     <string name="zip_compressing_one">Comprimiendo un archivo</string>
     <string name="zip_compressing_success">Comprimido correctamente</string>
