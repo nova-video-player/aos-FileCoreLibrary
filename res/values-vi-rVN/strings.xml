@@ -14,8 +14,8 @@
     <string name="file_info_directory_empty">Thư mục trống</string>
     <string name="file_info_one_directory">1 thư mục</string>
     <string name="file_info_directories">thư mục</string>
-    <string name="file_info_one_file">1 tập tin</string>
-    <string name="file_info_files">các tệp</string>
+    <string name="file_info_one_file">1 tệp</string>
+    <string name="file_info_files">tệp</string>
     <string name="usbhost_ptp_storage">Camera ngoài</string>
     <string name="network_media_servers">Media servers (UPnP)</string>
     <string name="network_shared_folders">Thư mục chia sẻ (SMB)</string>
@@ -112,29 +112,29 @@
     <string name="refresh_directory">Làm mới thư mục</string>
     <string-array name="folder_or_file">
         <item>Tạo một thư mục</item>
-        <item>Tạo một tập tin rỗng</item>
+        <item>Tạo một tệp rỗng</item>
     </string-array>
     <string name="new_directory">Thư mục mới</string>
     <string name="new_file">Tập tin mới</string>
-    <string name="new_folder_or_file">Thư mục hoặc tập tin mới</string>
+    <string name="new_folder_or_file">Thư mục hoặc tệp mới</string>
     <string name="refresh_servers_list">Làm mới danh sách máy chủ</string>
     <string name="enable_network_shares">Bật chia sẻ mạng</string>
     <string name="go_top">Quay lại đầu trang</string>
     <string name="uncheck_impossible">Không thể thay đổi lựa chọn khi thư mục mẹ được chọn</string>
     <string name="confirm_delete_one">Bạn có thực sự muốn xóa nó?</string>
-    <string name="confirm_delete_parent_folder">Có vẻ như thư mục mẹ không chứa bất kỳ video nào khác, chúng ta có nên xóa nó không?</string>
+    <string name="confirm_delete_parent_folder">Có vẻ như thư mục mẹ không chứa bất kỳ băng hình nào khác, chúng ta có nên xóa nó không?</string>
     <string name="confirm_delete_many">Bạn có thực sự muốn xóa chúng?</string>
     <string name="enter_new_name">Tên:</string>
-    <string name="file_name">Tên tập tin</string>
+    <string name="file_name">Tên tệp</string>
     <string name="folder_name">Tên thư mục</string>
     <string name="run_in_background">Tối thiểu</string>
     <string name="confirm_deleting_cancellation">Bạn có thực sự muốn hủy xóa không?</string>
     <string name="confirm_copying_cancellation">Bạn có thật sự muốn hủy sao chép?</string>
     <string name="confirm_moving_cancellation">Bạn có thật sự muốn hủy di chuyển?</string>
     <string name="cannot_create_directory">Không thể tạo thư mục mới</string>
-    <string name="cannot_create_file">Không thể tạo tập tin mới</string>
+    <string name="cannot_create_file">Không thể tạo tệp mới</string>
     <string name="cannot_delete_directory">Không thể xóa thư mục</string>
-    <string name="cannot_delete_file">Không thể xóa tập tin</string>
+    <string name="cannot_delete_file">Không thể xóa tệp</string>
     <string name="cannot_delete_files">Không thể xóa các tệp</string>
     <string name="directory_deleted">Thư mục đã bị xóa</string>
     <string name="file_deleted">Đã xóa tệp</string>
