@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.List;
@@ -264,6 +262,7 @@ public class FileUtils {
         }
     }
 
+    // provides the basename
     public static String getName(Uri uri){
         if(uri!=null) {
             String name = uri.getLastPathSegment();
@@ -521,5 +520,4 @@ public class FileUtils {
         if (log.isTraceEnabled()) log.error(method + ": caught " + exceptionType + " ", e);
         else log.warn(method + ": caught "+ exceptionType);
     }
-
 }
