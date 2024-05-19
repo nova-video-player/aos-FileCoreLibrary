@@ -32,7 +32,7 @@ public final class ArchosUtils {
     private static Context globalContext;
 
     public static boolean isAmazonApk() {
-        return android.os.Build.MANUFACTURER.toLowerCase().equals("amazon");
+        return android.os.Build.MANUFACTURER.equalsIgnoreCase("amazon");
     }
 
     public static boolean isInstalledfromPlayStore(Context context) {
@@ -45,7 +45,7 @@ public final class ArchosUtils {
 
     public static String getNameWithoutExtension(String filenameWithExtension) {
         int dotPos = filenameWithExtension.lastIndexOf('.');
-        if (dotPos >= 0 && dotPos < filenameWithExtension.length()) {
+        if (dotPos >= 0) {
             return filenameWithExtension.substring(0, dotPos);
         } else {
             return filenameWithExtension;
@@ -56,7 +56,8 @@ public final class ArchosUtils {
         if (filename == null)
             return null;
         int dotPos = filename.lastIndexOf('.');
-        if (dotPos >= 0 && dotPos < filename.length()) {
+        if (dotPos >= 0) {
+            filename.length();
             return filename.substring(dotPos + 1).toLowerCase();
         }
         return null;
