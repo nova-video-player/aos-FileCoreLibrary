@@ -37,7 +37,12 @@ public class ObservableOutputStream extends OutputStream implements Closeable {
 
     @Override
     public void close() throws IOException {
-        outputStream.close();
+        try {
+            outputStream.close();
+        } catch (com.hierynomus.mssmb2.SMBApiException e) {
+            // Handle SMBApiException here
+            throw new IOException("Error closing SMB output stream", e);
+        }
         if (onClose != null) {
             onClose.run();
         }
