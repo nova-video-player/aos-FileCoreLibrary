@@ -33,6 +33,7 @@ import com.hierynomus.security.bc.BCSecurityProvider;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.common.SMBRuntimeException;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
@@ -41,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -119,17 +121,33 @@ public class SmbjUtils {
             return null;
         }
         DiskShare smbShare = smbjShares.get(cred);
-        if (smbShare == null) log.trace("getSmbShare: smbShare is null");
-        else log.trace("getSmbShare: cred.getUriString={} -> shareName={} =? shareName={}", cred.getUriString(), getShareName(Uri.parse(cred.getUriString())), shareName);
         if (smbShare == null || !shareName.equals(getShareName(Uri.parse(cred.getUriString()))) || !smbShare.isConnected()) {
             log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
             // ensures that there is a valid connection and regenerate session if not connected
             getSmbConnection(uri);
             Session smbSession = smbjSessions.get(cred);
             if (smbSession != null) {
-                smbShare = (DiskShare) smbSession.connectShare(shareName);
-                log.trace("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
-                smbjShares.put(cred, smbShare);
+                try {
+                    smbShare = (DiskShare) smbSession.connectShare(shareName);
+                    log.trace("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
+                    smbjShares.put(cred, smbShare);
+                } catch (SMBRuntimeException e) {
+                    if (e.getCause() instanceof SocketException) {
+                        // Try to reconnect
+                        getSmbConnection(uri);
+                        smbSession = smbjSessions.get(cred);
+                        if (smbSession != null) {
+                            smbShare = (DiskShare) smbSession.connectShare(shareName);
+                            smbjShares.put(cred, smbShare);
+                        } else {
+                            log.error("getSmbShare: caught SMBRuntimeException but smbSession is null after reconnecting! " + e.getMessage() + " for uri " + uri + ", sharename=" + shareName + " -> throwing IOException instead");
+                            throw new IOException("getSmbShare: smbSession is null after reconnecting!");
+                        }
+                    } else {
+                        log.error("getSmbShare: caught exception " + e.getMessage() + " for uri " + uri + ", sharename=" + shareName + " -> throwing IOException instead");
+                        throw new IOException("getSmbShare: smbSession is null after reconnecting!");
+                    }
+                }
             } else log.warn("getSmbShare: smbSession is null!");
         }
         log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, (smbShare != null)?smbShare.isConnected():"false");
