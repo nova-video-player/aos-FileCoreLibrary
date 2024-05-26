@@ -106,7 +106,8 @@ dependencies {
     // https://commons.apache.org/proper/commons-net/release-notes.html need to stick with java7: max 3.8.0
     // versions of commons-net otherwise we get java.time.Duration ClassNotFoundException even with threetenabp
     implementation 'commons-net:commons-net:3.8.0'
-    implementation 'com.github.nova-video-player:sardine-android:0.0.2'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.7'
+    implementation 'com.github.nova-video-player:sardine-android:0.0.3'
     implementation 'com.hierynomus:smbj:0.13.0'
     implementation 'com.hierynomus:sshj:0.38.0'
     implementation 'oro:oro:2.0.8'
