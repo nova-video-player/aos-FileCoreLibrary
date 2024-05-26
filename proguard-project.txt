@@ -1,0 +1,2 @@
+-keep class com.hierynomus.smbj.** { *; }
+-keep class org.slf4j.** { *; }
