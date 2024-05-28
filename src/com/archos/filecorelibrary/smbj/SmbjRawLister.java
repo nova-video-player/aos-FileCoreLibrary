@@ -24,6 +24,7 @@ import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +44,12 @@ public class SmbjRawLister extends RawLister {
     @Override
     public ArrayList<MetaFile2> getFileList() throws IOException, AuthenticationException {
         try {
-            var files = new ArrayList<MetaFile2>();
-            var diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+            ArrayList<MetaFile2> files = new ArrayList<MetaFile2>();
+            DiskShare diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
             final String filePath = getFilePath(mUri);
             final String shareName = getShareName(mUri);
             List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
-            for (var fileOrDir : diskShareLst) {
+            for (FileIdBothDirectoryInformation fileOrDir : diskShareLst) {
                 final String filename = fileOrDir.getFileName();
                 final String fullFilename = "/" + shareName + "/" + filename;
                 log.trace("getFileList: adding " + fullFilename);

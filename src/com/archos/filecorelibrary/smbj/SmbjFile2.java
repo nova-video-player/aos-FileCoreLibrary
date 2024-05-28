@@ -33,6 +33,7 @@ import com.hierynomus.mssmb2.SMB2CreateOptions;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.smbj.share.DiskEntry;
+import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +152,7 @@ public class SmbjFile2 extends MetaFile2 {
      * get metafile2 object from a uri (please use this only if absolutely necessary)
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        var diskShare = SmbjUtils.peekInstance().getSmbShare(uri);
+        DiskShare diskShare = SmbjUtils.peekInstance().getSmbShare(uri);
         final String filePath = getFilePath(uri);
         final String shareName = getShareName(uri);
         DiskEntry file = diskShare.open(filePath,

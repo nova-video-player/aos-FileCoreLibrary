@@ -317,9 +317,9 @@ public class StreamOverHttp {
 					if(metaFile2.length()!=0)
 						length = metaFile2.length();
 					try {
-						var fe = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext());
+						FileEditor fe = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext());
 						is = fe.getInputStream(startFrom);
-						var l = fe.length();
+						long l = fe.length();
 						log.trace("HttpSession:openInputStream: got length " + l);
 						if (l > 0 && length <=0) length = l;
 					 } catch (IOException ioexception) {

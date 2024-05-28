@@ -35,6 +35,7 @@ import java.util.HashMap;
 import okhttp3.Request;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 public class WebdavFileEditor extends FileEditor {
 
@@ -57,19 +58,19 @@ public class WebdavFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        var uri = WebdavFile2.uriToHttp(mUri);
+        Uri uri = WebdavFile2.uriToHttp(mUri);
         log.trace("getInputStream: requesting length for " + uri);
-        var reqBuilder = new Request.Builder()
+        Request.Builder reqBuilder = new Request.Builder()
             .url(uri.toString())
             .get();
         if (from >= 0) {
-            var headers = new HashMap<String, String>();
+            HashMap<String, String> headers = new HashMap<String, String>();
             headers.put("Range", "bytes=" + from + "-");
             reqBuilder.headers(Headers.of(headers));
         }
-        var req = reqBuilder.build();
-        var resp = mHttpClient.newCall(req).execute();
-        var length = resp.header("Content-Length");
+        Request req = reqBuilder.build();
+        Response resp = mHttpClient.newCall(req).execute();
+        String length = resp.header("Content-Length");
         log.trace("getInputStream: got length " + length);
         mLength = Long.parseLong(length);
 
@@ -89,7 +90,7 @@ public class WebdavFileEditor extends FileEditor {
     @Override
     public boolean mkdir() {
         try {
-            var u = WebdavFile2.uriToHttp(mUri);
+            Uri u = WebdavFile2.uriToHttp(mUri);
             mSardine.createDirectory(u.toString());
             return true;
         } catch (IOException e) {
@@ -100,17 +101,17 @@ public class WebdavFileEditor extends FileEditor {
 
     @Override
     public Boolean delete() throws Exception {
-        var u = WebdavFile2.uriToHttp(mUri);
+        Uri u = WebdavFile2.uriToHttp(mUri);
         mSardine.delete(u.toString());
         return null;
     }
 
     @Override
     public boolean move(Uri uri) {
-        var origin = WebdavFile2.uriToHttp(mUri);
+        Uri origin = WebdavFile2.uriToHttp(mUri);
         try {
             if (origin != null) {
-                var destination = WebdavFile2.uriToHttp(uri);
+                Uri destination = WebdavFile2.uriToHttp(uri);
                 if (destination != null) {
                     mSardine.move(origin.toString(), destination.toString());
                     return true;
@@ -130,7 +131,7 @@ public class WebdavFileEditor extends FileEditor {
     @Override
     public boolean exists() {
         try {
-            var u = WebdavFile2.uriToHttp(mUri);
+            Uri u = WebdavFile2.uriToHttp(mUri);
             boolean doesItExist;
             if (u != null) {
                 doesItExist = mSardine.exists(u.toString());
@@ -153,8 +154,8 @@ public class WebdavFileEditor extends FileEditor {
         return new ByteArrayOutputStream() {
             @Override
             public void close() throws IOException {
-                var u = WebdavFile2.uriToHttp(mUri);
-                var fileContent = toByteArray();
+                Uri u = WebdavFile2.uriToHttp(mUri);
+                byte[] fileContent = toByteArray();
                 mSardine.put(u.toString(), fileContent);
             }
         };

@@ -178,7 +178,7 @@ public class SshjFile2 extends MetaFile2 {
             log.trace("fromUri: " + uri);
             sftpClient = SshjUtils.peekInstance().getSFTPClient(uri);
             final String filePath = getSftpPath(uri);
-            var fileAttributes = sftpClient.lstat(filePath);
+            FileAttributes fileAttributes = sftpClient.lstat(filePath);
             if (fileAttributes == null) log.error("fromUri: file does not exist " + uri);
             // throw perm if null!
             return new SshjFile2(fileAttributes, uri);

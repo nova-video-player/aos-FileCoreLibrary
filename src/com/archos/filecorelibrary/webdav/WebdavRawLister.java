@@ -19,12 +19,15 @@ import android.net.Uri;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
+import com.thegrizzlylabs.sardineandroid.DavResource;
+import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class WebdavRawLister extends RawLister {
 
@@ -37,15 +40,15 @@ public class WebdavRawLister extends RawLister {
     @Override
     public ArrayList<MetaFile2> getFileList() throws IOException, AuthenticationException {
         try {
-            var sardine = WebdavUtils.peekInstance().getSardine(mUri);
-            var httpUri = WebdavFile2.uriToHttp(mUri);
+            OkHttpSardine sardine = WebdavUtils.peekInstance().getSardine(mUri);
+            Uri httpUri = WebdavFile2.uriToHttp(mUri);
 
-            var files = new ArrayList<MetaFile2>();
-            var resources = sardine.list(httpUri.toString());
+            ArrayList<MetaFile2> files = new ArrayList<MetaFile2>();
+            List<DavResource> resources = sardine.list(httpUri.toString());
 
             // First answer is ourselves, ignore it
             resources.remove(0);
-            for (var res : resources) {
+            for (DavResource res : resources) {
                 files.add(new WebdavFile2(res, mUri.buildUpon().appendEncodedPath(res.getName()).build()));
             }
             return files;

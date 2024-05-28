@@ -28,6 +28,7 @@ import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
+import net.schmizz.sshj.sftp.SFTPClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,10 +84,10 @@ public class SshjListingEngine extends ListingEngine {
             try {
                 log.debug("SshjListingThread: listFiles for: " + mUri.toString());
 
-                var sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
+                SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
                 String filePath = getSftpPath(mUri);
 
-                var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
+                List<FileIdBothDirectoryInformation>  acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
                 List<RemoteResourceInfo> lst = sftpClient.ls(filePath);
 
                 final ArrayList<SshjFile2> directories = new ArrayList<>();

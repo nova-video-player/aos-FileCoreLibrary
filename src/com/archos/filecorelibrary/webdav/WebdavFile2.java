@@ -22,6 +22,7 @@ import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.thegrizzlylabs.sardineandroid.DavAce;
 import com.thegrizzlylabs.sardineandroid.DavResource;
+import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +153,7 @@ public class WebdavFile2 extends MetaFile2 {
      * get metafile2 object from a uri (please use this only if absolutely necessary)
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        var sardine = WebdavUtils.peekInstance().getSardine(uri);
+        OkHttpSardine sardine = WebdavUtils.peekInstance().getSardine(uri);
         Uri httpUri = WebdavFile2.uriToHttp(uri);
         List<DavResource> resources = sardine.list(httpUri.toString());
         return new WebdavFile2(resources.get(0), uri);

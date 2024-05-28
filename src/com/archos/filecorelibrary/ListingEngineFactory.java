@@ -27,6 +27,8 @@ import com.archos.filecorelibrary.sshj.SshjListingEngine;
 import com.archos.filecorelibrary.webdav.WebdavListingEngine;
 import com.archos.filecorelibrary.zip.ZipListingEngine;
 
+import java.util.List;
+
 public class ListingEngineFactory {
     public static ListingEngine getListingEngineForUrl(Context context, Uri uri) {
         if (FileUtils.isLocal(uri)&&(uri.getScheme()==null||!uri.getScheme().equals("content"))) {
@@ -70,7 +72,7 @@ public class ListingEngineFactory {
         final private Thread mListingThread = new Thread() {
             public void run() {
                 try {
-                    final var files = mRawLister.getFileList();
+                    final List<MetaFile2> files = mRawLister.getFileList();
                     if(files == null) throw new Exception();
                     mUiHandler.post(() -> {
                         if (mListener != null) { // do not report error if aborted

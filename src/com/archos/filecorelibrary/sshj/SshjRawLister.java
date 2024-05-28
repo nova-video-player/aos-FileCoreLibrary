@@ -49,11 +49,11 @@ public class SshjRawLister extends RawLister {
         log.trace("getFileList: " + mUri);
         SFTPClient sftpClient = null;
         try {
-            var files = new ArrayList<MetaFile2>();
+            ArrayList<MetaFile2> files = new ArrayList<MetaFile2>();
             sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
             final String filePath = getSftpPath(mUri);
             List<RemoteResourceInfo> remoteResourceInfos = sftpClient.ls(filePath);
-            for (var fileOrDir : remoteResourceInfos) {
+            for (RemoteResourceInfo fileOrDir : remoteResourceInfos) {
                 final String filename = fileOrDir.getName();
                 log.trace("getFileList: adding " + filename);
                 files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));

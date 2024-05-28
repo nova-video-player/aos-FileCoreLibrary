@@ -20,6 +20,7 @@ import android.net.Uri;
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.thegrizzlylabs.sardineandroid.DavResource;
+import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * This class handles the threading of the Webdav file listing
@@ -74,18 +76,18 @@ public class WebdavListingEngine extends ListingEngine {
             try {
                 log.debug("WebdavListingThread: listFiles for: " + mUri.toString());
 
-                var sardine = WebdavUtils.peekInstance().getSardine(mUri);
-                var httpUri = WebdavFile2.uriToHttp(mUri);
+                OkHttpSardine sardine = WebdavUtils.peekInstance().getSardine(mUri);
+                Uri httpUri = WebdavFile2.uriToHttp(mUri);
 
-                var acceptedDavResources = new ArrayList<DavResource>();
-                var davResources = sardine.list(httpUri.toString()); // can generate IllegalArgumentException Invalid URL port: ":7802"
+                ArrayList<DavResource> acceptedDavResources = new ArrayList<DavResource>();
+                List<DavResource> davResources = sardine.list(httpUri.toString()); // can generate IllegalArgumentException Invalid URL port: ":7802"
 
                 final ArrayList<WebdavFile2> directories = new ArrayList<>();
                 final ArrayList<WebdavFile2> files = new ArrayList<>();
 
                 // First answer is ourselves, ignore it
                 davResources.remove(0);
-                for (var davResource : davResources) {
+                for (DavResource davResource : davResources) {
                     final String filename = davResource.getName();
                     if (davResource.isDirectory()) {
                         if (keepDirectory(filename)) {

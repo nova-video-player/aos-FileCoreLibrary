@@ -26,6 +26,7 @@ import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,10 +82,10 @@ public class SmbjListingEngine extends ListingEngine {
             try {
                 log.debug("SmbjListingThread: listFiles for: " + mUri.toString());
 
-                var diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+                DiskShare diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
                 String filePath = getFilePath(mUri);
 
-                var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
+                ArrayList<FileIdBothDirectoryInformation> acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
                 List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
 
                 final ArrayList<SmbjFile2> directories = new ArrayList<>();

@@ -98,7 +98,7 @@ public class WebdavUtils {
             builder.followRedirects(true);
             builder.followSslRedirects(true); // Handle SSL redirect
             // Set the custom client to the Sardine instance
-            var client = builder.build();
+            OkHttpClient client = builder.build();
             sardine = new OkHttpSardine(client);
             sardine.setCredentials(username, password);
             httpClients.put(cred, client);
