@@ -105,7 +105,7 @@ dependencies {
     api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
     api 'com.github.mwiede:jsch:0.2.17'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
-    implementation 'commons-net:commons-net:3.10.0'
+    implementation 'commons-net:commons-net:3.11.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.7'
     implementation 'com.github.nova-video-player:sardine-android:0.0.3'
     implementation 'com.hierynomus:smbj:0.13.0'
