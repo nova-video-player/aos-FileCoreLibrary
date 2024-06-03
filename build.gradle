@@ -111,7 +111,7 @@ dependencies {
     implementation 'com.hierynomus:smbj:0.13.0'
     implementation 'com.hierynomus:sshj:0.38.0'
     implementation 'oro:oro:2.0.8'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation 'com.github.tony19:logback-android:3.0.0'
