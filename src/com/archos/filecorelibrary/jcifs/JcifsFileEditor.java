@@ -93,7 +93,8 @@ public class JcifsFileEditor extends FileEditor{
         try {
             SmbFile from = getSmbFile(mUri).smbFile;
             if (from != null) {
-                SmbFile to = getSmbFile(Uri.parse(from.getParent() + "/" + newName)).smbFile;
+                SmbFile to = getSmbFile(Uri.parse(from.getParent() + newName)).smbFile;
+                log.debug("rename: " + from + " to " + to);
                 if (to != null) {
                     from.renameTo(to);
                     return true;

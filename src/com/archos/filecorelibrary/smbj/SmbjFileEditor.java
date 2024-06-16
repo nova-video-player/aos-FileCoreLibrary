@@ -138,9 +138,15 @@ public class SmbjFileEditor extends FileEditor {
     public boolean rename(String newName) {
         String mFilePath = getFilePath(mUri);
         try {
-            File from = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(mFilePath, EnumSet.of(AccessMask.GENERIC_ALL), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+            File from = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(mFilePath,
+                    EnumSet.of(AccessMask.FILE_READ_DATA),
+                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                    SMB2CreateDisposition.FILE_OPEN,
+                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
+            log.debug("rename: mFilePath=" + mFilePath + " -> " + getParentDirectoryPath(mFilePath) + newName);
             if (from != null) {
-                from.rename(getParentDirectoryPath(mFilePath) + "/" + newName);
+                from.rename(getParentDirectoryPath(mFilePath) + newName);
                 return true;
             }
         } catch (IOException e) {

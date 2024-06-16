@@ -162,7 +162,7 @@ public class SshjFileEditor extends FileEditor {
         try {
             final String mFilePath = getSftpPath(mUri);
             final SFTPClient sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
-            sftpClient.rename(getSftpPath(mUri), getParentDirectoryPath(mFilePath) + "/" + newName);
+            sftpClient.rename(getSftpPath(mUri), getParentDirectoryPath(mFilePath) + newName);
             return true;
         } catch (IOException e) {
             caughtException(e, "SshjFileEditor:rename", "IOException" + mUri);
