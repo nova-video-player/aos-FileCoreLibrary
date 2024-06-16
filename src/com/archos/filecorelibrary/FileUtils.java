@@ -352,10 +352,10 @@ public class FileUtils {
 
     public static String getParentDirectoryPath(String inputPath) {
         String parentDirectory = "";
-        String regEx = "(.*\\/)\\S+\\/$";
+        String regEx = "(.*\\/)[^\\/]+$";
         Pattern regexPattern = Pattern.compile(regEx);
         Matcher match = regexPattern.matcher(inputPath);
-        if(match.find()) parentDirectory = match.group(1);
+        if (match.find()) parentDirectory = match.group(1);
         return parentDirectory;
     }
 
