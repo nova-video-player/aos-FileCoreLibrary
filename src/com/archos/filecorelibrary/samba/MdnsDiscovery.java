@@ -103,8 +103,12 @@ public class MdnsDiscovery implements InternalDiscovery {
     @Override
     public void start() {
         log.debug("start: starting discovering...");
-        mNsdManager.discoverServices("_smb._tcp", NsdManager.PROTOCOL_DNS_SD, mMdnsListener);
-        mMdnsListenerRegistered = true;
+        if (!mMdnsListenerRegistered) {
+            mNsdManager.discoverServices("_smb._tcp", NsdManager.PROTOCOL_DNS_SD, mMdnsListener);
+            mMdnsListenerRegistered = true;
+        } else {
+            log.warn("start: listener already registered");
+        }
     }
 
     @Override
