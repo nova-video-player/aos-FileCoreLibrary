@@ -200,7 +200,7 @@ public class UdpDiscovery implements InternalDiscovery {
                             }
                             try {
                                 response.readWireFormat(rcv_buf.array(), 0);
-                            } catch (ArrayIndexOutOfBoundsException e) {
+                            } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
                                 log.error("UdpDiscoveryThread", e);
                                 if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", e);
                                 else log.warn("doTcpDiscovery: caught ArrayIndexOutOfBoundsException");
