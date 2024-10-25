@@ -10,22 +10,22 @@
     <string name="file_info_label_can_write">запис</string>
     <string name="file_info_label_cannot_write">запис неможливий</string>
     <string name="file_info_label_last_modified">Востаннє змінено:</string>
-    <string name="file_info_label_mime_type">Mime-тип:</string>
+    <string name="file_info_label_mime_type">Тип MIME:</string>
     <string name="file_info_directory_empty">Порожня тека</string>
     <string name="file_info_one_directory">1 тека</string>
     <string name="file_info_directories">теки</string>
     <string name="file_info_one_file">1 файл</string>
     <string name="file_info_files">файли</string>
     <string name="usbhost_ptp_storage">Зовнішня камера</string>
-    <string name="network_media_servers">Медіа-сервер (UPnP)</string>
+    <string name="network_media_servers">Медіасервер (UPnP)</string>
     <string name="network_shared_folders">Спільні теки (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">копіювати</string>
     <string name="fast_scroll_numeric_alphabet">\u00200123456789АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ</string>
     <!-- Samba share settings -->
-    <string name="samba_settings_title">Налаштування спільних папок</string>
-    <string name="samba_settings_summary">Налаштування користувачів та паролів для доступу до спільних папок у вашій приватній мережі</string>
-    <string name="samba_profiles">Профілі спільних папок</string>
+    <string name="samba_settings_title">Налаштування спільних тек</string>
+    <string name="samba_settings_summary">Налаштуйте імена користувачів і паролі для доступу до загальних тек у вашій приватній мережі</string>
+    <string name="samba_profiles">Профілі спільних тек</string>
     <string name="samba_delete_settings">Ви дійсно хочете видалити це налаштування?</string>
     <string name="samba_add_server">Додати сервер</string>
     <string name="samba_server">Вкажіть сервер</string>
@@ -34,7 +34,7 @@
     <string name="network_timeout">На жаль, віддалена тека недоступна.\nПеревірте підключення до мережі та повторіть спробу.</string>
     <string name="samba_loading">Будь ласка, зачекайте на завантаження спільної теки&#8230;</string>
     <string name="samba_reloading">Будь ласка, зачекайте на перезавантаження спільної теки&#8230;</string>
-    <string name="samba_password_request_title">Запит паролю для спільної теки</string>
+    <string name="samba_password_request_title">Запит пароля до спільної теки</string>
     <string name="samba_domain">Домен</string>
     <string name="samba_username">Імʼя користувача</string>
     <string name="samba_password">Пароль</string>
@@ -45,10 +45,10 @@
     <string name="no_saved_passwords">Немає збережених паролів</string>
     <!-- WiFi Direct strings-->
     <string name="wifi_direct">WiFi Direct</string>
-    <string name="receive_p2p_here">отримати тут через WiFi Direct</string>
+    <string name="receive_p2p_here">отримувати через WiFi Direct</string>
     <string name="empty_message">Виявлення доступних цільових пристроїв&#8230;&lt;br/&gt;Цільовий пристрій повинен активувати опцію &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
-    <string name="wifip2p_waiting">Передача WiFi Direct розпочнеться незабаром</string>
-    <string name="connect_to_target">Підключення до цілі</string>
+    <string name="wifip2p_waiting">Передача WiFi Direct незабаром розпочнеться</string>
+    <string name="connect_to_target">Підключення...</string>
     <string name="upload_in_progress">Триває завантаження&#8230;</string>
     <string name="file_uploading">Ваш файл завантажується</string>
     <string name="back_cancel">Натисніть назад, щоб скасувати</string>

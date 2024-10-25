@@ -26,16 +26,24 @@
     <string name="samba_settings_title">공유 폴더 설정</string>
     <string name="samba_loading">공유폴더에 로딩중입니다</string>
     <string name="samba_reloading">공유폴더에 다시 로딩하는 동안 기다려주십시오.</string>
+    <string name="samba_password_request_title">공유 폴더 비밀번호 요청</string>
+    <string name="samba_domain">도메인</string>
+    <string name="samba_show_password">비밀번호 표시</string>
     <!-- WiFi Direct strings-->
+    <string name="server_wait">클라이언트의 연결 및 파일 전송 대기 중</string>
+    <string name="no_network_title">네트워크 연결 없음</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">USB연결중에는 내부메모리를 이용할 수 없습니다.</string>
+    <string name="network_storage">네트워크</string>
     <string name="external_storage">외부메모리</string>
     <string name="internal_storage">내부메모리</string>
     <string name="directory_empty">빈 폴더</string>
     <string name="no_server">미디어 서버 없음</string>
     <string name="loading">로딩중</string>
+    <string name="ssh_password">비밀번호</string>
     <string name="cannot_list">콘텐츠를 표시할 수 없습니다.</string>
     <string name="error_listing">오류가 발생하였습니다.</string>
+    <string name="error_file_not_found">파일을 찾을 수 없음</string>
     <string name="pasting_copy_one">파일이 복사됨 (%1$s/%2$s)</string>
     <string name="pasting_copy_many">복사됨: %1$d/%2$d 파일이 (%3$s/%4$s)</string>
     <string name="pasting_cut_one">파일이 이동됨 (%1$s/%2$s)</string>
