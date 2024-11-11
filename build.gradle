@@ -101,7 +101,7 @@ configurations.configureEach {
 }
 
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.3'
     api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
     api 'com.github.mwiede:jsch:0.2.20'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
