@@ -104,8 +104,9 @@ public class SmbjUtils {
             smbjConnections.put(cred, smbConnection);
             // need to regenerate smbSession in this case too
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
+            Session smbSession;
             try {
-                Session smbSession = smbConnection.authenticate(ac);
+                smbSession = smbConnection.authenticate(ac);
             } catch (SMB2GuestSigningRequiredException e) {
                 log.error("getSmbConnection: caught SMB2GuestSigningRequiredException " + e.getMessage() + " for uri " + uri + " -> throwing IOException instead");
                 throw new IOException("getSmbConnection: SMB2GuestSigningRequiredException");
