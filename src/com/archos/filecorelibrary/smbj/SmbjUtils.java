@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class SmbjUtils {
 
@@ -78,7 +77,7 @@ public class SmbjUtils {
     private SmbjUtils(Context context) {
         mContext = context;
         log.debug("SmbjUtils: initializing contexts");
-        smbConfig = SmbConfig.builder().withSecurityProvider(new BCSecurityProvider())
+        smbConfig = SmbConfig.builder().withSecurityProvider(new BCSecurityProvider()).withMultiProtocolNegotiate(true).withSigningRequired(false)
                 .build();
     }
 
