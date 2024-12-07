@@ -35,6 +35,7 @@ import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.common.SMBRuntimeException;
 import com.hierynomus.smbj.connection.Connection;
+import com.hierynomus.smbj.session.SMB2GuestSigningRequiredException;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 
@@ -103,7 +104,12 @@ public class SmbjUtils {
             smbjConnections.put(cred, smbConnection);
             // need to regenerate smbSession in this case too
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
-            Session smbSession = smbConnection.authenticate(ac);
+            try {
+                Session smbSession = smbConnection.authenticate(ac);
+            } catch (SMB2GuestSigningRequiredException e) {
+                log.error("getSmbConnection: caught SMB2GuestSigningRequiredException " + e.getMessage() + " for uri " + uri + " -> throwing IOException instead");
+                throw new IOException("getSmbConnection: SMB2GuestSigningRequiredException");
+            }
             smbjSessions.put(cred, smbSession);
         }
     }
