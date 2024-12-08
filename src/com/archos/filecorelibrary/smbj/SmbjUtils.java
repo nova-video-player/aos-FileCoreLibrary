@@ -23,6 +23,7 @@ import androidx.preference.PreferenceManager;
 
 import com.archos.filecorelibrary.jcifs.JcifsUtils;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
+import com.archos.filecorelibrary.samba.SambaDiscovery;
 
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
@@ -97,7 +98,9 @@ public class SmbjUtils {
             SMBClient smbClient;
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
-            final String serverIP = JcifsUtils.getInstance(mContext).getBaseContextOnly(true).getNameServiceClient().getByName(server).getHostAddress();
+            String serverIP = SambaDiscovery.getIpFromShareName(server);
+            if (serverIP == null)
+                serverIP = JcifsUtils.getInstance(mContext).getBaseContextOnly(true).getNameServiceClient().getByName(server).getHostAddress();
             log.trace("getSmbConnection: {} -> {}", server, serverIP);
             if (port != -1) smbConnection = smbClient.connect(serverIP, port);
             else smbConnection = smbClient.connect(serverIP);
