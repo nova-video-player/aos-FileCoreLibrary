@@ -45,6 +45,11 @@ public class MdnsDiscovery implements InternalDiscovery {
                 InetAddress hostInetAddress = InetAddress.getByName(nsdServiceInfo.getHost().getHostAddress());
                 byte[] addressInBytes = hostInetAddress.getAddress();
                 //Inet6Address IPv6 = Inet6Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes, NetworkInterface.getByInetAddress(hostInetAddress));
+                InetAddress IP = InetAddress.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
+                if (!(IP instanceof Inet4Address)) {
+                    log.error("Unsupported IPv6 for mdns SMB " + nsdServiceInfo.getServiceName());
+                    return;
+                }
                 Inet4Address IPv4 = (Inet4Address) Inet4Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
                 log.debug("NsdServiceInfo: IPv4 address " + IPv4.getHostAddress());
                 //log.debug("NsdServiceInfo: IPv6 address " + IPv6.getHostAddress());
