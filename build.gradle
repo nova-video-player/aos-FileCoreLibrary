@@ -106,7 +106,7 @@ dependencies {
     api 'com.github.mwiede:jsch:0.2.21'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.11.1'
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.7'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.8'
     implementation 'com.github.nova-video-player:sardine-android:0.0.2'
     implementation 'com.hierynomus:smbj:0.13.0'
     // sshj 0.39.0 nok
