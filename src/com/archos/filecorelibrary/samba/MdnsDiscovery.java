@@ -123,8 +123,15 @@ public class MdnsDiscovery implements InternalDiscovery {
 
     @Override
     public void abort() {
-        if (mMdnsListenerRegistered) mNsdManager.stopServiceDiscovery(mMdnsListener);
-        mMdnsListenerRegistered = false;
+        if (mMdnsListenerRegistered) {
+            try {
+                mNsdManager.stopServiceDiscovery(mMdnsListener);
+            } catch (IllegalArgumentException e) {
+                log.error("abort: caught IllegalArgumentException", e);
+            } finally {
+                mMdnsListenerRegistered = false;
+            }
+        }
     }
 
     @Override
