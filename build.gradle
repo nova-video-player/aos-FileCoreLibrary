@@ -109,14 +109,13 @@ dependencies {
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.8'
     implementation 'com.github.nova-video-player:sardine-android:0.0.2'
     implementation 'com.hierynomus:smbj:0.13.0'
-    // sshj 0.39.0 nok
-    implementation 'com.hierynomus:sshj:0.38.0'
+    implementation 'com.hierynomus:sshj:0.39.0'
     implementation 'oro:oro:2.0.8'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    implementation 'io.sentry:sentry:7.16.0'
+    implementation 'io.sentry:sentry:7.19.0'
 }
 
