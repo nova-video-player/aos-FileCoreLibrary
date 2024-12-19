@@ -399,8 +399,9 @@ public class FileUtilsQ {
     }
 
     public static File getNovaPublicAppDirFile(Context context) {
+        String externalStorageState = Environment.getExternalStorageState();
         // at this point externalStorageState might not be ready
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+        if (externalStorageState != null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
             File externalFilesDir = context.getExternalFilesDir(null);
             if (externalFilesDir != null) return externalFilesDir;
             else return DEFAULT_PUBLIC_APP_FILE;
