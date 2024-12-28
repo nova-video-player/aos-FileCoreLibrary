@@ -114,6 +114,7 @@ public class LocalStorageFileEditor extends FileEditor {
                 fos = external.write();
             }
             else {
+                log.error("getOutputStream: caught FileNotFoundException for {}", mUri);
                 throw e;
             }
         }
