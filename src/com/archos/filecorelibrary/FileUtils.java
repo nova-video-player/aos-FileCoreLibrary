@@ -78,7 +78,7 @@ public class FileUtils {
         // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
         if (! canManageExternalStorage()) {
-            String path = uri.getPath();
+            String path = encodeUri(uri).getPath();
             if (!path.startsWith(FileUtilsQ.publicAppDirectory)) {
                 String scheme = uri.getScheme();
                 if (scheme != null && !scheme.equals(""))
@@ -91,8 +91,18 @@ public class FileUtils {
         } else return uri;
     }
 
-    public static Uri relocateNfoJpgAppPublicDir(Uri uri) {
+    public static Uri relocateNfoAppPublicDirForNfoJpgFiles(Uri uri) {
         // converts local file uri for jpg and nfo ONLY to public application uri to avoid Android Q storage restrictions
+        // and creates the relocate directory if not existing
+        // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
+        if (uri == null) return null;
+        String lowerCasePath = uri.getPath().toLowerCase();
+        if (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")) return relocateNfoAppPublicDir(uri);
+        else return uri;
+    }
+
+    public static Uri relocateNfoAppPublicDir(Uri uri) {
+        // converts local file uri for a directory if localstorage only to public application uri to avoid Android Q storage restrictions
         // and creates the relocate directory if not existing
         // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
@@ -102,20 +112,18 @@ public class FileUtils {
             String relocatedPath = uri.getPath();
             // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
             if (("file".equals(uri.getScheme()) || relocatedUri.toString().startsWith("/"))) {
-                log.trace("relocateNfoJpgAppPublicDir: relocatedPath " + relocatedPath + ", " + FileUtilsQ.publicAppDirectory + "/nfoPoster");
-                lowerCasePath = uri.getPath().toLowerCase();
-                if (!uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster") && // avoid double prefixing
-                        (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")))
+                log.trace("relocateNfoAppPublicDir: relocatedPath {}, {}/nfoPoster", relocatedPath, FileUtilsQ.publicAppDirectory);
+                if (!uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) // avoid double prefixing
                     relocatedUri = prefixPublicNfoPosterUri(relocatedUri);
                 Uri relocatedDir = removeLastSegment(relocatedUri);
                 File dir = new File(relocatedDir.getPath());
                 try {
                     dir.mkdirs();
                 } catch (Exception e) {
-                    log.error("relocateNfoJpgAppPublicDir: cannot recreate tree structure for " + dir.getPath());
+                    log.error("relocateNfoAppPublicDir: cannot recreate tree structure for {}", dir.getPath());
                 }
             }
-            log.debug("relocateNfoJpgAppPublicDir: " + uri + " -> " + relocatedUri.getPath());
+            log.debug("relocateNfoAppPublicDir: {} -> {} = {}", uri, relocatedUri, relocatedUri.getPath());
         }
         return relocatedUri;
     }
@@ -477,15 +485,15 @@ public class FileUtils {
     public static boolean canManageExternalStorage() {
         boolean result;
         if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
-            log.debug("canManageExternalStorage: API<23 -> true");
+            log.trace("canManageExternalStorage: API<23 -> true");
             return true;
         } else {
             if(Build.VERSION.SDK_INT>=30) {
                 result = Environment.isExternalStorageManager();
-                log.debug("canManageExternalStorage: API>=30 -> " + result);
+                log.trace("canManageExternalStorage: API>=30 -> " + result);
                 return result;
             } else {
-                log.debug("canManageExternalStorage: 23<=API<=29 -> true");
+                log.trace("canManageExternalStorage: 23<=API<=29 -> true");
                 return true;
             }
         }
