@@ -273,7 +273,8 @@ public class FileUtils {
     // provides the basename
     public static String getName(Uri uri){
         if(uri!=null) {
-            String name = uri.getLastPathSegment();
+            // note that getLastPathSegment() does not return the last segment it could omit the fragment i.e. for /toto/tata/agent#327.mp4 provide only agent
+            String name = uri.getLastPathSegment() + (uri.getFragment() != null ? "#" + uri.getFragment() : "");
             if (name == null || name.isEmpty()) {
                 if (uri.toString().lastIndexOf("/") >= 0 && uri.toString().lastIndexOf("/") < (uri.toString().length() - 1))
                     name = uri.toString().substring(uri.toString().lastIndexOf("/") + 1);
