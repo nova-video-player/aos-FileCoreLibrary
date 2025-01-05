@@ -98,6 +98,7 @@ tasks.register('ndkClean', Exec) {
 configurations.configureEach {
     exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "log4j", module: "log4j"
+    exclude group: 'jcifs', module: 'jcifs' // try to avoid conflict with jcifs-ng on Konka Android TV 2861
 }
 
 dependencies {
