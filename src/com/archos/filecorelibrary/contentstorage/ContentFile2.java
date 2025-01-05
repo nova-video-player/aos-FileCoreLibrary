@@ -21,6 +21,7 @@ import androidx.documentfile.provider.DocumentFile;
 import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.MimeUtils;
 import com.archos.filecorelibrary.RawLister;
@@ -58,7 +59,7 @@ public class ContentFile2 extends MetaFile2 {
 
         mName = file.getName();
         if(mName==null)
-            mName = file.getUri().getLastPathSegment();
+            mName = FileUtils.getName(file.getUri());
         mLength = file.length();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
@@ -75,7 +76,7 @@ public class ContentFile2 extends MetaFile2 {
         mPath = uri.toString();
         mName = DocumentUriBuilder.getNameFromContentProvider(uri);
         if(mName==null)
-            mName = uri.getLastPathSegment();
+            mName = FileUtils.getName(uri);
         mMimeType = DocumentUriBuilder.getTypeFromContentProvider(uri);
         mLength = 0;
         mIsFile = true;

@@ -21,6 +21,7 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
@@ -56,7 +57,7 @@ public class SshjFile2 extends MetaFile2 {
         log.trace("SshjFile2: " + uri);
         final FileAttributes fileAttributes = fileOrDir.getAttributes();
         mUriString = uri.toString();
-        mName = uri.getLastPathSegment();
+        mName = FileUtils.getName(uri);
         if (fileAttributes == null) log.error("SshjFile2: fileAttributes is null for " + uri);
         final FileMode.Type type = fileAttributes.getType();
         mIsDirectory = (type == FileMode.Type.DIRECTORY);
@@ -84,7 +85,7 @@ public class SshjFile2 extends MetaFile2 {
         if (fileAttributes == null) log.error("SshjFile2: argument fileAttributes is null for " + uri);
         log.trace("SshjFile2: " + uri);
         mUriString = uri.toString();
-        mName = uri.getLastPathSegment();
+        mName = FileUtils.getName(uri);
         final FileMode.Type type = fileAttributes.getType();
         mIsDirectory = (type == FileMode.Type.DIRECTORY);
         mIsFile = (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK);
@@ -101,7 +102,7 @@ public class SshjFile2 extends MetaFile2 {
         mCanRead = true;
         mCanWrite = true;
         mLength = fileAttributes.getSize();
-        log.trace("SshjFile2: uri=" + mUriString + ", mName=" + mName + ", isDirectory=" + isDirectory() +
+        log.trace("SshjFile2: uriString=" + mUriString + ", mName=" + mName + ", isDirectory=" + isDirectory() +
                 ", lastModified=" + mLastModified + ", canWrite=" + canWrite() + ", length=" + mLength);
     }
 
@@ -178,6 +179,7 @@ public class SshjFile2 extends MetaFile2 {
             log.trace("fromUri: " + uri);
             sftpClient = SshjUtils.peekInstance().getSFTPClient(uri);
             final String filePath = getSftpPath(uri);
+            log.trace("fromUri: uri={}, filePath={}", uri, filePath);
             var fileAttributes = sftpClient.lstat(filePath);
             if (fileAttributes == null) log.error("fromUri: file does not exist " + uri);
             // throw perm if null!

@@ -45,7 +45,7 @@ public class DocumentUriBuilder {
         return new Uri.Builder().scheme(ContentResolver.SCHEME_CONTENT)
                 .authority(treeUri.getAuthority()).appendPath(PATH_TREE)
                 .appendPath(getTreeDocumentId(treeUri)).appendPath(PATH_DOCUMENT)
-                .appendPath(treeUri.getLastPathSegment()).build();
+                .appendPath(FileUtils.getName(treeUri)).build();
     }
 
     public static Uri convertFileUriToContentUri(Context context, Uri fileUri){
@@ -105,13 +105,13 @@ public class DocumentUriBuilder {
         Constructor<?> constructor = c.getDeclaredConstructor(DocumentFile.class, Context.class, Uri.class);
         constructor.setAccessible(true);
         Uri docUri;
-        docUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, uri.getLastPathSegment());
+        docUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, FileUtils.getName(uri));
         return (DocumentFile) constructor.newInstance(null, context, docUri);
     }
 
     public static Pair<String, String>  getParentUriStringAndFileName(Uri uri){
         //try to get parent
-        String last = uri.getLastPathSegment();
+        String last = FileUtils.getName(uri);
         String[] parts = last.split(":");
         int i = 0;
         String parentLastPart = "";

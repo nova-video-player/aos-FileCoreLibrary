@@ -18,6 +18,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
@@ -148,7 +149,7 @@ public class SFTPFile2 extends MetaFile2 {
             SftpATTRS attrs = ((ChannelSftp)channel).stat(uri.getPath());
             channel.disconnect();
             SFTPSession.getInstance().releaseSession(channel);
-            return new SFTPFile2(attrs,uri.getLastPathSegment(), uri);
+            return new SFTPFile2(attrs,FileUtils.getName(uri), uri);
         } catch (JSchException e) {
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();

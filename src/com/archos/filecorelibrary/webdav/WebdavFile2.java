@@ -18,6 +18,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.thegrizzlylabs.sardineandroid.DavAce;
@@ -61,7 +62,7 @@ public class WebdavFile2 extends MetaFile2 {
 
     public WebdavFile2(DavResource res, Uri uri) {
         mUriString = uri.toString();
-        mName = uri.getLastPathSegment();
+        mName = FileUtils.getName(uri);
         mIsDirectory = res.isDirectory();
         mIsFile = ! mIsDirectory;
         if (res.getModified() != null) mLastModified = res.getModified().getTime();

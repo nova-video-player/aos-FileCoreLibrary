@@ -17,7 +17,6 @@ package com.archos.filecorelibrary;
 import static com.archos.filecorelibrary.FileUtils.caughtException;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.contentstorage.ContentStorageFileEditor;
@@ -124,7 +123,7 @@ public class StreamOverHttp {
 		if(mSubList!=null)
 			return mSubList;
 		final Uri parentUri = FileUtils.getParentUrl(video);
-		final String videoFileName = video.getLastPathSegment();
+		final String videoFileName = FileUtils.getName(video);
 		final String videoExtension = MimeUtils.getExtension(videoFileName);
 		String filenameWithoutExtension;
 		if (videoExtension!=null) { // may happen in UPnP
@@ -175,7 +174,7 @@ public class StreamOverHttp {
 			mPosterLocalUri = Uri.parse("resource://"+"generic_poster.png");//special case when no poster
 			return getUri("generic_poster.png");
 		}
-		return getUri(posterLocalUri.getLastPathSegment());
+		return getUri(FileUtils.getName(posterLocalUri));
 	}
 
 	private class HttpSession implements Runnable {

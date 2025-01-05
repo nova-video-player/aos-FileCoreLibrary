@@ -22,6 +22,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.hierynomus.msdtyp.AccessMask;
@@ -57,7 +58,7 @@ public class SmbjFile2 extends MetaFile2 {
     public SmbjFile2(FileIdBothDirectoryInformation fileOrDir, Uri uri) {
         final long fileAttributes = fileOrDir.getFileAttributes();
         mUriString = uri.toString();
-        mName = uri.getLastPathSegment();
+        mName = FileUtils.getName(uri);
         mIsDirectory = EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_DIRECTORY);
         mIsFile = !mIsDirectory;
         if (fileOrDir.getChangeTime() != null) mLastModified = fileOrDir.getChangeTime().toDate().getTime();
