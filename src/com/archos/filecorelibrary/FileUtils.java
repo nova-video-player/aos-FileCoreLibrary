@@ -371,20 +371,33 @@ public class FileUtils {
     public static Uri encodeUri(Uri uri) {
         String uriString = uri.toString();
         String uriEncodedString ="";
-        if(uri.getScheme()!=null) {
+        if (uri.getScheme() != null) {
             uriEncodedString += uri.getScheme() + "://";
             uriString = uriString.substring((uri.getScheme() + "://").length());
+            // Extract the authority (host:port) to not recode the : in the port
+            String authority = uriString.split("/")[0];
+            if (authority.contains(":")) {
+                String[] parts = authority.split(":");
+                uriEncodedString += parts[0] + ":" + parts[1]; // Keep the port as is
+                uriString = uriString.substring(authority.length());
+            } else {
+                uriEncodedString += authority;
+                uriString = uriString.substring(authority.length());
+            }
         }
         int i= 0;
-        for(String seg : uriString.split("/")){ //split instead of using uri. get path segments because when weird caracters such as # %, path segments don't work properly
+        for(String seg : uriString.split("/")){ //split instead of using uri. get path segments because when weird characters such as # %, path segments don't work properly
             seg = seg.replace("/","");
-            if(i!=0||uriString.startsWith("/"))
-                uriEncodedString+="/";
+            if(i!=0 && uriString.startsWith("/")) {
+                uriEncodedString += "/";
+            }
             uriEncodedString+=Uri.encode(seg);
             i++;
         }
-        if(uriEncodedString.startsWith("//"))
+        if(uriEncodedString.startsWith("//")) {
             uriEncodedString = uriEncodedString.substring(1);
+        }
+        log.debug("encodeUri: results in uriEncodedString={}", uriEncodedString);
         return Uri.parse(uriEncodedString);
     }
 
