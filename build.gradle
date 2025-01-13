@@ -102,9 +102,9 @@ configurations.configureEach {
 }
 
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.3'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
-    api 'com.github.mwiede:jsch:0.2.21'
+    api 'com.github.mwiede:jsch:0.2.22'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.11.1'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.8'
@@ -117,6 +117,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    implementation 'io.sentry:sentry:7.19.1'
+    implementation 'io.sentry:sentry:7.20.0'
 }
 
