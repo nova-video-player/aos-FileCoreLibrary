@@ -100,12 +100,22 @@ public class DocumentUriBuilder {
         return buildDocumentUriUsingTree(treeUri);
     }
 
+    public static Uri sanitizeUri(Uri uri) {
+        String uriString = uri.toString();
+        // Remove trailing invalid characters (e.g., %3A) see https://github.com/nova-video-player/aos-AVP/issues/1373
+        if (uriString.endsWith("%3A")) {
+            uriString = uriString.substring(0, uriString.length() - 3);
+        }
+        return Uri.parse(uriString);
+    }
+
     public static DocumentFile getDocumentFileForUri(Context context, Uri uri) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
         Class<?> c = Class.forName("androidx.documentfile.provider.TreeDocumentFile");
         Constructor<?> constructor = c.getDeclaredConstructor(DocumentFile.class, Context.class, Uri.class);
         constructor.setAccessible(true);
+        String sanitizedUriString = uri.toString().replace("%3A", ":");
         Uri docUri;
-        docUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, FileUtils.getName(uri));
+        docUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, FileUtils.getName(sanitizedUriString));
         return (DocumentFile) constructor.newInstance(null, context, docUri);
     }
 
