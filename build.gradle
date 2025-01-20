@@ -117,6 +117,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    implementation 'io.sentry:sentry:7.19.1'
+    implementation 'io.sentry:sentry:7.20.1'
 }
 
