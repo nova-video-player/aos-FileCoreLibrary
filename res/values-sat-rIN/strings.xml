@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_info_label_name">ᱧᱩᱛᱩᱢ:</string>
+    <string name="file_info_label_can_read">ᱯᱟᱲᱦᱟᱣ</string>
+    <string name="file_info_label_cannot_read">ᱵᱟᱢ ᱯᱟᱲᱦᱟᱣ ᱫᱟᱲᱮᱭᱟᱜ ᱠᱟᱱᱟ</string>
+    <string name="file_info_label_can_write">ᱚᱞ ᱢᱮ</string>
+    <string name="file_info_label_cannot_write">ᱵᱟᱹᱧ ᱚᱞ ᱫᱟᱲᱮᱭᱟᱜᱼᱟ</string>
+    <string name="file_info_label_last_modified">ᱢᱩᱪᱟᱹᱫ ᱥᱚᱫᱚᱨ:</string>
+    <string name="file_info_label_mime_type">ᱢᱟᱭᱤᱢ ᱞᱮᱠᱟ:</string>
+    <string name="file_info_directory_empty">ᱠᱷᱟᱹᱞᱤ ᱯᱚᱴᱚᱢ</string>
+    <!-- Archos file manager core -->
+    <!-- Samba share settings -->
+    <!-- WiFi Direct strings-->
+    <!-- FileManager strings -->
+    <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
+    <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
+    <!-- Shortcuts -->
+    <!-- DLNA -->
+    <!-- ZIP -->
+    <!-- Notifications -->
+    <!-- Network Scanning -->
+    <!-- Hiding from media scanning -->
+    <!-- Folder Picker -->
+</resources>
