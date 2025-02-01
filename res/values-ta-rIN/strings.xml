@@ -1,9 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="file_info_label_name">பெயர்:</string>
+    <string name="file_info_label_can_read">படி</string>
+    <string name="file_info_label_cannot_read">படிக்க இயலவில்லை</string>
+    <string name="file_info_label_can_write">எழுது</string>
+    <string name="file_info_label_cannot_write">எழுத இயலவில்லை</string>
+    <string name="file_info_label_last_modified">கடைசியாக மாற்றப்பட்டது:</string>
+    <string name="file_info_label_mime_type">மைம் வகை:</string>
+    <string name="file_info_directory_empty">காலி கோப்புறை</string>
+    <string name="file_info_one_directory">1 கோப்புறை</string>
+    <string name="file_info_directories">கோப்புறைகள்</string>
+    <string name="file_info_one_file">1 கோப்பு</string>
+    <string name="file_info_files">கோப்புகள்</string>
+    <string name="usbhost_ptp_storage">வெளிப்புற புகைபடக் கருவி</string>
+    <string name="network_media_servers">மீடியா சர்வர்கள் (UPnP)</string>
+    <string name="network_shared_folders">பகிரப்பட்ட கோப்புறைகள் (SMB)</string>
     <!-- Archos file manager core -->
+    <string name="file_copy_pattern">நகல்</string>
+    <string name="fast_scroll_numeric_alphabet">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
+    <string name="samba_settings_title">பகிரப்பட்ட கோப்புறை அமைப்புகள்</string>
+    <string name="samba_settings_summary">உங்கள் தனிப்பட்ட நெட்வொர்க்கில் பகிரப்பட்ட கோப்புறைகளை அணுக பயனர் பெயர் மற்றும் கடவுச்சொற்களை அமைக்கவும்</string>
+    <string name="samba_profiles">பகிரப்பட்ட கோப்புறை சுயவிவரங்கள்</string>
+    <string name="samba_delete_settings">இந்த அமைப்பை நீங்கள் உண்மையிலேயே நீக்க விரும்புகிறீர்களா?</string>
+    <string name="samba_add_server">ஒரு சேவையகத்தைச் சேர்க்கவும்</string>
+    <string name="samba_server">ஒரு சேவையகத்தை வரையறுக்கவும்</string>
+    <string name="samba_share">ஒரு பங்கை வரையறுக்கவும்</string>
+    <string name="refresh">புதுப்பி</string>
+    <string name="network_timeout">மன்னிக்கவும், தொலை கோப்புறையை அணுக முடியாது.\nஉங்கள் நெட்வொர்க் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="samba_loading">பகிரப்பட்ட கோப்புறையைத் திறக்கும் வரை காத்திருக்கவும்&#8230;</string>
+    <string name="samba_reloading">பகிரப்பட்ட கோப்புறையை மீண்டும் திறக்கும் வரை காத்திருக்கவும்&#8230;</string>
+    <string name="samba_password_request_title">பகிரப்பட்ட கோப்புறை கடவுச்சொல் கோரிக்கை</string>
+    <string name="samba_domain">டொமைன்</string>
+    <string name="samba_username">பயனர்பெயர்</string>
+    <string name="samba_password">கடவுச்சொல்</string>
+    <string name="samba_show_password">கடவுச்சொல்லை காட்டு</string>
+    <string name="samba_wrong_password">பயனர்பெயர் அல்லது கடவுச்சொல் தவறானது</string>
+    <string name="preferences">விருப்பத்தேர்வுகள்</string>
+    <string name="shared_folder_credentials">கடவுச்சொற்கள்</string>
+    <string name="no_saved_passwords">சேமிக்கப்பட்ட கடவுச்சொற்கள் எதுவும் இல்லை</string>
     <!-- WiFi Direct strings-->
+    <string name="wifi_direct">நேரடி அருகலை</string>
+    <string name="receive_p2p_here">இங்கே நேரடி அருகலை வழியாகப் பெறுங்கள்</string>
+    <string name="empty_message">கிடைக்கக்கூடிய இலக்கு சாதனங்களைக் கண்டறிதல்&#8230;&lt;br/&gt;இலக்கு சாதனம் செயல்படுத்தப்பட வேண்டும் &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; விருப்பத்தேர்வு</string>
+    <string name="wifip2p_waiting">நேரடி அருகலை பரிமாற்றம் விரைவில் தொடங்கும்</string>
+    <string name="connect_to_target">இலக்கோடு இணைக்கிறது</string>
+    <string name="upload_in_progress">பதிவேற்றம் செயலில் உள்ளது&#8230;</string>
+    <string name="file_uploading">உங்கள் கோப்பு பதிவேற்றப்படுகிறது</string>
+    <string name="back_cancel">ரத்துசெய்ய, பின் பொத்தானை அழுத்தவும்</string>
+    <string name="server_wait">வாடிக்கையாளர் இணைத்துக் கோப்பை அனுப்ப காத்திருக்கிறது</string>
     <!-- FileManager strings -->
+    <string name="open_file_after_download">நகலெடுத்த பிறகு கோப்பைத் திறக்கவும்</string>
+    <string name="pasting_copy_one">ஒரு கோப்பை நகலெடுக்கிறது (%1$s/%2$s)</string>
+    <string name="pasting_copy_many">நகலெடுக்கிறது: %1$d/%2$d கோப்புகள் (%3$s/%4$s)</string>
+    <string name="pasting_cut_one">ஒரு கோப்பை நகர்த்துகிறது (%1$s/%2$s)</string>
+    <string name="pasting_cut_many">நகர்த்துகிறது: %1$d/%2$d கோப்புகள் (%3$s/%4$s)</string>
+    <string name="pasting_copy_speed">&#160;&#160;%1$s ஒரு நொடிக்கு Kb</string>
+    <string name="delete">நீக்கு</string>
+    <string name="rename">மறுபெயரிடு</string>
+    <string name="details">விவரங்கள்</string>
+    <string name="refresh_directory">கோப்புறையைப் புதுப்பிக்கவும்</string>
+    <string-array name="folder_or_file">
+        <item>ஒரு கோப்புறையை உருவாக்கு</item>
+        <item>ஒரு வெற்று கோப்பை உருவாக்கவும்</item>
+    </string-array>
+    <string name="new_directory">புதிய கோப்புறை</string>
+    <string name="new_file">புதிய கோப்பு</string>
+    <string name="new_folder_or_file">புதிய கோப்புறை அல்லது கோப்பு</string>
+    <string name="refresh_servers_list">சேவையகப் பட்டியலைப் புதுப்பிக்கவும்</string>
+    <string name="enable_network_shares">நெட்வொர்க் பகிர்வுகளை இயக்கு</string>
+    <string name="go_top">மேலே செல்</string>
+    <string name="uncheck_impossible">பெற்றோர் கோப்புறை தேர்ந்தெடுக்கப்படும்போது தேர்வை மாற்ற முடியாது</string>
+    <string name="confirm_delete_one">நீங்கள் உண்மையில் நீக்க விரும்புகிறீர்களா?</string>
+    <string name="confirm_delete_parent_folder">மூல கோப்புறையில் வேறு எந்த வீடியோவும் இல்லை போலிருக்கிறது, அதை நீக்க வேண்டுமா?</string>
+    <string name="confirm_delete_many">நீங்கள் உண்மையில் நீக்க விரும்புகிறீர்களா?</string>
+    <string name="enter_new_name">பெயர்:</string>
+    <string name="file_name">கோப்புப் பெயர்</string>
+    <string name="folder_name">கோப்புறை பெயர்</string>
+    <string name="run_in_background">சிறிதாக்கு</string>
+    <string name="confirm_deleting_cancellation">நீக்குவதை உண்மையிலேயே ரத்து செய்ய விரும்புகிறீர்களா?</string>
+    <string name="confirm_copying_cancellation">நகலெடுப்பதை உண்மையிலேயே ரத்து செய்ய விரும்புகிறீர்களா?</string>
+    <string name="confirm_moving_cancellation">நீங்கள் உண்மையிலேயே இடமாற்றத்தை ரத்து செய்ய விரும்புகிறீர்களா?</string>
+    <string name="cannot_create_directory">புதிய கோப்புறையை உருவாக்க முடியவில்லை</string>
+    <string name="cannot_create_file">புதிய கோப்பை உருவாக்க முடியவில்லை</string>
+    <string name="cannot_delete_directory">கோப்புறையை நீக்க முடியாது</string>
+    <string name="cannot_delete_file">கோப்பை நீக்க முடியாது</string>
+    <string name="cannot_delete_files">கோப்புகளை நீக்க முடியாது</string>
+    <string name="directory_deleted">கோப்புறை நீக்கப்பட்டது</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <!-- Shortcuts -->

@@ -21,7 +21,7 @@
     <string name="network_shared_folders">Udostępnione foldery (SMB)</string>
     <!-- Archos file manager core -->
     <string name="file_copy_pattern">kopiuj</string>
-    <string name="fast_scroll_numeric_alphabet"> 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
     <string name="samba_settings_title">Ustawienia folderów udostępnionych</string>
     <string name="samba_settings_summary">Skonfiguruj nazwy użytkowników i hasła dostępu do folderów udostępnionych w sieci prywatnej</string>
@@ -33,7 +33,7 @@
     <string name="refresh">Odśwież</string>
     <string name="network_timeout">Przepraszamy, zdalny folder jest niedostępny.\nSprawdź połączenie z internetem i spróbuj ponownie.</string>
     <string name="samba_loading">Ładowanie folderu sieciowego w toku&#8230;</string>
-    <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego…</string>
+    <string name="samba_reloading">Proszę czekać, trwa ponowne ładowanie foldera współdzielonego&#8230;</string>
     <string name="samba_password_request_title">Dzielony folder wymaga hasła</string>
     <string name="samba_domain">Domena</string>
     <string name="samba_username">Nazwa użytkownika</string>
@@ -44,7 +44,7 @@
     <string name="shared_folder_credentials">Hasła</string>
     <string name="no_saved_passwords">Brak zapisanych haseł</string>
     <!-- WiFi Direct strings-->
-    <string name="wifi_direct">Wi-Fi Direct</string>
+    <string name="wifi_direct">WiFi Direct</string>
     <string name="receive_p2p_here">odbierz przez WiFi Direct</string>
     <string name="empty_message">Odnajdywanie dostępnych urządzeń docelowych&#8230;&lt;br/&gt;Urządzenie docelowe musi mieć aktywna opcję &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt;</string>
     <string name="wifip2p_waiting">Transfer WiFi Direct rozpocznie się wkrótce</string>
@@ -73,7 +73,7 @@
     <string name="cloud_storage">Chmura</string>
     <string name="directory_empty">Folder jest pusty</string>
     <string name="no_server">Nie znaleziono serwera</string>
-    <string name="loading">Ładowanie…</string>
+    <string name="loading">Ładowanie&#8230;</string>
     <string name="ssh_error">Nie można połączyć: Proszę sprawdzić połączenie i poświadczenia</string>
     <string name="ssh_remote_address">Adres zdalny</string>
     <string name="ssh_remote_address_error">Należy określić adres zdalny</string>
@@ -94,7 +94,7 @@
     <string name="error_no_permission">Konto nie ma uprawnienia do wyświetlenia zawartości tego folderu</string>
     <string name="error_file_not_found">Nie znaleziono pliku</string>
     <string name="error_time_out">Przekroczenie czasu</string>
-    <string name="deleting">Usuwanie&#8230;</string>
+    <string name="deleting">Usuwanie</string>
     <string name="deleting_many">%1$d/%2$d usuniętych plików</string>
     <string name="deleting_one">Kasowanie jednego pliku</string>
     <string name="copying">Kopiuję&#8230;</string>
@@ -173,8 +173,8 @@
     <string name="copy_on_device_multi">Pobierz na urządzenie</string>
     <string name="storage_swapped_primary">główny</string>
     <string name="storage_swapped_secondary">dodatkowy</string>
-    <string name="yes">"„Tak”"</string>
-    <string name="no">"„Nie”"</string>
+    <string name="yes">"Tak"</string>
+    <string name="no">"Nie"</string>
     <string name="share">Udostępnij</string>
     <!-- Displayed in the title of the dialog for things to do with a picture that is to be sent to another application: -->
     <string name="send_file">Udostępnij plik poprzez</string>
@@ -196,7 +196,7 @@
     <string name="n_shortcut_removed">%1$d skrótów usunięto</string>
     <string name="server_not_available" comment="deprecated">Serwer jest obecnie niedostępny</string>
     <string name="server_not_available_2" comment="deprecated">%1$s jest obecnie niedostępny</string>
-    <string name="cannot_open_shortcut">Zawartość tego skrótu nie jest obecnie dostępna. \nPlease Sprawdź, czy masz wymagane uprawnienia.</string>
+    <string name="cannot_open_shortcut">Zawartość tego skrótu nie jest obecnie dostępna.\nPlease Sprawdź, czy masz wymagane uprawnienia.</string>
     <string name="network_shortcuts">Skróty sieciowe</string>
     <string name="media_servers">Serwery mediów</string>
     <string name="shortcut_list_empty">Aby utworzyć skróty do ulubionych zdalnych folderów długo kliknij na foldery docelowe i wybierz opcję \"%s\" na pasku akcji.</string>
@@ -209,8 +209,8 @@
     <!-- ZIP -->
     <string name="zip_extract_action">Wypakuj tutaj</string>
     <string name="zip_extract_success_message">Wyodrębnianie udane</string>
-    <string name="zip_compress_action">Skompresuj do archiwum Zip</string>
-    <string name="zip_extracting_message">Wyodrębnianie plików z archiwum ZIP..</string>
+    <string name="zip_compress_action">Skompresuj do archiwum ZIP</string>
+    <string name="zip_extracting_message">Wyodrębnianie plików z archiwum ZIP...</string>
     <string name="zip_compressing_message">Kompresowanie plików do archiwum Zip</string>
     <string name="zip_compressing_many">%1$d/%2$d skompresowanych plików</string>
     <string name="zip_compressing_one">Kopiowanie jednego pliku</string>
@@ -218,9 +218,9 @@
     <string name="zip_compressing_canceled">Kompresowanie anulowane</string>
     <string name="zip_extracting_many">%1$d/%2$d wyodrębnionych plików</string>
     <string name="zip_extracting_one">Wyodrębnianie jednego pliku (%1$s/%2$s)</string>
-    <string name="zip_extract_error_message">Wystąpił błąd podczas rozpakowywania archiwum. \nArchiwum może być uszkodzone lub jest za mało wolnego miejsca na dysku.</string>
+    <string name="zip_extract_error_message">Wystąpił błąd podczas rozpakowywania archiwum.\nArchiwum może być uszkodzone lub jest za mało wolnego miejsca na dysku.</string>
     <string name="zip_extract_canceled">Wypakowanie anulowane</string>
-    <string name="zip_compress_error_message">Wystąpił błąd podczas tworzenia archiwum. \nMoże jest zbyt mało wolnego miejsca na dysku.</string>
+    <string name="zip_compress_error_message">Wystąpił błąd podczas tworzenia archiwum.\nMoże jest zbyt mało wolnego miejsca na dysku.</string>
     <string name="zip_cannot_open_inner_entry">Nie można otworzyć plik w archiwum. Rozpakuj go najpierw.</string>
     <string name="zip_size_limit">Przeglądanie plików Zip ograniczone jest do plików mniejszych niż 20 MB</string>
     <!-- Notifications -->
