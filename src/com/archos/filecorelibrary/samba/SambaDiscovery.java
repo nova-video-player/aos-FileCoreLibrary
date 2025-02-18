@@ -105,7 +105,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     /**
      * We have several (3 as of today...) discovery engine internally
      */
-    private List<InternalDiscovery> mInternalDiscoveries = new ArrayList<InternalDiscovery>(3);
+    private List<InternalDiscovery> mInternalDiscoveries = new CopyOnWriteArrayList<>();
 
     /**
      * true if user aborted the discovery
