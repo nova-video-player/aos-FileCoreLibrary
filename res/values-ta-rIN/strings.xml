@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="file_info_label_name">பெயர்:</string>
+    <string name="file_info_label_size">அளவு:</string>
+    <string name="file_info_label_size_internal">அளவு(உள்):</string>
+    <string name="file_info_label_size_sd">அளவு(SD):</string>
+    <string name="file_info_label_permission">அனுமதி:</string>
     <string name="file_info_label_can_read">படி</string>
     <string name="file_info_label_cannot_read">படிக்க இயலவில்லை</string>
     <string name="file_info_label_can_write">எழுது</string>
@@ -49,7 +53,25 @@
     <string name="file_uploading">உங்கள் கோப்பு பதிவேற்றப்படுகிறது</string>
     <string name="back_cancel">ரத்துசெய்ய, பின் பொத்தானை அழுத்தவும்</string>
     <string name="server_wait">வாடிக்கையாளர் இணைத்துக் கோப்பை அனுப்ப காத்திருக்கிறது</string>
+    <string name="download_in_progress">பதிவேற்றம் செயலில் உள்ளது&#8230;</string>
+    <string name="file_downloading">உங்கள் கோப்பு பதிவிறக்கப்படுகிறது</string>
+    <string name="server_ready">பெற தயாராக உள்ளது</string>
+    <string name="nonetwork_title" comment="deprecated">வைஃபை இணைப்பு இல்லை</string>
+    <string name="no_network_title">நெட்வொர்க் இணைப்பு இல்லை</string>
+    <string name="nonetwork_message">இந்த அம்சத்திற்கு நீங்கள் வைஃபையை இயக்க வேண்டும்</string>
     <!-- FileManager strings -->
+    <string name="storage_busy_message">USB மூலம் இணைக்கப்பட்டு மவுண்ட் செய்யப்பட்டிருக்கும் போது, ​​உள் சேமிப்பகத்தைப் பயன்படுத்த முடியாது.</string>
+    <string name="ssh_storage">FTP</string>
+    <string name="network_storage">நெட்வொர்க்</string>
+    <string name="external_storage">வெளிப்புற</string>
+    <string name="internal_storage">உள்புற</string>
+    <string name="internal_storage_unified">சேமிப்பகம்</string>
+    <string name="sd_card_storage">SD அட்டை</string>
+    <string name="usb_host_storage">யுஎஸ்பி</string>
+    <string name="other_storage">இயக்கி</string>
+    <string name="usb_ptp_storage">PTP பயன்முறை</string>
+    <string name="cloud_storage">மேகம்</string>
+    <string name="directory_empty">வெற்று கோப்புறை</string>
     <string name="open_file_after_download">நகலெடுத்த பிறகு கோப்பைத் திறக்கவும்</string>
     <string name="pasting_copy_one">ஒரு கோப்பை நகலெடுக்கிறது (%1$s/%2$s)</string>
     <string name="pasting_copy_many">நகலெடுக்கிறது: %1$d/%2$d கோப்புகள் (%3$s/%4$s)</string>

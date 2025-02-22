@@ -122,7 +122,7 @@
     <string name="go_top">Zurück in das Hauptverzeichnis</string>
     <string name="uncheck_impossible">Es ist nicht möglich die Auswahl zu ändern, wenn das übergeordnete Verzeichnis ausgewählt ist</string>
     <string name="confirm_delete_one">Wollen Sie es wirklich löschen?</string>
-    <string name="confirm_delete_parent_folder">Es scheint, dass das übergeordnete Verzeichnis kein anderes Video enthält, soll es gelöscht werden?</string>
+    <string name="confirm_delete_parent_folder">Es scheint, dass das übergeordnete Verzeichnis kein anderes Video enthält. Soll es gelöscht werden?</string>
     <string name="confirm_delete_many">Wollen Sie diese wirklich löschen?</string>
     <string name="enter_new_name">Namen:</string>
     <string name="file_name">Dateiname</string>
