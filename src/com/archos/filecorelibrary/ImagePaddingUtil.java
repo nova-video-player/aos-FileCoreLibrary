@@ -15,20 +15,27 @@ public class ImagePaddingUtil {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
+        // Ensure padding is less than half of the image dimensions
+        padding = Math.min(padding, Math.min(width, height) / 2);
+
         int transparentPixelCount = 0;
         int totalEdgePixels = 0;
 
         // Check top and bottom edges for transparency
         for (int x = 0; x < width; x++) {
-            if (isTransparent(bitmap.getPixel(x, padding))) transparentPixelCount++; // Top edge
-            if (isTransparent(bitmap.getPixel(x, height - padding - 1))) transparentPixelCount++; // Bottom edge
+            if (x < width && padding < height && isTransparent(bitmap.getPixel(x, padding)))
+                transparentPixelCount++; // Top edge
+            if (x < width && height - padding - 1 >= 0 && isTransparent(bitmap.getPixel(x, height - padding - 1)))
+                transparentPixelCount++; // Bottom edge
             totalEdgePixels += 2;
         }
 
         // Check left and right edges for transparency
         for (int y = 0; y < height; y++) {
-            if (isTransparent(bitmap.getPixel(padding, y))) transparentPixelCount++; // Left edge
-            if (isTransparent(bitmap.getPixel(width - padding - 1, y))) transparentPixelCount++; // Right edge
+            if (y < height && padding < width && isTransparent(bitmap.getPixel(padding, y)))
+                transparentPixelCount++; // Left edge
+            if (y < height && width - padding - 1 >= 0 && isTransparent(bitmap.getPixel(width - padding - 1, y)))
+                transparentPixelCount++; // Right edge
             totalEdgePixels += 2;
         }
 
@@ -38,6 +45,7 @@ public class ImagePaddingUtil {
         // Only apply padding if the transparency ratio is below the threshold
         return transparencyRatio < transparencyThreshold;
     }
+
 
     // Helper function to check if the pixel is transparent
     public static boolean isTransparent(int pixel) {
