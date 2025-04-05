@@ -228,7 +228,7 @@
     <string name="cut_error">No se ha podido cortar</string>
     <string name="delete_error">No se ha podido eliminar</string>
     <!-- Network Scanning -->
-    <string name="scan_network_index">Indexar archivos multimedia</string>
+    <string name="scan_network_index">Índice de archivos multimedia</string>
     <string name="scan_network_remove">Eliminar multimedia del índice</string>
     <string name="debug_browse_to_root">Vaya a la raíz del dispositivo (sólo debug)</string>
     <!-- Hiding from media scanning -->

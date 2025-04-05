@@ -169,7 +169,7 @@
     <string name="cannot_open_file">Nie można otworzyć pliku</string>
     <string name="no_application_to_open_file">Brak aplikacji na urządzeniu umożliwiającej otworzenie tego pliku</string>
     <string name="delete_still_ongoing">W tle trwa przenoszenie usuwanie</string>
-    <string name="copy_on_device">Pobierz video na urządzenie</string>
+    <string name="copy_on_device">Pobierz plik wideo na urządzenie</string>
     <string name="copy_on_device_multi">Pobierz na urządzenie</string>
     <string name="storage_swapped_primary">główny</string>
     <string name="storage_swapped_secondary">dodatkowy</string>
