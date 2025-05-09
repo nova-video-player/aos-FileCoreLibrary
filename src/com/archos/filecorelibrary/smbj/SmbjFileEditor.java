@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.EnumSet;
+import java.util.concurrent.TimeoutException;
 
 public class SmbjFileEditor extends FileEditor {
 
@@ -174,14 +175,11 @@ public class SmbjFileEditor extends FileEditor {
                 return false;
             }
             String mFilePath = getFilePath(mUri);
-            if (mDiskShare.fileExists(mFilePath)) return true;
-            else {
-                if (mDiskShare.folderExists(mFilePath)) return true;
-            }
-        } catch (IOException ioe) {
-            caughtException(ioe, "SmbjFileEditor:exists", "IOException in exists " + mUri);
-        } catch (SMBApiException se) {
-            caughtException(se, "SmbjFileEditor:exists", "SMBApiException in exists " + mUri);
+            return mDiskShare.fileExists(mFilePath) || mDiskShare.folderExists(mFilePath);
+        } catch (TimeoutException te) {
+            caughtException(te, "SmbjFileEditor:exists", "TimeoutException in exists " + mUri);
+        } catch (IOException | SMBApiException e) {
+            caughtException(e, "SmbjFileEditor:exists", "Exception in exists " + mUri);
         }
         return false;
     }
