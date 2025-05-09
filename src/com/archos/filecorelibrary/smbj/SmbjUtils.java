@@ -102,11 +102,19 @@ public class SmbjUtils {
             if (serverIP == null)
                 serverIP = JcifsUtils.getInstance(mContext).getBaseContextOnly(true).getNameServiceClient().getByName(server).getHostAddress();
             log.trace("getSmbConnection: {} -> {}", server, serverIP);
-            if (port != -1) smbConnection = smbClient.connect(serverIP, port);
-            else smbConnection = smbClient.connect(serverIP);
+            smbConnection = (port != -1) ? smbClient.connect(serverIP, port) : smbClient.connect(serverIP);
             smbjConnections.put(cred, smbConnection);
+            // check that auth information is valid
+            if (username == null || password == null) {
+                log.error("getSmbConnection: username or password is null for uri {}", uri);
+                throw new IOException("Invalid credentials: username or password is null");
+            }
             // need to regenerate smbSession in this case too
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
+            if (ac == null) {
+                log.error("getSmbConnection: AuthenticationContext is null for uri {}", uri);
+                throw new IOException("Failed to create AuthenticationContext");
+            }
             Session smbSession;
             try {
                 smbSession = smbConnection.authenticate(ac);
