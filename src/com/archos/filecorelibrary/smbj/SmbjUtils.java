@@ -181,6 +181,10 @@ public class SmbjUtils {
     }
 
     public static boolean isSMBjEnabled() {
+        if (mContext == null) {
+            log.error("isSMBjEnabled: mContext is null! Returning false");
+            return false;
+        }
         log.trace("isSMBjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false);
     }
