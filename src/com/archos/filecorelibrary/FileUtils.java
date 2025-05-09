@@ -96,7 +96,12 @@ public class FileUtils {
         // and creates the relocate directory if not existing
         // BUT ONLY IF it has not been granted MANAGE_EXTERNAL_STORAGE yet
         if (uri == null) return null;
-        String lowerCasePath = uri.getPath().toLowerCase();
+        String lowerCasePath = uri.getPath();
+        if (lowerCasePath == null) {
+            log.error("relocateNfoAppPublicDirForNfoJpgFiles: uri path is null for {}", uri);
+            return uri;
+        }
+        lowerCasePath = lowerCasePath.toLowerCase();
         if (lowerCasePath.endsWith(".nfo") || lowerCasePath.endsWith(".jpg")) return relocateNfoAppPublicDir(uri);
         else return uri;
     }
