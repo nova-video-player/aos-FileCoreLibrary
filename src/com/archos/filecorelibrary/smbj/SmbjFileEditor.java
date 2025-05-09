@@ -176,7 +176,7 @@ public class SmbjFileEditor extends FileEditor {
             }
             String mFilePath = getFilePath(mUri);
             return mDiskShare.fileExists(mFilePath) || mDiskShare.folderExists(mFilePath);
-        } catch (IOException | SMBApiException e) {
+        } catch (Exception e) { // can be IOException | SMBApiException but also TimeoutException claimed not to be thrown
             caughtException(e, "SmbjFileEditor:exists", "Exception in exists " + mUri);
         }
         return false;

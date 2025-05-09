@@ -109,6 +109,15 @@ public class JcifListingEngine extends ListingEngine {
             try {
                 log.debug("JcifListingThread: listFiles for: " + mUri.toString());
                 NovaSmbFile nSmbFile = getSmbFile(mUri);
+                if (nSmbFile == null || nSmbFile.smbFile == null) {
+                    log.error("JcifListingThread: SmbFile is null for URI: {}", mUri.toString());
+                    mUiHandler.post(() -> {
+                        if (mListener != null) {
+                            mListener.onListingFatalError(null, ErrorEnum.ERROR_UNKNOWN);
+                        }
+                    });
+                    return;
+                }
                 SmbFile[] listFiles = nSmbFile.smbFile.listFiles(mFileFilter);
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
