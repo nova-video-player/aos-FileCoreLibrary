@@ -120,13 +120,18 @@ public class NetworkState {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-                if (capabilities != null)
-                    if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                        // to test hasInternet capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                        log.debug("isNetworkConnected: true");
-                        return true;
+                try {
+                    NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                    if (capabilities != null) {
+                        if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                            // to test hasInternet capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                            log.debug("isNetworkConnected: true");
+                            return true;
+                        }
                     }
+                } catch (Exception e) {
+                    log.debug("isNetworkConnected: caught Exception" + e.getMessage());
+                }
             } else {
                 try {
                     NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
