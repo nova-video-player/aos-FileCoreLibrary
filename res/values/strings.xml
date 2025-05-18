@@ -289,4 +289,5 @@
 
     <string name="acquire_external_usb_permission">File manager needs special permission to access external storage. Please select your storage on next screen</string>
 
+    <string name="nfo_export_complete">nfo export completed</string>
 </resources>
