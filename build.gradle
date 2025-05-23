@@ -113,7 +113,7 @@ dependencies {
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.11.1'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.9'
-    implementation 'com.github.nova-video-player:sardine-android:0.0.2'
+    implementation 'com.github.nova-video-player:sardine-android:0.9'
     implementation 'com.hierynomus:smbj:0.14.0'
     implementation 'com.hierynomus:sshj:0.40.0'
     implementation 'oro:oro:2.0.8'
