@@ -25,5 +25,9 @@
     <color name="default_icon_background">#cc003040</color>
     <color name="default_icons_color_filter">#ff508090</color>
     <color name="list_item_background_grey">#20000000</color>
+    <color name="green_accent">#8BC34A</color>
+    <color name="light_blue">#69A2D0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_pressed">#451122</color>
 </resources>
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#B7BAB5"> <!-- or use a hardcoded ripple color -->
+
+    <!-- This defines the shape/background under ripple -->
+    <item android:drawable="@drawable/back_button_enabled" />
+</ripple>
