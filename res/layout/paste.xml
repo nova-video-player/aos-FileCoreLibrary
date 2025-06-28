@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="16dip"
+    android:paddingBottom="0dip"
     android:paddingLeft="16dip"
     android:paddingRight="16dip"
     android:paddingTop="16dip" >
@@ -11,6 +11,7 @@
         android:id="@+id/message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/nhaasgroteskdspro_65md"
         android:ellipsize="end"
         android:maxHeight="160dip"
         android:scrollbarAlwaysDrawVerticalTrack="true"
@@ -23,6 +24,7 @@
         style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:progressTint="@color/green_accent"
         android:layout_below="@id/message"
         android:layout_marginBottom="4dip"
         android:layout_marginTop="16dip"
@@ -34,6 +36,7 @@
         style="?android:attr/progressBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminateTint="@color/green_accent"
         android:layout_below="@id/progress"
         android:layout_marginRight="8dip"
         android:layout_marginTop="4dip" />
@@ -42,6 +45,8 @@
         android:id="@+id/progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/nhaasgroteskdspro_65md"
+        android:layout_marginTop="4dip"
         android:layout_below="@id/progress"
         android:layout_toRightOf="@id/progress_small"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -50,7 +55,9 @@
         android:id="@+id/open_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dip" 
+        android:fontFamily="@font/nhaasgroteskdspro_65md"
+        android:buttonTint="@color/checkbox_tint"
+        android:layout_marginTop="8dip"
         android:layout_below="@id/progress_text"
         android:text="@string/open_file_after_download" />
 
