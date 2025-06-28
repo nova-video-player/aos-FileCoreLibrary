@@ -29,5 +29,6 @@
     <color name="light_blue">#7997AF</color>
     <color name="white">#FFFFFF</color>
     <color name="text_pressed">#280510</color>
+    <color name="ripple_orange">#AAF6D9B8</color>
 </resources>
 
