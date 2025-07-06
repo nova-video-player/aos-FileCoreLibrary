@@ -4,7 +4,7 @@ repositories {
     google()
     mavenCentral()
     mavenLocal()
-    maven { url 'https://jitpack.io' }
+    maven { url = 'https://jitpack.io' }
 }
 
 allprojects {
@@ -18,8 +18,8 @@ allprojects {
 }
 
 android {
-    namespace 'com.archos.filecorelibrary'
-    compileSdk 35
+    namespace = 'com.archos.filecorelibrary'
+    compileSdk = 35
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -36,9 +36,9 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 35
-        multiDexEnabled true
+        minSdkVersion = 23
+        targetSdkVersion = 35
+        multiDexEnabled = true
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -48,20 +48,20 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
         }
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
-        aidl true
-        renderScript false
+        aidl = true
+        renderScript = false
     }
 
     packagingOptions {
@@ -85,7 +85,7 @@ tasks.register('ndkBuild', Exec) {
     myCmd.add("native_libnativehelper")
     myCmd.add("native_build_FileCoreLibrary")
     //myCmd.add("jcifs-ng")
-    commandLine myCmd
+    commandLine = myCmd
 }
 
 tasks.register('ndkClean', Exec) {
@@ -94,7 +94,7 @@ tasks.register('ndkClean', Exec) {
     myCmd.add("make")
     myCmd.add("native_clean")
     //myCmd.add("external_clean_jcifs-ng")
-    commandLine myCmd
+    commandLine = myCmd
 }
 
 // ensure there is no loggers other than logback
