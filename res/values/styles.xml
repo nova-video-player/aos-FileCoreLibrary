@@ -24,7 +24,8 @@
     </style>
 
     <style name="Widget.Holo.ActionBar.Archos" parent="Widget.AppCompat.ActionBar">
-        <item name="background">@null</item>
+        <item name="background">@android:color/transparent</item>
+        <item name="displayOptions">showCustom</item>
     </style>
 
     <style name="Theme.HoloBackground" parent="android:style/Theme.Holo">
