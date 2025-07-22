@@ -36,8 +36,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -511,16 +509,8 @@ public class StreamOverHttp {
 	public Uri getUri(String fileName){
 		int port = serverSocket.getLocalPort();
 		String url = "http://localhost:"+port;
-		if(fileName!=null) {
-			try {
-				// URL encode the filename to handle spaces and special characters
-				String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
-				url += '/'+encodedFileName;
-			} catch (Exception e) {
-				log.warn("Failed to URL encode filename: " + fileName + ", using original", e);
-				url += '/'+fileName;
-			}
-		}
+		if(fileName!=null)
+			url += '/'+fileName;
 		return Uri.parse(url);
 	}
 
