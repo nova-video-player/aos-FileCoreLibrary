@@ -43,6 +43,7 @@ public abstract class FileEditor {
     public FileEditor(Uri uri){
         mUri = uri;
     }
+    public Uri getUri() { return mUri; }
     public boolean touchFile() { return false; };
     public boolean mkdir() { return false; };
     public abstract InputStream getInputStream() throws Exception;
