@@ -312,11 +312,19 @@ public class FileUtils {
 
     // TODO: when adding new share check also in VideoOpenHelper the _id increment due to 1e9 android 13 change
     public static boolean isNetworkShare(Uri uri) {
-        return "smb".equals(uri.getScheme())||
-                "upnp".equals(uri.getScheme())||
-                "ftps".equals(uri.getScheme())||"ftp".equals(uri.getScheme())||"sftp".equals(uri.getScheme()) ||
-                "webdav".equals(uri.getScheme())||"webdavs".equals(uri.getScheme()) ||
-                "smbj".equals(uri.getScheme()) || "sshj".equals(uri.getScheme());
+        if (uri == null) {
+            return false;
+        }
+        String scheme = uri.getScheme();
+        if (scheme == null) {
+            return false;
+        }
+        String normalized = scheme.toLowerCase(Locale.ROOT);
+        return "smb".equals(normalized) ||
+                "upnp".equals(normalized) ||
+                "ftps".equals(normalized) || "ftp".equals(normalized) || "sftp".equals(normalized) ||
+                "webdav".equals(normalized) || "webdavs".equals(normalized) ||
+                "smbj".equals(normalized) || "sshj".equals(normalized);
     }
 
     public static boolean isNetworkShare(String path) {
