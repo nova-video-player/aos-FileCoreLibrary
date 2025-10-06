@@ -32,7 +32,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int i) {
-            log.error("onResolveFailed: Failed resolving " + nsdServiceInfo);
+            log.debug("onResolveFailed: Failed resolving " + nsdServiceInfo + ", error code: " + i);
             if(mFailCount < 10) {
                 mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(mInfo, mFailCount + 1));
             }
