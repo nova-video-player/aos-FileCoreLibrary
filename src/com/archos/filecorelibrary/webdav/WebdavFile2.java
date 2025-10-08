@@ -31,6 +31,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import okhttp3.Request;
+import okhttp3.OkHttpClient;
+
 public class WebdavFile2 extends MetaFile2 {
 
     // see https://github.com/lookfirst/sardine/issues/359 to re-enable when issue fixed
@@ -38,15 +41,58 @@ public class WebdavFile2 extends MetaFile2 {
 
     private static final Logger log = LoggerFactory.getLogger(WebdavFile2.class);
 
+    private static String sResolvedBaseUrl = null;
+    private static String sOriginUrl = "http";
+
     public static Uri uriToHttp(Uri u) {
+        // convert scheme
+        Uri httpUri;
         if (u.getScheme().equals("webdavs"))
-            return u.buildUpon().
-                    scheme("https").
-                    build();
+            httpUri = u.buildUpon().scheme("https").build();
         else
-            return u.buildUpon().
-                    scheme("http").
-                    build();
+            httpUri = u.buildUpon().scheme("http").build();
+
+        // If baseurl was updated, new 302 request
+        String sBaseUrl = u.getScheme() + "://" + u.getHost();
+        if (!sBaseUrl.equals(sOriginUrl)) {
+            sOriginUrl = sBaseUrl;
+            sResolvedBaseUrl = null;
+        }
+
+        // if already resolved, reuse cached base URL
+        if (sResolvedBaseUrl != null) {
+            return Uri.parse(sResolvedBaseUrl + httpUri.getPath());
+        }
+
+        // make HEAD request only to domain (ignore path)
+        String baseUrl = httpUri.getScheme() + "://" + httpUri.getHost();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .followRedirects(false) // do not auto-follow
+                .build();
+
+        Request req = new Request.Builder().url(baseUrl + "/").head().build();
+        try {
+            var resp = client.newCall(req).execute();
+            if (resp.code() == 302 || resp.code() == 301) {
+                String location = resp.header("Location");
+                // extract scheme + host + port only
+                Uri redirectUri = Uri.parse(location);
+                String base = redirectUri.getScheme() + "://" + redirectUri.getHost();
+                if (redirectUri.getPort() != -1) {
+                    base += ":" + redirectUri.getPort();
+                }
+                sResolvedBaseUrl = base;
+                log.info("WebDAV redirect resolved to: " + sResolvedBaseUrl);
+                return Uri.parse(base + httpUri.getPath());
+            }
+            else {
+                sResolvedBaseUrl = baseUrl;
+                return httpUri;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to resolve WebDAV redirect for " + u, e);
+            return httpUri; // fallback
+        }
     }
 
     private static final long serialVersionUID = 2L;
