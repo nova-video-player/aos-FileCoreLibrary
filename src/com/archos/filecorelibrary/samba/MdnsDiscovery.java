@@ -99,7 +99,7 @@ public class MdnsDiscovery implements InternalDiscovery {
     }
 
     public MdnsDiscovery(InternalDiscoveryListener listener, Context ctxt, int socketReadDurationMs) {
-        mNsdManager = (NsdManager)ctxt.getSystemService(Context.NSD_SERVICE);
+        mNsdManager = (NsdManager)ctxt.getApplicationContext().getSystemService(Context.NSD_SERVICE);
         mMdnsListener = new MdnsListener();
         log.debug("MdnsDiscovery: created mdns discovery");
         mSmbListener = listener;
