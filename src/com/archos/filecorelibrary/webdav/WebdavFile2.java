@@ -33,6 +33,7 @@ import java.util.Objects;
 
 import okhttp3.Request;
 import okhttp3.OkHttpClient;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebdavFile2 extends MetaFile2 {
 
@@ -41,8 +42,14 @@ public class WebdavFile2 extends MetaFile2 {
 
     private static final Logger log = LoggerFactory.getLogger(WebdavFile2.class);
 
-    private static String sResolvedBaseUrl = null;
-    private static String sOriginUrl = "http";
+    // Multi-server cache: key = scheme+host+port, value = resolvedBaseUrl
+    private static final ConcurrentHashMap<String, String> resolvedBaseMap = new ConcurrentHashMap<>();
+
+    // Singleton OkHttpClient used only for redirect resolution
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .build();
 
     public static Uri uriToHttp(Uri u) {
         // convert scheme
@@ -52,43 +59,43 @@ public class WebdavFile2 extends MetaFile2 {
         else
             httpUri = u.buildUpon().scheme("http").build();
 
-        // If baseurl was updated, new 302 request
-        String sBaseUrl = u.getScheme() + "://" + u.getHost();
-        if (!sBaseUrl.equals(sOriginUrl)) {
-            sOriginUrl = sBaseUrl;
-            sResolvedBaseUrl = null;
-        }
-
-        // if already resolved, reuse cached base URL
-        if (sResolvedBaseUrl != null) {
-            return Uri.parse(sResolvedBaseUrl + httpUri.getPath());
-        }
-
         // make HEAD request only to domain (ignore path)
         String baseUrl = httpUri.getScheme() + "://" + httpUri.getHost();
-        OkHttpClient client = new OkHttpClient.Builder()
-                .followRedirects(false) // do not auto-follow
-                .build();
+        if (httpUri.getPort() != -1) {
+            baseUrl += ":" + httpUri.getPort();
+        }
+
+        // Check cache first
+        String cachedBase = resolvedBaseMap.get(baseUrl);
+        if (cachedBase != null) {
+            return Uri.parse(cachedBase + httpUri.getPath());
+        }
 
         Request req = new Request.Builder().url(baseUrl + "/").head().build();
-        try {
-            var resp = client.newCall(req).execute();
-            if (resp.code() == 302 || resp.code() == 301) {
+        try (var resp = client.newCall(req).execute()) {
+            int code = resp.code();
+            //Handle redirect status codes:
+            //301/302: classic permanent/temporary redirect (may change HTTP method)
+            //307/308: preserve HTTP method and request body (important for WebDAV PROPFIND/PUT/DELETE)
+            if (code == 301 || code == 302 || code == 307 || code == 308) {
                 String location = resp.header("Location");
-                // extract scheme + host + port only
-                Uri redirectUri = Uri.parse(location);
-                String base = redirectUri.getScheme() + "://" + redirectUri.getHost();
-                if (redirectUri.getPort() != -1) {
-                    base += ":" + redirectUri.getPort();
+                if (location != null) {
+                    Uri redirectUri = Uri.parse(location);
+                    String base = redirectUri.getScheme() + "://" + redirectUri.getHost();
+                    if (redirectUri.getPort() != -1) {
+                        base += ":" + redirectUri.getPort();
+                    }
+                    resolvedBaseMap.put(baseUrl, base);
+                    log.info("WebDAV redirect resolved to: " + base);
+                    return Uri.parse(base + httpUri.getPath());
+                } else {
+                    log.warn("Redirect response without Location header from " + baseUrl);
                 }
-                sResolvedBaseUrl = base;
-                log.info("WebDAV redirect resolved to: " + sResolvedBaseUrl);
-                return Uri.parse(base + httpUri.getPath());
             }
-            else {
-                sResolvedBaseUrl = baseUrl;
-                return httpUri;
-            }
+
+            // No redirect, cache the original base
+            resolvedBaseMap.put(baseUrl, baseUrl);
+            return httpUri;
         } catch (Exception e) {
             log.warn("Failed to resolve WebDAV redirect for " + u, e);
             return httpUri; // fallback
