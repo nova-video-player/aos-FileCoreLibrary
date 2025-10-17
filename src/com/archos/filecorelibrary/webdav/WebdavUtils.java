@@ -31,8 +31,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.Request;
-import okhttp3.Route;
 import okhttp3.Response;
+import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class WebdavUtils {
@@ -40,6 +40,8 @@ public class WebdavUtils {
     private static final Logger log = LoggerFactory.getLogger(WebdavUtils.class);
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpSardine> sardines = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpClient> httpClients = new ConcurrentHashMap<>();
+    static private ConcurrentHashMap<Uri, String> resolvedRedirects = new ConcurrentHashMap<>();
+    private static final OkHttpClient redirectClient = new OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build();
     private static Context mContext;
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile WebdavUtils sInstance;
@@ -120,4 +122,43 @@ public class WebdavUtils {
         return uri.buildUpon().path("").build();
     }
 
+    public String resolveRedirect(Uri uri) {
+        Uri key = buildKeyFromUri(uri);
+        String resolved = resolvedRedirects.get(key);
+        if (resolved != null) {
+            log.trace("resolveRedirect: cache hit for " + key + " -> " + resolved);
+            return resolved;
+        }
+        log.trace("resolveRedirect: cache miss for " + key);
+
+        String baseUrl = uri.getScheme() + "://" + uri.getHost();
+        if (uri.getPort() != -1) {
+            baseUrl += ":" + uri.getPort();
+        }
+
+        Request request = new Request.Builder().url(baseUrl + "/").head().build();
+        try {
+            Response response = redirectClient.newCall(request).execute();
+            if (response.code() == 301 || response.code() == 302) {
+                String location = response.header("Location");
+                if (location != null) {
+                    Uri redirectUri = Uri.parse(location);
+                    String redirectBase = redirectUri.getScheme() + "://" + redirectUri.getHost();
+                    if (redirectUri.getPort() != -1) {
+                        redirectBase += ":" + redirectUri.getPort();
+                    }
+                    resolved = redirectBase;
+                    log.debug("resolveRedirect: resolved " + key + " to " + resolved);
+                }
+            }
+        } catch (IOException e) {
+            log.error("resolveRedirect: failed for " + uri, e);
+        }
+
+        if (resolved == null) {
+            resolved = baseUrl;
+        }
+        resolvedRedirects.put(key, resolved);
+        return resolved;
+    }
 }
