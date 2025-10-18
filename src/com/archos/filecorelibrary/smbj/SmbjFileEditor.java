@@ -24,6 +24,7 @@ import com.archos.environment.ObservableInputStream;
 import com.archos.environment.ObservableOutputStream;
 import com.archos.filecorelibrary.FileEditor;
 import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2CreateOptions;
@@ -126,10 +127,32 @@ public class SmbjFileEditor extends FileEditor {
     public Boolean delete() throws Exception {
         DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
         String mFilePath = getFilePath(mUri);
-        // TODO MARC check if need to be recursive
-        if(mDiskShare.folderExists(mFilePath)) mDiskShare.rmdir(mFilePath, true);
-        else mDiskShare.rm(mFilePath);
-        return null;
+        try {
+            // Try to delete as file first (most common case)
+            try {
+                mDiskShare.rm(mFilePath);
+                log.debug("delete: successfully deleted file " + mUri);
+                return true;
+            } catch (SMBApiException e) {
+                NtStatus status = e.getStatus();
+                // If it's not a file, try as a directory
+                if (status == NtStatus.STATUS_FILE_IS_A_DIRECTORY) {
+                    log.debug("delete: path is a directory, using rmdir " + mUri);
+                    mDiskShare.rmdir(mFilePath, true);
+                    log.debug("delete: successfully deleted directory " + mUri);
+                    return true;
+                } else if (status == NtStatus.STATUS_OBJECT_NAME_NOT_FOUND) {
+                    // File doesn't exist - this is not an error, just return true
+                    log.debug("delete: file does not exist " + mUri);
+                    return true;
+                } else {
+                    throw e;
+                }
+            }
+        } catch (Exception e) {
+            caughtException(e, "SmbjFileEditor:delete", "Exception in delete " + mUri);
+            throw e;
+        }
     }
 
     @Override
