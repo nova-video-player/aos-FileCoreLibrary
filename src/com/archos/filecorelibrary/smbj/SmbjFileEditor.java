@@ -206,10 +206,16 @@ public class SmbjFileEditor extends FileEditor {
                 from.close();
                 return true;
             }
-        } catch (IOException e) {
-            caughtException(e, "SmbjFileEditor:rename", "IOException in rename " + mUri + " into " + newName);
-        } catch (SMBApiException se) {
-            caughtException(se, "SmbjFileEditor:rename", "SMBApiException in rename " + mUri + " into " + newName);
+        } catch (Exception e) {
+            // Handle smbj quirk: TransportException with EOFException during rename close
+            // Same root cause as delete() - the close operation can trigger EOF
+            if (isEofTransportException(e)) {
+                log.debug("rename: got EOF exception during close, invalidating share cache for " + mUri);
+                SmbjUtils.peekInstance().invalidateShare(mUri);
+                // File was renamed on server; return true to proceed with next operation
+                return true;
+            }
+            caughtException(e, "SmbjFileEditor:rename", "Exception in rename " + mUri + " into " + newName);
         }
         return false;
     }
