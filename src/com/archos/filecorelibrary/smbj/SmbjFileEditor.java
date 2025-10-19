@@ -30,6 +30,7 @@ import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2CreateOptions;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.protocol.transport.TransportException;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 
@@ -148,11 +149,40 @@ public class SmbjFileEditor extends FileEditor {
                 } else {
                     throw e;
                 }
+            } catch (Exception e) {
+                // Handle smbj quirk: TransportException with EOFException during delete
+                // The file is typically deleted on server despite the exception, but the
+                // connection is compromised. Invalidate the cached share to force reconnection.
+                if (isEofTransportException(e)) {
+                    log.debug("delete: got EOF exception during rm/rmdir, invalidating share cache for " + mUri);
+                    SmbjUtils.peekInstance().invalidateShare(mUri);
+                    // File was deleted on server; return true to proceed with next operation
+                    // which will get a fresh, connected share via getSmbShare()
+                    return true;
+                }
+                throw e;
             }
         } catch (Exception e) {
             caughtException(e, "SmbjFileEditor:delete", "Exception in delete " + mUri);
             throw e;
         }
+    }
+
+    /**
+     * Check if exception is a TransportException wrapping EOFException (smbj library quirk)
+     */
+    private boolean isEofTransportException(Exception e) {
+        if (!(e instanceof TransportException)) {
+            return false;
+        }
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            if (cause instanceof java.io.EOFException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     @Override

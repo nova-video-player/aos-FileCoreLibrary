@@ -189,4 +189,18 @@ public class SmbjUtils {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false);
     }
 
+    /**
+     * Invalidate cached DiskShare for a URI, forcing reconnection on next access.
+     * Used when a protocol error (TransportException) indicates connection is compromised.
+     */
+    public synchronized void invalidateShare(Uri uri) {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        if (cred != null) {
+            DiskShare share = smbjShares.remove(cred);
+            if (share != null) {
+                log.debug("invalidateShare: removed cached share for " + uri);
+            }
+        }
+    }
+
 }
