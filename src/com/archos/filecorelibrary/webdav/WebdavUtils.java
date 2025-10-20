@@ -80,7 +80,7 @@ public class WebdavUtils {
                 HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
                     @Override
                     public void log(String msg) {
-                        log.trace("OkHttpSardine: webdav " + msg);
+                        log.trace("OkHttpSardine: webdav {}", msg);
                     }});
                 logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
                 builder.addInterceptor(logging);

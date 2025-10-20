@@ -96,21 +96,21 @@ public class NetworkState {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean connected = isNetworkConnected(mContext);
         if (connected != mConnected) { // only fire change if there is a change
-            log.debug("updateFrom: connected changed notifying, " + mConnected + "->" +  connected);
+            log.debug("updateFrom: connected changed notifying, {}->{}", mConnected, connected);
             boolean oldState = mConnected;
             mConnected = connected;
             propertyChangeSupport.firePropertyChange(WAN_STATE, oldState, connected);
         } else
-            log.debug("updateFrom: connected (" + connected + ") state not changed -> not notifying");
+            log.debug("updateFrom: connected ({}) state not changed -> not notifying", connected);
         boolean hasLocalConnection = isLocalNetworkConnected(mContext) || preferences.getBoolean("vpn_mobile", false);
         if (hasLocalConnection != mHasLocalConnection) { // only fire change if there is a change
-            log.debug("updateFrom: hasLocalConnection changed notifying, " + mHasLocalConnection + "->" +  hasLocalConnection);
+            log.debug("updateFrom: hasLocalConnection changed notifying, {}->{}", mHasLocalConnection, hasLocalConnection);
             returnBoolean = true;
             boolean oldState = mHasLocalConnection;
             mHasLocalConnection = hasLocalConnection;
             propertyChangeSupport.firePropertyChange(LAN_STATE, oldState, hasLocalConnection);
         } else
-            log.debug("updateFrom: hasLocalConnection (" + hasLocalConnection + ") not changed -> not notifying, " + mHasLocalConnection + "->" +  hasLocalConnection);
+            log.debug("updateFrom: hasLocalConnection ({}) not changed -> not notifying, {}->{}", hasLocalConnection, mHasLocalConnection, hasLocalConnection);
         return returnBoolean;
     }
 
@@ -130,7 +130,7 @@ public class NetworkState {
                         }
                     }
                 } catch (Exception e) {
-                    log.debug("isNetworkConnected: caught Exception" + e.getMessage());
+                    log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
                 }
             } else {
                 try {
@@ -140,7 +140,7 @@ public class NetworkState {
                         return true;
                     }
                 } catch (Exception e) {
-                    log.debug("isNetworkConnected: caught exception" + e.getMessage());
+                    log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
                 }
             }
         }
@@ -171,7 +171,7 @@ public class NetworkState {
                         return true;
                     }
                 } catch (Exception e) {
-                    log.warn("isLocalNetworkConnected: caught exception" + e.getMessage());
+                    log.warn("isLocalNetworkConnected: caught exception {}", e.getMessage());
                 }
             }
         }
@@ -196,7 +196,7 @@ public class NetworkState {
                             (networkInfo.getType() == ConnectivityManager.TYPE_WIFI))
                         return true;
                 } catch (Exception e) {
-                    log.warn("isWiFiAvailable: caught exception" + e.getMessage());
+                    log.warn("isWiFiAvailable: caught exception {}", e.getMessage());
                 }
             }
         }
@@ -237,13 +237,13 @@ public class NetworkState {
     public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
         log.debug("addPropertyChangeListener");
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
-        log.debug("addPropertyChangeListener: number of Listeners=" + propertyChangeSupport.getPropertyChangeListeners().length);
+        log.debug("addPropertyChangeListener: number of Listeners={}", propertyChangeSupport.getPropertyChangeListeners().length);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
         log.debug("removePropertyChangeListener");
         propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
-        log.debug("removePropertyChangeListener: number of Listeners=" + propertyChangeSupport.getPropertyChangeListeners().length);
+        log.debug("removePropertyChangeListener: number of Listeners={}", propertyChangeSupport.getPropertyChangeListeners().length);
     }
 
     public void removeAllPropertyChangeListener() {

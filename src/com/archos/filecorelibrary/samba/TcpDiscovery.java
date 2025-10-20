@@ -156,7 +156,7 @@ public class TcpDiscovery implements InternalDiscovery {
                         int ipNumber = sockets.indexOf(currentChannel) + 1;
                         final String ip = netRange.concat(String.valueOf(ipNumber));
                         final String shareAddress = "smb://" + ip + '/';
-                        log.debug("found share at " + ip);
+                        log.debug("found share at {}", ip);
                         mListener.onShareFound(Workgroup.NOGROUP, "", shareAddress); // TCP discovery does not give the share name
                     }
                 }

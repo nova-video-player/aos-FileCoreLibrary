@@ -40,8 +40,8 @@ public class NovaSmbFile {
 
     public static String getIpUriString(Uri uri) {
         String shareName = uri.getHost();
-        log.trace("getIpUriString: uri " + uri + ", shareName " + shareName + ", shareNameIp " + getIpFromShareName(shareName));
-        log.trace("getIpUriString: shareNameResolver hashtable " + dumpShareNameResolver());
+        log.trace("getIpUriString: uri {}, shareName {}, shareNameIp {}", uri, shareName, getIpFromShareName(shareName));
+        log.trace("getIpUriString: shareNameResolver hashtable {}", dumpShareNameResolver());
         String shareNameIP = getIpFromShareName(shareName);
         if (shareNameIP == null) return uri.toString();
         else return uri.toString().replaceFirst(shareName, shareNameIP);
@@ -58,9 +58,9 @@ public class NovaSmbFile {
     public NovaSmbFile(Uri uri, CIFSContext cifsContext) throws MalformedURLException {
         originalUri = uri;
         shareName = uri.getHost();
-        log.trace("NovaSmbFile: shareNameResolver hashtable " + dumpShareNameResolver());
+        log.trace("NovaSmbFile: shareNameResolver hashtable {}", dumpShareNameResolver());
         String shareNameIP = getIpFromShareName(shareName);
-        log.trace("NovaSmbFile: uri " + uri + ", shareName " + shareName + ", shareNameIP " + shareNameIP);
+        log.trace("NovaSmbFile: uri {}, shareName {}, shareNameIP {}", uri, shareName, shareNameIP);
         if (shareNameIP == null) {
             smbFile = new SmbFile(uri.toString(), cifsContext);
             shareIP = shareName;

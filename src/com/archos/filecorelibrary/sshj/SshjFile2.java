@@ -54,11 +54,11 @@ public class SshjFile2 extends MetaFile2 {
     private final String mUriString;
 
     public SshjFile2(RemoteResourceInfo fileOrDir, Uri uri) {
-        log.trace("SshjFile2: " + uri);
+        log.trace("SshjFile2: {}", uri);
         final FileAttributes fileAttributes = fileOrDir.getAttributes();
         mUriString = uri.toString();
         mName = FileUtils.getName(uri);
-        if (fileAttributes == null) log.error("SshjFile2: fileAttributes is null for " + uri);
+        if (fileAttributes == null) log.error("SshjFile2: fileAttributes is null for {}", uri);
         final FileMode.Type type = fileAttributes.getType();
         mIsDirectory = (type == FileMode.Type.DIRECTORY);
         mIsFile = (type == FileMode.Type.REGULAR || type == FileMode.Type.SYMLINK);
@@ -77,13 +77,12 @@ public class SshjFile2 extends MetaFile2 {
         mCanRead = true;
         mCanWrite = true;
         mLength = fileAttributes.getSize();
-        log.trace("SshjFile2: uri=" + mUriString + ", mName=" + mName + ", isDirectory=" + isDirectory() +
-                ", lastModified=" + mLastModified + ", canWrite=" + canWrite() + ", length=" + mLength);
+        log.trace("SshjFile2: uri={}, mName={}, isDirectory={}, lastModified={}, canWrite={}, length={}", mUriString, mName, isDirectory(), mLastModified, canWrite(), mLength);
     }
 
     public SshjFile2(FileAttributes fileAttributes, Uri uri) {
-        if (fileAttributes == null) log.error("SshjFile2: argument fileAttributes is null for " + uri);
-        log.trace("SshjFile2: " + uri);
+        if (fileAttributes == null) log.error("SshjFile2: argument fileAttributes is null for {}", uri);
+        log.trace("SshjFile2: {}", uri);
         mUriString = uri.toString();
         mName = FileUtils.getName(uri);
         final FileMode.Type type = fileAttributes.getType();
@@ -102,8 +101,7 @@ public class SshjFile2 extends MetaFile2 {
         mCanRead = true;
         mCanWrite = true;
         mLength = fileAttributes.getSize();
-        log.trace("SshjFile2: uriString=" + mUriString + ", mName=" + mName + ", isDirectory=" + isDirectory() +
-                ", lastModified=" + mLastModified + ", canWrite=" + canWrite() + ", length=" + mLength);
+        log.trace("SshjFile2: uriString={}, mName={}, isDirectory={}, lastModified={}, canWrite={}, length={}", mUriString, mName, isDirectory(), mLastModified, canWrite(), mLength);
     }
 
     @Override
@@ -176,12 +174,12 @@ public class SshjFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         SFTPClient sftpClient = null;
         try {
-            log.trace("fromUri: " + uri);
+            log.trace("fromUri: {}", uri);
             sftpClient = SshjUtils.peekInstance().getSFTPClient(uri);
             final String filePath = getSftpPath(uri);
             log.trace("fromUri: uri={}, filePath={}", uri, filePath);
             var fileAttributes = sftpClient.lstat(filePath);
-            if (fileAttributes == null) log.error("fromUri: file does not exist " + uri);
+            if (fileAttributes == null) log.error("fromUri: file does not exist {}", uri);
             // throw perm if null!
             return new SshjFile2(fileAttributes, uri);
         } catch (IOException e) {

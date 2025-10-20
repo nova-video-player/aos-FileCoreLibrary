@@ -51,7 +51,7 @@ public class ExternalSDFileWriter {
     private final Uri imagesUri;
 
     public ExternalSDFileWriter(ContentResolver contentResolver, File file) {
-        log.debug("ExternalSDFileWriter " + file.getPath());
+        log.debug("ExternalSDFileWriter {}", file.getPath());
         this.file = file;
         this.contentResolver = contentResolver;
         filesUri = MediaStore.Files.getContentUri("external");
@@ -88,7 +88,7 @@ public class ExternalSDFileWriter {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Files.FileColumns.DATA, file.getAbsolutePath());
             // TODO: leads to a crash on external usb storage on recent Android
-            log.debug("delete: insert like it was an image imagesUri " + imagesUri + ", filesUri " + filesUri);
+            log.debug("delete: insert like it was an image imagesUri {}, filesUri {}", imagesUri, filesUri);
             contentResolver.insert(imagesUri, values);
 
             // TODO MARC the real delete is there

@@ -81,7 +81,7 @@ public class SshjListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("SshjListingThread: listFiles for: " + mUri.toString());
+                log.debug("SshjListingThread: listFiles for: {}", mUri.toString());
 
                 var sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
                 String filePath = getSftpPath(mUri);
@@ -97,12 +97,12 @@ public class SshjListingEngine extends ListingEngine {
                     final String filename = fileOrDir.getName();
                     if (fileOrDir.isDirectory()) {
                         if (keepDirectory(filename)) {
-                            log.trace("SshjListingThread: adding directory " + filename);
+                            log.trace("SshjListingThread: adding directory {}", filename);
                             directories.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
-                            log.trace("SshjListingThread: adding file " + filename);
+                            log.trace("SshjListingThread: adding file {}", filename);
                             files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     }

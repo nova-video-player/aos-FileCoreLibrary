@@ -32,7 +32,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int i) {
-            log.debug("onResolveFailed: Failed resolving " + nsdServiceInfo + ", error code: " + i);
+            log.debug("onResolveFailed: Failed resolving {}, error code: {}", nsdServiceInfo, i);
             if(mFailCount < 10) {
                 mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(mInfo, mFailCount + 1));
             }
@@ -40,25 +40,25 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
-            log.debug("onServiceResolved: share found nogroup:" + nsdServiceInfo.getServiceName() + ":" + nsdServiceInfo.getHost().getHostAddress());
+            log.debug("onServiceResolved: share found nogroup:{}:{}", nsdServiceInfo.getServiceName(), nsdServiceInfo.getHost().getHostAddress());
             try {
                 InetAddress hostInetAddress = InetAddress.getByName(nsdServiceInfo.getHost().getHostAddress());
                 byte[] addressInBytes = hostInetAddress.getAddress();
                 //Inet6Address IPv6 = Inet6Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes, NetworkInterface.getByInetAddress(hostInetAddress));
                 InetAddress IP = InetAddress.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
                 if (!(IP instanceof Inet4Address)) {
-                    log.error("Unsupported IPv6 for mdns SMB " + nsdServiceInfo.getServiceName());
+                    log.error("Unsupported IPv6 for mdns SMB {}", nsdServiceInfo.getServiceName());
                     return;
                 }
                 Inet4Address IPv4 = (Inet4Address) Inet4Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
-                log.debug("NsdServiceInfo: IPv4 address " + IPv4.getHostAddress());
-                //log.debug("NsdServiceInfo: IPv6 address " + IPv6.getHostAddress());
+                log.debug("NsdServiceInfo: IPv4 address {}", IPv4.getHostAddress());
+                //log.debug("NsdServiceInfo: IPv6 address {}", IPv6.getHostAddress());
                 String uri = "smb://" + IPv4.getHostAddress() + "/";
                 mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName().toUpperCase(), uri);
             } catch (UnknownHostException e) {
-                log.error("onServiceResolved: caught UnknownHostException for " + nsdServiceInfo.getServiceName() + "/" + nsdServiceInfo.getHost().getHostAddress(), e);
+                log.error("onServiceResolved: caught UnknownHostException for {}/{}", nsdServiceInfo.getServiceName(), nsdServiceInfo.getHost().getHostAddress(), e);
             } catch (ClassCastException cce) {
-                log.error("onServiceResolved: caught ClassCastException for " + nsdServiceInfo.getServiceName() + "/" + nsdServiceInfo.getHost().getHostAddress() , cce);
+                log.error("onServiceResolved: caught ClassCastException for {}/{}", nsdServiceInfo.getServiceName(), nsdServiceInfo.getHost().getHostAddress(), cce);
             }
         }
     }
@@ -67,12 +67,12 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onStartDiscoveryFailed(String s, int i) {
-            log.debug("onStartDiscoveryFailed: failed starting discovery..." + s + ":" + i);
+            log.debug("onStartDiscoveryFailed: failed starting discovery...{}:{}", s, i);
         }
 
         @Override
         public void onStopDiscoveryFailed(String s, int i) {
-            log.debug("onStopDiscoveryFailed: failed stopping discovery..." + s + ":" + i);
+            log.debug("onStopDiscoveryFailed: failed stopping discovery...{}:{}", s, i);
         }
 
         @Override
@@ -87,7 +87,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onServiceFound(NsdServiceInfo nsdServiceInfo) {
-            log.debug("Found service " + nsdServiceInfo);
+            log.debug("Found service {}", nsdServiceInfo);
             // MdnsResolveListener CAN NOT be reused across services
             mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(nsdServiceInfo, 0));
         }

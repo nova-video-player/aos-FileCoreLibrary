@@ -126,7 +126,7 @@ public class Session {
         //try to connect
         ftp.connect(path.getHost(), port);
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            log.debug("getNewFTPClient: connected to " + path);
+            log.debug("getNewFTPClient: connected to {}", path);
             //enter passive mode
             ftp.enterLocalPassiveMode();
             // Send keepalive to preserve control channel every 5mn
@@ -178,7 +178,7 @@ public class Session {
         //try to connect
         ftp.connect(path.getHost(), port);
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            log.debug("getNewFTPSClient: connected to " + path);
+            log.debug("getNewFTPSClient: connected to {}", path);
             //enter passive mode
             ftp.enterLocalPassiveMode();
             // Set protection buffer size
@@ -230,15 +230,15 @@ public class Session {
             cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(),"",true);
         FTPClient ftpclient = ftpClients.get(cred);
         if (ftpclient != null && ftpclient.isConnected()) {
-            log.debug("getFTPClient: reusing ftp session for " + uri);
+            log.debug("getFTPClient: reusing ftp session for {}", uri);
             return ftpclient;
         }
         FTPClient ftp = getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
         // Not previous session found, open a new one
-        log.debug("getFTPClient: create new ftp session for " + uri);
+        log.debug("getFTPClient: create new ftp session for {}", uri);
         if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
-        log.debug("getFTPClient: new ftp session created with key " + key);
+        log.debug("getFTPClient: new ftp session created with key {}", key);
         ftpClients.put(cred, ftp);
         return ftp;
     }
@@ -251,15 +251,15 @@ public class Session {
             cred = new Credential("anonymous","", buildKeyFromUri(uri).toString(),"",true);
         FTPSClient ftpclient = ftpsClients.get(cred);
         if (ftpclient!=null && ftpclient.isConnected()) {
-            log.debug("getFTPSClient: reusing ftp session for " + uri);
+            log.debug("getFTPSClient: reusing ftp session for {}", uri);
             return ftpclient;
         }
         // Not previous session found, open a new one
-        log.debug("getFTPSClient: create new ftp session for "+uri);
+        log.debug("getFTPSClient: create new ftp session for {}", uri);
         FTPSClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
         if (ftp == null) return null;
         Uri key = buildKeyFromUri(uri);
-        log.debug("getFTPSClient: new ftp session created with key " + key);
+        log.debug("getFTPSClient: new ftp session created with key {}", key);
         ftpsClients.put(cred, ftp);
         return ftp;
     }

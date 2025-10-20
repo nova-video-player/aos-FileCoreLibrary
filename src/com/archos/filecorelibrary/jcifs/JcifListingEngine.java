@@ -92,7 +92,7 @@ public class JcifListingEngine extends ListingEngine {
                     return keepDirectory(filename);
                 }
                 else {
-                    log.debug("SmbFileFilter: neither file nor directory: "+filename);
+                    log.debug("SmbFileFilter: neither file nor directory: {}", filename);
                     return false;
                 }
             } catch (SmbException e) {
@@ -107,7 +107,7 @@ public class JcifListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("JcifListingThread: listFiles for: " + mUri.toString());
+                log.debug("JcifListingThread: listFiles for: {}", mUri.toString());
                 NovaSmbFile nSmbFile = getSmbFile(mUri);
                 if (nSmbFile == null || nSmbFile.smbFile == null) {
                     log.error("JcifListingThread: SmbFile is null for URI: {}", mUri.toString());
@@ -151,11 +151,11 @@ public class JcifListingEngine extends ListingEngine {
                 final ArrayList<JcifsFile2> files = new ArrayList<>();
                 for (SmbFile f : listFiles) {
                     if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
-                        log.trace("JcifListingThread: adding file " + f.getPath());
+                        log.trace("JcifListingThread: adding file {}", f.getPath());
                         files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                     }
                     else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
-                        log.trace("JcifListingThread: adding directory " + f.getPath());
+                        log.trace("JcifListingThread: adding directory {}", f.getPath());
                         directories.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                     }
                 }
@@ -215,8 +215,8 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final SmbAuthException e) {
-                if (log.isTraceEnabled()) log.error("JcifListingThread: SmbAuthException for " + mUri.toString(), e);
-                else log.warn("JcifListingThread: SmbAuthException for " + mUri.toString());
+                if (log.isTraceEnabled()) log.error("JcifListingThread: SmbAuthException for {}", mUri.toString(), e);
+                else log.warn("JcifListingThread: SmbAuthException for {}", mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -232,8 +232,8 @@ public class JcifListingEngine extends ListingEngine {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
-                if (log.isTraceEnabled()) log.error("JcifListingThread: SmbException (" + getErrorStringResId(error) + ") for " + mUri.toString(), e);
-                else log.error("JcifListingThread: SmbException (" + getErrorStringResId(error) + ") for " + mUri.toString());
+                if (log.isTraceEnabled()) log.error("JcifListingThread: SmbException ({}) for {}", getErrorStringResId(error), mUri.toString(), e);
+                else log.error("JcifListingThread: SmbException ({}) for {}", getErrorStringResId(error), mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -243,8 +243,8 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final MalformedURLException e) {
-                if (log.isTraceEnabled()) log.error("JcifListingThread: MalformedURLException for " + mUri.toString(), e);
-                else log.error("JcifListingThread: MalformedURLException for " + mUri.toString());
+                if (log.isTraceEnabled()) log.error("JcifListingThread: MalformedURLException for {}", mUri.toString(), e);
+                else log.error("JcifListingThread: MalformedURLException for {}", mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted

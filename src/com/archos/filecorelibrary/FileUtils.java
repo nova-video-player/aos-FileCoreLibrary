@@ -85,7 +85,7 @@ public class FileUtils {
                     scheme = scheme + "://";
                 else scheme = "";
                 path = path.replaceFirst("/", FileUtilsQ.publicAppDirectory + "/nfoPoster/");
-                log.debug("prefixPublicNfoPosterUri: " + uri + " --> " + path);
+                log.debug("prefixPublicNfoPosterUri: {} --> {}", uri, path);
                 return Uri.parse(scheme + path);
             } else return uri;
         } else return uri;
@@ -149,12 +149,12 @@ public class FileUtils {
     public static Uri removeLastSegment(Uri uri){
         int index;
         String str = uri.toString();
-        log.trace("removeLastSegment input: " + str);
+        log.trace("removeLastSegment input: {}", str);
         if (str.endsWith(SEPARATOR))
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
         else index = str.lastIndexOf(SEPARATOR);
         if (index <= 0) return null;
-        log.trace("removeLastSegment output: " + str.substring(0, index + 1));
+        log.trace("removeLastSegment output: {}", str.substring(0, index + 1));
         // MUST keep the trailing "/" for samba
         return Uri.parse(str.substring(0, index + 1));
     }
@@ -223,7 +223,7 @@ public class FileUtils {
             return contentUri;
 
         // log contentUri.getHost() to whitelist only MediaProvider for this file:/// access
-        log.debug("getRealUriFromVideoURI: contentUri.getHost()=" + contentUri.getHost());
+        log.debug("getRealUriFromVideoURI: contentUri.getHost()={}", contentUri.getHost());
         Cursor cursor = null;
 
         String[] proj = { MediaStore.Video.Media.DATA };
@@ -297,10 +297,10 @@ public class FileUtils {
     }
 
     public static String getName(String file) {
-        log.debug("getName input: " + file);
+        log.debug("getName input: {}", file);
         if (file.lastIndexOf(SEPARATOR) >= 0 && file.lastIndexOf(SEPARATOR) < (file.length() - 1))
             file = file.substring(file.lastIndexOf(SEPARATOR) + 1);
-        log.debug("getName result: " + file);
+        log.debug("getName result: {}", file);
         return file;
     }
 
@@ -348,10 +348,10 @@ public class FileUtils {
         if (uri == null) return null;
         List<String> pathSegments = uri.getPathSegments();
         if (pathSegments != null && !pathSegments.isEmpty()) {
-            log.debug("getShareName: uri=" + uri + " -> " + Arrays.toString(pathSegments.toArray()) + " -> " +  pathSegments.get(0));
+            log.debug("getShareName: uri={} -> {} -> {}", uri, Arrays.toString(pathSegments.toArray()), pathSegments.get(0));
             return pathSegments.get(0);
         } else {
-            log.warn("getShareName: returns null since getPathSegments is null for uri=" + uri);
+            log.warn("getShareName: returns null since getPathSegments is null for uri={}", uri);
         }
         return null;
     }
@@ -365,7 +365,7 @@ public class FileUtils {
         if (pathSegments != null && !pathSegments.isEmpty()) {
             List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size());
             String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
-            log.debug("getFilePath: uri=" + uri + " -> " + Arrays.toString(pathSegmentsWithoutFirst.toArray()) + " -> " + filePath);
+            log.debug("getFilePath: uri={} -> {} -> {}", uri, Arrays.toString(pathSegmentsWithoutFirst.toArray()), filePath);
             return filePath;
         }
         if (pathSegments != null && pathSegments.isEmpty()) return "/";
@@ -517,7 +517,7 @@ public class FileUtils {
         } else {
             if(Build.VERSION.SDK_INT>=30) {
                 result = Environment.isExternalStorageManager();
-                log.trace("canManageExternalStorage: API>=30 -> " + result);
+                log.trace("canManageExternalStorage: API>=30 -> {}", result);
                 return result;
             } else {
                 log.trace("canManageExternalStorage: 23<=API<=29 -> true");
@@ -536,15 +536,15 @@ public class FileUtils {
         } else {
             if (Build.VERSION.SDK_INT>29 && hasManageExternalStoragePermission(context) && externalStoragePermissionGrantable) {
                 result = Environment.isExternalStorageManager();
-                log.debug("canReadExternalStorage: API>29 -> " + result);
+                log.debug("canReadExternalStorage: API>29 -> {}", result);
                 return result;
             } else {
                 if(Build.VERSION.SDK_INT<33) {
                     result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-                    log.debug("canReadExternalStorage: 22<API<30 -> " + result);
+                    log.debug("canReadExternalStorage: 22<API<30 -> {}", result);
                 } else {
                     result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED;
-                    log.debug("canReadExternalStorage: 32<API -> " + result);
+                    log.debug("canReadExternalStorage: 32<API -> {}", result);
                 }
                 return result;
             }
@@ -552,7 +552,7 @@ public class FileUtils {
     }
 
     public static void caughtException(Throwable e, String method, String exceptionType) {
-        if (log.isTraceEnabled()) log.error(method + ": caught " + exceptionType + " ", e);
-        else log.warn(method + ": caught "+ exceptionType);
+        if (log.isTraceEnabled()) log.error("{}: caught {} ", method, exceptionType, e);
+        else log.warn("{}: caught {}", method, exceptionType);
     }
 }

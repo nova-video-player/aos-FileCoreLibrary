@@ -72,7 +72,7 @@ public class WebdavListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("WebdavListingThread: listFiles for: " + mUri.toString());
+                log.debug("WebdavListingThread: listFiles for: {}", mUri.toString());
 
                 var sardine = WebdavUtils.peekInstance().getSardine(mUri);
                 var httpUri = WebdavFile2.uriToHttp(mUri);
@@ -89,12 +89,12 @@ public class WebdavListingEngine extends ListingEngine {
                     final String filename = davResource.getName();
                     if (davResource.isDirectory()) {
                         if (keepDirectory(filename)) {
-                            log.trace("WebdavListingThread: adding directory " + davResource.getPath());
+                            log.trace("WebdavListingThread: adding directory {}", davResource.getPath());
                             directories.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
-                            log.trace("WebdavListingThread: adding file " + davResource.getPath());
+                            log.trace("WebdavListingThread: adding file {}", davResource.getPath());
                             //listFiles.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
                             files.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
                         }
@@ -186,8 +186,8 @@ public class WebdavListingEngine extends ListingEngine {
             // TODO MARC
             /*
             catch (final AuthenticationException e) {
-                if (log.isTraceEnabled()) log.error("WebdavListingThread: SmbAuthException for " + mUri.toString(), e);
-                else log.warn("WebdavListingThread: SmbAuthException for " + mUri.toString());
+                if (log.isTraceEnabled()) log.error("WebdavListingThread: SmbAuthException for {}", mUri.toString(), e);
+                else log.warn("WebdavListingThread: SmbAuthException for {}", mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
@@ -202,8 +202,8 @@ public class WebdavListingEngine extends ListingEngine {
                     error = ErrorEnum.ERROR_UNKNOWN_HOST;
                 }
                 final ErrorEnum fError = error;
-                if (log.isTraceEnabled()) log.error("WebdavListingThread: IOException or IllegalArgumentException (" + getErrorStringResId(error) + ") for " + mUri.toString(), e);
-                else log.error("WebdavListingThread: IOException (" + getErrorStringResId(error) + ") for " + mUri.toString());
+                if (log.isTraceEnabled()) log.error("WebdavListingThread: IOException or IllegalArgumentException ({}) for {}", getErrorStringResId(error), mUri.toString(), e);
+                else log.error("WebdavListingThread: IOException ({}) for {}", getErrorStringResId(error), mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted

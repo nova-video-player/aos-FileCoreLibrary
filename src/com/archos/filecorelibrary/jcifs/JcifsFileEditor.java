@@ -94,7 +94,7 @@ public class JcifsFileEditor extends FileEditor{
             SmbFile from = getSmbFile(mUri).smbFile;
             if (from != null) {
                 SmbFile to = getSmbFile(Uri.parse(from.getParent() + newName)).smbFile;
-                log.debug("rename: " + from + " to " + to);
+                log.debug("rename: {} to {}", from, to);
                 if (to != null) {
                     from.renameTo(to);
                     return true;
@@ -115,14 +115,14 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public boolean exists() {
-        log.trace("exists: check " + mUri);
+        log.trace("exists: check {}", mUri);
         try {
             SmbFile sf = getSmbFile(mUri).smbFile;
             if (sf != null) {
                 boolean doesItExist = sf.exists();
                 if (log.isTraceEnabled()) {
-                    if (doesItExist) log.trace("exists: " + mUri + " exists");
-                    else log.trace("exists: " + mUri + " does not exist");
+                    if (doesItExist) log.trace("exists: {} exists", mUri);
+                    else log.trace("exists: {} does not exist", mUri);
                 }
                 return doesItExist;
                 //return sf.exists();

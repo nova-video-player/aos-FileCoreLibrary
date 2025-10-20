@@ -79,7 +79,7 @@ public class SmbjListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("SmbjListingThread: listFiles for: " + mUri.toString());
+                log.debug("SmbjListingThread: listFiles for: {}", mUri.toString());
 
                 var diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
                 String filePath = getFilePath(mUri);
@@ -96,12 +96,12 @@ public class SmbjListingEngine extends ListingEngine {
                     final String fullFilename = "/" + shareName + "/" + filename;
                     if (isDirectory(fileOrDir)) {
                         if (keepDirectory(filename)) {
-                            log.trace("SmbjListingThread: adding directory " + fullFilename);
+                            log.trace("SmbjListingThread: adding directory {}", fullFilename);
                             directories.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
-                            log.trace("SmbjListingThread: adding file " + fullFilename);
+                            log.trace("SmbjListingThread: adding file {}", fullFilename);
                             files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     }

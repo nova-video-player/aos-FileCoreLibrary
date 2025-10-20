@@ -91,7 +91,7 @@ public class FileUtilsQ {
         mContext = context;
         publicAppDirectory = getNovaPublicAppDirPath(context);
         privateAppDirectory = mContext.getFilesDir().getPath();
-        log.debug("FileUtilsQ: publicAppDirectory " + publicAppDirectory + ", privateAppDirectory " + privateAppDirectory);
+        log.debug("FileUtilsQ: publicAppDirectory {}, privateAppDirectory {}", publicAppDirectory, privateAppDirectory);
     }
 
     public FileUtilsQ with(Context context) {
@@ -143,7 +143,7 @@ public class FileUtilsQ {
 
         try {
             // delete object using resolver
-            log.debug("delete: uri " + uri);
+            log.debug("delete: uri {}", uri);
             contentResolver.delete(uri, null, null);
             isSuccessful = true;
         } catch (SecurityException e) {
@@ -189,7 +189,7 @@ public class FileUtilsQ {
         for (Uri uri : allUris) {
             try {
                 // delete object using resolver
-                log.debug("deleteAll: uri " + uri);
+                log.debug("deleteAll: uri {}", uri);
                 contentResolver.delete(uri, null, null);
             } catch (SecurityException e) {
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) { // only for API29...
@@ -297,7 +297,7 @@ public class FileUtilsQ {
                     public void onScanCompleted(String path, Uri uri) {
                         // uri is in format content://media/external_primary/video/media/##
                         contentUri = uri;
-                        log.debug("scanFile: contentUri " + contentUri + " for path " + path);
+                        log.debug("scanFile: contentUri {} for path {}", contentUri, path);
                     }
                 });
     }
@@ -327,10 +327,10 @@ public class FileUtilsQ {
         contentUri = null;
         File fileToDelete = new File(uri.getPath());
         if (!fileToDelete.exists()) {
-            log.debug("getContentUri: file " + uri + " does not exist: easy job!");
+            log.debug("getContentUri: file {} does not exist: easy job!", uri);
             return null;
         } else {
-            log.debug("getContentUri: file " + uri + " exists");
+            log.debug("getContentUri: file {} exists", uri);
         }
         ContentResolver contentResolver = mContext.getContentResolver();
         boolean isVideo = isVideoFile(uri);
@@ -390,7 +390,7 @@ public class FileUtilsQ {
             }
         }
         if (cursor != null) cursor.close();
-        log.debug("getContentUri: contentUri " + contentUri);
+        log.debug("getContentUri: contentUri {}", contentUri);
         return contentUri;
     }
 
@@ -407,7 +407,7 @@ public class FileUtilsQ {
             else return DEFAULT_PUBLIC_APP_FILE;
         } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
             // TOFIX doing wild guess but should in reality wait for result to be available
-            log.warn("FileUtilsQ: getNovaPublicAppDirFile getExternalStorageState " + Environment.getExternalStorageState() + " is not mounted!");
+            log.warn("FileUtilsQ: getNovaPublicAppDirFile getExternalStorageState {} is not mounted!", Environment.getExternalStorageState());
             return DEFAULT_PUBLIC_APP_FILE;
         }
     }

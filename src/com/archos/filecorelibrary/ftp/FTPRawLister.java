@@ -67,7 +67,7 @@ public class FTPRawLister extends RawLister {
         for(FTPFile f : listFiles){
             if(!f.getName().equals("..")|| !f.getName().equals(".")){
                 FTPFile2 sf = new FTPFile2(f , Uri.withAppendedPath(mUri, f.getName()));
-                log.trace("FTPRawLister: add " + sf.getName());
+                log.trace("FTPRawLister: add {}", sf.getName());
                 list.add(sf);   
             }
         }

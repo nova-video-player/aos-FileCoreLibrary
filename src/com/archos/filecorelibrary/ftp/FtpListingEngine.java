@@ -107,7 +107,7 @@ public class FtpListingEngine extends ListingEngine {
             } else if (f.isDirectory()) {
                 return keepDirectory(filename);
             } else {
-                log.debug("neither file nor directory: " + filename);
+                log.debug("neither file nor directory: {}", filename);
                 return false;
             }
         } else {
@@ -168,10 +168,10 @@ public class FtpListingEngine extends ListingEngine {
                 for (FTPFile f : listFiles){
                     FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
                     if (sf.isDirectory()) {
-                        log.trace("FtpListingThread: add directory " + sf.getName());
+                        log.trace("FtpListingThread: add directory {}", sf.getName());
                         directories.add(sf);
                     } else {
-                        log.trace("FtpListingThread: add file " + sf.getName());
+                        log.trace("FtpListingThread: add file {}", sf.getName());
                         files.add(sf);
                     }
                 }

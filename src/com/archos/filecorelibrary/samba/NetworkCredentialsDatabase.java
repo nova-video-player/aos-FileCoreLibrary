@@ -140,7 +140,7 @@ public class NetworkCredentialsDatabase {
     }
 
     public void saveCredential(Credential cred){
-        log.debug("saveCredential: path " + cred.getUriString() + ", username=" + cred.getUsername());
+        log.debug("saveCredential: path {}, username={}", cred.getUriString(), cred.getUsername());
         mCredentials.put(cred.getUriString(), cred);
         open();
         ContentValues initialValues = new ContentValues(1);
@@ -316,7 +316,7 @@ public class NetworkCredentialsDatabase {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion < DATABASE_CREATE_VERSION) {
-                log.debug("Upgrade not supported for version " + oldVersion + ", recreating the database.");
+                log.debug("Upgrade not supported for version {}, recreating the database.", oldVersion);
                 // triggers database deletion
                 deleteDatabase();
             }

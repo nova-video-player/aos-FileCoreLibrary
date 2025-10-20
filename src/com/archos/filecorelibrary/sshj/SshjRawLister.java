@@ -41,12 +41,12 @@ public class SshjRawLister extends RawLister {
 
     public SshjRawLister(Uri uri) {
         super(uri);
-        log.trace("SshjRawLister: " + mUri);
+        log.trace("SshjRawLister: {}", mUri);
     }
 
     @Override
     public ArrayList<MetaFile2> getFileList() throws AuthenticationException, IOException {
-        log.trace("getFileList: " + mUri);
+        log.trace("getFileList: {}", mUri);
         SFTPClient sftpClient = null;
         try {
             var files = new ArrayList<MetaFile2>();
@@ -55,7 +55,7 @@ public class SshjRawLister extends RawLister {
             List<RemoteResourceInfo> remoteResourceInfos = sftpClient.ls(filePath);
             for (var fileOrDir : remoteResourceInfos) {
                 final String filename = fileOrDir.getName();
-                log.trace("getFileList: adding " + filename);
+                log.trace("getFileList: adding {}", filename);
                 files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
             }
             return files;

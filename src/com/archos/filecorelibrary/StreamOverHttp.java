@@ -192,7 +192,7 @@ public class StreamOverHttp {
 		HttpSession(Socket s, String fileMimeType){
 			this.fileMimeType = fileMimeType;
 			socket = s;
-			log.debug("Stream over localhost: serving request on " + s.getInetAddress());
+			log.debug("Stream over localhost: serving request on {}", s.getInetAddress());
 			Thread t = new Thread(this, "Http response");
 			t.setDaemon(true);
 			t.start();
@@ -321,7 +321,7 @@ public class StreamOverHttp {
 						var fe = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext());
 						is = fe.getInputStream(startFrom);
 						var l = fe.length();
-						log.trace("HttpSession:openInputStream: got length " + l);
+						log.trace("HttpSession:openInputStream: got length {}", l);
 						if (l > 0 && length <=0) length = l;
 					 } catch (IOException ioexception) {
 						log.debug("openInputStream: caught IOException ", ioexception);
@@ -402,7 +402,7 @@ public class StreamOverHttp {
 						sendError(socket, HTTP_416, null);
 						return;
 					}
-					log.debug("handleResponse : "+range);
+					log.debug("handleResponse : {}", range);
 					range = range.substring(6); // removes "bytes="
 					long startFrom = 0, endAt = -1;
 					int minus = range.indexOf('-');
@@ -424,7 +424,7 @@ public class StreamOverHttp {
 					if(endAt < 0)
 						endAt = length - 1;
 					sendCount = (endAt - startFrom + 1);
-					log.debug("handleResponse: startFrom = " + startFrom + " + endAt=" + endAt +" sendCount=" + sendCount + " (length = " + length + ")");
+					log.debug("handleResponse: startFrom = {} + endAt={} sendCount={} (length = {})", startFrom, endAt, sendCount, length);
 					if(sendCount < 0)
 						sendCount = 0;
 					status = "206 Partial Content";
@@ -483,7 +483,7 @@ public class StreamOverHttp {
 					if(line==null)
 						break;
 					if(log.isDebugEnabled() && line.length()>0)
-						log.debug("decodeHeader "+line);
+						log.debug("decodeHeader {}", line);
 					int p = line.indexOf(':');
 					if(p<0)
 						continue;
@@ -525,7 +525,7 @@ public class StreamOverHttp {
 				String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
 				url += '/'+encodedFileName;
 			} catch (Exception e) {
-				log.warn("Failed to URL encode filename: " + fileName + ", using original", e);
+				log.warn("Failed to URL encode filename: {}, using original", fileName, e);
 				url += '/'+fileName;
 			}
 		}
@@ -558,14 +558,14 @@ public class StreamOverHttp {
 		int count;
 
 		while(maxSize>0) {
-			log.debug("copyStream: looping maxSize= " + maxSize);
+			log.debug("copyStream: looping maxSize= {}", maxSize);
 			count = (int) Math.min(maxSize, (long)tmpBuf.length);
-			log.debug("copyStream: looping count= " + count);
+			log.debug("copyStream: looping count= {}", count);
 			count = in.read(tmpBuf, 0, count);
-			log.debug("copyStream: looping count after in.read " + count);
+			log.debug("copyStream: looping count after in.read {}", count);
 			if(count<0)
 				break;
-			log.debug("copyStream: looping tmpBuf is of length " + tmpBuf.length + " writing count " + count);
+			log.debug("copyStream: looping tmpBuf is of length {} writing count {}", tmpBuf.length, count);
 			out.write(tmpBuf, 0, count); // TODO MARC CRASH HERE
 			out.flush();
 			maxSize -= count;
@@ -595,7 +595,7 @@ public class StreamOverHttp {
 					String key = (String)e.nextElement();
 					String value = header.getProperty(key);
 					String l = key + ": " + value + "\r\n";
-					log.debug("sendResponse : " + l);
+					log.debug("sendResponse : {}", l);
 					pw.print(l);
 				}
 			}
@@ -626,6 +626,5 @@ public class StreamOverHttp {
 		}
 	}
 }
-
 
 

@@ -94,7 +94,7 @@ public class SmbjUtils {
         int port = uri.getPort();
         Connection smbConnection = smbjConnections.get(cred);
         if (smbConnection == null || !smbConnection.isConnected()) {
-            log.trace("getSmbConnection: smbConnection is null or not connected for " + uri + ", connecting to " + server);
+            log.trace("getSmbConnection: smbConnection is null or not connected for {}, connecting to {}", uri, server);
             SMBClient smbClient;
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
@@ -119,7 +119,7 @@ public class SmbjUtils {
             try {
                 smbSession = smbConnection.authenticate(ac);
             } catch (SMB2GuestSigningRequiredException e) {
-                log.error("getSmbConnection: caught SMB2GuestSigningRequiredException " + e.getMessage() + " for uri " + uri + " -> throwing IOException instead");
+                log.error("getSmbConnection: caught SMB2GuestSigningRequiredException {} for uri {} -> throwing IOException instead", e.getMessage(), uri);
                 throw new IOException("getSmbConnection: SMB2GuestSigningRequiredException");
             }
             smbjSessions.put(cred, smbSession);
@@ -134,19 +134,19 @@ public class SmbjUtils {
         getSmbConnection(uri); // be sure to be connected
         // shareName can be null when asking for smbj://server/
         if (shareName == null) {
-            log.warn("getSmbShare: returning null shareName for uri " + uri);
+            log.warn("getSmbShare: returning null shareName for uri {}", uri);
             return null;
         }
         DiskShare smbShare = smbjShares.get(cred);
         if (smbShare == null || !shareName.equals(getShareName(Uri.parse(cred.getUriString()))) || !smbShare.isConnected()) {
-            log.trace("getSmbShare: smbShare is null or not connected for " + shareName);
+            log.trace("getSmbShare: smbShare is null or not connected for {}", shareName);
             // ensures that there is a valid connection and regenerate session if not connected
             getSmbConnection(uri);
             Session smbSession = smbjSessions.get(cred);
             if (smbSession != null) {
                 try {
                     smbShare = (DiskShare) smbSession.connectShare(shareName);
-                    log.trace("getSmbShare: saving smbShare " + shareName + ", smbshare=" + smbShare);
+                    log.trace("getSmbShare: saving smbShare {}, smbshare={}", shareName, smbShare);
                     smbjShares.put(cred, smbShare);
                 } catch (SMBRuntimeException e) {
                     if (e.getCause() instanceof SocketException) {
@@ -157,11 +157,11 @@ public class SmbjUtils {
                             smbShare = (DiskShare) smbSession.connectShare(shareName);
                             smbjShares.put(cred, smbShare);
                         } else {
-                            log.error("getSmbShare: caught SMBRuntimeException but smbSession is null after reconnecting! " + e.getMessage() + " for uri " + uri + ", sharename=" + shareName + " -> throwing IOException instead");
+                            log.error("getSmbShare: caught SMBRuntimeException but smbSession is null after reconnecting! {} for uri {}, sharename={} -> throwing IOException instead", e.getMessage(), uri, shareName);
                             throw new IOException("getSmbShare: smbSession is null after reconnecting!");
                         }
                     } else {
-                        log.error("getSmbShare: caught exception " + e.getMessage() + " for uri " + uri + ", sharename=" + shareName + " -> throwing IOException instead");
+                        log.error("getSmbShare: caught exception {} for uri {}, sharename={} -> throwing IOException instead", e.getMessage(), uri, shareName);
                         throw new IOException("getSmbShare: smbSession is null after reconnecting!");
                     }
                 }
@@ -185,7 +185,7 @@ public class SmbjUtils {
             log.error("isSMBjEnabled: mContext is null! Returning false");
             return false;
         }
-        log.trace("isSMBjEnabled=" + PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
+        log.trace("isSMBjEnabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false);
     }
 
@@ -198,7 +198,7 @@ public class SmbjUtils {
         if (cred != null) {
             DiskShare share = smbjShares.remove(cred);
             if (share != null) {
-                log.debug("invalidateShare: removed cached share for " + uri);
+                log.debug("invalidateShare: removed cached share for {}", uri);
             }
         }
     }
