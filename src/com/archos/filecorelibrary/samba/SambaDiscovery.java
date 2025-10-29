@@ -622,7 +622,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     }
 
     static {
-        System.loadLibrary("filecoreutils");
+        try {
+            System.loadLibrary("filecoreutils");
+        } catch (UnsatisfiedLinkError e) {
+            Log.w("SambaDiscovery", "Failed to load libfilecoreutils: " + e.getMessage());
+        }
     }
 
     public void notifyPrefChange() {
