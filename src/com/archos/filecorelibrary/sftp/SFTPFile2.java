@@ -62,7 +62,7 @@ public class SFTPFile2 extends MetaFile2 {
         mName = filename;
         mIsDirectory = stat.isDir();
         mIsFile = !stat.isDir();
-        mLastModified = stat.getMTime();
+        mLastModified = ((long) stat.getMTime()) * 1000L;
         //TODO : permissions
         mCanRead = true;
         mCanWrite = true;
