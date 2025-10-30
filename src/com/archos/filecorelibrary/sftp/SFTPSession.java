@@ -154,8 +154,12 @@ public class SFTPSession {
             return session;
         }
         JSch jsch=new JSch();
+        int port = path.getPort();
+        if (port < 0) {
+            port = 22;
+        }
         try {
-            session = jsch.getSession(username, path.getHost(), path.getPort());
+            session = jsch.getSession(username, path.getHost(), port);
             session.setPassword(password);
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
