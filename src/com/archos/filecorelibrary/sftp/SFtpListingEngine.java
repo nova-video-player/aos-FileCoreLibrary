@@ -99,8 +99,6 @@ public class SFtpListingEngine extends ListingEngine {
         };
 
         channelSftp.ls(path, selector);
-        channelSftp.disconnect();
-        SFTPSession.getInstance().releaseSession(channelSftp);
         return vector;
     }
 
