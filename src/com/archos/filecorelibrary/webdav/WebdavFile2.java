@@ -39,14 +39,30 @@ public class WebdavFile2 extends MetaFile2 {
     private static final Logger log = LoggerFactory.getLogger(WebdavFile2.class);
 
     public static Uri uriToHttp(Uri u) {
+        Uri httpUri;
         if (u.getScheme().equals("webdavs"))
-            return u.buildUpon().
-                    scheme("https").
-                    build();
+            httpUri = u.buildUpon().scheme("https").build();
         else
-            return u.buildUpon().
-                    scheme("http").
-                    build();
+            httpUri = u.buildUpon().scheme("http").build();
+        
+        try {
+            WebdavUtils utils = WebdavUtils.peekInstance();
+            if (utils == null) {
+                log.warn("uriToHttp: WebdavUtils not initialized, using original URI");
+                return httpUri;
+            }
+            String resolvedUrl = utils.resolveRedirect(httpUri);
+            if (resolvedUrl == null) {
+                log.warn("uriToHttp: redirect resolution failed for " + httpUri + ", using original");
+                return httpUri;
+            }
+            String path = httpUri.getPath();
+            if (path == null) path = "";
+            return Uri.parse(resolvedUrl + path);
+        } catch (Exception e) {
+            log.warn("uriToHttp: redirect resolution error for " + httpUri + ", using original", e);
+            return httpUri;
+        }
     }
 
     private static final long serialVersionUID = 2L;
