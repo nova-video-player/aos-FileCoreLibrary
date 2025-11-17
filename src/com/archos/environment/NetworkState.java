@@ -82,7 +82,7 @@ public class NetworkState {
         // set initial state
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         mConnected = isNetworkConnected(context);
-        mHasLocalConnection = isLocalNetworkConnected(mContext);
+        mHasLocalConnection = isLocalNetworkConnectedOrVpnMobileEnabled(mContext);
         propertyChangeSupport = new PropertyChangeSupport(context);
     }
 
@@ -93,7 +93,6 @@ public class NetworkState {
     public boolean updateFrom() {
         // returns true when that changes hasLocalConnection
         boolean returnBoolean = false;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean connected = isNetworkConnected(mContext);
         if (connected != mConnected) { // only fire change if there is a change
             log.debug("updateFrom: connected changed notifying, {}->{}", mConnected, connected);
@@ -102,7 +101,7 @@ public class NetworkState {
             propertyChangeSupport.firePropertyChange(WAN_STATE, oldState, connected);
         } else
             log.debug("updateFrom: connected ({}) state not changed -> not notifying", connected);
-        boolean hasLocalConnection = isLocalNetworkConnected(mContext) || preferences.getBoolean("vpn_mobile", false);
+        boolean hasLocalConnection = isLocalNetworkConnectedOrVpnMobileEnabled(mContext);
         if (hasLocalConnection != mHasLocalConnection) { // only fire change if there is a change
             log.debug("updateFrom: hasLocalConnection changed notifying, {}->{}", mHasLocalConnection, hasLocalConnection);
             returnBoolean = true;
@@ -200,6 +199,25 @@ public class NetworkState {
                 }
             }
         }
+        return false;
+    }
+
+    public static boolean isLocalNetworkConnectedOrVpnMobileEnabled(Context context) {
+        // Check if on local network (WIFI/ETHERNET) OR if VPN on mobile network is enabled
+        if (context == null) return false;
+        // First check if on actual local network (WiFi or Ethernet)
+        if (isLocalNetworkConnected(context)) {
+            return true;
+        }
+        // If not on local network, check if vpn_mobile preference is enabled
+        // This allows SMB/UPnP discovery via VPN/Tailscale connections on mobile networks
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean vpnMobileEnabled = preferences.getBoolean("vpn_mobile", false);
+        if (vpnMobileEnabled && isNetworkConnected(context)) {
+            log.debug("isLocalNetworkConnectedOrVpnMobileEnabled: true (VPN on mobile network)");
+            return true;
+        }
+        log.debug("isLocalNetworkConnectedOrVpnMobileEnabled: false");
         return false;
     }
 
