@@ -16,6 +16,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libfilecoreutils
 
 LOCAL_LDLIBS := -L$(TARGET_OUT) -llog
+LOCAL_LDFLAGS = -Wl,-z,max-page-size=16384
 
 # All of the source files that we will compile.
 LOCAL_SRC_FILES:= \
