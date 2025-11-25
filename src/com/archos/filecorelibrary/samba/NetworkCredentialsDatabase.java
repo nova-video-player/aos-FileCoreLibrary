@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +60,7 @@ public class NetworkCredentialsDatabase {
     private static final String KEY_DOMAIN = "domain";
     private static final String KEY_PASSWORD = "password";
     private static final String[] COLS = { KEY_PATH, KEY_USERNAME, KEY_PASSWORD, KEY_DOMAIN };
-    private static final byte[] cipherKey = "vimcufJies8".getBytes();
+    private static final byte[] cipherKey = "vimcufJies8".getBytes(StandardCharsets.UTF_8);
 
     private static final String DATABASE_CREATE_CREDENTIALS =
             "create table "+CREDENTIALS_TABLE+" (" + KEY_PATH + " text not null primary key, "+KEY_USERNAME+" text, " + KEY_PASSWORD + " text, " + KEY_DOMAIN + " text);";
@@ -281,7 +282,7 @@ public class NetworkCredentialsDatabase {
             Key key = new SecretKeySpec(cipherKey,"Blowfish");
             Cipher cipher=Cipher.getInstance("Blowfish");
             cipher.init(Cipher.ENCRYPT_MODE,key);
-            return Base64.encodeToString(cipher.doFinal(password.getBytes()), Base64.DEFAULT);
+            return Base64.encodeToString(cipher.doFinal(password.getBytes(StandardCharsets.UTF_8)), Base64.DEFAULT);
         }
         catch (Exception e) {
             return null;
@@ -293,7 +294,7 @@ public class NetworkCredentialsDatabase {
             Key key = new SecretKeySpec(cipherKey,"Blowfish");
             Cipher cipher=Cipher.getInstance("Blowfish");
             cipher.init(Cipher.DECRYPT_MODE,key);
-            return new String(cipher.doFinal(Base64.decode(password.getBytes(), Base64.DEFAULT)));
+            return new String(cipher.doFinal(Base64.decode(password.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT)), StandardCharsets.UTF_8);
         }
         catch (Exception e) {
             return null;

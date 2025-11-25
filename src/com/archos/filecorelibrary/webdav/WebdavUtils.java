@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Authenticator;
@@ -93,7 +94,7 @@ public class WebdavUtils {
                     if (response.request().header("Authorization") != null) {
                         return null;
                     }
-                    String credential = Credentials.basic(username, password);
+                    String credential = Credentials.basic(username, password, StandardCharsets.UTF_8);
                     return response.request().newBuilder().header("Authorization", credential).build();
                 }
             });
