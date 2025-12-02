@@ -47,63 +47,80 @@ public class SmbjFileEditor extends FileEditor {
 
     private static final Logger log = LoggerFactory.getLogger(SmbjFileEditor.class);
 
+    private SmbjUtils requireUtils() {
+        SmbjUtils utils = SmbjUtils.peekInstance();
+        if (utils == null) {
+            throw new IllegalStateException("SmbjUtils instance is null");
+        }
+        return utils;
+    }
+
     public SmbjFileEditor(Uri uri) { super(uri); }
 
     @Override
     public InputStream getInputStream() throws Exception {
         log.trace("getInputStream: opening {}", mUri);
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
-                EnumSet.of(AccessMask.FILE_READ_DATA),
-                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
-                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
-                SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-        InputStream is = smbjFile.getInputStream();
-        ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {if (smbjFile != null) {
-            log.trace("getInputStream: closing {}", mUri);
-            // check that DiskShare has not already been closed (seen on sentry)
-            if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
-        }});
-        return ois;
+        SmbjUtils utils = requireUtils();
+        return utils.withOutOfCreditsRetry(mUri, () -> {
+            File smbjFile = utils.getSmbShare(mUri).openFile(getFilePath(mUri),
+                    EnumSet.of(AccessMask.FILE_READ_DATA),
+                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                    SMB2CreateDisposition.FILE_OPEN,
+                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
+            InputStream is = smbjFile.getInputStream();
+            ObservableInputStream ois = new ObservableInputStream(is);
+            ois.onClose(() -> {if (smbjFile != null) {
+                log.trace("getInputStream: closing {}", mUri);
+                // check that DiskShare has not already been closed (seen on sentry)
+                if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
+            }});
+            return ois;
+        });
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
         log.trace("getInputStream: opening {}", mUri);
-        File smbjFile = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
-                EnumSet.of(AccessMask.FILE_READ_DATA),
-                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
-                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
-                SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-        InputStream is = smbjFile.getInputStream();
-        is.skip(from);
-        ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {if (smbjFile != null) {
-            log.trace("getInputStream: closing {}", mUri);
-            // check that DiskShare has not already been closed (seen on sentry)
-            if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
-        }});
-        return ois;
+        SmbjUtils utils = requireUtils();
+        return utils.withOutOfCreditsRetry(mUri, () -> {
+            File smbjFile = utils.getSmbShare(mUri).openFile(getFilePath(mUri),
+                    EnumSet.of(AccessMask.FILE_READ_DATA),
+                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                    SMB2CreateDisposition.FILE_OPEN,
+                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
+            InputStream is = smbjFile.getInputStream();
+            is.skip(from);
+            ObservableInputStream ois = new ObservableInputStream(is);
+            ois.onClose(() -> {if (smbjFile != null) {
+                log.trace("getInputStream: closing {}", mUri);
+                // check that DiskShare has not already been closed (seen on sentry)
+                if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
+            }});
+            return ois;
+        });
     }
 
     @Override
     public OutputStream getOutputStream() throws Exception {
         log.trace("getOutputStream: opening {}", mUri);
-        File smbjFile =  SmbjUtils.peekInstance().getSmbShare(mUri).openFile(getFilePath(mUri),
-                EnumSet.of(AccessMask.GENERIC_WRITE, AccessMask.GENERIC_READ),
-                null, SMB2ShareAccess.ALL,
-                SMB2CreateDisposition.FILE_OVERWRITE_IF,
-                null);
-        OutputStream os = smbjFile.getOutputStream();
-        ObservableOutputStream oos = new ObservableOutputStream(os);
-        oos.onClose(() -> {if (smbjFile != null) {
-            log.trace("getOutputStream: closing {}", mUri);
-            // check that DiskShare has not already been closed (seen on sentry)
-            if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
-        }});
-        return oos;
+        SmbjUtils utils = requireUtils();
+        return utils.withOutOfCreditsRetry(mUri, () -> {
+            File smbjFile =  utils.getSmbShare(mUri).openFile(getFilePath(mUri),
+                    EnumSet.of(AccessMask.GENERIC_WRITE, AccessMask.GENERIC_READ),
+                    null, SMB2ShareAccess.ALL,
+                    SMB2CreateDisposition.FILE_OVERWRITE_IF,
+                    null);
+            OutputStream os = smbjFile.getOutputStream();
+            ObservableOutputStream oos = new ObservableOutputStream(os);
+            oos.onClose(() -> {if (smbjFile != null) {
+                log.trace("getOutputStream: closing {}", mUri);
+                // check that DiskShare has not already been closed (seen on sentry)
+                if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
+            }});
+            return oos;
+        });
     }
 
     @Override
@@ -114,54 +131,62 @@ public class SmbjFileEditor extends FileEditor {
     @Override
     public boolean mkdir() {
         try {
-            SmbjUtils.peekInstance().getSmbShare(mUri).mkdir(getFilePath(mUri));
-            return true;
+            SmbjUtils utils = requireUtils();
+            return utils.withOutOfCreditsRetry(mUri, () -> {
+                utils.getSmbShare(mUri).mkdir(getFilePath(mUri));
+                return true;
+            });
         } catch (IOException e) {
             caughtException(e, "SmbjFileEditor:mkdir", "IOException in mkdir " + mUri);
         }  catch (SMBApiException se) {
             caughtException(se, "SMBApiException:mkdir", "IOException in mkdir " + mUri);
+        } catch (Exception e) {
+            caughtException(e, "SmbjFileEditor:mkdir", "Exception in mkdir " + mUri);
         }
         return false;
     }
 
     @Override
     public Boolean delete() throws Exception {
-        DiskShare mDiskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
-        String mFilePath = getFilePath(mUri);
+        SmbjUtils utils = requireUtils();
         try {
-            // Try to delete as file first (most common case)
-            try {
-                mDiskShare.rm(mFilePath);
-                log.debug("delete: successfully deleted file {}", mUri);
-                return true;
-            } catch (SMBApiException e) {
-                NtStatus status = e.getStatus();
-                // If it's not a file, try as a directory
-                if (status == NtStatus.STATUS_FILE_IS_A_DIRECTORY) {
-                    log.debug("delete: path is a directory, using rmdir {}", mUri);
-                    mDiskShare.rmdir(mFilePath, true);
-                    log.debug("delete: successfully deleted directory {}", mUri);
+            return utils.withOutOfCreditsRetry(mUri, () -> {
+                DiskShare mDiskShare = utils.getSmbShare(mUri);
+                String mFilePath = getFilePath(mUri);
+                // Try to delete as file first (most common case)
+                try {
+                    mDiskShare.rm(mFilePath);
+                    log.debug("delete: successfully deleted file {}", mUri);
                     return true;
-                } else if (status == NtStatus.STATUS_OBJECT_NAME_NOT_FOUND) {
-                    // File doesn't exist - this is not an error, just return true
-                    log.debug("delete: file does not exist {}", mUri);
-                    return true;
-                } else {
+                } catch (SMBApiException e) {
+                    NtStatus status = e.getStatus();
+                    // If it's not a file, try as a directory
+                    if (status == NtStatus.STATUS_FILE_IS_A_DIRECTORY) {
+                        log.debug("delete: path is a directory, using rmdir {}", mUri);
+                        mDiskShare.rmdir(mFilePath, true);
+                        log.debug("delete: successfully deleted directory {}", mUri);
+                        return true;
+                    } else if (status == NtStatus.STATUS_OBJECT_NAME_NOT_FOUND) {
+                        // File doesn't exist - this is not an error, just return true
+                        log.debug("delete: file does not exist {}", mUri);
+                        return true;
+                    } else {
+                        throw e;
+                    }
+                } catch (Exception e) {
+                    // Handle smbj quirk: TransportException with EOFException during delete
+                    // The file is typically deleted on server despite the exception, but the
+                    // connection is compromised. Invalidate the cached share to force reconnection.
+                    if (isEofTransportException(e)) {
+                        log.debug("delete: got EOF exception during rm/rmdir, invalidating share cache for {}", mUri);
+                        utils.invalidateShare(mUri);
+                        // File was deleted on server; return true to proceed with next operation
+                        // which will get a fresh, connected share via getSmbShare()
+                        return true;
+                    }
                     throw e;
                 }
-            } catch (Exception e) {
-                // Handle smbj quirk: TransportException with EOFException during delete
-                // The file is typically deleted on server despite the exception, but the
-                // connection is compromised. Invalidate the cached share to force reconnection.
-                if (isEofTransportException(e)) {
-                    log.debug("delete: got EOF exception during rm/rmdir, invalidating share cache for {}", mUri);
-                    SmbjUtils.peekInstance().invalidateShare(mUri);
-                    // File was deleted on server; return true to proceed with next operation
-                    // which will get a fresh, connected share via getSmbShare()
-                    return true;
-                }
-                throw e;
-            }
+            });
         } catch (Exception e) {
             caughtException(e, "SmbjFileEditor:delete", "Exception in delete " + mUri);
             throw e;
@@ -192,26 +217,30 @@ public class SmbjFileEditor extends FileEditor {
     public boolean rename(String newName) {
         String mFilePath = getFilePath(mUri);
         try {
-            File from = SmbjUtils.peekInstance().getSmbShare(mUri).openFile(mFilePath,
-                    EnumSet.of(AccessMask.DELETE, AccessMask.GENERIC_WRITE),
-                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
-                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ, SMB2ShareAccess.FILE_SHARE_DELETE),
-                    SMB2CreateDisposition.FILE_OPEN,
-                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS)
-                    );
+            SmbjUtils utils = requireUtils();
+            return utils.withOutOfCreditsRetry(mUri, () -> {
+                File from = utils.getSmbShare(mUri).openFile(mFilePath,
+                        EnumSet.of(AccessMask.DELETE, AccessMask.GENERIC_WRITE),
+                        EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
+                        EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ, SMB2ShareAccess.FILE_SHARE_DELETE),
+                        SMB2CreateDisposition.FILE_OPEN,
+                        EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS)
+                );
 
-            log.debug("rename: mFilePath={} -> {}{}", mFilePath, getParentDirectoryPath(mFilePath), newName);
-            if (from != null) {
-                from.rename(getParentDirectoryPath(mFilePath) + newName);
-                from.close();
-                return true;
-            }
+                log.debug("rename: mFilePath={} -> {}{}", mFilePath, getParentDirectoryPath(mFilePath), newName);
+                if (from != null) {
+                    from.rename(getParentDirectoryPath(mFilePath) + newName);
+                    from.close();
+                    return true;
+                }
+                return false;
+            });
         } catch (Exception e) {
             // Handle smbj quirk: TransportException with EOFException during rename close
             // Same root cause as delete() - the close operation can trigger EOF
             if (isEofTransportException(e)) {
                 log.debug("rename: got EOF exception during close, invalidating share cache for {}", mUri);
-                SmbjUtils.peekInstance().invalidateShare(mUri);
+                requireUtils().invalidateShare(mUri);
                 // File was renamed on server; return true to proceed with next operation
                 return true;
             }
@@ -223,18 +252,17 @@ public class SmbjFileEditor extends FileEditor {
     @Override
     public boolean exists() {
         try {
-            SmbjUtils smbjUtilsInstance = SmbjUtils.peekInstance();
-            if (smbjUtilsInstance == null) {
-                throw new IllegalStateException("SmbjUtils instance is null");
-            }
-            DiskShare mDiskShare = smbjUtilsInstance.getSmbShare(mUri);
-            // at this stage, mDiskShare if not null should be connected i.e. .isConnected() should be true granted by getSmbShare
-            if (mDiskShare == null || ! mDiskShare.isConnected()) {
-                log.error("exists: mDiskShare is null or not connected for {} returning false", mUri);
-                return false;
-            }
-            String mFilePath = getFilePath(mUri);
-            return mDiskShare.fileExists(mFilePath) || mDiskShare.folderExists(mFilePath);
+            SmbjUtils utils = requireUtils();
+            return utils.withOutOfCreditsRetry(mUri, () -> {
+                DiskShare mDiskShare = utils.getSmbShare(mUri);
+                // at this stage, mDiskShare if not null should be connected i.e. .isConnected() should be true granted by getSmbShare
+                if (mDiskShare == null || ! mDiskShare.isConnected()) {
+                    log.error("exists: mDiskShare is null or not connected for {} returning false", mUri);
+                    return false;
+                }
+                String mFilePath = getFilePath(mUri);
+                return mDiskShare.fileExists(mFilePath) || mDiskShare.folderExists(mFilePath);
+            });
         } catch (Exception e) { // can be IOException | SMBApiException but also TimeoutException claimed not to be thrown
             caughtException(e, "SmbjFileEditor:exists", "Exception in exists " + mUri);
         }

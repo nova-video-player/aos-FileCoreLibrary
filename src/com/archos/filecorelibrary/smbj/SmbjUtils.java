@@ -76,6 +76,11 @@ public class SmbjUtils {
         return sInstance;
     }
 
+    @FunctionalInterface
+    public interface CheckedSupplier<T> {
+        T get() throws Exception;
+    }
+
     private SmbjUtils(Context context) {
         mContext = context;
         log.debug("SmbjUtils: initializing contexts");
@@ -123,6 +128,68 @@ public class SmbjUtils {
                 throw new IOException("getSmbConnection: SMB2GuestSigningRequiredException");
             }
             smbjSessions.put(cred, smbSession);
+        }
+    }
+
+    /**
+     * Reset cached share/session/connection for a URI and close existing resources.
+     */
+    public synchronized void resetConnection(Uri uri) {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        if (cred == null)
+            cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
+        DiskShare share = smbjShares.remove(cred);
+        if (share != null) {
+            try {
+                share.close();
+            } catch (Exception e) {
+                log.warn("resetConnection: failed closing share for {}: {}", uri, e.getMessage());
+            }
+        }
+        Session session = smbjSessions.remove(cred);
+        if (session != null) {
+            try {
+                session.close();
+            } catch (Exception e) {
+                log.warn("resetConnection: failed closing session for {}: {}", uri, e.getMessage());
+            }
+        }
+        Connection connection = smbjConnections.remove(cred);
+        if (connection != null) {
+            try {
+                connection.close(true);
+            } catch (Exception e) {
+                log.warn("resetConnection: failed closing connection for {}: {}", uri, e.getMessage());
+            }
+        }
+    }
+
+    private boolean isOutOfCredits(Throwable t) {
+        Throwable current = t;
+        while (current != null) {
+            if (current instanceof SMBRuntimeException && current.getMessage() != null &&
+                    current.getMessage().contains("Not enough credits")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    /**
+     * Execute an SMBJ operation, resetting the connection and retrying once if the server reports
+     * that we ran out of credits.
+     */
+    public <T> T withOutOfCreditsRetry(Uri uri, CheckedSupplier<T> supplier) throws Exception {
+        try {
+            return supplier.get();
+        } catch (SMBRuntimeException e) {
+            if (isOutOfCredits(e)) {
+                log.warn("withOutOfCreditsRetry: out of credits for {}, resetting connection and retrying", uri);
+                resetConnection(uri);
+                return supplier.get();
+            }
+            throw e;
         }
     }
 

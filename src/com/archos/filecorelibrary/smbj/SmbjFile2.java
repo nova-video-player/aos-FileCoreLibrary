@@ -152,17 +152,22 @@ public class SmbjFile2 extends MetaFile2 {
      * get metafile2 object from a uri (please use this only if absolutely necessary)
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        var diskShare = SmbjUtils.peekInstance().getSmbShare(uri);
-        final String filePath = getFilePath(uri);
-        final String shareName = getShareName(uri);
-        DiskEntry file = diskShare.open(filePath,
-                EnumSet.of(AccessMask.FILE_READ_DATA),
-                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
-                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
-                SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-        FileAllInformation fileInformation = diskShare.getFileInformation(filePath);
-        file.close();
-        return new SmbjFile2(fileInformation, uri);
+        SmbjUtils utils = SmbjUtils.peekInstance();
+        if (utils == null) {
+            throw new IllegalStateException("SmbjUtils instance is null");
+        }
+        return utils.withOutOfCreditsRetry(uri, () -> {
+            var diskShare = utils.getSmbShare(uri);
+            final String filePath = getFilePath(uri);
+            DiskEntry file = diskShare.open(filePath,
+                    EnumSet.of(AccessMask.FILE_READ_DATA),
+                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                    SMB2CreateDisposition.FILE_OPEN,
+                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
+            FileAllInformation fileInformation = diskShare.getFileInformation(filePath);
+            file.close();
+            return new SmbjFile2(fileInformation, uri);
+        });
     }
 }

@@ -26,6 +26,7 @@ import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,11 +82,17 @@ public class SmbjListingEngine extends ListingEngine {
             try {
                 log.debug("SmbjListingThread: listFiles for: {}", mUri.toString());
 
-                var diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+                final SmbjUtils smbjUtils = SmbjUtils.peekInstance();
+                if (smbjUtils == null) {
+                    throw new IOException("SmbjUtils instance is null");
+                }
                 String filePath = getFilePath(mUri);
 
                 var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
-                List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
+                List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withOutOfCreditsRetry(mUri, () -> {
+                    DiskShare share = smbjUtils.getSmbShare(mUri);
+                    return share.list(filePath);
+                });
 
                 final ArrayList<SmbjFile2> directories = new ArrayList<>();
                 final ArrayList<SmbjFile2> files = new ArrayList<>();
@@ -208,6 +215,15 @@ public class SmbjListingEngine extends ListingEngine {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted
                             mListener.onListingFatalError(e, fError);
+                        }
+                    }
+                });
+            } catch (final Exception e) {
+                caughtException(e, "SmbjListingEngine:SmbjListingThread", "Unexpected exception for " + mUri);
+                mUiHandler.post(new Runnable() {
+                    public void run() {
+                        if (!mAbort && mListener != null) { // do not report error if aborted
+                            mListener.onListingFatalError(e, ErrorEnum.ERROR_UNKNOWN);
                         }
                     }
                 });

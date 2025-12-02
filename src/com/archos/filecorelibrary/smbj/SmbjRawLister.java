@@ -24,6 +24,7 @@ import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +45,16 @@ public class SmbjRawLister extends RawLister {
     public ArrayList<MetaFile2> getFileList() throws IOException, AuthenticationException {
         try {
             var files = new ArrayList<MetaFile2>();
-            var diskShare = SmbjUtils.peekInstance().getSmbShare(mUri);
+            final SmbjUtils smbjUtils = SmbjUtils.peekInstance();
+            if (smbjUtils == null) {
+                throw new IOException("SmbjUtils instance is null");
+            }
             final String filePath = getFilePath(mUri);
             final String shareName = getShareName(mUri);
-            List<FileIdBothDirectoryInformation> diskShareLst = diskShare.list(filePath);
+            List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withOutOfCreditsRetry(mUri, () -> {
+                DiskShare share = smbjUtils.getSmbShare(mUri);
+                return share.list(filePath);
+            });
             for (var fileOrDir : diskShareLst) {
                 final String filename = fileOrDir.getFileName();
                 final String fullFilename = "/" + shareName + "/" + filename;
@@ -58,6 +65,9 @@ public class SmbjRawLister extends RawLister {
         } catch (SMBApiException se) { // most likely an Authentication error
             if (se.getMessage().contains("STATUS_ACCESS_DENIED")) throw new AuthenticationException();
             else log.warn("Caught SMBApiException");
+        } catch (Exception e) {
+            if (e instanceof IOException) throw (IOException) e;
+            log.warn("Failed listing smbj files", e);
         } catch (Throwable t) {
             log.warn("Failed listing smbj files", t);
         }
