@@ -93,7 +93,7 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.CREAT, OpenMode.WRITE));
+        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
         final OutputStream os = sshjFile.new RemoteFileOutputStream();
         /*
         final ObservableOutputStream oos = new ObservableOutputStream(os);
