@@ -376,6 +376,7 @@ public final class MimeUtils {
         add("text/plain", "sub");
         add("application/smil", "smi");
         add("text/plain", "srt");
+        add("text/vtt", "vtt");
         add("text/plain", "ssa");
         add("video/wtv", "wtv");
         // avos extra extensions

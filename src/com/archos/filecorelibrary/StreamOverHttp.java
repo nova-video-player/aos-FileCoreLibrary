@@ -120,7 +120,9 @@ public class StreamOverHttp {
         mainThread.setDaemon(true);
         mainThread.start();
     }
-	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml"};
+
+	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};
+
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
 		if(mSubList!=null)
 			return mSubList;
