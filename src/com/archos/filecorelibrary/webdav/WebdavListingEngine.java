@@ -72,7 +72,7 @@ public class WebdavListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("WebdavListingThread: listFiles for: {}", mUri.toString());
+                if (log.isDebugEnabled()) log.debug("WebdavListingThread: listFiles for: {}", mUri.toString());
 
                 var sardine = WebdavUtils.peekInstance().getSardine(mUri);
                 var httpUri = WebdavFile2.uriToHttp(mUri);
@@ -89,12 +89,12 @@ public class WebdavListingEngine extends ListingEngine {
                     final String filename = davResource.getName();
                     if (davResource.isDirectory()) {
                         if (keepDirectory(filename)) {
-                            log.trace("WebdavListingThread: adding directory {}", davResource.getPath());
+                            if (log.isTraceEnabled()) log.trace("WebdavListingThread: adding directory {}", davResource.getPath());
                             directories.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
-                            log.trace("WebdavListingThread: adding file {}", davResource.getPath());
+                            if (log.isTraceEnabled()) log.trace("WebdavListingThread: adding file {}", davResource.getPath());
                             //listFiles.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
                             files.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
                         }
@@ -163,7 +163,7 @@ public class WebdavListingEngine extends ListingEngine {
 
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
-                    log.debug("WebdavListingThread: abort");
+                    if (log.isDebugEnabled()) log.debug("WebdavListingThread: abort");
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (mListener != null) { // always report end even when aborted

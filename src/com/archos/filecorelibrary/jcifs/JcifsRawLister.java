@@ -59,7 +59,7 @@ public class JcifsRawLister extends RawLister {
             for(SmbFile f : listFiles){
                 // better verify that it is a file or directory before adding
                 if(f.isFile() || f.isDirectory()) {
-                    log.trace("found {}", f.getPath());
+                    if (log.isTraceEnabled()) log.trace("found {}", f.getPath());
                     files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                 }
             }

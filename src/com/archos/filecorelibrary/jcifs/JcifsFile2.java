@@ -111,7 +111,7 @@ public class JcifsFile2 extends MetaFile2 {
             try {
                 mCanRead = file.canRead();
                 mCanWrite = file.canWrite(); // /!\ does not work on directories
-                log.debug("JcifsFile2:buildJcifsFile2 {} canRead={} canWrite={}", file.getPath(), mCanRead, mCanWrite);
+                if (log.isDebugEnabled()) log.debug("JcifsFile2:buildJcifsFile2 {} canRead={} canWrite={}", file.getPath(), mCanRead, mCanWrite);
                 if (mIsFile) mLength = file.length();
             } catch (SmbAuthException e) {
                 caughtException(e, "JfisFile2:buildJcifsFile2 " + file.getPath(), "SmbAuthException");

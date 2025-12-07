@@ -32,7 +32,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int i) {
-            log.debug("onResolveFailed: Failed resolving {}, error code: {}", nsdServiceInfo, i);
+            if (log.isDebugEnabled()) log.debug("onResolveFailed: Failed resolving {}, error code: {}", nsdServiceInfo, i);
             if(mFailCount < 10) {
                 mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(mInfo, mFailCount + 1));
             }
@@ -40,7 +40,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
-            log.debug("onServiceResolved: share found nogroup:{}:{}", nsdServiceInfo.getServiceName(), nsdServiceInfo.getHost().getHostAddress());
+            if (log.isDebugEnabled()) log.debug("onServiceResolved: share found nogroup:{}:{}", nsdServiceInfo.getServiceName(), nsdServiceInfo.getHost().getHostAddress());
             try {
                 InetAddress hostInetAddress = InetAddress.getByName(nsdServiceInfo.getHost().getHostAddress());
                 byte[] addressInBytes = hostInetAddress.getAddress();
@@ -51,7 +51,7 @@ public class MdnsDiscovery implements InternalDiscovery {
                     return;
                 }
                 Inet4Address IPv4 = (Inet4Address) Inet4Address.getByAddress(nsdServiceInfo.getHost().getHostAddress(), addressInBytes);
-                log.debug("NsdServiceInfo: IPv4 address {}", IPv4.getHostAddress());
+                if (log.isDebugEnabled()) log.debug("NsdServiceInfo: IPv4 address {}", IPv4.getHostAddress());
                 //log.debug("NsdServiceInfo: IPv6 address {}", IPv6.getHostAddress());
                 String uri = "smb://" + IPv4.getHostAddress() + "/";
                 mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName().toUpperCase(), uri);
@@ -67,12 +67,12 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onStartDiscoveryFailed(String s, int i) {
-            log.debug("onStartDiscoveryFailed: failed starting discovery...{}:{}", s, i);
+            if (log.isDebugEnabled()) log.debug("onStartDiscoveryFailed: failed starting discovery...{}:{}", s, i);
         }
 
         @Override
         public void onStopDiscoveryFailed(String s, int i) {
-            log.debug("onStopDiscoveryFailed: failed stopping discovery...{}:{}", s, i);
+            if (log.isDebugEnabled()) log.debug("onStopDiscoveryFailed: failed stopping discovery...{}:{}", s, i);
         }
 
         @Override
@@ -87,7 +87,7 @@ public class MdnsDiscovery implements InternalDiscovery {
 
         @Override
         public void onServiceFound(NsdServiceInfo nsdServiceInfo) {
-            log.debug("Found service {}", nsdServiceInfo);
+            if (log.isDebugEnabled()) log.debug("Found service {}", nsdServiceInfo);
             // MdnsResolveListener CAN NOT be reused across services
             mNsdManager.resolveService(nsdServiceInfo, new MdnsResolveListener(nsdServiceInfo, 0));
         }
@@ -101,13 +101,13 @@ public class MdnsDiscovery implements InternalDiscovery {
     public MdnsDiscovery(InternalDiscoveryListener listener, Context ctxt, int socketReadDurationMs) {
         mNsdManager = (NsdManager)ctxt.getApplicationContext().getSystemService(Context.NSD_SERVICE);
         mMdnsListener = new MdnsListener();
-        log.debug("MdnsDiscovery: created mdns discovery");
+        if (log.isDebugEnabled()) log.debug("MdnsDiscovery: created mdns discovery");
         mSmbListener = listener;
     }
 
     @Override
     public void start() {
-        log.debug("start: starting discovering...");
+        if (log.isDebugEnabled()) log.debug("start: starting discovering...");
         if (!mMdnsListenerRegistered) {
             mNsdManager.discoverServices("_smb._tcp", NsdManager.PROTOCOL_DNS_SD, mMdnsListener);
             mMdnsListenerRegistered = true;

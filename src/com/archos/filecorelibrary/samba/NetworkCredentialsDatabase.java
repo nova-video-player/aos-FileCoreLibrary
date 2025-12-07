@@ -141,7 +141,7 @@ public class NetworkCredentialsDatabase {
     }
 
     public void saveCredential(Credential cred){
-        log.debug("saveCredential: path {}, username={}", cred.getUriString(), cred.getUsername());
+        if (log.isDebugEnabled()) log.debug("saveCredential: path {}, username={}", cred.getUriString(), cred.getUsername());
         mCredentials.put(cred.getUriString(), cred);
         open();
         ContentValues initialValues = new ContentValues(1);
@@ -272,8 +272,8 @@ public class NetworkCredentialsDatabase {
                 }
             }
         }
-        if (ret != null) log.debug("getCredential: found credential user {} for {} while searching for {}", ret.getUsername(), ret.getUriString(), uriString);
-        else log.trace("getCredential: no credential found");
+        if (ret != null) if (log.isDebugEnabled()) log.debug("getCredential: found credential user {} for {} while searching for {}", ret.getUsername(), ret.getUriString(), uriString);
+        else if (log.isTraceEnabled()) log.trace("getCredential: no credential found");
         return ret;
     }
 
@@ -317,7 +317,7 @@ public class NetworkCredentialsDatabase {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion < DATABASE_CREATE_VERSION) {
-                log.debug("Upgrade not supported for version {}, recreating the database.", oldVersion);
+                if (log.isDebugEnabled()) log.debug("Upgrade not supported for version {}, recreating the database.", oldVersion);
                 // triggers database deletion
                 deleteDatabase();
             }

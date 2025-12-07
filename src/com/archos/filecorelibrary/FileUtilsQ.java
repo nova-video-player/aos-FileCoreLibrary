@@ -91,7 +91,7 @@ public class FileUtilsQ {
         mContext = context;
         publicAppDirectory = getNovaPublicAppDirPath(context);
         privateAppDirectory = mContext.getFilesDir().getPath();
-        log.debug("FileUtilsQ: publicAppDirectory {}, privateAppDirectory {}", publicAppDirectory, privateAppDirectory);
+        if (log.isDebugEnabled()) log.debug("FileUtilsQ: publicAppDirectory {}, privateAppDirectory {}", publicAppDirectory, privateAppDirectory);
     }
 
     public FileUtilsQ with(Context context) {
@@ -143,27 +143,27 @@ public class FileUtilsQ {
 
         try {
             // delete object using resolver
-            log.debug("delete: uri {}", uri);
+            if (log.isDebugEnabled()) log.debug("delete: uri {}", uri);
             contentResolver.delete(uri, null, null);
             isSuccessful = true;
         } catch (SecurityException e) {
             PendingIntent pendingIntent = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                log.debug("delete: SecurityException Android >= R");
+                if (log.isDebugEnabled()) log.debug("delete: SecurityException Android >= R");
                 ArrayList<Uri> collection = new ArrayList<>();
                 collection.add(uri);
                 pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                log.debug("delete: SecurityException Q<=Android<R");
+                if (log.isDebugEnabled()) log.debug("delete: SecurityException Q<=Android<R");
                 // if exception is recoverable then again send delete request using intent
                 if (e instanceof RecoverableSecurityException) {
-                    log.debug("delete: RecoverableSecurityException");
+                    if (log.isDebugEnabled()) log.debug("delete: RecoverableSecurityException");
                     RecoverableSecurityException exception = (RecoverableSecurityException) e;
                     pendingIntent = exception.getUserAction().getActionIntent();
                 }
             }
             if (pendingIntent != null) {
-                log.debug("delete: pending intent not null");
+                if (log.isDebugEnabled()) log.debug("delete: pending intent not null");
                 IntentSender sender = pendingIntent.getIntentSender();
                 IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
                 launcher.launch(request);
@@ -189,18 +189,18 @@ public class FileUtilsQ {
         for (Uri uri : allUris) {
             try {
                 // delete object using resolver
-                log.debug("deleteAll: uri {}", uri);
+                if (log.isDebugEnabled()) log.debug("deleteAll: uri {}", uri);
                 contentResolver.delete(uri, null, null);
             } catch (SecurityException e) {
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) { // only for API29...
                     PendingIntent pendingIntent = null;
-                    log.debug("deleteAll: SecurityException Q<=Android<R");
+                    if (log.isDebugEnabled()) log.debug("deleteAll: SecurityException Q<=Android<R");
                     // if exception is recoverable then again send delete request using intent
                     if (e instanceof RecoverableSecurityException) {
-                        log.debug("deleteAll: RecoverableSecurityException");
+                        if (log.isDebugEnabled()) log.debug("deleteAll: RecoverableSecurityException");
                         RecoverableSecurityException exception = (RecoverableSecurityException) e;
                         pendingIntent = exception.getUserAction().getActionIntent();
-                        log.debug("deleteAll: pending intent not null");
+                        if (log.isDebugEnabled()) log.debug("deleteAll: pending intent not null");
                         IntentSender sender = pendingIntent.getIntentSender();
                         IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
                         launcher.launch(request);
@@ -212,9 +212,9 @@ public class FileUtilsQ {
         if (! collection.isEmpty()) { // at least one SecurityException
             PendingIntent pendingIntent = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // should be always true
-                log.debug("deleteAll: SecurityException Android >= R");
+                if (log.isDebugEnabled()) log.debug("deleteAll: SecurityException Android >= R");
                 pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
-                log.debug("deleteAll: pending intent not null");
+                if (log.isDebugEnabled()) log.debug("deleteAll: pending intent not null");
                 IntentSender sender = pendingIntent.getIntentSender();
                 IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
                 launcher.launch(request);
@@ -297,7 +297,7 @@ public class FileUtilsQ {
                     public void onScanCompleted(String path, Uri uri) {
                         // uri is in format content://media/external_primary/video/media/##
                         contentUri = uri;
-                        log.debug("scanFile: contentUri {} for path {}", contentUri, path);
+                        if (log.isDebugEnabled()) log.debug("scanFile: contentUri {} for path {}", contentUri, path);
                     }
                 });
     }
@@ -327,10 +327,10 @@ public class FileUtilsQ {
         contentUri = null;
         File fileToDelete = new File(uri.getPath());
         if (!fileToDelete.exists()) {
-            log.debug("getContentUri: file {} does not exist: easy job!", uri);
+            if (log.isDebugEnabled()) log.debug("getContentUri: file {} does not exist: easy job!", uri);
             return null;
         } else {
-            log.debug("getContentUri: file {} exists", uri);
+            if (log.isDebugEnabled()) log.debug("getContentUri: file {} exists", uri);
         }
         ContentResolver contentResolver = mContext.getContentResolver();
         boolean isVideo = isVideoFile(uri);
@@ -390,7 +390,7 @@ public class FileUtilsQ {
             }
         }
         if (cursor != null) cursor.close();
-        log.debug("getContentUri: contentUri {}", contentUri);
+        if (log.isDebugEnabled()) log.debug("getContentUri: contentUri {}", contentUri);
         return contentUri;
     }
 

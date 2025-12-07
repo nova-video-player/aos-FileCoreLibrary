@@ -95,21 +95,21 @@ public class NetworkState {
         boolean returnBoolean = false;
         boolean connected = isNetworkConnected(mContext);
         if (connected != mConnected) { // only fire change if there is a change
-            log.debug("updateFrom: connected changed notifying, {}->{}", mConnected, connected);
+            if (log.isDebugEnabled()) log.debug("updateFrom: connected changed notifying, {}->{}", mConnected, connected);
             boolean oldState = mConnected;
             mConnected = connected;
             propertyChangeSupport.firePropertyChange(WAN_STATE, oldState, connected);
         } else
-            log.debug("updateFrom: connected ({}) state not changed -> not notifying", connected);
+            if (log.isDebugEnabled()) log.debug("updateFrom: connected ({}) state not changed -> not notifying", connected);
         boolean hasLocalConnection = isLocalNetworkConnectedOrVpnMobileEnabled(mContext);
         if (hasLocalConnection != mHasLocalConnection) { // only fire change if there is a change
-            log.debug("updateFrom: hasLocalConnection changed notifying, {}->{}", mHasLocalConnection, hasLocalConnection);
+            if (log.isDebugEnabled()) log.debug("updateFrom: hasLocalConnection changed notifying, {}->{}", mHasLocalConnection, hasLocalConnection);
             returnBoolean = true;
             boolean oldState = mHasLocalConnection;
             mHasLocalConnection = hasLocalConnection;
             propertyChangeSupport.firePropertyChange(LAN_STATE, oldState, hasLocalConnection);
         } else
-            log.debug("updateFrom: hasLocalConnection ({}) not changed -> not notifying, {}->{}", hasLocalConnection, mHasLocalConnection, hasLocalConnection);
+            if (log.isDebugEnabled()) log.debug("updateFrom: hasLocalConnection ({}) not changed -> not notifying, {}->{}", hasLocalConnection, mHasLocalConnection, hasLocalConnection);
         return returnBoolean;
     }
 
@@ -124,26 +124,26 @@ public class NetworkState {
                     if (capabilities != null) {
                         if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                             // to test hasInternet capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                            log.debug("isNetworkConnected: true");
+                            if (log.isDebugEnabled()) log.debug("isNetworkConnected: true");
                             return true;
                         }
                     }
                 } catch (Exception e) {
-                    log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
+                    if (log.isDebugEnabled()) log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
                 }
             } else {
                 try {
                     NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        log.debug("isNetworkConnected: true");
+                        if (log.isDebugEnabled()) log.debug("isNetworkConnected: true");
                         return true;
                     }
                 } catch (Exception e) {
-                    log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
+                    if (log.isDebugEnabled()) log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
                 }
             }
         }
-        log.debug("isNetworkConnected false");
+        if (log.isDebugEnabled()) log.debug("isNetworkConnected false");
         return false;
     }
 
@@ -156,10 +156,10 @@ public class NetworkState {
                 NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
                 if (capabilities != null)
                     if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                        log.debug("isLocalNetworkConnected: true (WIFI)");
+                        if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: true (WIFI)");
                         return true;
                     } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                        log.debug("isLocalNetworkConnected: true (ETHERNET)");
+                        if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: true (ETHERNET)");
                         return true;
                     }
             } else {
@@ -174,7 +174,7 @@ public class NetworkState {
                 }
             }
         }
-        log.debug("isLocalNetworkConnected: false");
+        if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: false");
         return false;
     }
 
@@ -214,10 +214,10 @@ public class NetworkState {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean vpnMobileEnabled = preferences.getBoolean("vpn_mobile", false);
         if (vpnMobileEnabled && isNetworkConnected(context)) {
-            log.debug("isLocalNetworkConnectedOrVpnMobileEnabled: true (VPN on mobile network)");
+            if (log.isDebugEnabled()) log.debug("isLocalNetworkConnectedOrVpnMobileEnabled: true (VPN on mobile network)");
             return true;
         }
-        log.debug("isLocalNetworkConnectedOrVpnMobileEnabled: false");
+        if (log.isDebugEnabled()) log.debug("isLocalNetworkConnectedOrVpnMobileEnabled: false");
         return false;
     }
 
@@ -253,19 +253,19 @@ public class NetworkState {
     }
 
     public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
-        log.debug("addPropertyChangeListener");
+        if (log.isDebugEnabled()) log.debug("addPropertyChangeListener");
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
-        log.debug("addPropertyChangeListener: number of Listeners={}", propertyChangeSupport.getPropertyChangeListeners().length);
+        if (log.isDebugEnabled()) log.debug("addPropertyChangeListener: number of Listeners={}", propertyChangeSupport.getPropertyChangeListeners().length);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
-        log.debug("removePropertyChangeListener");
+        if (log.isDebugEnabled()) log.debug("removePropertyChangeListener");
         propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
-        log.debug("removePropertyChangeListener: number of Listeners={}", propertyChangeSupport.getPropertyChangeListeners().length);
+        if (log.isDebugEnabled()) log.debug("removePropertyChangeListener: number of Listeners={}", propertyChangeSupport.getPropertyChangeListeners().length);
     }
 
     public void removeAllPropertyChangeListener() {
-        log.debug("removeAllPropertyChangeListener");
+        if (log.isDebugEnabled()) log.debug("removeAllPropertyChangeListener");
         for (PropertyChangeListener propertyChangeListener : propertyChangeSupport.getPropertyChangeListeners())
             propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
     }
@@ -281,7 +281,7 @@ public class NetworkState {
                     @Override
                     public void onAvailable(@NonNull android.net.Network network) {
                         super.onAvailable(network);
-                        log.debug("registerNetworkCallback: onAvailable");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onAvailable");
                         isNetworkConnected = true;
                         updateFrom();
                     }
@@ -289,7 +289,7 @@ public class NetworkState {
                     public void onLost(@NonNull android.net.Network network) {
                         // note that onLost is not sent when loosing wifi and 4G is connected
                         super.onLost(network);
-                        log.debug("registerNetworkCallback: onLost");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onLost");
                         updateFrom();
                         if (getAvailableNetworksCount() == 0) { // need to be sure that there is really no interface working
                             isNetworkConnected = false;
@@ -298,28 +298,28 @@ public class NetworkState {
                     @Override
                     public void onBlockedStatusChanged(@NonNull Network network, boolean blocked) {
                         super.onBlockedStatusChanged(network, blocked);
-                        log.debug("registerNetworkCallback: onBlockedStatusChanged");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onBlockedStatusChanged");
                     }
                     @Override
                     public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
                         super.onCapabilitiesChanged(network, networkCapabilities);
-                        log.debug("registerNetworkCallback: onCapabilitiesChanged");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onCapabilitiesChanged");
                         updateFrom();
                     }
                     @Override
                     public void onLinkPropertiesChanged(@NonNull Network network, @NonNull LinkProperties linkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties);
-                        log.debug("registerNetworkCallback: onLinkPropertiesChanged");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onLinkPropertiesChanged");
                     }
                     @Override
                     public void onLosing(@NonNull Network network, int maxMsToLive) {
                         super.onLosing(network, maxMsToLive);
-                        log.debug("registerNetworkCallback: onLosing");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onLosing");
                     }
                     @Override
                     public void onUnavailable() {
                         super.onUnavailable();
-                        log.debug("registerNetworkCallback: onUnavailable");
+                        if (log.isDebugEnabled()) log.debug("registerNetworkCallback: onUnavailable");
                     }
                 };
                 connectivityManager.registerNetworkCallback(builder.build(), mNetworkCallback);

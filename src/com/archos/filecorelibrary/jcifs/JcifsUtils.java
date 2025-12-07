@@ -84,12 +84,12 @@ public class JcifsUtils {
 
     private JcifsUtils(Context context) {
         mContext = context;
-        log.debug("JcifsUtils: initializing contexts");
+        if (log.isDebugEnabled()) log.debug("JcifsUtils: initializing contexts");
         reCreateAllContexts();
     }
 
     public static void reCreateAllContexts() {
-        log.debug("JcifsUtils: reCreateAllContexts");
+        if (log.isDebugEnabled()) log.debug("JcifsUtils: reCreateAllContexts");
         baseContextSmb1 = createContext(false);
         baseContextSmb2 = createContext(true);
         baseContextSmb1Only = createContextOnly(false);
@@ -110,7 +110,7 @@ public class JcifsUtils {
         // do not change resolveOrder for now
         // with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST, jcifs-ng author recommends no change
         if (isResolverBcastFirst()) {
-            log.debug("createContext: resolver set to BCAST,DNS");
+            if (log.isDebugEnabled()) log.debug("createContext: resolver set to BCAST,DNS");
             prop.put("jcifs.resolveOrder", "BCAST,DNS");
         }
         // get around https://github.com/AgNO3/jcifs-ng/issues/40 and this is required for guest login on win10 smb2
@@ -160,7 +160,7 @@ public class JcifsUtils {
         // do not change resolveOrder for now
         // with jcifs-old, resolveOrder was not changed i.e. LMHOSTS,DNS,WINS,BCAST, jcifs-ng author recommends no change
         if (isResolverBcastFirst()) {
-            log.debug("createContext: resolver set to BCAST,DNS");
+            if (log.isDebugEnabled()) log.debug("createContext: resolver set to BCAST,DNS");
             prop.put("jcifs.resolveOrder", "BCAST,DNS");
         }
         // allow plaintext password fallback
@@ -201,25 +201,25 @@ public class JcifsUtils {
     }
 
     public static void notifyPrefChange() {
-        log.debug("notifyPrefChange: preference changed");
+        if (log.isDebugEnabled()) log.debug("notifyPrefChange: preference changed");
         prefChanged = true;
     }
 
     private static void checkPrefChange() {
         if (prefChanged) {
-            log.debug("JcifsUtils: reCreateAllContexts after preference change");
+            if (log.isDebugEnabled()) log.debug("JcifsUtils: reCreateAllContexts after preference change");
             prefChanged = false;
             reCreateAllContexts();
         }
     }
 
     public static void declareServerSmbV2(String server, boolean isSmbV2) {
-        log.debug("declareServerSmbV2 for {} {}", server, isSmbV2);
+        if (log.isDebugEnabled()) log.debug("declareServerSmbV2 for {} {}", server, isSmbV2);
         listServersSmb2.put(server, isSmbV2);
     }
 
     public static void declareServerBeingProbed(String server, boolean probed) {
-        log.debug("declareServerBeingProbed for {} {}", server, probed);
+        if (log.isDebugEnabled()) log.debug("declareServerBeingProbed for {} {}", server, probed);
         listServersBeingProbed.put(server, probed);
     }
 
@@ -227,11 +227,11 @@ public class JcifsUtils {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
         if (cred != null && ! cred.getUsername().isEmpty()) {
-            log.debug("getCifsContext using credentials for {}", uri);
+            if (log.isDebugEnabled()) log.debug("getCifsContext using credentials for {}", uri);
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             context = getBaseContext(isSmbV2).withCredentials(auth);
         } else {
-            log.debug("getCifsContext using NO credentials for {}", uri);
+            if (log.isDebugEnabled()) log.debug("getCifsContext using NO credentials for {}", uri);
             context = getBaseContext(isSmbV2).withGuestCrendentials();
         }
         return context;
@@ -241,11 +241,11 @@ public class JcifsUtils {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
         if (cred != null) {
-            log.debug("getCifsContext using credentials for {}", uri);
+            if (log.isDebugEnabled()) log.debug("getCifsContext using credentials for {}", uri);
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             context = getBaseContextOnly(isSmbV2).withCredentials(auth);
         } else {
-            log.debug("getCifsContextOnly using NO credentials for {}", uri);
+            if (log.isDebugEnabled()) log.debug("getCifsContextOnly using NO credentials for {}", uri);
             context = getBaseContextOnly(isSmbV2).withGuestCrendentials();
         }
         return context;
@@ -257,23 +257,23 @@ public class JcifsUtils {
         Boolean isServerBeingProbed = listServersBeingProbed.get(server);
         // do not multiple probe one same server until we know first result
         if (isServerBeingProbed != null && isServerBeingProbed) {
-            log.debug("isServerSmbV2: {} already being probed in parallel returning null if debouncing", server);
+            if (log.isDebugEnabled()) log.debug("isServerSmbV2: {} already being probed in parallel returning null if debouncing", server);
             if (PREVENT_MULTIPLE_TIME_SERVER_PROBING) return null;
         }
         declareServerBeingProbed(server, true);
-        log.debug("isServerSmbV2 for {} previous state is {}", server, isSmbV2);
+        if (log.isDebugEnabled()) log.debug("isServerSmbV2 for {} previous state is {}", server, isSmbV2);
         if (isSmbV2 == null) { // let's probe server root
             Uri uri;
             if (port != -1) uri = Uri.parse("smb://" + server + ":" + port + "/");
             else uri = Uri.parse("smb://" + server + '/');
             SmbFile smbFile = null;
             try {
-                log.debug("isServerSmbV2: probing {} to check if smbV2", uri);
+                if (log.isDebugEnabled()) log.debug("isServerSmbV2: probing {} to check if smbV2", uri);
                 CIFSContext ctx = getCifsContextOnly(uri, true);
                 smbFile = new SmbFile(getIpUriString(uri), ctx);
                 smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                 declareServerSmbV2(server, true);
-                log.debug("isServerSmbV2 for {} returning true", server);
+                if (log.isDebugEnabled()) log.debug("isServerSmbV2 for {} returning true", server);
                 declareServerBeingProbed(server, false);
                 return true;
             } catch (SmbAuthException authE) {
@@ -285,12 +285,12 @@ public class JcifsUtils {
                 if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbException in probing SMB2 ", smbE);
                 else log.warn("isServerSmbV2: caught SmbException in probing SMB2");
                 try {
-                    log.debug("isServerSmbV2: it is not smbV2 probing {} to check if smbV1", uri);
+                    if (log.isDebugEnabled()) log.debug("isServerSmbV2: it is not smbV2 probing {} to check if smbV1", uri);
                     CIFSContext ctx = getCifsContextOnly(uri, false);
                     smbFile = new SmbFile(getIpUriString(uri), ctx);
                     smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
                     declareServerSmbV2(server, false);
-                    log.debug("isServerSmbV2 for {} returning false", server);
+                    if (log.isDebugEnabled()) log.debug("isServerSmbV2 for {} returning false", server);
                     declareServerBeingProbed(server, false);
                     return false;
                 } catch (SmbAuthException authE2) {
@@ -324,14 +324,14 @@ public class JcifsUtils {
         CIFSContext context = null;
         if (isSmbV2 == null) { // server type not identified, default to smbV2&1 auto
             context = getBaseContext(true);
-            log.debug("getSmbFileStrictNego: server NOT identified passing smbv2/smbv1 capable context for uri {}", uri);
+            if (log.isDebugEnabled()) log.debug("getSmbFileStrictNego: server NOT identified passing smbv2/smbv1 capable context for uri {}", uri);
         } else {
             if (isSmbV2) { // provide smbV2 only
                 context = getBaseContextOnly(true);
-                log.debug("getSmbFileStrictNego: server already identified as smbv2 processing uri {}", uri);
+                if (log.isDebugEnabled()) log.debug("getSmbFileStrictNego: server already identified as smbv2 processing uri {}", uri);
             } else { // if dont't know (null) or smbV2 provide smbV2 only to try out. Fallback needs to be implemented in each calls
                 context = getBaseContextOnly(false);
-                log.debug("getSmbFileStrictNego: server already identified as smbv1 processing uri {}", uri);
+                if (log.isDebugEnabled()) log.debug("getSmbFileStrictNego: server already identified as smbv1 processing uri {}", uri);
             }
         }
         CIFSContext ctx = null;
@@ -350,12 +350,12 @@ public class JcifsUtils {
     }
 
     public static boolean isSMBv2Enabled() {
-        log.debug("isSMBv2Enabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true));
+        if (log.isDebugEnabled()) log.debug("isSMBv2Enabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true);
     }
 
     public static boolean isResolverBcastFirst() {
-        log.debug("isResolverBcastFirst={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false));
+        if (log.isDebugEnabled()) log.debug("isResolverBcastFirst={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false);
     }
 

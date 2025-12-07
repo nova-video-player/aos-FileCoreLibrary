@@ -107,7 +107,7 @@ public class FtpListingEngine extends ListingEngine {
             } else if (f.isDirectory()) {
                 return keepDirectory(filename);
             } else {
-                log.debug("neither file nor directory: {}", filename);
+                if (log.isDebugEnabled()) log.debug("neither file nor directory: {}", filename);
                 return false;
             }
         } else {
@@ -123,7 +123,7 @@ public class FtpListingEngine extends ListingEngine {
             FTPSClient ftps = null;
             FTPClient ftp = null;
             try {
-                log.debug("FtpListingThread:run");
+                if (log.isDebugEnabled()) log.debug("FtpListingThread:run");
                 FTPFile[] listFiles;
                 if (mUri.getScheme().equals("ftps")) {
                     ftps = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
@@ -168,10 +168,10 @@ public class FtpListingEngine extends ListingEngine {
                 for (FTPFile f : listFiles){
                     FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
                     if (sf.isDirectory()) {
-                        log.trace("FtpListingThread: add directory {}", sf.getName());
+                        if (log.isTraceEnabled()) log.trace("FtpListingThread: add directory {}", sf.getName());
                         directories.add(sf);
                     } else {
-                        log.trace("FtpListingThread: add file {}", sf.getName());
+                        if (log.isTraceEnabled()) log.trace("FtpListingThread: add file {}", sf.getName());
                         files.add(sf);
                     }
                 }

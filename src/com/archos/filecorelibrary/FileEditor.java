@@ -64,7 +64,7 @@ public abstract class FileEditor {
     public boolean copyFileTo(Uri target, Context ct) throws Exception {
         FileEditor targetEditor = FileEditorFactory.getFileEditorForUrl(target, ct);
         OutputStream out = targetEditor.getOutputStream();
-        log.debug("copyFileTo: {}->{}", mUri, target);
+        if (log.isDebugEnabled()) log.debug("copyFileTo: {}->{}", mUri, target);
         InputStream in = getInputStream();
         if(in!=null&&out!=null) {
             long position = 0;

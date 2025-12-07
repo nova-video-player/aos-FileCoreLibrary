@@ -80,7 +80,7 @@ public class SmbjListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("SmbjListingThread: listFiles for: {}", mUri.toString());
+                if (log.isDebugEnabled()) log.debug("SmbjListingThread: listFiles for: {}", mUri.toString());
 
                 final SmbjUtils smbjUtils = SmbjUtils.peekInstance();
                 if (smbjUtils == null) {
@@ -103,12 +103,12 @@ public class SmbjListingEngine extends ListingEngine {
                     final String fullFilename = "/" + shareName + "/" + filename;
                     if (isDirectory(fileOrDir)) {
                         if (keepDirectory(filename)) {
-                            log.trace("SmbjListingThread: adding directory {}", fullFilename);
+                            if (log.isTraceEnabled()) log.trace("SmbjListingThread: adding directory {}", fullFilename);
                             directories.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
-                            log.trace("SmbjListingThread: adding file {}", fullFilename);
+                            if (log.isTraceEnabled()) log.trace("SmbjListingThread: adding file {}", fullFilename);
                             files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     }
@@ -176,7 +176,7 @@ public class SmbjListingEngine extends ListingEngine {
 
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
-                    log.debug("SmbjListingThread: abort");
+                    if (log.isDebugEnabled()) log.debug("SmbjListingThread: abort");
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (mListener != null) { // always report end even when aborted

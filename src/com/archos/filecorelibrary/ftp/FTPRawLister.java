@@ -48,7 +48,7 @@ public class FTPRawLister extends RawLister {
 
     public List<MetaFile2> getFileList() throws IOException, AuthenticationException {
         FTPFile[] listFiles;
-        log.debug("getFileList");
+        if (log.isDebugEnabled()) log.debug("getFileList");
         if (mUri.getScheme().equals("ftps")) {
             FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
             ftp.cwd(mUri.getPath());
@@ -67,7 +67,7 @@ public class FTPRawLister extends RawLister {
         for(FTPFile f : listFiles){
             if(!f.getName().equals("..")|| !f.getName().equals(".")){
                 FTPFile2 sf = new FTPFile2(f , Uri.withAppendedPath(mUri, f.getName()));
-                log.trace("FTPRawLister: add {}", sf.getName());
+                if (log.isTraceEnabled()) log.trace("FTPRawLister: add {}", sf.getName());
                 list.add(sf);   
             }
         }

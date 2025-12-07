@@ -85,7 +85,7 @@ public class FileUtils {
                     scheme = scheme + "://";
                 else scheme = "";
                 path = path.replaceFirst("/", FileUtilsQ.publicAppDirectory + "/nfoPoster/");
-                log.debug("prefixPublicNfoPosterUri: {} --> {}", uri, path);
+                if (log.isDebugEnabled()) log.debug("prefixPublicNfoPosterUri: {} --> {}", uri, path);
                 return Uri.parse(scheme + path);
             } else return uri;
         } else return uri;
@@ -117,7 +117,7 @@ public class FileUtils {
             String relocatedPath = uri.getPath();
             // always relocate jpg/nfo in private app dir due to SAF/Q which might cause a migration issue
             if (("file".equals(uri.getScheme()) || relocatedUri.toString().startsWith("/"))) {
-                log.trace("relocateNfoAppPublicDir: relocatedPath {}, {}/nfoPoster", relocatedPath, FileUtilsQ.publicAppDirectory);
+                if (log.isTraceEnabled()) log.trace("relocateNfoAppPublicDir: relocatedPath {}, {}/nfoPoster", relocatedPath, FileUtilsQ.publicAppDirectory);
                 if (!uri.getPath().startsWith(FileUtilsQ.publicAppDirectory + "/nfoPoster")) // avoid double prefixing
                     relocatedUri = prefixPublicNfoPosterUri(relocatedUri);
                 Uri relocatedDir = removeLastSegment(relocatedUri);
@@ -128,7 +128,7 @@ public class FileUtils {
                     log.error("relocateNfoAppPublicDir: cannot recreate tree structure for {}", dir.getPath());
                 }
             }
-            log.debug("relocateNfoAppPublicDir: {} -> {} = {}", uri, relocatedUri, relocatedUri.getPath());
+            if (log.isDebugEnabled()) log.debug("relocateNfoAppPublicDir: {} -> {} = {}", uri, relocatedUri, relocatedUri.getPath());
         }
         return relocatedUri;
     }
@@ -149,12 +149,12 @@ public class FileUtils {
     public static Uri removeLastSegment(Uri uri){
         int index;
         String str = uri.toString();
-        log.trace("removeLastSegment input: {}", str);
+        if (log.isTraceEnabled()) log.trace("removeLastSegment input: {}", str);
         if (str.endsWith(SEPARATOR))
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
         else index = str.lastIndexOf(SEPARATOR);
         if (index <= 0) return null;
-        log.trace("removeLastSegment output: {}", str.substring(0, index + 1));
+        if (log.isTraceEnabled()) log.trace("removeLastSegment output: {}", str.substring(0, index + 1));
         // MUST keep the trailing "/" for samba
         return Uri.parse(str.substring(0, index + 1));
     }
@@ -223,7 +223,7 @@ public class FileUtils {
             return contentUri;
 
         // log contentUri.getHost() to whitelist only MediaProvider for this file:/// access
-        log.debug("getRealUriFromVideoURI: contentUri.getHost()={}", contentUri.getHost());
+        if (log.isDebugEnabled()) log.debug("getRealUriFromVideoURI: contentUri.getHost()={}", contentUri.getHost());
         Cursor cursor = null;
 
         String[] proj = { MediaStore.Video.Media.DATA };
@@ -297,10 +297,10 @@ public class FileUtils {
     }
 
     public static String getName(String file) {
-        log.debug("getName input: {}", file);
+        if (log.isDebugEnabled()) log.debug("getName input: {}", file);
         if (file.lastIndexOf(SEPARATOR) >= 0 && file.lastIndexOf(SEPARATOR) < (file.length() - 1))
             file = file.substring(file.lastIndexOf(SEPARATOR) + 1);
-        log.debug("getName result: {}", file);
+        if (log.isDebugEnabled()) log.debug("getName result: {}", file);
         return file;
     }
 
@@ -348,7 +348,7 @@ public class FileUtils {
         if (uri == null) return null;
         List<String> pathSegments = uri.getPathSegments();
         if (pathSegments != null && !pathSegments.isEmpty()) {
-            log.debug("getShareName: uri={} -> {} -> {}", uri, Arrays.toString(pathSegments.toArray()), pathSegments.get(0));
+            if (log.isDebugEnabled()) log.debug("getShareName: uri={} -> {} -> {}", uri, Arrays.toString(pathSegments.toArray()), pathSegments.get(0));
             return pathSegments.get(0);
         } else {
             log.warn("getShareName: returns null since getPathSegments is null for uri={}", uri);
@@ -365,7 +365,7 @@ public class FileUtils {
         if (pathSegments != null && !pathSegments.isEmpty()) {
             List<String> pathSegmentsWithoutFirst = pathSegments.subList(1, pathSegments.size());
             String filePath = "/" + String.join("/", pathSegmentsWithoutFirst);
-            log.debug("getFilePath: uri={} -> {} -> {}", uri, Arrays.toString(pathSegmentsWithoutFirst.toArray()), filePath);
+            if (log.isDebugEnabled()) log.debug("getFilePath: uri={} -> {} -> {}", uri, Arrays.toString(pathSegmentsWithoutFirst.toArray()), filePath);
             return filePath;
         }
         if (pathSegments != null && pathSegments.isEmpty()) return "/";
@@ -410,7 +410,7 @@ public class FileUtils {
         if(uriEncodedString.startsWith("//")) {
             uriEncodedString = uriEncodedString.substring(1);
         }
-        log.debug("encodeUri: results in uriEncodedString={}", uriEncodedString);
+        if (log.isDebugEnabled()) log.debug("encodeUri: results in uriEncodedString={}", uriEncodedString);
         return Uri.parse(uriEncodedString);
     }
 
@@ -512,15 +512,15 @@ public class FileUtils {
     public static boolean canManageExternalStorage() {
         boolean result;
         if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
-            log.trace("canManageExternalStorage: API<23 -> true");
+            if (log.isTraceEnabled()) log.trace("canManageExternalStorage: API<23 -> true");
             return true;
         } else {
             if(Build.VERSION.SDK_INT>=30) {
                 result = Environment.isExternalStorageManager();
-                log.trace("canManageExternalStorage: API>=30 -> {}", result);
+                if (log.isTraceEnabled()) log.trace("canManageExternalStorage: API>=30 -> {}", result);
                 return result;
             } else {
-                log.trace("canManageExternalStorage: 23<=API<=29 -> true");
+                if (log.isTraceEnabled()) log.trace("canManageExternalStorage: 23<=API<=29 -> true");
                 return true;
             }
         }
@@ -531,20 +531,20 @@ public class FileUtils {
         Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + context.getPackageName()));
         boolean externalStoragePermissionGrantable = intent.resolveActivity(context.getPackageManager()) != null;
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.M) {
-            log.debug("canReadExternalStorage: API<23 -> true");
+            if (log.isDebugEnabled()) log.debug("canReadExternalStorage: API<23 -> true");
             return true;
         } else {
             if (Build.VERSION.SDK_INT>29 && hasManageExternalStoragePermission(context) && externalStoragePermissionGrantable) {
                 result = Environment.isExternalStorageManager();
-                log.debug("canReadExternalStorage: API>29 -> {}", result);
+                if (log.isDebugEnabled()) log.debug("canReadExternalStorage: API>29 -> {}", result);
                 return result;
             } else {
                 if(Build.VERSION.SDK_INT<33) {
                     result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-                    log.debug("canReadExternalStorage: 22<API<30 -> {}", result);
+                    if (log.isDebugEnabled()) log.debug("canReadExternalStorage: 22<API<30 -> {}", result);
                 } else {
                     result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED;
-                    log.debug("canReadExternalStorage: 32<API -> {}", result);
+                    if (log.isDebugEnabled()) log.debug("canReadExternalStorage: 32<API -> {}", result);
                 }
                 return result;
             }

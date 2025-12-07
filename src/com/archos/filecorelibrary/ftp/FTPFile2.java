@@ -66,7 +66,7 @@ public class FTPFile2 extends MetaFile2 {
         } else {
             mName = name;
         }
-        log.trace("FTPFile2 uri: {}, isFile={}, isDirectory={}", uri, mIsFile, mIsDirectory);
+        if (log.isTraceEnabled()) log.trace("FTPFile2 uri: {}, isFile={}, isDirectory={}", uri, mIsFile, mIsDirectory);
     }
 
     @SuppressWarnings("unused")
@@ -141,7 +141,7 @@ public class FTPFile2 extends MetaFile2 {
      *
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
-        log.debug("fromUri: {}", uri);
+        if (log.isDebugEnabled()) log.debug("fromUri: {}", uri);
         if (uri.getScheme().equals("ftps")) {
             // ftpClient is not thread safe: using a new instance (need to close afterwards)
             FTPSClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);

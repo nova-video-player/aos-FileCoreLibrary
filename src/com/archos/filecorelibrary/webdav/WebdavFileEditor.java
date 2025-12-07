@@ -58,7 +58,7 @@ public class WebdavFileEditor extends FileEditor {
     @Override
     public InputStream getInputStream(long from) throws Exception {
         var uri = WebdavFile2.uriToHttp(mUri);
-        log.trace("getInputStream: requesting length for {}", uri);
+        if (log.isTraceEnabled()) log.trace("getInputStream: requesting length for {}", uri);
         var reqBuilder = new Request.Builder()
             .url(uri.toString())
             .get();
@@ -70,7 +70,7 @@ public class WebdavFileEditor extends FileEditor {
         var req = reqBuilder.build();
         var resp = mHttpClient.newCall(req).execute();
         var length = resp.header("Content-Length");
-        log.trace("getInputStream: got length {}", length);
+        if (log.isTraceEnabled()) log.trace("getInputStream: got length {}", length);
         mLength = Long.parseLong(length);
 
         return resp.body().byteStream();
@@ -136,7 +136,7 @@ public class WebdavFileEditor extends FileEditor {
                 doesItExist = mSardine.exists(u.toString());
                 if (log.isTraceEnabled()) {
                     if (doesItExist) log.trace("exists: {} exists", mUri);
-                    else log.trace("exists: {} does not exist", mUri);
+                    else if (log.isTraceEnabled()) log.trace("exists: {} does not exist", mUri);
                 }
                 return doesItExist;
             } else {

@@ -66,7 +66,7 @@ public class SmbjFile2 extends MetaFile2 {
         mCanRead = true; // TODO assume true for now
         mCanWrite = ! EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_READONLY);
         mLength = fileOrDir.getEndOfFile();
-        log.trace("SmbjFile2: uri={}, mName={}, isDirectory={}, lastModified={}, canWrite={}, length={}",
+        if (log.isTraceEnabled()) log.trace("SmbjFile2: uri={}, mName={}, isDirectory={}, lastModified={}, canWrite={}, length={}",
                 mUriString, mName, isDirectory(), mLastModified, canWrite(), mLength);
     }
 
@@ -80,7 +80,7 @@ public class SmbjFile2 extends MetaFile2 {
         mCanWrite = ! EnumWithValue.EnumUtils.isSet(fileInformation.getBasicInformation().getFileAttributes(),
                 FileAttributes.FILE_ATTRIBUTE_READONLY);
         mLength = fileInformation.getStandardInformation().getAllocationSize();
-        log.trace("SmbjFile2: uri={}, mName={}, isDirectory={}, lastModified={}, canWrite={}, length={}",
+        if (log.isTraceEnabled()) log.trace("SmbjFile2: uri={}, mName={}, isDirectory={}, lastModified={}, canWrite={}, length={}",
                 mUriString, mName, isDirectory(), mLastModified, canWrite(), mLength);
     }
 

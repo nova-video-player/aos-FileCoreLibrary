@@ -175,11 +175,11 @@ public class LocalStorageFileEditor extends FileEditor {
         // TODO: does not work on usb external storage on recent Android
         File fileToDelete = new File(mUri.getPath());
         if (fileToDelete.isDirectory()) {
-            log.debug("delete: folder {}", mUri.getPath());
+            if (log.isDebugEnabled()) log.debug("delete: folder {}", mUri.getPath());
             isDeleteOK = deleteFolder(mUri);
             return isDeleteOK;
         } else {
-            log.debug("delete: file {}", mUri.getPath());
+            if (log.isDebugEnabled()) log.debug("delete: file {}", mUri.getPath());
             isDeleteOK = deleteFile(fileToDelete);
             return isDeleteOK;
         }
@@ -189,11 +189,11 @@ public class LocalStorageFileEditor extends FileEditor {
         Boolean isDeleteOK = null;
         File dirToDelete = new File(dirUri.getPath());
         if (dirToDelete.isDirectory()) {
-            log.debug("deleteDir: folder {}", dirUri.getPath());
+            if (log.isDebugEnabled()) log.debug("deleteDir: folder {}", dirUri.getPath());
             isDeleteOK = dirToDelete.delete();
             return isDeleteOK;
         } else {
-            log.debug("deleteDir: not a folder {}", dirUri.getPath());
+            if (log.isDebugEnabled()) log.debug("deleteDir: not a folder {}", dirUri.getPath());
             return false;
         }
     }
@@ -207,7 +207,7 @@ public class LocalStorageFileEditor extends FileEditor {
             try {
                 isDeleteOK = external.delete();
             } catch (IOException ioe) {
-                log.debug("deleteSingleFile: caught IOException for ExternalSDFileWriter {}", fileUri);
+                if (log.isDebugEnabled()) log.debug("deleteSingleFile: caught IOException for ExternalSDFileWriter {}", fileUri);
                 isDeleteOK = false;
             }
         }
@@ -223,30 +223,30 @@ public class LocalStorageFileEditor extends FileEditor {
     }
 
     private void deleteFromDatabase(String path) {
-        log.debug("deleteFromDatabase: {}", path);
+        if (log.isDebugEnabled()) log.debug("deleteFromDatabase: {}", path);
         if (mContext != null) {
             Uri extUri = MediaStore.Files.getContentUri("external");
             String where = MediaStore.MediaColumns.DATA + "=?";
             String[] selectionArgs = { path };
-            log.debug("deleteFromDatabase: where {}, selectionArgs {}", where, Arrays.toString(selectionArgs));
+            if (log.isDebugEnabled()) log.debug("deleteFromDatabase: where {}, selectionArgs {}", where, Arrays.toString(selectionArgs));
             mContext.getContentResolver().delete(extUri, where, selectionArgs);
         }
     }
 
     private Boolean deleteFile(File file) throws DeleteFailException {
         Boolean isDeleteOK = null;
-        log.debug("deleteFile: file {}, mUri {}", file.getPath(), mUri);
+        if (log.isDebugEnabled()) log.debug("deleteFile: file {}, mUri {}", file.getPath(), mUri);
         if (!file.delete()) {
             if (mContext != null) {
                 if (Build.VERSION.SDK_INT > 29 && (! FileUtils.isNovaOwnedFile(file))) {
-                    log.debug("deleteFile: delete failed -> going the Q way");
+                    if (log.isDebugEnabled()) log.debug("deleteFile: delete failed -> going the Q way");
                     // isDeleteOK can be null since UI involved in Android Q+
                     isDeleteOK = FileUtilsQ.delete(FileUtilsQ.getDeleteLauncher(), FileUtilsQ.getContentUri(mUri));
                     if (isDeleteOK != null && ! isDeleteOK)
                         throw new DeleteFailException();
                     else return isDeleteOK;
                 } else {
-                    log.debug("deleteFile: delete failed -> going the traditional way");
+                    if (log.isDebugEnabled()) log.debug("deleteFile: delete failed -> going the traditional way");
                     ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), file);
                     try {
                         if (!external.delete()) {
@@ -268,7 +268,7 @@ public class LocalStorageFileEditor extends FileEditor {
 
     private Boolean deleteFolder(Uri uri) throws Exception {
         Boolean isDeleteOK = null;
-        log.debug("deleteFolder: {}", uri);
+        if (log.isDebugEnabled()) log.debug("deleteFolder: {}", uri);
         LocalStorageRawLister lsrl = new LocalStorageRawLister(uri);
         List<MetaFile2> children = lsrl.getFileList();
         if (children != null) {
@@ -281,11 +281,11 @@ public class LocalStorageFileEditor extends FileEditor {
                 toDeleteLocal.add(fileUri);
                 if (Build.VERSION.SDK_INT > 29) {
                     contentUri = FileUtilsQ.getContentUri(fileUri);
-                    log.debug("deleteFolder: files to be batch processed: {} -> contentUri {}", fileUri, contentUri);
+                    if (log.isDebugEnabled()) log.debug("deleteFolder: files to be batch processed: {} -> contentUri {}", fileUri, contentUri);
                     // if contentUri is null file has already been deleted before...
                     if (contentUri != null) contentUrisToDelete.add(contentUri);
                     else { // in case of no contentUri try luck
-                        log.debug("deleteFolder: {} has no contentUri, try old style file delete", fileUri);
+                        if (log.isDebugEnabled()) log.debug("deleteFolder: {} has no contentUri, try old style file delete", fileUri);
                         deleteSingleFileOldStyle(fileUri);
                     }
                 } else { // <= API29
@@ -293,17 +293,17 @@ public class LocalStorageFileEditor extends FileEditor {
                 }
             }
             if (! contentUrisToDelete.isEmpty()) { // cannot be empty if API>29
-                log.debug("deleteFolder: delete failed -> going the Q way");
+                if (log.isDebugEnabled()) log.debug("deleteFolder: delete failed -> going the Q way");
                 isDeleteOK = FileUtilsQ.deleteAll(FileUtilsQ.getDeleteLauncher(), contentUrisToDelete);
             } else isDeleteOK = true;
 
             if (children.isEmpty()) {
-                log.debug("deleteFolder: empty children for {}", uri);
+                if (log.isDebugEnabled()) log.debug("deleteFolder: empty children for {}", uri);
                 File toDelete = new File(uri.getPath());
                 toDelete.delete();
             }
         } else { // in case of single empty directory we get there too
-            log.debug("deleteFolder: empty directory children for {}", uri);
+            if (log.isDebugEnabled()) log.debug("deleteFolder: empty directory children for {}", uri);
             File toDelete = new File(uri.getPath());
             toDelete.delete();
             isDeleteOK = deleteFile(new File(uri.getPath()));

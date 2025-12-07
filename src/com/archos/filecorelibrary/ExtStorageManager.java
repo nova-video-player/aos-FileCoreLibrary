@@ -49,7 +49,7 @@ public class ExtStorageManager {
     private static ExtStorageManager mExtStorageManager = new ExtStorageManager();
 
     public static ExtStorageManager getExtStorageManager() {
-        log.debug("getExtStorageManager: updateAllVolumes");
+        if (log.isDebugEnabled()) log.debug("getExtStorageManager: updateAllVolumes");
         mExtStorageManager.updateAllVolumes();
         return mExtStorageManager;
     }
@@ -73,7 +73,7 @@ public class ExtStorageManager {
             String volumeName = volume.getKey();
             if (s.startsWith(volumeName)) {
                 volumeId = volume.getValue();
-                log.trace("getStorageId3: {}->{}, volumeId:{}", s, volumeName, volumeId);
+                if (log.isTraceEnabled()) log.trace("getStorageId3: {}->{}, volumeId:{}", s, volumeName, volumeId);
             }
         }
         return volumeId;
@@ -216,7 +216,7 @@ public class ExtStorageManager {
                             volumesMap.get(volumeType).add(volName);
                             if (getUuid != null) {
                                 volumesIdMap.put(volName, (String) getUuid.invoke(storageVolumesArray[i], noparams));
-                                log.debug("updateAllVolumes: volumes scan result (<N): {}, {}", volName, volState);
+                                if (log.isDebugEnabled()) log.debug("updateAllVolumes: volumes scan result (<N): {}, {}", volName, volState);
                             }
                         }
                     } else {
@@ -234,9 +234,9 @@ public class ExtStorageManager {
                         // TODO in the future use these instead of introspections that are required for low API levels
                         String uuid = storageVolume.getUuid(); // >=4.4
                         Integer hashCode = storageVolume.hashCode(); // API24(N)+
-                        log.debug("updateAllVolumes: NOT USED YET storagevolume uuid={}, hascode={}, description={}", uuid, hashCode, storageVolume.getDescription(context));
+                        if (log.isDebugEnabled()) log.debug("updateAllVolumes: NOT USED YET storagevolume uuid={}, hascode={}, description={}", uuid, hashCode, storageVolume.getDescription(context));
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            log.debug("updateAllVolumes: NOT USED YET storagevolume directory={}, mediaStoreVolumeName={}", storageVolume.getDirectory(), storageVolume.getMediaStoreVolumeName());
+                            if (log.isDebugEnabled()) log.debug("updateAllVolumes: NOT USED YET storagevolume directory={}, mediaStoreVolumeName={}", storageVolume.getDirectory(), storageVolume.getMediaStoreVolumeName());
                         }
                         //storageVolume.getMediaStoreVolumeName(); // >=30
                         //String directory = storageVolume.getDirectory().getPath(); // >=30
@@ -244,13 +244,13 @@ public class ExtStorageManager {
                             // wait for media to be ready
                             int count = 0;
                             final int maxTries = 10;
-                            log.debug("updateAllVolumes: media state {}", storageVolume.getState());
+                            if (log.isDebugEnabled()) log.debug("updateAllVolumes: media state {}", storageVolume.getState());
                             // Only retry if media is checking
                             //while (!mediaReady.contains(storageVolume.getState()) && !mediaBorked.contains(storageVolume.getState()) && count < maxTries) {
                             // to avoid ANR needs to be based on handlers in UI thread
                             /*
                             while (storageVolume.getState().equals(Environment.MEDIA_CHECKING) && count < maxTries) {
-                                log.debug("updateAllVolumes: media checking and not ready yet {} try {} out of {}", storageVolume.getState(), String.valueOf(count), String.valueOf(maxTries));
+                                if (log.isDebugEnabled()) log.debug("updateAllVolumes: media checking and not ready yet {} try {} out of {}", storageVolume.getState(), String.valueOf(count), String.valueOf(maxTries));
                                 SystemClock.sleep(100);
                                 count++;
                             }
@@ -278,7 +278,7 @@ public class ExtStorageManager {
                                             // for now keep the two
                                             volumesHashMap.put(volName, volHash);
                                             volumesHashTreeMap.put(volName, volHash);
-                                            log.debug("updateAllVolumes: volumes scan result (>=N): {} of type {} descr: {} label: {} hash: {}", volName, volType, volDescr, volLabel, volHash);
+                                            if (log.isDebugEnabled()) log.debug("updateAllVolumes: volumes scan result (>=N): {} of type {} descr: {} label: {} hash: {}", volName, volType, volDescr, volLabel, volHash);
                                         }
                                     }
                                 }

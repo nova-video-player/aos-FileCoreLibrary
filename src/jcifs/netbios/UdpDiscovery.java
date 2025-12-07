@@ -62,7 +62,7 @@ public class UdpDiscovery implements InternalDiscovery {
 
     @Override
     public void start() {
-        log.debug("start thread alive? {}" , isAlive());
+        if (log.isDebugEnabled()) log.debug("start thread alive? {}" , isAlive());
         mThread.start(); // start the Thread
     }
 
@@ -83,7 +83,7 @@ public class UdpDiscovery implements InternalDiscovery {
 
     private class UdpDiscoveryThread extends Thread {
         public void run() {
-            log.debug("UdpDiscoveryThread.run()");
+            if (log.isDebugEnabled()) log.debug("UdpDiscoveryThread.run()");
 
             NbtAddress[] addrs;
             LinkedList<InetAddress> addresses = new LinkedList<>();
@@ -93,7 +93,7 @@ public class UdpDiscovery implements InternalDiscovery {
             try {
                 selector = Selector.open();
             } catch (IOException e) {
-                log.debug("abort UdpDiscovery: no selector");
+                if (log.isDebugEnabled()) log.debug("abort UdpDiscovery: no selector");
                 return;
             }
             final String netRange = mIpAddress.substring(0, mIpAddress.lastIndexOf(".") + 1);
@@ -102,7 +102,7 @@ public class UdpDiscovery implements InternalDiscovery {
             Configuration configuration = cifsContext.getConfig();
             byte[] snd_buf = new byte[configuration.getNetbiosSndBufSize()];
             ByteBuffer rcv_buf = ByteBuffer.allocate(configuration.getNetbiosRcvBufSize());
-            log.trace("UdpDiscoveryThread: size (snd|rcv)_buf {}", configuration.getNetbiosSndBufSize());
+            if (log.isTraceEnabled()) log.trace("UdpDiscoveryThread: size (snd|rcv)_buf {}", configuration.getNetbiosSndBufSize());
             final NodeStatusRequest request = new NodeStatusRequest(configuration,
                     new Name(configuration,
                             NbtAddress.ANY_HOSTS_NAME, 0x00, null));
@@ -254,7 +254,7 @@ public class UdpDiscovery implements InternalDiscovery {
                         final String shareName = addr.getHostName();
                         final String shareAddress = "smb://" + remoteAddr.getHostAddress() + '/';
 
-                        log.trace("found share {} at {}", shareName, shareAddress);
+                        if (log.isTraceEnabled()) log.trace("found share {} at {}", shareName, shareAddress);
                         mListener.onShareFound(workgroupName, shareName, shareAddress);
 
                         // Update the JCIFS cache
@@ -285,7 +285,7 @@ public class UdpDiscovery implements InternalDiscovery {
                 addr.hostName.srcHashCode = context.getConfig().getBroadcastAddress().hashCode();
                 NameServiceClientImpl impl = (NameServiceClientImpl) context.getNameServiceClient();
                 impl.cacheAddress(name, addr);
-                log.debug("Check cache after insert {} at {}", impl.getCachedAddress(name).getHostName(), impl.getCachedAddress(name).getHostAddress());
+                if (log.isDebugEnabled()) log.debug("Check cache after insert {} at {}", impl.getCachedAddress(name).getHostName(), impl.getCachedAddress(name).getHostAddress());
             }
         }
     }

@@ -58,7 +58,7 @@ public class SmbjRawLister extends RawLister {
             for (var fileOrDir : diskShareLst) {
                 final String filename = fileOrDir.getFileName();
                 final String fullFilename = "/" + shareName + "/" + filename;
-                log.trace("getFileList: adding {}", fullFilename);
+                if (log.isTraceEnabled()) log.trace("getFileList: adding {}", fullFilename);
                 files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
             }
             return files;

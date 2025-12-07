@@ -92,7 +92,7 @@ public class JcifListingEngine extends ListingEngine {
                     return keepDirectory(filename);
                 }
                 else {
-                    log.debug("SmbFileFilter: neither file nor directory: {}", filename);
+                    if (log.isDebugEnabled()) log.debug("SmbFileFilter: neither file nor directory: {}", filename);
                     return false;
                 }
             } catch (SmbException e) {
@@ -107,7 +107,7 @@ public class JcifListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("JcifListingThread: listFiles for: {}", mUri.toString());
+                if (log.isDebugEnabled()) log.debug("JcifListingThread: listFiles for: {}", mUri.toString());
                 NovaSmbFile nSmbFile = getSmbFile(mUri);
                 if (nSmbFile == null || nSmbFile.smbFile == null) {
                     log.error("JcifListingThread: SmbFile is null for URI: {}", mUri.toString());
@@ -151,11 +151,11 @@ public class JcifListingEngine extends ListingEngine {
                 final ArrayList<JcifsFile2> files = new ArrayList<>();
                 for (SmbFile f : listFiles) {
                     if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
-                        log.trace("JcifListingThread: adding file {}", f.getPath());
+                        if (log.isTraceEnabled()) log.trace("JcifListingThread: adding file {}", f.getPath());
                         files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                     }
                     else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
-                        log.trace("JcifListingThread: adding directory {}", f.getPath());
+                        if (log.isTraceEnabled()) log.trace("JcifListingThread: adding directory {}", f.getPath());
                         directories.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
                     }
                 }
@@ -194,7 +194,7 @@ public class JcifListingEngine extends ListingEngine {
 
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
-                    log.debug("JcifListingThread: abort");
+                    if (log.isDebugEnabled()) log.debug("JcifListingThread: abort");
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (mListener != null) { // always report end even when aborted

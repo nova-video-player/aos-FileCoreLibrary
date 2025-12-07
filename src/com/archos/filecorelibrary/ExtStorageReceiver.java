@@ -54,9 +54,9 @@ public class ExtStorageReceiver extends BroadcastReceiver {
     private static Handler handler = null;
 
     public ExtStorageReceiver() {
-        log.debug("ExtStorageReceiver constructor");
+        if (log.isDebugEnabled()) log.debug("ExtStorageReceiver constructor");
         if(handlerThread == null) {
-            log.debug("ExtStorageReceiver: handlerThread null starting thread");
+            if (log.isDebugEnabled()) log.debug("ExtStorageReceiver: handlerThread null starting thread");
             handlerThread = new HandlerThread("ExtStorageReceiver");
             handlerThread.start();
             looper = handlerThread.getLooper();
@@ -66,7 +66,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        log.debug("onReceive: INTENT = {}", intentToString(intent));
+        if (log.isDebugEnabled()) log.debug("onReceive: INTENT = {}", intentToString(intent));
 
         final Intent mIntent = intent;
         final Context mContext = context;
@@ -92,7 +92,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                         path = uri.substring(7);
                         //file:// will throw exception from android N
                         if (uri.startsWith("file://")) uri = ARCHOS_FILE_SCHEME + "://" + path;
-                        log.debug("onReceive: uri is {}", uri);
+                        if (log.isDebugEnabled()) log.debug("onReceive: uri is {}", uri);
                     } else {
                         log.warn("onReceive: uri is null for action {}!", action);
                     }
@@ -100,7 +100,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
 
                 switch (action) {
                     case Intent.ACTION_MEDIA_MOUNTED:
-                        log.debug("onReceive: media mounted {}", uri);
+                        if (log.isDebugEnabled()) log.debug("onReceive: media mounted {}", uri);
                         //StorageVolume volume = (StorageVolume) intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
                         intentManager = new Intent(ACTION_MEDIA_MOUNTED, Uri.parse(uri));
                         intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
@@ -109,7 +109,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                     case Intent.ACTION_MEDIA_UNMOUNTED:
                     case Intent.ACTION_MEDIA_EJECT:
                     case Intent.ACTION_MEDIA_BAD_REMOVAL:
-                        log.debug("onReceive: media removed {}", uri);
+                        if (log.isDebugEnabled()) log.debug("onReceive: media removed {}", uri);
                         if (path == null || path.isEmpty()) return;
                         intentManager = new Intent(ACTION_MEDIA_UNMOUNTED, Uri.parse(uri));
                         intentManager.setPackage(ArchosUtils.getGlobalContext().getPackageName());
@@ -118,7 +118,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                     // more clever stuff could be done when detecting USB device attached but for now we only throw logs
                     // disabled in AndroidManifest for now since it gets triggered a lot on Sony TVs and causes full rescan
                     case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                        log.debug("onReceive: usb device attached");
+                        if (log.isDebugEnabled()) log.debug("onReceive: usb device attached");
                         if (mIntent.hasExtra(UsbManager.EXTRA_DEVICE)) {
                             final UsbDevice device = mIntent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                             boolean isMassStorage = false;
@@ -127,7 +127,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                                 final UsbInterface usbInterface = device.getInterface(i);
                                 path = device.getDeviceName();
                                 if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
-                                    log.debug("onReceive: USB mass storage {} attached", path);
+                                    if (log.isDebugEnabled()) log.debug("onReceive: USB mass storage {} attached", path);
                                     isMassStorage = true;
                                 }
                             }
@@ -140,7 +140,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                         }
                         break;
                     case UsbManager.ACTION_USB_DEVICE_DETACHED:
-                        log.debug("onReceive: usb device detached");
+                        if (log.isDebugEnabled()) log.debug("onReceive: usb device detached");
                         if (mIntent.hasExtra(UsbManager.EXTRA_DEVICE)) {
                             final UsbDevice device = mIntent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                             boolean isMassStorage = false;
@@ -148,7 +148,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                                 final UsbInterface usbInterface = device.getInterface(i);
                                 path = device.getDeviceName();
                                 if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_MASS_STORAGE && path != null) {
-                                    log.debug("onReceive: USB mass storage {} detached", path);
+                                    if (log.isDebugEnabled()) log.debug("onReceive: USB mass storage {} detached", path);
                                     isMassStorage = true;
                                 }
                             }

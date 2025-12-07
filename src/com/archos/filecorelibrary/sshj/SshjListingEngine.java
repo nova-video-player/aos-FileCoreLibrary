@@ -81,7 +81,7 @@ public class SshjListingEngine extends ListingEngine {
 
         public void run(){
             try {
-                log.debug("SshjListingThread: listFiles for: {}", mUri.toString());
+                if (log.isDebugEnabled()) log.debug("SshjListingThread: listFiles for: {}", mUri.toString());
 
                 var sftpClient = SshjUtils.peekInstance().getSFTPClient(mUri);
                 String filePath = getSftpPath(mUri);
@@ -97,12 +97,12 @@ public class SshjListingEngine extends ListingEngine {
                     final String filename = fileOrDir.getName();
                     if (fileOrDir.isDirectory()) {
                         if (keepDirectory(filename)) {
-                            log.trace("SshjListingThread: adding directory {}", filename);
+                            if (log.isTraceEnabled()) log.trace("SshjListingThread: adding directory {}", filename);
                             directories.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
-                            log.trace("SshjListingThread: adding file {}", filename);
+                            if (log.isTraceEnabled()) log.trace("SshjListingThread: adding file {}", filename);
                             files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
                         }
                     }
@@ -170,7 +170,7 @@ public class SshjListingEngine extends ListingEngine {
 
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
-                    log.debug("SshjListingThread: abort");
+                    if (log.isDebugEnabled()) log.debug("SshjListingThread: abort");
                     mUiHandler.post(new Runnable() {
                         public void run() {
                             if (mListener != null) { // always report end even when aborted
@@ -217,7 +217,7 @@ public class SshjListingEngine extends ListingEngine {
                     }
                 });
             } finally {
-                log.trace("SshjListingEngine:SshjListingThread: onListingEnd");
+                if (log.isTraceEnabled()) log.trace("SshjListingEngine:SshjListingThread: onListingEnd");
                 noTimeOut(); // be sure there is no time out triggered after an error
                 mUiHandler.post(new Runnable() {
                     public void run() {

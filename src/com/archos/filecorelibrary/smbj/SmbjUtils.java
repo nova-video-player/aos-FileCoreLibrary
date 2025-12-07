@@ -83,7 +83,7 @@ public class SmbjUtils {
 
     private SmbjUtils(Context context) {
         mContext = context;
-        log.debug("SmbjUtils: initializing contexts");
+        if (log.isDebugEnabled()) log.debug("SmbjUtils: initializing contexts");
         smbConfig = SmbConfig.builder().withSecurityProvider(new BCSecurityProvider()).withMultiProtocolNegotiate(true).withSigningRequired(false)
                 .build();
     }
@@ -99,14 +99,14 @@ public class SmbjUtils {
         int port = uri.getPort();
         Connection smbConnection = smbjConnections.get(cred);
         if (smbConnection == null || !smbConnection.isConnected()) {
-            log.trace("getSmbConnection: smbConnection is null or not connected for {}, connecting to {}", uri, server);
+            if (log.isTraceEnabled()) log.trace("getSmbConnection: smbConnection is null or not connected for {}, connecting to {}", uri, server);
             SMBClient smbClient;
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
             String serverIP = SambaDiscovery.getIpFromShareName(server);
             if (serverIP == null)
                 serverIP = JcifsUtils.getInstance(mContext).getBaseContextOnly(true).getNameServiceClient().getByName(server).getHostAddress();
-            log.trace("getSmbConnection: {} -> {}", server, serverIP);
+            if (log.isTraceEnabled()) log.trace("getSmbConnection: {} -> {}", server, serverIP);
             smbConnection = (port != -1) ? smbClient.connect(serverIP, port) : smbClient.connect(serverIP);
             smbjConnections.put(cred, smbConnection);
             // check that auth information is valid
@@ -206,14 +206,14 @@ public class SmbjUtils {
         }
         DiskShare smbShare = smbjShares.get(cred);
         if (smbShare == null || !shareName.equals(getShareName(Uri.parse(cred.getUriString()))) || !smbShare.isConnected()) {
-            log.trace("getSmbShare: smbShare is null or not connected for {}", shareName);
+            if (log.isTraceEnabled()) log.trace("getSmbShare: smbShare is null or not connected for {}", shareName);
             // ensures that there is a valid connection and regenerate session if not connected
             getSmbConnection(uri);
             Session smbSession = smbjSessions.get(cred);
             if (smbSession != null) {
                 try {
                     smbShare = (DiskShare) smbSession.connectShare(shareName);
-                    log.trace("getSmbShare: saving smbShare {}, smbshare={}", shareName, smbShare);
+                    if (log.isTraceEnabled()) log.trace("getSmbShare: saving smbShare {}, smbshare={}", shareName, smbShare);
                     smbjShares.put(cred, smbShare);
                 } catch (SMBRuntimeException e) {
                     if (e.getCause() instanceof SocketException) {
@@ -234,7 +234,7 @@ public class SmbjUtils {
                 }
             } else log.warn("getSmbShare: smbSession is null!");
         }
-        log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, (smbShare != null)?smbShare.isConnected():"false");
+        if (log.isDebugEnabled()) log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, (smbShare != null)?smbShare.isConnected():"false");
         return smbShare;
     }
 
@@ -252,7 +252,7 @@ public class SmbjUtils {
             log.error("isSMBjEnabled: mContext is null! Returning false");
             return false;
         }
-        log.trace("isSMBjEnabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
+        if (log.isTraceEnabled()) log.trace("isSMBjEnabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbj", false);
     }
 
@@ -265,7 +265,7 @@ public class SmbjUtils {
         if (cred != null) {
             DiskShare share = smbjShares.remove(cred);
             if (share != null) {
-                log.debug("invalidateShare: removed cached share for {}", uri);
+                if (log.isDebugEnabled()) log.debug("invalidateShare: removed cached share for {}", uri);
             }
         }
     }

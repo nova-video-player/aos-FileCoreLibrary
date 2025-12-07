@@ -67,7 +67,7 @@ public class SshjUtils {
 
     private SshjUtils(Context context) {
         mContext = context;
-        log.debug("SshjUtils: initializing contexts");
+        if (log.isDebugEnabled()) log.debug("SshjUtils: initializing contexts");
     }
 
     public synchronized SSHClient getSshClient(Uri uri) throws IOException, AuthenticationException {
@@ -81,7 +81,7 @@ public class SshjUtils {
             int port = uri.getPort();
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient == null || !sshClient.isConnected()) {
-                log.trace("getSshClient: sshClient is null or not connected for {}, connecting to {}", uri, server);
+                if (log.isTraceEnabled()) log.trace("getSshClient: sshClient is null or not connected for {}, connecting to {}", uri, server);
                 DefaultConfig sshjConfig = new DefaultConfig();
                 sshClient = new SSHClient(sshjConfig);
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
@@ -90,7 +90,7 @@ public class SshjUtils {
                 sshClient.authPassword(username, password.toCharArray());
                 sshClients.put(cred, sshClient);
             } else {
-                log.trace("getSshClient: found non null connected sshClient for {}", uri);
+                if (log.isTraceEnabled()) log.trace("getSshClient: found non null connected sshClient for {}", uri);
             }
             return sshClient;
         } catch (UserAuthException uae) {
@@ -118,12 +118,12 @@ public class SshjUtils {
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient != null && sshClient.isConnected()) {
                 sshClient.disconnect();
-                log.trace("disconnectSshClient: sshClient disconnected for {}", uri);
+                if (log.isTraceEnabled()) log.trace("disconnectSshClient: sshClient disconnected for {}", uri);
             }
         } catch (IOException e) {
             caughtException(e, "SshjUtils:disconnectSshClient", "IOException " + uri);
         } finally {
-            log.trace("closeSFTPClient: remove sshClient from known sshClients for {}", uri);
+            if (log.isTraceEnabled()) log.trace("closeSFTPClient: remove sshClient from known sshClients for {}", uri);
             sshClients.remove(cred);
         }
     }
@@ -135,17 +135,17 @@ public class SshjUtils {
         getSshClient(uri); // be sure to be connected
         SFTPClient sftpClient = sftpClients.get(cred);
         if (sftpClient == null) {
-            log.trace("getSFTPClient: sftpClient is null or not connected for {}", sftpClient);
+            if (log.isTraceEnabled()) log.trace("getSFTPClient: sftpClient is null or not connected for {}", sftpClient);
             // ensures that there is a valid connection and regenerate session if not connected
             getSshClient(uri);
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient != null) {
                 sftpClient = sshClient.newSFTPClient();
-                log.trace("getSFTPClient: saving sftpClient {}", sftpClient);
+                if (log.isTraceEnabled()) log.trace("getSFTPClient: saving sftpClient {}", sftpClient);
                 sftpClients.put(cred, sftpClient);
             }
         } else {
-            log.trace("getSFTPClient: sftpClient is not null reusing it for {}", uri);
+            if (log.isTraceEnabled()) log.trace("getSFTPClient: sftpClient is not null reusing it for {}", uri);
         }
         return sftpClient;
     }
@@ -158,12 +158,12 @@ public class SshjUtils {
             SFTPClient sftpClient = sftpClients.get(cred);
             if (sftpClient != null) {
                 sftpClient.close();
-                log.trace("closeSFTPClient: sftpClient disconnected for {}", uri);
+                if (log.isTraceEnabled()) log.trace("closeSFTPClient: sftpClient disconnected for {}", uri);
             }
         } catch (IOException e) {
             caughtException(e, "SshjUtils:closeSFTPClient", "IOException " + uri);
         } finally {
-            log.trace("closeSFTPClient: remove sftpClient from known sftpClients for {}", uri);
+            if (log.isTraceEnabled()) log.trace("closeSFTPClient: remove sftpClient from known sftpClients for {}", uri);
             sftpClients.remove(cred);
         }
     }
@@ -180,7 +180,7 @@ public class SshjUtils {
     }
 
     public static boolean isSSHjEnabled() {
-        log.trace("isSSHjEnabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false));
+        if (log.isTraceEnabled()) log.trace("isSSHjEnabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false));
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_sshj", false);
     }
 
