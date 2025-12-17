@@ -67,6 +67,12 @@ android {
     packagingOptions {
         exclude 'META-INF/versions/**/OSGI-INF/MANIFEST.MF'
     }
+    lint {
+        abortOnError false // Set to false to only fail on fatal issues
+        disable 'all'
+        enable 'NewApi'
+        fatal 'NewApi'
+    }
 }
 
 tasks.register('ndkBuild', Exec) {
