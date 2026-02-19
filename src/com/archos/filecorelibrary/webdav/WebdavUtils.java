@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import okhttp3.OkHttpClient;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
@@ -88,6 +89,20 @@ public class WebdavUtils {
                 logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
                 builder.addInterceptor(logging);
             }
+            // Add preemptive authentication to avoid 401 round-trip when credentials are available
+            final String preemptiveCredential = Credentials.basic(username, password, StandardCharsets.UTF_8);
+            builder.addInterceptor(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    Request request = chain.request();
+                    if (request.header("Authorization") == null && !username.equals("anonymous")) {
+                        request = request.newBuilder()
+                            .header("Authorization", preemptiveCredential)
+                            .build();
+                    }
+                    return chain.proceed(request);
+                }
+            });
             builder.authenticator(new Authenticator() {
                 @Override
                 public Request authenticate(Route route, Response response) throws IOException {
