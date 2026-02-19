@@ -57,7 +57,7 @@
     <string name="file_downloading">Twój plik jest pobierany</string>
     <string name="server_ready">Gotowy do odebrania</string>
     <string name="nonetwork_title" comment="deprecated">Brak połączenia WiFi</string>
-    <string name="no_network_title">Brak połączenia z Internetem</string>
+    <string name="no_network_title">Brak połączenia z internetem</string>
     <string name="nonetwork_message">Musisz aktywować WiFi dla tej funkcji</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">Nie można korzystać z pamięci wewnętrznej, gdy urządzenie jest podłączone za pomocą USB.</string>
