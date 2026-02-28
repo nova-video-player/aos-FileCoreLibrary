@@ -32,6 +32,11 @@ public final class ArchosFeatures {
     }
 
     public static boolean isAndroidTV(Context ct) {
+        if (ct == null) return false;
+        // Check for Leanback feature (standard for Android TV)
+        if (ct.getPackageManager().hasSystemFeature("android.software.leanback")) {
+            return true;
+        }
         // false on chromeos
         UiModeManager uiModeManager = (UiModeManager) ct.getSystemService(Context.UI_MODE_SERVICE);
         if (uiModeManager != null) { // seen issues on MSTAR TVs Android 8
