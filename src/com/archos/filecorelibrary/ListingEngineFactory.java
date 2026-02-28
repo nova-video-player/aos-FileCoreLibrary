@@ -23,6 +23,7 @@ import com.archos.filecorelibrary.jcifs.JcifListingEngine;
 import com.archos.filecorelibrary.localstorage.LocalStorageListingEngine;
 import com.archos.filecorelibrary.sftp.SFtpListingEngine;
 import com.archos.filecorelibrary.smbj.SmbjListingEngine;
+import com.archos.filecorelibrary.smbj.SmbjUtils;
 import com.archos.filecorelibrary.sshj.SshjListingEngine;
 import com.archos.filecorelibrary.webdav.WebdavListingEngine;
 import com.archos.filecorelibrary.zip.ZipListingEngine;
@@ -35,7 +36,9 @@ public class ListingEngineFactory {
             return new ContentProviderListingEngine(context, uri);
         }
         else if (uri.getScheme().equals("smb")) {
-            return new JcifListingEngine(context, uri);
+            if (SmbjUtils.isSMBjEnabled() && uri.getPath() != null && !uri.getPath().equals("/") && !uri.getPath().isEmpty())
+                return new SmbjListingEngine(context, uri);
+            else return new JcifListingEngine(context, uri);
         }
         else if (uri.getScheme().equals("ftp")||uri.getScheme().equals("ftps")) {
             return new FtpListingEngine(context, uri);
