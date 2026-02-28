@@ -61,7 +61,7 @@ public class SmbjFileEditor extends FileEditor {
     public InputStream getInputStream() throws Exception {
         if (log.isTraceEnabled()) log.trace("getInputStream: opening {}", mUri);
         SmbjUtils utils = requireUtils();
-        return utils.withOutOfCreditsRetry(mUri, () -> {
+        return utils.withReadRetry(mUri, () -> {
             File smbjFile = utils.getSmbShare(mUri).openFile(getFilePath(mUri),
                     EnumSet.of(AccessMask.FILE_READ_DATA),
                     EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
@@ -83,7 +83,7 @@ public class SmbjFileEditor extends FileEditor {
     public InputStream getInputStream(long from) throws Exception {
         if (log.isTraceEnabled()) log.trace("getInputStream: opening {}", mUri);
         SmbjUtils utils = requireUtils();
-        return utils.withOutOfCreditsRetry(mUri, () -> {
+        return utils.withReadRetry(mUri, () -> {
             File smbjFile = utils.getSmbShare(mUri).openFile(getFilePath(mUri),
                     EnumSet.of(AccessMask.FILE_READ_DATA),
                     EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
@@ -102,11 +102,12 @@ public class SmbjFileEditor extends FileEditor {
         });
     }
 
+
     @Override
     public OutputStream getOutputStream() throws Exception {
         if (log.isTraceEnabled()) log.trace("getOutputStream: opening {}", mUri);
         SmbjUtils utils = requireUtils();
-        return utils.withOutOfCreditsRetry(mUri, () -> {
+        return utils.withRetry(mUri, () -> {
             File smbjFile =  utils.getSmbShare(mUri).openFile(getFilePath(mUri),
                     EnumSet.of(AccessMask.GENERIC_WRITE, AccessMask.GENERIC_READ),
                     null, SMB2ShareAccess.ALL,
@@ -132,7 +133,7 @@ public class SmbjFileEditor extends FileEditor {
     public boolean mkdir() {
         try {
             SmbjUtils utils = requireUtils();
-            return utils.withOutOfCreditsRetry(mUri, () -> {
+            return utils.withRetry(mUri, () -> {
                 utils.getSmbShare(mUri).mkdir(getFilePath(mUri));
                 return true;
             });
@@ -150,7 +151,7 @@ public class SmbjFileEditor extends FileEditor {
     public Boolean delete() throws Exception {
         SmbjUtils utils = requireUtils();
         try {
-            return utils.withOutOfCreditsRetry(mUri, () -> {
+            return utils.withRetry(mUri, () -> {
                 DiskShare mDiskShare = utils.getSmbShare(mUri);
                 String mFilePath = getFilePath(mUri);
                 // Try to delete as file first (most common case)
@@ -218,7 +219,7 @@ public class SmbjFileEditor extends FileEditor {
         String mFilePath = getFilePath(mUri);
         try {
             SmbjUtils utils = requireUtils();
-            return utils.withOutOfCreditsRetry(mUri, () -> {
+            return utils.withRetry(mUri, () -> {
                 File from = utils.getSmbShare(mUri).openFile(mFilePath,
                         EnumSet.of(AccessMask.DELETE, AccessMask.GENERIC_WRITE),
                         EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
@@ -253,7 +254,7 @@ public class SmbjFileEditor extends FileEditor {
     public boolean exists() {
         try {
             SmbjUtils utils = requireUtils();
-            return utils.withOutOfCreditsRetry(mUri, () -> {
+            return utils.withReadRetry(mUri, () -> {
                 DiskShare mDiskShare = utils.getSmbShare(mUri);
                 // at this stage, mDiskShare if not null should be connected i.e. .isConnected() should be true granted by getSmbShare
                 if (mDiskShare == null || ! mDiskShare.isConnected()) {

@@ -89,7 +89,7 @@ public class SmbjListingEngine extends ListingEngine {
                 String filePath = getFilePath(mUri);
 
                 var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
-                List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withOutOfCreditsRetry(mUri, () -> {
+                List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withReadRetry(mUri, () -> {
                     DiskShare share = smbjUtils.getSmbShare(mUri);
                     return share.list(filePath);
                 });

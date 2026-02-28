@@ -31,6 +31,7 @@ import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.security.bc.BCSecurityProvider;
+import com.hierynomus.protocol.transport.TransportException;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -176,22 +177,57 @@ public class SmbjUtils {
         return false;
     }
 
+    private boolean isTransportError(Throwable t) {
+        Throwable current = t;
+        while (current != null) {
+            if (current instanceof TransportException || current instanceof SocketException || current instanceof java.io.EOFException) {
+                return true;
+            }
+            if (current instanceof SMBRuntimeException && current.getCause() != null) {
+                if (current.getCause() instanceof TransportException || current.getCause() instanceof SocketException || current.getCause() instanceof java.io.EOFException) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
     /**
      * Execute an SMBJ operation, resetting the connection and retrying once if the server reports
-     * that we ran out of credits.
+     * that we ran out of credits. Safe for all operations (including mutating ones).
      */
-    public <T> T withOutOfCreditsRetry(Uri uri, CheckedSupplier<T> supplier) throws Exception {
+    public <T> T withRetry(Uri uri, CheckedSupplier<T> supplier) throws Exception {
         try {
             return supplier.get();
-        } catch (SMBRuntimeException e) {
+        } catch (Exception e) {
             if (isOutOfCredits(e)) {
-                log.warn("withOutOfCreditsRetry: out of credits for {}, resetting connection and retrying", uri);
+                log.warn("withRetry: out of credits for {}, resetting connection and retrying", uri);
                 resetConnection(uri);
                 return supplier.get();
             }
             throw e;
         }
     }
+
+    /**
+     * Execute an SMBJ operation, resetting the connection and retrying once if the server reports
+     * that we ran out of credits or if a transport error occurred.
+     * ONLY use this for idempotent operations (directory listing, exists, etc.).
+     */
+    public <T> T withReadRetry(Uri uri, CheckedSupplier<T> supplier) throws Exception {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            if (isOutOfCredits(e) || isTransportError(e)) {
+                log.warn("withReadRetry: error (out of credits or transport) for {}, resetting connection and retrying", uri);
+                resetConnection(uri);
+                return supplier.get();
+            }
+            throw e;
+        }
+    }
+
 
     public synchronized DiskShare getSmbShare(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());

@@ -51,7 +51,7 @@ public class SmbjRawLister extends RawLister {
             }
             final String filePath = getFilePath(mUri);
             final String shareName = getShareName(mUri);
-            List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withOutOfCreditsRetry(mUri, () -> {
+            List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withReadRetry(mUri, () -> {
                 DiskShare share = smbjUtils.getSmbShare(mUri);
                 return share.list(filePath);
             });

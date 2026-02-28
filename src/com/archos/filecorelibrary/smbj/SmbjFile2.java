@@ -156,7 +156,7 @@ public class SmbjFile2 extends MetaFile2 {
         if (utils == null) {
             throw new IllegalStateException("SmbjUtils instance is null");
         }
-        return utils.withOutOfCreditsRetry(uri, () -> {
+        return utils.withReadRetry(uri, () -> {
             var diskShare = utils.getSmbShare(uri);
             final String filePath = getFilePath(uri);
             DiskEntry file = diskShare.open(filePath,
