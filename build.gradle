@@ -114,7 +114,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
     // upgrading for later release i.e. 0.2.25 or 2.27.0 will break the build since it has switched to java 24
-    api 'com.github.mwiede:jsch:2.27.7'
+    api 'com.github.mwiede:jsch:2.27.8'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.12.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.9'
@@ -127,6 +127,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
-    implementation 'io.sentry:sentry:8.31.0'
+    implementation 'io.sentry:sentry:8.34.1'
 }
 
