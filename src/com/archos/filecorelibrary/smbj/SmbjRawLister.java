@@ -16,6 +16,7 @@ package com.archos.filecorelibrary.smbj;
 
 import static com.archos.filecorelibrary.FileUtils.getFilePath;
 import static com.archos.filecorelibrary.FileUtils.getShareName;
+import static com.archos.filecorelibrary.FileUtils.isDotDirectoryEntry;
 
 import android.net.Uri;
 
@@ -57,6 +58,9 @@ public class SmbjRawLister extends RawLister {
             });
             for (var fileOrDir : diskShareLst) {
                 final String filename = fileOrDir.getFileName();
+                if (isDotDirectoryEntry(filename)) {
+                    continue;
+                }
                 final String fullFilename = "/" + shareName + "/" + filename;
                 if (log.isTraceEnabled()) log.trace("getFileList: adding {}", fullFilename);
                 files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));

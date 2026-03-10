@@ -17,6 +17,7 @@ package com.archos.filecorelibrary.smbj;
 import static com.archos.filecorelibrary.FileUtils.caughtException;
 import static com.archos.filecorelibrary.FileUtils.getFilePath;
 import static com.archos.filecorelibrary.FileUtils.getShareName;
+import static com.archos.filecorelibrary.FileUtils.isDotDirectoryEntry;
 import static com.archos.filecorelibrary.smbj.SmbjUtils.isDirectory;
 
 import android.content.Context;
@@ -100,6 +101,9 @@ public class SmbjListingEngine extends ListingEngine {
                 final String shareName = getShareName(mUri);
                 for (FileIdBothDirectoryInformation fileOrDir : diskShareLst) {
                     final String filename = fileOrDir.getFileName();
+                    if (isDotDirectoryEntry(filename)) {
+                        continue;
+                    }
                     final String fullFilename = "/" + shareName + "/" + filename;
                     if (isDirectory(fileOrDir)) {
                         if (keepDirectory(filename)) {

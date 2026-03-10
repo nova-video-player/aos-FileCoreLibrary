@@ -50,6 +50,8 @@ public class FileUtils {
 
     final static char SEP = '/';
     final static String SEPARATOR = "/";
+    private static final String CURRENT_DIRECTORY = ".";
+    private static final String PARENT_DIRECTORY = "..";
 
     public static String getParentUrl(String url) {
         int index;
@@ -65,6 +67,10 @@ public class FileUtils {
             return null;
         }
         return url.substring(0, index + 1);
+    }
+
+    public static boolean isDotDirectoryEntry(String filename) {
+        return CURRENT_DIRECTORY.equals(filename) || PARENT_DIRECTORY.equals(filename);
     }
 
     public static Boolean isNovaOwnedFile(File file) {

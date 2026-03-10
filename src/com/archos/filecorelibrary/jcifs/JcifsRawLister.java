@@ -31,6 +31,7 @@ import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
 import static com.archos.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
+import static com.archos.filecorelibrary.FileUtils.isDotDirectoryEntry;
 
 
 /**
@@ -57,6 +58,10 @@ public class JcifsRawLister extends RawLister {
         if (listFiles != null) {
             ArrayList<MetaFile2> files = new ArrayList<>();
             for(SmbFile f : listFiles){
+                String filename = f.getName();
+                if (isDotDirectoryEntry(filename)) {
+                    continue;
+                }
                 // better verify that it is a file or directory before adding
                 if(f.isFile() || f.isDirectory()) {
                     if (log.isTraceEnabled()) log.trace("found {}", f.getPath());
