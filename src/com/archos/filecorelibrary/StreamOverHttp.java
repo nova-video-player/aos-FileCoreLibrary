@@ -44,6 +44,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jcifs.util.transport.TransportException;
 
@@ -62,6 +63,8 @@ public class StreamOverHttp {
 	private ServerSocket serverSocket;
 	private Thread mainThread;
 	private MetaFile2 mMetaFile;
+	private final AtomicInteger mNextRequestId = new AtomicInteger(1);
+	private volatile int mActiveMediaRequestId = 0;
 
 	/**
 	 * Some HTTP response status codes
@@ -185,19 +188,37 @@ public class StreamOverHttp {
 		private boolean canSeek;
 		private InputStream is;
 		private final Socket socket;
+		private final int requestId;
 		private Properties mPre=null;
 		private int mRlen=-1;
 		private InputStream mInS=null;
 		private String fileMimeType =""; // this might be changed we a subtitle is sent
 		private long length;
+		private boolean supersedableMediaRequest;
+		private long requestedStart = -1;
 
 		HttpSession(Socket s, String fileMimeType){
 			this.fileMimeType = fileMimeType;
 			socket = s;
+			requestId = mNextRequestId.getAndIncrement();
 			if (log.isDebugEnabled()) log.debug("Stream over localhost: serving request on {}", s.getInetAddress());
 			Thread t = new Thread(this, "Http response");
 			t.setDaemon(true);
 			t.start();
+		}
+
+		private void markActiveMediaRequest() {
+			if (!supersedableMediaRequest) return;
+			int previous = mActiveMediaRequestId;
+			mActiveMediaRequestId = requestId;
+			if (log.isDebugEnabled()) {
+				log.debug("http session activate: uri={} request_id={} previous_id={} from={}",
+						mUri, requestId, previous, requestedStart);
+			}
+		}
+
+		private boolean isSuperseded() {
+			return supersedableMediaRequest && mActiveMediaRequestId != 0 && mActiveMediaRequestId != requestId;
 		}
 
 		public void run(){
@@ -223,6 +244,7 @@ public class StreamOverHttp {
 		}
 
 		private void openInputStream() throws IOException{
+			long requestStartedNs = System.nanoTime();
 			boolean isAskingPoster = false;
 			boolean needsToStream = false;
 			long startFrom = 0;
@@ -236,18 +258,20 @@ public class StreamOverHttp {
 				BufferedReader hin = new BufferedReader(new InputStreamReader(hbis));
 				try {
 					String encodedPath;
-					if((encodedPath=decodeHeader(socket, hin, mPre))!=null){
-						String range = mPre.getProperty("range");
-						if(range!=null) {
-							range = range.substring(6);
+						if((encodedPath=decodeHeader(socket, hin, mPre))!=null){
+							String range = mPre.getProperty("range");
+							if(range!=null) {
+								range = range.substring(6);
 
-							int minus = range.indexOf('-');
-							String startR = range.substring(0, minus);
-							startFrom = Long.parseLong(startR);
-							needsToStream = true;
+								int minus = range.indexOf('-');
+								String startR = range.substring(0, minus);
+								startFrom = Long.parseLong(startR);
+								needsToStream = true;
+								requestedStart = startFrom;
+								if (log.isDebugEnabled()) log.debug("openInputStream: range request uri={} from={} raw_range={}", mUri, startFrom, mPre.getProperty("range"));
+							}
+							path = Uri.decode(encodedPath);
 						}
-						path = Uri.decode(encodedPath);
-					}
 				} catch (InterruptedException e) {
 					caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException");
 				}
@@ -314,11 +338,15 @@ public class StreamOverHttp {
 					}
 				}
 
-				if(metaFile2==null&&!isAskingPoster)
-					metaFile2 = mMetaFile;
-				if(metaFile2!=null) { //mMetafile can be null
-					if(metaFile2.length()!=0)
-						length = metaFile2.length();
+					if(metaFile2==null&&!isAskingPoster)
+						metaFile2 = mMetaFile;
+					supersedableMediaRequest = needsToStream && !isAskingPoster && metaFile2 == mMetaFile;
+					if (supersedableMediaRequest) {
+						markActiveMediaRequest();
+					}
+					if(metaFile2!=null) { //mMetafile can be null
+						if(metaFile2.length()!=0)
+							length = metaFile2.length();
 					try {
 						var fe = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext());
 						is = fe.getInputStream(startFrom);
@@ -353,6 +381,17 @@ public class StreamOverHttp {
 					length = is.available();
 				if(length == 0 && "content".equalsIgnoreCase(mUri.getScheme()))
 					length = ((ContentStorageFileEditor)FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext())).getSize();
+				if (log.isDebugEnabled()) {
+					log.debug("openInputStream: ready uri={} scheme={} from={} canSeek={} needsToStream={} length={} path={} total_ms={}",
+							mUri,
+							mUri != null ? mUri.getScheme() : "null",
+							startFrom,
+							canSeek,
+							needsToStream,
+							length,
+							path,
+							(System.nanoTime() - requestStartedNs) / 1_000_000.0);
+				}
 
 			} catch (Exception e) {
 				caughtException(e, "StreamOverHttp:openInputStream", "Exception");
@@ -361,6 +400,13 @@ public class StreamOverHttp {
 
 		private void handleResponse(Socket socket) throws TransportException {
 			try {
+				if (isSuperseded()) {
+					if (log.isDebugEnabled()) {
+						log.debug("handleResponse: superseded before response uri={} request_id={} active_id={} from={}",
+								mUri, requestId, mActiveMediaRequestId, requestedStart);
+					}
+					return;
+				}
 				InputStream inS = socket.getInputStream();
 				if(inS == null&&mInS==null)
 					return;
@@ -439,7 +485,7 @@ public class StreamOverHttp {
             	   headers.put("Content-Range", rangeSpec);
 				}
 				headers.put("Access-Control-Allow-Origin", "*");
-				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null);
+				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null, this);
 				if (log.isDebugEnabled()) log.debug("Http stream finished");
 			} catch(IOException ioe) {
 				caughtException(ioe, "StreamOverHttp:handleResponse", "IOException");
@@ -549,17 +595,24 @@ public class StreamOverHttp {
 	 */
 	private void sendError(Socket socket, String status, String msg){
 		try {
-			sendResponse(socket, status, "text/plain", null, null, 0, null, msg);
+			sendResponse(socket, status, "text/plain", null, null, 0, null, msg, null);
 		} catch (IOException e) {
 			caughtException(e, "StreamOverHttp:sendError", "IOException");
 		}
 	}
 
-	private void copyStream(InputStream in, OutputStream out, byte[] tmpBuf, long maxSize) throws IOException{
+	private void copyStream(InputStream in, OutputStream out, byte[] tmpBuf, long maxSize, HttpSession session) throws IOException{
 		if (log.isDebugEnabled()) log.debug("copyStream");
 		int count;
 
 		while(maxSize>0) {
+			if (session != null && session.isSuperseded()) {
+				if (log.isDebugEnabled()) {
+					log.debug("copyStream: abort superseded uri={} request_id={} active_id={} from={} remaining={}",
+							mUri, session.requestId, mActiveMediaRequestId, session.requestedStart, maxSize);
+				}
+				break;
+			}
 			if (log.isDebugEnabled()) log.debug("copyStream: looping maxSize= {}", maxSize);
 			count = (int) Math.min(maxSize, (long)tmpBuf.length);
 			if (log.isDebugEnabled()) log.debug("copyStream: looping count= {}", count);
@@ -576,7 +629,7 @@ public class StreamOverHttp {
 	/**
 	 * Sends given response to the socket, and closes the socket.
 	 */
-	private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg) throws IOException {
+	private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg, HttpSession session) throws IOException {
 		if (log.isDebugEnabled()) log.debug("sendResponse");
 		BufferedInputStream bin = null;
 		try {
@@ -604,7 +657,7 @@ public class StreamOverHttp {
 			pw.print("\r\n");
 			pw.flush();
 			if(isInput != null)
-				copyStream(bin, out, buf, sendCount);
+				copyStream(bin, out, buf, sendCount, session);
 			else if(errMsg!=null) {
 				pw.print(errMsg);
 				pw.flush();
@@ -628,5 +681,3 @@ public class StreamOverHttp {
 		}
 	}
 }
-
-
