@@ -37,6 +37,7 @@ import com.hierynomus.smbj.share.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,6 +47,7 @@ import java.util.concurrent.TimeoutException;
 public class SmbjFileEditor extends FileEditor {
 
     private static final Logger log = LoggerFactory.getLogger(SmbjFileEditor.class);
+    private static final int SMBJ_READ_BUFFER_SIZE = 1024 * 1024;
 
     private SmbjUtils requireUtils() {
         SmbjUtils utils = SmbjUtils.peekInstance();
@@ -55,51 +57,198 @@ public class SmbjFileEditor extends FileEditor {
         return utils;
     }
 
-    public SmbjFileEditor(Uri uri) { super(uri); }
+    private InputStream instrumentInputStream(InputStream inputStream, long from, long openStartedNs) {
+        long openDoneNs = System.nanoTime();
+        if (log.isDebugEnabled()) {
+            log.debug("smbj stream open: uri={} from={} open_ms={}",
+                    mUri, from, (openDoneNs - openStartedNs) / 1_000_000.0);
+        }
+        return new FilterInputStream(inputStream) {
+            private final long firstReadStartedNs = System.nanoTime();
+            private boolean firstReadLogged;
+            private long bytesRead;
 
-    @Override
-    public InputStream getInputStream() throws Exception {
-        if (log.isTraceEnabled()) log.trace("getInputStream: opening {}", mUri);
+            private void logReadResult(int count) {
+                if (!firstReadLogged) {
+                    firstReadLogged = true;
+                    if (log.isDebugEnabled()) {
+                        log.debug("smbj stream first-read: uri={} from={} first_read_ms={} count={}",
+                                mUri, from, (System.nanoTime() - firstReadStartedNs) / 1_000_000.0, count);
+                    }
+                }
+                if (count > 0) {
+                    bytesRead += count;
+                }
+            }
+
+            @Override
+            public int read() throws IOException {
+                int result = super.read();
+                logReadResult(result >= 0 ? 1 : result);
+                return result;
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                int result = super.read(b, off, len);
+                logReadResult(result);
+                return result;
+            }
+
+            @Override
+            public void close() throws IOException {
+                long closeStartedNs = System.nanoTime();
+                try {
+                    super.close();
+                } finally {
+                    if (log.isDebugEnabled()) {
+                        log.debug("smbj stream close: uri={} from={} bytes_read={} lifetime_ms={} close_ms={}",
+                                mUri, from, bytesRead,
+                                (System.nanoTime() - openDoneNs) / 1_000_000.0,
+                                (System.nanoTime() - closeStartedNs) / 1_000_000.0);
+                    }
+                }
+            }
+        };
+    }
+
+    private File openReadOnlyFile(SmbjUtils utils) throws Exception {
+        return utils.getSmbShare(mUri).openFile(getFilePath(mUri),
+                EnumSet.of(AccessMask.FILE_READ_DATA),
+                EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
+                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                SMB2CreateDisposition.FILE_OPEN,
+                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
+    }
+
+    private ObservableInputStream openObservableInputStream(long from) throws Exception {
+        if (log.isTraceEnabled()) {
+            log.trace("getInputStream: opening {}", mUri);
+        }
         SmbjUtils utils = requireUtils();
+        long openStartedNs = System.nanoTime();
         return utils.withReadRetry(mUri, () -> {
-            File smbjFile = utils.getSmbShare(mUri).openFile(getFilePath(mUri),
-                    EnumSet.of(AccessMask.FILE_READ_DATA),
-                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
-                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
-                    SMB2CreateDisposition.FILE_OPEN,
-                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-            InputStream is = smbjFile.getInputStream();
+            File smbjFile = openReadOnlyFile(utils);
+            InputStream is = instrumentInputStream(new SmbjOffsetInputStream(smbjFile, from), from, openStartedNs);
             ObservableInputStream ois = new ObservableInputStream(is);
-            ois.onClose(() -> {if (smbjFile != null) {
-                if (log.isTraceEnabled()) log.trace("getInputStream: closing {}", mUri);
-                // check that DiskShare has not already been closed (seen on sentry)
-                if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
-            }});
+            ois.onClose(() -> {
+                if (smbjFile != null) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("getInputStream: closing {}", mUri);
+                    }
+                    // check that DiskShare has not already been closed (seen on sentry)
+                    if (smbjFile.getDiskShare().isConnected()) {
+                        smbjFile.closeSilently();
+                    }
+                }
+            });
             return ois;
         });
     }
 
+    private static final class SmbjOffsetInputStream extends InputStream {
+        private final File file;
+        private final byte[] buffer;
+        private long fileOffset;
+        private int bufferPos;
+        private int bufferLimit;
+        private boolean eof;
+        private boolean closed;
+
+        SmbjOffsetInputStream(File file, long startOffset) {
+            this.file = file;
+            this.fileOffset = startOffset;
+            this.buffer = new byte[SMBJ_READ_BUFFER_SIZE];
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (!ensureBuffered()) {
+                return -1;
+            }
+            return buffer[bufferPos++] & 0xFF;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (b == null) {
+                throw new NullPointerException("buffer == null");
+            }
+            if (off < 0 || len < 0 || len > b.length - off) {
+                throw new IndexOutOfBoundsException();
+            }
+            if (len == 0) {
+                return 0;
+            }
+            if (!ensureBuffered()) {
+                return -1;
+            }
+            int bytesToCopy = Math.min(len, bufferLimit - bufferPos);
+            System.arraycopy(buffer, bufferPos, b, off, bytesToCopy);
+            bufferPos += bytesToCopy;
+            return bytesToCopy;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            if (n <= 0) {
+                return 0;
+            }
+            if (closed) {
+                return 0;
+            }
+            int buffered = bufferLimit - bufferPos;
+            if (n <= buffered) {
+                bufferPos += (int) n;
+                return n;
+            }
+            long skipped = buffered;
+            bufferPos = 0;
+            bufferLimit = 0;
+            fileOffset += (n - buffered);
+            eof = false;
+            return skipped + (n - buffered);
+        }
+
+        @Override
+        public void close() {
+            closed = true;
+            eof = true;
+            bufferPos = 0;
+            bufferLimit = 0;
+        }
+
+        private boolean ensureBuffered() throws IOException {
+            if (closed || eof) {
+                return false;
+            }
+            if (bufferPos < bufferLimit) {
+                return true;
+            }
+            int bytesRead = file.read(buffer, fileOffset, 0, buffer.length);
+            if (bytesRead <= 0) {
+                eof = true;
+                bufferPos = 0;
+                bufferLimit = 0;
+                return false;
+            }
+            fileOffset += bytesRead;
+            bufferPos = 0;
+            bufferLimit = bytesRead;
+            return true;
+        }
+    }
+
+    public SmbjFileEditor(Uri uri) { super(uri); }
+
+    @Override
+    public InputStream getInputStream() throws Exception {
+        return openObservableInputStream(0);
+    }
+
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        if (log.isTraceEnabled()) log.trace("getInputStream: opening {}", mUri);
-        SmbjUtils utils = requireUtils();
-        return utils.withReadRetry(mUri, () -> {
-            File smbjFile = utils.getSmbShare(mUri).openFile(getFilePath(mUri),
-                    EnumSet.of(AccessMask.FILE_READ_DATA),
-                    EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
-                    EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
-                    SMB2CreateDisposition.FILE_OPEN,
-                    EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-            InputStream is = smbjFile.getInputStream();
-            is.skip(from);
-            ObservableInputStream ois = new ObservableInputStream(is);
-            ois.onClose(() -> {if (smbjFile != null) {
-                if (log.isTraceEnabled()) log.trace("getInputStream: closing {}", mUri);
-                // check that DiskShare has not already been closed (seen on sentry)
-                if (smbjFile.getDiskShare().isConnected()) smbjFile.closeSilently();
-            }});
-            return ois;
-        });
+        return openObservableInputStream(from);
     }
 
 
