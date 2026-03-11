@@ -65,6 +65,7 @@ public class StreamOverHttp {
 	private MetaFile2 mMetaFile;
 	private final AtomicInteger mNextRequestId = new AtomicInteger(1);
 	private volatile int mActiveMediaRequestId = 0;
+	private volatile HttpSession mActiveMediaSession;
 
 	/**
 	 * Some HTTP response status codes
@@ -186,7 +187,7 @@ public class StreamOverHttp {
 
 	private class HttpSession implements Runnable {
 		private boolean canSeek;
-		private InputStream is;
+		private volatile InputStream is;
 		private final Socket socket;
 		private final int requestId;
 		private Properties mPre=null;
@@ -196,6 +197,7 @@ public class StreamOverHttp {
 		private long length;
 		private boolean supersedableMediaRequest;
 		private long requestedStart = -1;
+		private volatile boolean forceClosed;
 
 		HttpSession(Socket s, String fileMimeType){
 			this.fileMimeType = fileMimeType;
@@ -209,16 +211,39 @@ public class StreamOverHttp {
 
 		private void markActiveMediaRequest() {
 			if (!supersedableMediaRequest) return;
+			HttpSession previousSession = mActiveMediaSession;
 			int previous = mActiveMediaRequestId;
 			mActiveMediaRequestId = requestId;
+			mActiveMediaSession = this;
 			if (log.isDebugEnabled()) {
 				log.debug("http session activate: uri={} request_id={} previous_id={} from={}",
 						mUri, requestId, previous, requestedStart);
+			}
+			if (previousSession != null && previousSession != this) {
+				previousSession.closeSupersededSession(requestId);
 			}
 		}
 
 		private boolean isSuperseded() {
 			return supersedableMediaRequest && mActiveMediaRequestId != 0 && mActiveMediaRequestId != requestId;
+		}
+
+		private boolean isCancelled() {
+			return forceClosed || isSuperseded();
+		}
+
+		private void closeSupersededSession(int activeRequestId) {
+			if (!supersedableMediaRequest || forceClosed) return;
+			forceClosed = true;
+			if (log.isDebugEnabled()) {
+				log.debug("http session force-close: uri={} request_id={} active_id={} from={}",
+						mUri, requestId, activeRequestId, requestedStart);
+			}
+			try {
+				socket.close();
+			} catch (IOException e) {
+				caughtException(e, "StreamOverHttp:closeSupersededSession", "IOException closing superseded socket");
+			}
 		}
 
 		public void run(){
@@ -228,6 +253,12 @@ public class StreamOverHttp {
 			} catch(IOException e) {
 				caughtException(e, "StreamOverHttp:HttpSession", "IOException while running for " + mUri);
 			} finally {
+				if (mActiveMediaSession == this) {
+					mActiveMediaSession = null;
+					if (mActiveMediaRequestId == requestId) {
+						mActiveMediaRequestId = 0;
+					}
+				}
 				try {
 					socket.close();
 				} catch(Exception e) {
@@ -606,7 +637,7 @@ public class StreamOverHttp {
 		int count;
 
 		while(maxSize>0) {
-			if (session != null && session.isSuperseded()) {
+			if (session != null && session.isCancelled()) {
 				if (log.isDebugEnabled()) {
 					log.debug("copyStream: abort superseded uri={} request_id={} active_id={} from={} remaining={}",
 							mUri, session.requestId, mActiveMediaRequestId, session.requestedStart, maxSize);
@@ -616,13 +647,35 @@ public class StreamOverHttp {
 			if (log.isDebugEnabled()) log.debug("copyStream: looping maxSize= {}", maxSize);
 			count = (int) Math.min(maxSize, (long)tmpBuf.length);
 			if (log.isDebugEnabled()) log.debug("copyStream: looping count= {}", count);
-			count = in.read(tmpBuf, 0, count);
+			try {
+				count = in.read(tmpBuf, 0, count);
+			} catch (RuntimeException e) {
+				if (session != null && session.isCancelled()) {
+					if (log.isDebugEnabled()) {
+						log.debug("copyStream: swallow cancelled read failure uri={} request_id={} active_id={} from={}",
+								mUri, session.requestId, mActiveMediaRequestId, session.requestedStart);
+					}
+					break;
+				}
+				throw e;
+			}
 			if (log.isDebugEnabled()) log.debug("copyStream: looping count after in.read {}", count);
 			if(count<0)
 				break;
 			if (log.isDebugEnabled()) log.debug("copyStream: looping tmpBuf is of length {} writing count {}", tmpBuf.length, count);
-			out.write(tmpBuf, 0, count); // TODO MARC CRASH HERE
-			out.flush();
+			try {
+				out.write(tmpBuf, 0, count); // TODO MARC CRASH HERE
+				out.flush();
+			} catch (IOException e) {
+				if (session != null && session.isCancelled()) {
+					if (log.isDebugEnabled()) {
+						log.debug("copyStream: swallow cancelled write failure uri={} request_id={} active_id={} from={}",
+								mUri, session.requestId, mActiveMediaRequestId, session.requestedStart);
+					}
+					break;
+				}
+				throw e;
+			}
 			maxSize -= count;
 		}
 	}
