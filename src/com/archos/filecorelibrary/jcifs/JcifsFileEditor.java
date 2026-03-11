@@ -15,6 +15,7 @@
 
 package com.archos.filecorelibrary.jcifs;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,6 +46,61 @@ public class JcifsFileEditor extends FileEditor{
         super(uri);
     }
 
+    private InputStream instrumentInputStream(InputStream inputStream, long from, long openStartedNs) {
+        long openDoneNs = System.nanoTime();
+        if (log.isDebugEnabled()) {
+            log.debug("jcifs stream open: uri={} from={} open_ms={}",
+                    mUri, from, (openDoneNs - openStartedNs) / 1_000_000.0);
+        }
+        return new FilterInputStream(inputStream) {
+            private final long firstReadStartedNs = System.nanoTime();
+            private boolean firstReadLogged;
+            private long bytesRead;
+
+            private void logReadResult(int count) {
+                if (!firstReadLogged) {
+                    firstReadLogged = true;
+                    if (log.isDebugEnabled()) {
+                        log.debug("jcifs stream first-read: uri={} from={} first_read_ms={} count={}",
+                                mUri, from, (System.nanoTime() - firstReadStartedNs) / 1_000_000.0, count);
+                    }
+                }
+                if (count > 0) {
+                    bytesRead += count;
+                }
+            }
+
+            @Override
+            public int read() throws IOException {
+                int result = super.read();
+                logReadResult(result >= 0 ? 1 : result);
+                return result;
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                int result = super.read(b, off, len);
+                logReadResult(result);
+                return result;
+            }
+
+            @Override
+            public void close() throws IOException {
+                long closeStartedNs = System.nanoTime();
+                try {
+                    super.close();
+                } finally {
+                    if (log.isDebugEnabled()) {
+                        log.debug("jcifs stream close: uri={} from={} bytes_read={} lifetime_ms={} close_ms={}",
+                                mUri, from, bytesRead,
+                                (System.nanoTime() - openDoneNs) / 1_000_000.0,
+                                (System.nanoTime() - closeStartedNs) / 1_000_000.0);
+                    }
+                }
+            }
+        };
+    }
+
     @Override
     public boolean touchFile() {
         return false;
@@ -65,14 +121,21 @@ public class JcifsFileEditor extends FileEditor{
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new SmbFileInputStream(getSmbFile(mUri).smbFile);
+        long openStartedNs = System.nanoTime();
+        return instrumentInputStream(new SmbFileInputStream(getSmbFile(mUri).smbFile), 0, openStartedNs);
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
+        long openStartedNs = System.nanoTime();
         InputStream is = new SmbFileInputStream(getSmbFile(mUri).smbFile);
+        long skipStartedNs = System.nanoTime();
         is.skip(from);
-        return is;
+        if (log.isDebugEnabled()) {
+            log.debug("jcifs stream skip: uri={} from={} skip_ms={}",
+                    mUri, from, (System.nanoTime() - skipStartedNs) / 1_000_000.0);
+        }
+        return instrumentInputStream(is, from, openStartedNs);
     }
 
     @Override
