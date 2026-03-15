@@ -657,7 +657,7 @@ public class StreamOverHttp {
 					}
 					break;
 				}
-				throw e;
+				throw new IOException("copyStream: input read failed", e);
 			}
 			if (log.isDebugEnabled()) log.debug("copyStream: looping count after in.read {}", count);
 			if(count<0)

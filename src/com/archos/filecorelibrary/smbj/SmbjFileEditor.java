@@ -128,35 +128,25 @@ public class SmbjFileEditor extends FileEditor {
         SmbjUtils utils = requireUtils();
         long openStartedNs = System.nanoTime();
         return utils.withReadRetry(mUri, () -> {
-            File smbjFile = openReadOnlyFile(utils);
-            InputStream is = instrumentInputStream(new SmbjOffsetInputStream(smbjFile, from), from, openStartedNs);
+            InputStream is = instrumentInputStream(new SmbjOffsetInputStream(utils, from), from, openStartedNs);
             ObservableInputStream ois = new ObservableInputStream(is);
-            ois.onClose(() -> {
-                if (smbjFile != null) {
-                    if (log.isTraceEnabled()) {
-                        log.trace("getInputStream: closing {}", mUri);
-                    }
-                    // check that DiskShare has not already been closed (seen on sentry)
-                    if (smbjFile.getDiskShare().isConnected()) {
-                        smbjFile.closeSilently();
-                    }
-                }
-            });
             return ois;
         });
     }
 
-    private static final class SmbjOffsetInputStream extends InputStream {
-        private final File file;
+    private final class SmbjOffsetInputStream extends InputStream {
+        private final SmbjUtils utils;
         private final byte[] buffer;
+        private File file;
         private long fileOffset;
         private int bufferPos;
         private int bufferLimit;
         private boolean eof;
         private boolean closed;
 
-        SmbjOffsetInputStream(File file, long startOffset) {
-            this.file = file;
+        SmbjOffsetInputStream(SmbjUtils utils, long startOffset) throws Exception {
+            this.utils = utils;
+            this.file = openReadOnlyFile(utils);
             this.fileOffset = startOffset;
             this.buffer = new byte[SMBJ_READ_BUFFER_SIZE];
         }
@@ -216,6 +206,7 @@ public class SmbjFileEditor extends FileEditor {
             eof = true;
             bufferPos = 0;
             bufferLimit = 0;
+            closeCurrentFile();
         }
 
         private boolean ensureBuffered() throws IOException {
@@ -225,7 +216,7 @@ public class SmbjFileEditor extends FileEditor {
             if (bufferPos < bufferLimit) {
                 return true;
             }
-            int bytesRead = file.read(buffer, fileOffset, 0, buffer.length);
+            int bytesRead = readIntoBuffer();
             if (bytesRead <= 0) {
                 eof = true;
                 bufferPos = 0;
@@ -236,6 +227,51 @@ public class SmbjFileEditor extends FileEditor {
             bufferPos = 0;
             bufferLimit = bytesRead;
             return true;
+        }
+
+        private int readIntoBuffer() throws IOException {
+            try {
+                return file.read(buffer, fileOffset, 0, buffer.length);
+            } catch (RuntimeException e) {
+                if (!utils.isRetryableReadError(e)) {
+                    throw new IOException("SMB read failed for " + mUri + " at offset " + fileOffset, e);
+                }
+                if (log.isWarnEnabled()) {
+                    log.warn("SmbjOffsetInputStream: retrying read after stale handle for uri={} offset={} cause={}",
+                            mUri, fileOffset, e.getMessage());
+                }
+                reopenFileAtOffset();
+                try {
+                    return file.read(buffer, fileOffset, 0, buffer.length);
+                } catch (RuntimeException retryFailure) {
+                    throw new IOException("SMB read retry failed for " + mUri + " at offset " + fileOffset, retryFailure);
+                }
+            }
+        }
+
+        private void reopenFileAtOffset() throws IOException {
+            closeCurrentFile();
+            utils.resetConnection(mUri);
+            try {
+                file = utils.withReadRetry(mUri, () -> openReadOnlyFile(utils));
+            } catch (Exception openFailure) {
+                throw new IOException("Failed to reopen SMB file for " + mUri + " at offset " + fileOffset, openFailure);
+            }
+        }
+
+        private void closeCurrentFile() {
+            if (file == null) {
+                return;
+            }
+            try {
+                file.closeSilently();
+            } catch (RuntimeException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("SmbjOffsetInputStream: close failed for {}: {}", mUri, e.getMessage());
+                }
+            } finally {
+                file = null;
+            }
         }
     }
 

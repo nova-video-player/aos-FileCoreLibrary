@@ -28,6 +28,7 @@ import com.archos.filecorelibrary.samba.SambaDiscovery;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 
+import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.security.bc.BCSecurityProvider;
@@ -219,13 +220,36 @@ public class SmbjUtils {
         try {
             return supplier.get();
         } catch (Exception e) {
-            if (isOutOfCredits(e) || isTransportError(e)) {
+            if (isRetryableReadError(e)) {
                 log.warn("withReadRetry: error (out of credits or transport) for {}, resetting connection and retrying", uri);
                 resetConnection(uri);
                 return supplier.get();
             }
             throw e;
         }
+    }
+
+    public boolean isRetryableReadError(Throwable t) {
+        if (isOutOfCredits(t) || isTransportError(t)) {
+            return true;
+        }
+        Throwable current = t;
+        while (current != null) {
+            if (current instanceof SMBApiException) {
+                NtStatus status = ((SMBApiException) current).getStatus();
+                if (status == NtStatus.STATUS_INTERNAL_ERROR
+                        || status == NtStatus.STATUS_FILE_CLOSED
+                        || status == NtStatus.STATUS_CONNECTION_DISCONNECTED
+                        || status == NtStatus.STATUS_CONNECTION_RESET
+                        || status == NtStatus.STATUS_NETWORK_NAME_DELETED
+                        || status == NtStatus.STATUS_NETWORK_SESSION_EXPIRED
+                        || status == NtStatus.STATUS_USER_SESSION_DELETED) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
 
