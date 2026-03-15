@@ -52,6 +52,9 @@ public class JcifsUtils {
     public final static boolean RESOLUTION_CACHE_INJECTION = false;
     public final static boolean PREVENT_MULTIPLE_TIME_SERVER_PROBING = true;
 
+    // SMB2 multi-credit transport buffer size (1 MiB) for large read/write operations
+    private static final int SMB2_TRANSPORT_BUFFER_SIZE = 1048576;
+
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
 
@@ -100,8 +103,13 @@ public class JcifsUtils {
         prop = new Properties();
         prop.putAll(System.getProperties());
 
-        if (isSmb2) prop.put("jcifs.smb.client.maxVersion", "SMB311");
-        else prop.put("jcifs.smb.client.maxVersion", "SMB1");
+        if (isSmb2) {
+            prop.put("jcifs.smb.client.maxVersion", "SMB311");
+            prop.put("jcifs.smb.client.snd_buf_size", String.valueOf(SMB2_TRANSPORT_BUFFER_SIZE));
+            prop.put("jcifs.smb.client.rcv_buf_size", String.valueOf(SMB2_TRANSPORT_BUFFER_SIZE));
+        } else {
+            prop.put("jcifs.smb.client.maxVersion", "SMB1");
+        }
 
         // must remain false to be able to talk to smbV1 only
         prop.put("jcifs.smb.client.useSMB2Negotiation", "false");
@@ -145,6 +153,9 @@ public class JcifsUtils {
             prop.put("jcifs.smb.client.useSMB2Negotiation", "true");
             // disable dfs makes win10 shares with ms account work
             prop.put("jcifs.smb.client.dfs.disabled", "true");
+            // enable multi-credit large I/O for SMB2
+            prop.put("jcifs.smb.client.snd_buf_size", String.valueOf(SMB2_TRANSPORT_BUFFER_SIZE));
+            prop.put("jcifs.smb.client.rcv_buf_size", String.valueOf(SMB2_TRANSPORT_BUFFER_SIZE));
         } else {
             prop.put("jcifs.smb.client.maxVersion", "SMB1");
             prop.put("jcifs.smb.client.minVersion", "SMB1");
