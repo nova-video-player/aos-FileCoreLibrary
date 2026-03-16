@@ -69,9 +69,35 @@ public class WebdavFileEditor extends FileEditor {
         }
         var req = reqBuilder.build();
         var resp = mHttpClient.newCall(req).execute();
-        var length = resp.header("Content-Length");
-        if (log.isTraceEnabled()) log.trace("getInputStream: got length {}", length);
-        mLength = Long.parseLong(length);
+
+        // For 206 Partial Content responses, extract total size from Content-Range
+        // header (format: "bytes start-end/total") rather than Content-Length which
+        // only reflects the partial response size
+        var contentRange = resp.header("Content-Range");
+        if (contentRange != null && contentRange.contains("/")) {
+            var totalStr = contentRange.substring(contentRange.indexOf('/') + 1).trim();
+            if (!"*".equals(totalStr)) {
+                try {
+                    mLength = Long.parseLong(totalStr);
+                    if (log.isTraceEnabled()) log.trace("getInputStream: got total length {} from Content-Range: {}", mLength, contentRange);
+                } catch (NumberFormatException e) {
+                    log.warn("getInputStream: failed to parse Content-Range total: {}", contentRange);
+                }
+            }
+        }
+
+        // Fall back to Content-Length if Content-Range was not available
+        if (mLength < 0) {
+            var length = resp.header("Content-Length");
+            if (length != null) {
+                try {
+                    mLength = Long.parseLong(length);
+                    if (log.isTraceEnabled()) log.trace("getInputStream: got length {} from Content-Length", mLength);
+                } catch (NumberFormatException e) {
+                    log.warn("getInputStream: failed to parse Content-Length: {}", length);
+                }
+            }
+        }
 
         return resp.body().byteStream();
     }
