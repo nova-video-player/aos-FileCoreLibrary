@@ -40,7 +40,7 @@
     <string name="samba_password">Senha</string>
     <string name="samba_show_password">Mostrar senha</string>
     <string name="samba_wrong_password">Nome de usuário ou senha incorretos</string>
-    <string name="preferences">Preferências</string>
+    <string name="preferences">Configurações</string>
     <string name="shared_folder_credentials">Senhas</string>
     <string name="no_saved_passwords">Nenhuma senha salva</string>
     <!-- WiFi Direct strings-->
@@ -118,7 +118,7 @@
     <string name="new_file">Novo arquivo</string>
     <string name="new_folder_or_file">Nova pasta ou arquivo</string>
     <string name="refresh_servers_list">Atualizar lista de servidores</string>
-    <string name="enable_network_shares">Habilitar compartilhamento de rede</string>
+    <string name="enable_network_shares">Ativar compartilhamento de rede</string>
     <string name="go_top">Voltar ao Topo</string>
     <string name="uncheck_impossible">Impossível alterar a seleção quando a pasta principal for selecionada</string>
     <string name="confirm_delete_one">Deseja realmente excluir?</string>
