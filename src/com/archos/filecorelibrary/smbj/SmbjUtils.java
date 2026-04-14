@@ -86,7 +86,12 @@ public class SmbjUtils {
     private SmbjUtils(Context context) {
         mContext = context;
         if (log.isDebugEnabled()) log.debug("SmbjUtils: initializing contexts");
-        smbConfig = SmbConfig.builder().withSecurityProvider(new BCSecurityProvider()).withMultiProtocolNegotiate(true).withSigningRequired(false)
+        smbConfig = SmbConfig.builder()
+                .withSecurityProvider(new BCSecurityProvider())
+                .withMultiProtocolNegotiate(true)
+                .withSigningRequired(false)
+                .withReadBufferSize(1024 * 1024)
+                .withWriteBufferSize(1024 * 1024)
                 .build();
     }
 
