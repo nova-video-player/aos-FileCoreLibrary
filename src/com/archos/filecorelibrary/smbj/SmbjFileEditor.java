@@ -33,6 +33,7 @@ import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.transport.TransportException;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
+import com.hierynomus.smbj.share.SmbjPrefetchInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,10 +129,7 @@ public class SmbjFileEditor extends FileEditor {
         long openStartedNs = System.nanoTime();
         return utils.withReadRetry(mUri, () -> {
             File smbjFile = openReadOnlyFile(utils);
-            InputStream is = smbjFile.getInputStream();
-            if (from > 0) {
-                is.skip(from);
-            }
+            InputStream is = new SmbjPrefetchInputStream(smbjFile, from, utils.getReadBufferSize(), utils.getReadTimeout());
             InputStream instrumentedIs = instrumentInputStream(is, from, openStartedNs);
             ObservableInputStream ois = new ObservableInputStream(instrumentedIs);
             ois.onClose(() -> {

@@ -95,6 +95,14 @@ public class SmbjUtils {
                 .build();
     }
 
+    public int getReadBufferSize() {
+        return smbConfig.getReadBufferSize();
+    }
+
+    public long getReadTimeout() {
+        return smbConfig.getReadTimeout();
+    }
+
     public synchronized void getSmbConnection(Uri uri) throws IOException, SMBApiException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
