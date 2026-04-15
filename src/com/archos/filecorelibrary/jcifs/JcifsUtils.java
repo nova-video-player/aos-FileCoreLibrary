@@ -103,6 +103,11 @@ public class JcifsUtils {
         prop = new Properties();
         prop.putAll(System.getProperties());
 
+        // reduce network calls for attributes
+        prop.put("jcifs.smb.client.attrExpirationPeriod", "30000"); // 30 seconds
+        // prevent long hangs
+        prop.put("jcifs.smb.client.responseTimeout", "20000"); // 20 seconds
+
         if (isSmb2) {
             prop.put("jcifs.smb.client.maxVersion", "SMB311");
             prop.put("jcifs.smb.client.snd_buf_size", String.valueOf(SMB2_TRANSPORT_BUFFER_SIZE));
@@ -145,6 +150,11 @@ public class JcifsUtils {
     private static CIFSContext createContextOnly(boolean isSmb2) {
         prop = new Properties();
         prop.putAll(System.getProperties());
+
+        // reduce network calls for attributes
+        prop.put("jcifs.smb.client.attrExpirationPeriod", "30000"); // 30 seconds
+        // prevent long hangs
+        prop.put("jcifs.smb.client.responseTimeout", "20000"); // 20 seconds
 
         if (isSmb2) {
             prop.put("jcifs.smb.client.maxVersion", "SMB311");
