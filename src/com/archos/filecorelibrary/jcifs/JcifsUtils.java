@@ -105,8 +105,6 @@ public class JcifsUtils {
 
         // reduce network calls for attributes
         prop.put("jcifs.smb.client.attrExpirationPeriod", "30000"); // 30 seconds
-        // prevent long hangs
-        prop.put("jcifs.smb.client.responseTimeout", "20000"); // 20 seconds
 
         if (isSmb2) {
             prop.put("jcifs.smb.client.maxVersion", "SMB311");
@@ -153,8 +151,6 @@ public class JcifsUtils {
 
         // reduce network calls for attributes
         prop.put("jcifs.smb.client.attrExpirationPeriod", "30000"); // 30 seconds
-        // prevent long hangs
-        prop.put("jcifs.smb.client.responseTimeout", "20000"); // 20 seconds
 
         if (isSmb2) {
             prop.put("jcifs.smb.client.maxVersion", "SMB311");
