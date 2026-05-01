@@ -32,6 +32,7 @@ import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.protocol.transport.TransportException;
+import com.hierynomus.security.bc.BCSecurityProvider;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -86,10 +87,9 @@ public class SmbjUtils {
         mContext = context;
         if (log.isDebugEnabled()) log.debug("SmbjUtils: initializing contexts");
         smbConfig = SmbConfig.builder()
+                .withSecurityProvider(new BCSecurityProvider())
                 .withMultiProtocolNegotiate(true)
                 .withSigningRequired(false)
-                .withReadBufferSize(1024 * 1024)
-                .withWriteBufferSize(1024 * 1024)
                 .build();
     }
 
