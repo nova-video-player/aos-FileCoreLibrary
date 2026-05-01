@@ -115,7 +115,7 @@ dependencies {
     //api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
     api 'com.github.nova-video-player:jcifs-ng:v2.1.10-multicredit3'
     // upgrading for later release i.e. 0.2.25 or 2.27.0 will break the build since it has switched to java 24
-    api 'com.github.mwiede:jsch:2.28.0'
+    api 'com.github.mwiede:jsch:2.28.2'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.13.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.9'
@@ -128,6 +128,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
-    implementation 'io.sentry:sentry:8.37.1'
+    implementation 'io.sentry:sentry:8.40.0'
 }
 
