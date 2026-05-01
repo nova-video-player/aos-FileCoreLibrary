@@ -52,13 +52,13 @@
     <string name="upload_in_progress">Yükleme devam ediyor&#8230;</string>
     <string name="file_uploading">Dosyanız yükleniyor</string>
     <string name="back_cancel">İptal etmek için geri tuşuna basın</string>
-    <string name="server_wait">İstemciye bağlantı bekleniyor</string>
+    <string name="server_wait">İstemcinin bağlanıp dosya göndermesi bekleniyor</string>
     <string name="download_in_progress">İndirme devam ediyor&#8230;</string>
     <string name="file_downloading">Dosya indiriliyor</string>
     <string name="server_ready">Almaya hazır</string>
-    <string name="nonetwork_title" comment="deprecated">WiFi Bağlantısı Yok</string>
+    <string name="nonetwork_title" comment="deprecated">Kablosuz bağlantı yok</string>
     <string name="no_network_title">Ağ bağlantısı yok</string>
-    <string name="nonetwork_message">Bu özellik için Kablosuz özelliğini etkinleştirmeniz gerekiyor</string>
+    <string name="nonetwork_message">Bu özelliği kullanmak için Kablosuz Ağ bağlantısını etkinleştirmeniz gerekir</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">Dahili depolama birimini USB üzerinden bağlı ve takılıyken kullanamazsınız.</string>
     <string name="ssh_storage">FTP</string>
@@ -74,23 +74,23 @@
     <string name="directory_empty">Boş Klasör</string>
     <string name="no_server">Hiç bir sunucu bulunamadı</string>
     <string name="loading">Yükleniyor&#8230;</string>
-    <string name="ssh_error">Bağlanılamadı. Lütfen ağ bağlantınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="ssh_error">Bağlanılamıyor: Lütfen bağlantınızı ve bilgilerinizi kontrol edin</string>
     <string name="ssh_remote_address">Uzak adres</string>
-    <string name="ssh_remote_address_error">Bir e-posta adresi belirtmelisiniz</string>
+    <string name="ssh_remote_address_error">Geçerli bir uzak adres belirtmelisiniz</string>
     <string name="ssh_password">Şifre</string>
     <string name="ssh_username">Kullanıcı Adı</string>
     <string name="ssh_port">Bağlantı Noktası (isteğe bağlı)</string>
-    <string name="ssh_path">(Zorunlu Değil)</string>
+    <string name="ssh_path">Dosya yolu (isteğe bağlı)</string>
     <string name="save_password">Şifreyi kaydet</string>
     <string name="ssh_prompt">FTP türü</string>
-    <string name="download_prompt">Dosyayı klasöre indirin:</string>
+    <string name="download_prompt">Dosyayı şu klasöre indir:</string>
     <string name="browse_ftp_server">Sunucu</string>
     <string name="cannot_list">İçerik listelenemiyor</string>
     <string name="error_listing">Hata oluştu</string>
-    <string name="error_host_not_found">Ana bilgisayar bulunamadı</string>
+    <string name="error_host_not_found">Sunucu bulunamadı</string>
     <string name="error_unknown_host">Bilinmeyen sunucu</string>
-    <string name="error_no_connection">Ana bilgisayara bağlanılamıyor</string>
-    <string name="error_credentials">Dizin listelenemiyor: kimlik bilgilerinizi kontrol edin</string>
+    <string name="error_no_connection">Sunucuya bağlanılamıyor</string>
+    <string name="error_credentials">Dizin listelenemiyor: bilgilerinizi kontrol edin</string>
     <string name="error_no_permission">Bu hesabın bu dizini listelemesine izin verilmiyor</string>
     <string name="error_file_not_found">Dosya bulunamadı</string>
     <string name="error_time_out">Zaman aşımı</string>
@@ -120,9 +120,9 @@
     <string name="refresh_servers_list">Sunucu listesini yenile</string>
     <string name="enable_network_shares">Ağ paylaşımlarını etkinleştir</string>
     <string name="go_top">Başa dön</string>
-    <string name="uncheck_impossible">Üst klasör seçildiğinde seçimi değiştirmek imkansız</string>
+    <string name="uncheck_impossible">Üst klasör seçiliyken seçimi değiştirmek mümkün değil</string>
     <string name="confirm_delete_one">Gerçekten silmek istiyor musunuz?</string>
-    <string name="confirm_delete_parent_folder">Üst klasörde başka video bulunmuyor gibi görünüyor, silinsin mi?</string>
+    <string name="confirm_delete_parent_folder">Görünüşe göre ana klasörde başka video yok; silinsin mi?</string>
     <string name="confirm_delete_many">Gerçekten silmek istiyor musunuz?</string>
     <string name="enter_new_name">İsim:</string>
     <string name="file_name">Dosya adı</string>
@@ -140,7 +140,7 @@
     <string name="file_deleted">Dosya silindi</string>
     <string name="files_deleted">Dosyalar silindi</string>
     <string name="cannot_rename">Yeniden adlandırılamıyor</string>
-    <string name="cannot_paste_folder_into_itself">Klasörler kendilerine veya alt klasörlerinden birine kopyalanamaz veya taşınamaz</string>
+    <string name="cannot_paste_folder_into_itself">Klasörler, kendilerinin içine veya alt klasörlerinden birine kopyalanamaz ya da taşınamaz</string>
     <string name="cannot_paste_file_same_location">Dosyalar orijinal konumlarına yapıştırılamıyor</string>
     <string name="cannot_paste_over_network">Ağ üzerinden dosya yapıştırılamıyor</string>
     <string name="copy_directory_success_one">Klasör kopyalandı</string>
@@ -159,7 +159,7 @@
     <string name="cut_directory_failed_many">Klasörler taşınmadı</string>
     <string name="cut_file_failed_one">Dosya taşınmadı</string>
     <string name="cut_file_failed_many">Dosyalar taşınmadı</string>
-    <string name="pasting_done">Yapıştırma bitti</string>
+    <string name="pasting_done">Yapıştırma işlemi tamamlandı</string>
     <string name="copy_done">Kopyalama başarılı</string>
     <string name="copy_canceled">Kopyalama iptal edildi</string>
     <string name="cut_done">Kesme başarılı</string>
@@ -167,10 +167,10 @@
     <string name="delete_done">Silme başarılı</string>
     <string name="delete_canceled">Silme iptal edildi</string>
     <string name="cannot_open_file">Dosya açılamıyor</string>
-    <string name="no_application_to_open_file">Bu cihazdaki hiçbir uygulama bu dosyayı açamıyor</string>
-    <string name="delete_still_ongoing">Silme arka planda devam ediyor</string>
+    <string name="no_application_to_open_file">Bu cihazda bu dosyayı açabilecek hiçbir uygulama yok</string>
+    <string name="delete_still_ongoing">Silme işlemi arka planda devam ediyor</string>
     <string name="copy_on_device">Videoyu cihaza indir</string>
-    <string name="copy_on_device_multi">Cihazdan indir</string>
+    <string name="copy_on_device_multi">Cihaza indir</string>
     <string name="storage_swapped_primary">ana</string>
     <string name="storage_swapped_secondary">ikincil</string>
     <string name="yes">"Evet"</string>
@@ -180,7 +180,7 @@
     <string name="send_file">Dosyayı şununla paylaş</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <string name="no_way_to_share_file">Dosyayı paylaşmak için kullanılabilir uygulama yok</string>
-    <string name="upnp_not_allowed">Bu UPNP sunucusuna erişim izniniz yok. Lütfen önce erişim yapılandırmanızı değiştirin.</string>
+    <string name="upnp_not_allowed">Bu UPNP sunucusuna erişiminiz yasaktır. Lütfen önce erişim ayarlarınızı değiştirin.</string>
     <string name="single_mode">Tek</string>
     <string name="double_mode">Çift</string>
     <string name="swap_panel">Değiştir</string>
@@ -196,10 +196,10 @@
     <string name="n_shortcut_removed">%1$d kısayol silindi</string>
     <string name="server_not_available" comment="deprecated">Sunucu şu anda kullanılamıyor</string>
     <string name="server_not_available_2" comment="deprecated">%1$s\' şu anda kullanılamıyor</string>
-    <string name="cannot_open_shortcut">Bu kısayolun içeriği şu anda kullanılamıyor.\nLütfen gerekli izinlere sahip olduğunuzu kontrol edin.</string>
+    <string name="cannot_open_shortcut">Bu kısayolun içeriği şu anda kullanılamıyor.\nLütfen gerekli izinlere sahip olup olmadığınızı kontrol edin.</string>
     <string name="network_shortcuts">Ağ kısayolları</string>
     <string name="media_servers">Medya sunucuları</string>
-    <string name="shortcut_list_empty">Favori uzak klasörlerinize kısayollar oluşturmak için hedef klasörlere uzun süre tıklayın ve üst eylem çubuğunda \"%s\" seçeneğini belirleyin.</string>
+    <string name="shortcut_list_empty">Favori uzak klasörlerinize kısayollar oluşturmak için hedef klasörlere uzun basın ve üstteki eylem çubuğundan “%s” seçeneğini seçin.</string>
     <!-- DLNA -->
     <string name="dlna_share">Medya paylaşımı</string>
     <string name="video">Video</string>
@@ -210,35 +210,35 @@
     <string name="zip_extract_action">Buraya çıkar</string>
     <string name="zip_extract_success_message">Çıkarma başarılı</string>
     <string name="zip_compress_action">Zip arşivi olarak sıkıştır</string>
-    <string name="zip_extracting_message">Zip arşivi çıkarılıyor...</string>
-    <string name="zip_compressing_message">Zip arşivi olarak sıkıştırılıyor</string>
+    <string name="zip_extracting_message">ZIP arşivinden dosyalar çıkarılıyor..</string>
+    <string name="zip_compressing_message">Dosyalar Zip arşivi olarak sıkıştırılıyor</string>
     <string name="zip_compressing_many">%1$d/%2$d sıkıştırılmış dosya</string>
     <string name="zip_compressing_one">Dosya sıkıştırılıyor</string>
     <string name="zip_compressing_success">Sıkıştırma başarılı</string>
     <string name="zip_compressing_canceled">Sıkıştırılma iptal edildi</string>
     <string name="zip_extracting_many">%1$d/%2$d dosya çıkarıldı</string>
-    <string name="zip_extracting_one">Dosya çıkarılıyor (%1$s/%2$s)</string>
-    <string name="zip_extract_error_message">Arşiviniz çıkarılırken bir hata oluştu.\nArşiviniz zarar görmüş veya cihazınızda boş hafıza kalmamış olabilir.</string>
-    <string name="zip_extract_canceled">Dışa aktarma iptal edildi</string>
-    <string name="zip_compress_error_message">Arşivinizi oluştururken bir hata oluştu.\nBelki ücretsiz disk depolama alanınız yeterli değildir.</string>
-    <string name="zip_cannot_open_inner_entry">Arşivdeki dosya açılamıyor. Önce çıkarın.</string>
-    <string name="zip_size_limit">Zip taraması 20 MB\'tan küçük dosyalarla sınırlıdır</string>
+    <string name="zip_extracting_one">Dosya çıkarılıyor: (%1$s/%2$s)</string>
+    <string name="zip_extract_error_message">Arşivinizi çıkarırken bir hata oluştu.\nArşiviniz bozuk olabilir veya disk alanınızda yeterli boş alan olmayabilir.</string>
+    <string name="zip_extract_canceled">Çıkarma işlemi iptal edildi</string>
+    <string name="zip_compress_error_message">Arşiviniz oluşturulurken bir hata oluştu.\nBelki de disk alanınızda yeterli boş alan yoktur.</string>
+    <string name="zip_cannot_open_inner_entry">Arşivdeki dosya açılamıyor. Önce dosyayı çıkarın.</string>
+    <string name="zip_size_limit">Zip dosyalarını tarama işlemi, 20 MB\'den küçük dosyalarla sınırlıdır</string>
     <!-- Notifications -->
     <string name="copy_error">Kopyalama başarısız</string>
     <string name="cut_error">Kesme işlemi başarısız</string>
-    <string name="delete_error">Silinemedi</string>
+    <string name="delete_error">Silme işlemi başarısız</string>
     <!-- Network Scanning -->
-    <string name="scan_network_index">Medya dosyalarını endeksle</string>
+    <string name="scan_network_index">Medya dosyalarını indeksle</string>
     <string name="scan_network_remove">Medyayı dizinden kaldır</string>
-    <string name="debug_browse_to_root">Cihaz köküne göz atın (yalnızca hata ayıklama)</string>
+    <string name="debug_browse_to_root">Cihazın kök dizinine git (yalnızca hata ayıklama)</string>
     <!-- Hiding from media scanning -->
-    <string name="nomedia_create">Medya kitaplığından kaldır</string>
-    <string name="nomedia_remove">Kitaplığa ekle</string>
-    <string name="nomedia_fail">Hata, bu klasör medya kitaplığından kaldırılamıyor</string>
-    <string name="nomedia_warning">Bu klasörün multimedya içeriği artık multimedya uygulamalarında görünmeyecek. \n Devam etmek istediğinizden emin misiniz?</string>
+    <string name="nomedia_create">Medya Kütüphanesinden kaldır</string>
+    <string name="nomedia_remove">Medya Kütüphanesine ekle</string>
+    <string name="nomedia_fail">Hata: Bu klasör medya kütüphanesinden kaldırılamıyor</string>
+    <string name="nomedia_warning">Bu klasördeki multimedya içerikleri artık multimedya uygulamalarında görünmeyecek.\nDevam etmek istediğinizden emin misiniz?</string>
     <!-- Folder Picker -->
     <string name="choose_a_folder">Bir klasör seçin</string>
-    <string name="choose_a_folder_help">Seçmek istediğiniz klasöre gidin ve Tamam\'a basın. Bir seviye yukarı çıkmak için GERİ düğmesini kullanın.</string>
+    <string name="choose_a_folder_help">Seçmek istediğiniz klasöre gidin ve Tamam düğmesine basın. Bir üst düzeye çıkmak için GERİ düğmesini kullanın.</string>
     <string name="current_choice">Mevcut seçim:</string>
     <string name="no_selection">seçim yok</string>
     <string name="external_storage_fake_name">Cihaz Belleği</string>

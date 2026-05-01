@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="file_info_label_name">Nome</string>
+    <string name="file_info_label_name">Nome:</string>
     <string name="file_info_label_size">Tamanho:</string>
     <string name="file_info_label_size_internal">Tamanho (interno):</string>
     <string name="file_info_label_size_sd">Tamanho (SD):</string>
@@ -23,17 +23,17 @@
     <string name="file_copy_pattern">copiar</string>
     <string name="fast_scroll_numeric_alphabet">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
-    <string name="samba_settings_title">Ajustes de pastas compartilhadas</string>
+    <string name="samba_settings_title">Configurações de pastas compartilhadas</string>
     <string name="samba_settings_summary">Configurar nomes de usuário e senhas para acessar pastas compartilhadas na sua rede privada</string>
     <string name="samba_profiles">Perfis de pastas compartilhadas</string>
-    <string name="samba_delete_settings">Você deseja realmente apagar esse ajuste?</string>
+    <string name="samba_delete_settings">Você deseja realmente excluir esta configuração?</string>
     <string name="samba_add_server">Adicionar um servidor</string>
     <string name="samba_server">Definir um servidor</string>
     <string name="samba_share">Definir um compartilhamento</string>
     <string name="refresh">Atualizar</string>
     <string name="network_timeout">Desculpe, a pasta remota não está acessível.\nVerifique sua conexão de rede e tente novamente.</string>
-    <string name="samba_loading">Por favor, aguarde enquanto carrega a pasta compartilhada&#8230;</string>
-    <string name="samba_reloading">Por favor, aguarde enquanto recarrega a pasta compartilhada&#8230;</string>
+    <string name="samba_loading">Por favor, aguarde, carregando pasta compartilhada&#8230;</string>
+    <string name="samba_reloading">Por favor, aguarde, recarregando pasta compartilhada&#8230;</string>
     <string name="samba_password_request_title">Solicitação de senha da pasta compartilhada</string>
     <string name="samba_domain">Domínio</string>
     <string name="samba_username">Nome de usuário</string>
@@ -58,9 +58,9 @@
     <string name="server_ready">Pronto para receber</string>
     <string name="nonetwork_title" comment="deprecated">Sem conexão WiFi</string>
     <string name="no_network_title">Nenhuma conexão de rede</string>
-    <string name="nonetwork_message">Você precisa ativar o Wi-Fi para este recurso</string>
+    <string name="nonetwork_message">Você precisa ativar o Wi-Fi para usar este recurso</string>
     <!-- FileManager strings -->
-    <string name="storage_busy_message">Você não pode usar o armazenamento interno enquanto ele está conectado e montado através do USB.</string>
+    <string name="storage_busy_message">Não é possível usar o armazenamento interno enquanto estiver conectado via USB.</string>
     <string name="ssh_storage">FTP</string>
     <string name="network_storage">Rede</string>
     <string name="external_storage">Externo</string>
@@ -76,7 +76,7 @@
     <string name="loading">Carregando&#8230;</string>
     <string name="ssh_error">Não é possível conectar: por favor, verifique sua conexão e credenciais</string>
     <string name="ssh_remote_address">Endereço remoto</string>
-    <string name="ssh_remote_address_error">Você deve especificar um endereço remoto</string>
+    <string name="ssh_remote_address_error">Você deve especificar um endereço remoto válido</string>
     <string name="ssh_password">Senha</string>
     <string name="ssh_username">Usuário</string>
     <string name="ssh_port">Porta (Opcional)</string>
@@ -120,17 +120,17 @@
     <string name="refresh_servers_list">Atualizar lista de servidores</string>
     <string name="enable_network_shares">Ativar compartilhamento de rede</string>
     <string name="go_top">Voltar ao Topo</string>
-    <string name="uncheck_impossible">Impossível alterar a seleção quando a pasta principal for selecionada</string>
-    <string name="confirm_delete_one">Deseja realmente excluir?</string>
+    <string name="uncheck_impossible">Impossível alterar a seleção quando a pasta pai está selecionada</string>
+    <string name="confirm_delete_one">Você deseja realmente excluí-lo?</string>
     <string name="confirm_delete_parent_folder">Parece que a pasta principal não contém nenhum outro vídeo, deletar?</string>
-    <string name="confirm_delete_many">Deseja realmente excluir?</string>
+    <string name="confirm_delete_many">Você deseja realmente excluí-los?</string>
     <string name="enter_new_name">Nome:</string>
     <string name="file_name">Nome do arquivo</string>
     <string name="folder_name">Nome da pasta</string>
     <string name="run_in_background">Minimizar</string>
-    <string name="confirm_deleting_cancellation">Você realmente deseja cancelar a exclusão?</string>
-    <string name="confirm_copying_cancellation">Você realmente quer cancelar a cópia?</string>
-    <string name="confirm_moving_cancellation">Você realmente quer cancelar a transferência?</string>
+    <string name="confirm_deleting_cancellation">Você deseja realmente cancelar a exclusão?</string>
+    <string name="confirm_copying_cancellation">Você deseja realmente cancelar a cópia?</string>
+    <string name="confirm_moving_cancellation">Você deseja realmente cancelar a movimentação?</string>
     <string name="cannot_create_directory">Não é possível criar nova pasta</string>
     <string name="cannot_create_file">Não é possível criar novo arquivo</string>
     <string name="cannot_delete_directory">Não é possível excluir a pasta</string>
@@ -180,8 +180,8 @@
     <string name="send_file">Compartilhar arquivo via</string>
     <!-- Toast after trying to share a file indicating that there are no applications which are capable of so doing. -->
     <string name="no_way_to_share_file">Nenhum aplicativo disponível para compartilhar o arquivo</string>
-    <string name="upnp_not_allowed">Você não tem permissão para acessar este servidor UPNP. Por favor, altere sua configuração de acesso primeiro.</string>
-    <string name="single_mode">Único</string>
+    <string name="upnp_not_allowed">Você não tem permissão para acessar este servidor UPnP. Altere as configurações de acesso primeiro.</string>
+    <string name="single_mode">Atual</string>
     <string name="double_mode">Duplo</string>
     <string name="swap_panel">Trocar</string>
     <string name="move">Mover</string>
@@ -194,9 +194,9 @@
     <string name="shortcut_created">Atalho \"%1$s\" criado</string>
     <string name="one_shortcut_removed">Um atalho excluído</string>
     <string name="n_shortcut_removed">%1$d atalhos deletados</string>
-    <string name="server_not_available" comment="deprecated">O servidor não está disponível no momento</string>
-    <string name="server_not_available_2" comment="deprecated">%1$s não está disponível</string>
-    <string name="cannot_open_shortcut">O conteúdo deste atalho não está disponível.\nPor favor, verifique se você tem as permissões necessárias.</string>
+    <string name="server_not_available" comment="deprecated">O servidor está indisponível no momento</string>
+    <string name="server_not_available_2" comment="deprecated">%1$s está indisponível no momento</string>
+    <string name="cannot_open_shortcut">O conteúdo deste atalho está indisponível no momento.\nPor favor, verifique se você tem as permissões necessárias.</string>
     <string name="network_shortcuts">Atalhos de rede</string>
     <string name="media_servers">Servidores de Mídia</string>
     <string name="shortcut_list_empty">Para criar atalhos para as pastas remotas favoritas, clique nas pastas de destino e selecione \"%s\" na barra de ação superior.</string>
@@ -205,7 +205,7 @@
     <string name="video">Vídeo</string>
     <string name="audio">Áudio</string>
     <string name="picture">Imagem</string>
-    <string name="share_types">Tipo de Compartilhamento</string>
+    <string name="share_types">Tipos de compartilhamento</string>
     <!-- ZIP -->
     <string name="zip_extract_action">Extrair aqui</string>
     <string name="zip_extract_success_message">Extração bem sucedida</string>
@@ -230,7 +230,7 @@
     <!-- Network Scanning -->
     <string name="scan_network_index">Indexar arquivos de mídia</string>
     <string name="scan_network_remove">Remover mídia do índice</string>
-    <string name="debug_browse_to_root">Navegar para a raiz do dispositivo (somente depuração)</string>
+    <string name="debug_browse_to_root">Navegar até a raiz do dispositivo (apenas depuração)</string>
     <!-- Hiding from media scanning -->
     <string name="nomedia_create">Remover da biblioteca</string>
     <string name="nomedia_remove">Adicionar à biblioteca de mídia</string>
