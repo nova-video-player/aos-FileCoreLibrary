@@ -49,7 +49,7 @@ android {
     buildTypes {
         release {
             minifyEnabled = false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-project.txt'
         }
     }
 
@@ -119,7 +119,12 @@ dependencies {
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.13.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.9'
-    implementation 'com.github.nova-video-player:sardine-android:0.0.2'
+    implementation('com.github.nova-video-player:sardine-android:0.0.2') {
+        // the published JitPack artifact doesn't propagate the exclusions from local sardine-android build.gradle
+        exclude group: 'xpp3', module: 'xpp3'
+        exclude group: 'stax', module: 'stax-api'
+        exclude group: 'stax', module: 'stax'
+    }
     implementation 'com.hierynomus:smbj:0.14.0'
     implementation 'com.hierynomus:sshj:0.40.0'
     implementation 'oro:oro:2.0.8'
