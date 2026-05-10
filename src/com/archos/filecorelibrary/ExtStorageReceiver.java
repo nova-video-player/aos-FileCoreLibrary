@@ -17,6 +17,7 @@ package com.archos.filecorelibrary;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import androidx.core.content.IntentCompat;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbInterface;
@@ -120,7 +121,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                     case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                         if (log.isDebugEnabled()) log.debug("onReceive: usb device attached");
                         if (mIntent.hasExtra(UsbManager.EXTRA_DEVICE)) {
-                            final UsbDevice device = mIntent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                            final UsbDevice device = IntentCompat.getParcelableExtra(mIntent, UsbManager.EXTRA_DEVICE, UsbDevice.class);
                             boolean isMassStorage = false;
                             // sometimes device.getInterfaceCount() = 0 causing an error
                             for (int i = 0; i < device.getInterfaceCount(); i++) {
@@ -142,7 +143,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                     case UsbManager.ACTION_USB_DEVICE_DETACHED:
                         if (log.isDebugEnabled()) log.debug("onReceive: usb device detached");
                         if (mIntent.hasExtra(UsbManager.EXTRA_DEVICE)) {
-                            final UsbDevice device = mIntent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                            final UsbDevice device = IntentCompat.getParcelableExtra(mIntent, UsbManager.EXTRA_DEVICE, UsbDevice.class);
                             boolean isMassStorage = false;
                             for (int i = 0; i < device.getInterfaceCount(); i++) {
                                 final UsbInterface usbInterface = device.getInterface(i);
