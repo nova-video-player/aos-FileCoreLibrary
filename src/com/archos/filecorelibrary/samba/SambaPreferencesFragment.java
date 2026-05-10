@@ -48,7 +48,6 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
         mProfiles = (PreferenceCategory) findPreference(KEY_PROFILE_LIST);
         mProfiles.setOrderingAsAdded(true);
 
-        setHasOptionsMenu(true);
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
