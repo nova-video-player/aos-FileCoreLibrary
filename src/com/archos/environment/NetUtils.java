@@ -14,24 +14,17 @@
 
 package com.archos.environment;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.NetworkRequest;
-import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -39,13 +32,12 @@ import java.util.List;
 
 // Note that this code has not be debugged yet
 
-public class NetUtils implements LifecycleObserver {
+public class NetUtils implements DefaultLifecycleObserver {
     private static final String TAG = NetUtils.class.getSimpleName();
     private static final boolean DBG = false;
 
     private ConnectivityManager mConnectivityMgr;
     private Context mContext;
-    private NetworkStateReceiver mNetworkStateReceiver;
     /*
      * boolean indicates if my device is connected to the internet or not
      * */
@@ -97,23 +89,13 @@ public class NetUtils implements LifecycleObserver {
      */
     public boolean isOnWAN() {
         mIsOnWAN = false;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            // Checking internet connectivity
-            NetworkInfo activeNetwork = null;
-            if (mConnectivityMgr != null) {
-                activeNetwork = mConnectivityMgr.getActiveNetworkInfo(); // Deprecated in API 29
-            }
-            mIsOnWAN = activeNetwork != null;
-        } else {
-            Network[] allNetworks = mConnectivityMgr.getAllNetworks(); // added in API 21 (Lollipop)
-            for (Network network : allNetworks) {
-                NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
-                if (networkCapabilities != null) {
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
-                        mIsOnWAN = true;
-                }
+        for (Network network : mConnectivityMgr.getAllNetworks()) {
+            NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
+            if (networkCapabilities != null) {
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                    mIsOnWAN = true;
             }
         }
         return mIsOnWAN;
@@ -124,25 +106,12 @@ public class NetUtils implements LifecycleObserver {
      */
     public boolean isOnLAN() {
         mIsOnLAN = false;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            // Checking internet connectivity
-            NetworkInfo activeNetwork = null;
-            if (mConnectivityMgr != null) {
-                activeNetwork = mConnectivityMgr.getActiveNetworkInfo(); // Deprecated in API 29
-                if (activeNetwork != null && activeNetwork.isConnected() &&
-                        (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI || activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET)) {
+        for (Network network : mConnectivityMgr.getAllNetworks()) {
+            NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
+            if (networkCapabilities != null) {
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
                     mIsOnLAN = true;
-                }
-            }
-        } else {
-            Network[] allNetworks = mConnectivityMgr.getAllNetworks(); // added in API 21 (Lollipop)
-            for (Network network : allNetworks) {
-                NetworkCapabilities networkCapabilities = mConnectivityMgr.getNetworkCapabilities(network);
-                if (networkCapabilities != null) {
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
-                        mIsOnLAN = true;
-                }
             }
         }
         return mIsOnLAN;
@@ -158,25 +127,16 @@ public class NetUtils implements LifecycleObserver {
      * <p>
      */
     public int getActiveNetwork() {
-        NetworkInfo activeNetwork = mConnectivityMgr.getActiveNetworkInfo(); // Deprecated in API 29
-        if (activeNetwork != null)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                NetworkCapabilities capabilities = mConnectivityMgr.getNetworkCapabilities(mConnectivityMgr.getActiveNetwork());
-                if (capabilities != null)
-                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                        return TRANSPORT_CELLULAR;
-                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                        return TRANSPORT_WIFI;
-                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                        return TRANSPORT_ETHERNET;
-                    }
-            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) { // Deprecated in API 28
-                    return TRANSPORT_CELLULAR;
-            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) { // Deprecated in API 28
-                    return TRANSPORT_WIFI;
-            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) { // Deprecated in API 28
+        NetworkCapabilities capabilities = mConnectivityMgr.getNetworkCapabilities(mConnectivityMgr.getActiveNetwork());
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                return TRANSPORT_CELLULAR;
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                 return TRANSPORT_WIFI;
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                return TRANSPORT_ETHERNET;
             }
+        }
         return NO_NETWORK_AVAILABLE;
     }
 
@@ -206,7 +166,7 @@ public class NetUtils implements LifecycleObserver {
                 if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
                     activeNetworks.add(TRANSPORT_CELLULAR);
                 if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
-                    activeNetworks.add(TRANSPORT_CELLULAR);
+                    activeNetworks.add(TRANSPORT_ETHERNET);
             }
         }
         return activeNetworks;
@@ -216,45 +176,12 @@ public class NetUtils implements LifecycleObserver {
         mConnectionMonitor.setOnConnectionStateListener(listener);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    public void onDestroy() {
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
         if (DBG) Log.d(TAG, "onDestroy");
         ((AppCompatActivity) mContext).getLifecycle().removeObserver(this);
         if (mConnectionMonitor != null)
             mConnectivityMgr.unregisterNetworkCallback(mConnectionMonitor);
-    }
-
-    public class NetworkStateReceiver extends BroadcastReceiver {
-        ConnectionStateListener mListener;
-        public NetworkStateReceiver(ConnectionStateListener listener) {
-            mListener = listener;
-        }
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getExtras() != null) {
-                NetworkInfo activeNetworkInfo = mConnectivityMgr.getActiveNetworkInfo(); // deprecated in API 29
-                if (mIsOnWAN != isOnWAN() && activeNetworkInfo != null && activeNetworkInfo.getState() == NetworkInfo.State.CONNECTED) {
-                    if (DBG) Log.d(TAG, "onReceive: " + "Connected to WAN: " + activeNetworkInfo.getTypeName());
-                    mIsOnWAN = true;
-                    mListener.onWanAvailable(true);
-                } else if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
-                    if (!isOnWAN()) {
-                        mListener.onWanAvailable(false);
-                        mIsOnWAN = false;
-                    }
-                }
-                if (mIsOnLAN != isOnLAN() && activeNetworkInfo != null && activeNetworkInfo.getState() == NetworkInfo.State.CONNECTED) {
-                    if (DBG) Log.d(TAG, "onReceive: " + "Connected LAN: " + activeNetworkInfo.getTypeName());
-                    mIsOnLAN = true;
-                    mListener.onLanAvailable(true);
-                } else if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
-                    if (!isOnLAN()) {
-                        mListener.onLanAvailable(false);
-                        mIsOnWAN = false;
-                    }
-                }
-            }
-        }
     }
 
     public class ConnectionMonitor extends ConnectivityManager.NetworkCallback {
@@ -264,40 +191,38 @@ public class NetUtils implements LifecycleObserver {
         }
         @Override
         public void onAvailable(@NonNull Network network) {
-            if (!mIsOnWAN && !mIsOnLAN && (mIsOnWAN != isOnWAN() || mIsOnLAN != isOnLAN()))
+            boolean wasOnWAN = mIsOnWAN;
+            boolean wasOnLAN = mIsOnLAN;
+            boolean nowOnWAN = isOnWAN();
+            boolean nowOnLAN = isOnLAN();
+            if (mConnectionStateListener == null) return;
+            if (!wasOnWAN && !wasOnLAN && (nowOnWAN || nowOnLAN))
                 mConnectionStateListener.onAvailable(true);
-            if (!mIsOnWAN && mIsOnWAN != isOnWAN()) {
-                if (mConnectionStateListener != null) {
-                    mConnectionStateListener.onWanAvailable(true);
-                    mConnectionStateListener.onChange(true);
-                    mIsOnWAN = true;
-                }
+            if (!wasOnWAN && nowOnWAN) {
+                mConnectionStateListener.onWanAvailable(true);
+                mConnectionStateListener.onChange(true);
             }
-            if (!mIsOnLAN && mIsOnLAN != isOnLAN()) {
-                if (mConnectionStateListener != null) {
-                    mConnectionStateListener.onLanAvailable(true);
-                    mConnectionStateListener.onChange(true);
-                    mIsOnLAN = true;
-                }
+            if (!wasOnLAN && nowOnLAN) {
+                mConnectionStateListener.onLanAvailable(true);
+                mConnectionStateListener.onChange(true);
             }
         }
         @Override
         public void onLost(@NonNull Network network) {
-            if (!isOnWAN() && !isOnLAN() && (mIsOnWAN != isOnWAN() || mIsOnLAN != isOnLAN()))
+            boolean wasOnWAN = mIsOnWAN;
+            boolean wasOnLAN = mIsOnLAN;
+            boolean nowOnWAN = isOnWAN();
+            boolean nowOnLAN = isOnLAN();
+            if (mConnectionStateListener == null) return;
+            if (!nowOnWAN && !nowOnLAN && (wasOnWAN || wasOnLAN))
                 mConnectionStateListener.onAvailable(false);
-            if (mIsOnWAN && mIsOnWAN != isOnWAN()) {
-                if (mConnectionStateListener != null) {
-                    mConnectionStateListener.onWanAvailable(false);
-                    mConnectionStateListener.onChange(true);
-                    mIsOnWAN = false;
-                }
+            if (wasOnWAN && !nowOnWAN) {
+                mConnectionStateListener.onWanAvailable(false);
+                mConnectionStateListener.onChange(true);
             }
-            if (mIsOnLAN && mIsOnLAN != isOnLAN()) {
-                if (mConnectionStateListener != null) {
-                    mConnectionStateListener.onLanAvailable(false);
-                    mConnectionStateListener.onChange(true);
-                    mIsOnLAN = false;
-                }
+            if (wasOnLAN && !nowOnLAN) {
+                mConnectionStateListener.onLanAvailable(false);
+                mConnectionStateListener.onChange(true);
             }
         }
     }

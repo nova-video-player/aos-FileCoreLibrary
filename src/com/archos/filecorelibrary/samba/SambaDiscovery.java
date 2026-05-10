@@ -569,15 +569,16 @@ public class SambaDiscovery implements InternalDiscoveryListener {
             log.error("getIpAddress", e);
         }
 
-        final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-        if (wifi.isConnected()) {
-            WifiManager myWifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            WifiInfo myWifiInfo = myWifiManager.getConnectionInfo();
-            int ipAddress = myWifiInfo.getIpAddress();
-            InetAddress address = inetFromInt(ipAddress);
-            if (address != null)
-                return address.getHostAddress();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (wifi != null && wifi.isConnected()) {
+                WifiManager myWifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                WifiInfo myWifiInfo = myWifiManager.getConnectionInfo();
+                int ipAddress = myWifiInfo.getIpAddress();
+                InetAddress address = inetFromInt(ipAddress);
+                if (address != null)
+                    return address.getHostAddress();
+            }
         }
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {

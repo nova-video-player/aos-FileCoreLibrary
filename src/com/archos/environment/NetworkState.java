@@ -24,9 +24,7 @@ import android.net.ConnectivityManager;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.NetworkRequest;
-import android.os.Build;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,29 +116,14 @@ public class NetworkState {
         if (context == null) return false;
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                try {
-                    NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-                    if (capabilities != null) {
-                        if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                            // to test hasInternet capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                            if (log.isDebugEnabled()) log.debug("isNetworkConnected: true");
-                            return true;
-                        }
-                    }
-                } catch (Exception e) {
-                    if (log.isDebugEnabled()) log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
+            try {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                    if (log.isDebugEnabled()) log.debug("isNetworkConnected: true");
+                    return true;
                 }
-            } else {
-                try {
-                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        if (log.isDebugEnabled()) log.debug("isNetworkConnected: true");
-                        return true;
-                    }
-                } catch (Exception e) {
-                    if (log.isDebugEnabled()) log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
-                }
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) log.debug("isNetworkConnected: caught Exception {}", e.getMessage());
             }
         }
         if (log.isDebugEnabled()) log.debug("isNetworkConnected false");
@@ -152,25 +135,14 @@ public class NetworkState {
         if (context == null) return false;
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-                if (capabilities != null)
-                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                        if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: true (WIFI)");
-                        return true;
-                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                        if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: true (ETHERNET)");
-                        return true;
-                    }
-            } else {
-                try {
-                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected() &&
-                            (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET)) {
-                        return true;
-                    }
-                } catch (Exception e) {
-                    log.warn("isLocalNetworkConnected: caught exception {}", e.getMessage());
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: true (WIFI)");
+                    return true;
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                    if (log.isDebugEnabled()) log.debug("isLocalNetworkConnected: true (ETHERNET)");
+                    return true;
                 }
             }
         }
@@ -183,21 +155,9 @@ public class NetworkState {
         if (context == null) return false;
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-                if (capabilities != null)
-                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
-                        return true;
-            } else {
-                try {
-                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected() &&
-                            (networkInfo.getType() == ConnectivityManager.TYPE_WIFI))
-                        return true;
-                } catch (Exception e) {
-                    log.warn("isWiFiAvailable: caught exception {}", e.getMessage());
-                }
-            }
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+            if (capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
+                return true;
         }
         return false;
     }
