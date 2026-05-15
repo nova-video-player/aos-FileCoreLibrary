@@ -159,12 +159,12 @@
     <string name="cut_directory_failed_many">Verzeichnisse wurden nicht verschoben</string>
     <string name="cut_file_failed_one">Datei wurde nicht verschoben</string>
     <string name="cut_file_failed_many">Dateien wurden nicht verschoben</string>
-    <string name="pasting_done">Einfügen erledigt</string>
+    <string name="pasting_done">Einfügen erfolgreich</string>
     <string name="copy_done">Kopieren erfolgreich</string>
     <string name="copy_canceled">Kopieren abgebrochen</string>
     <string name="cut_done">Ausschneiden erfolgreich</string>
     <string name="cut_canceled">Ausschneiden abgebrochen</string>
-    <string name="delete_done">Löschen abgebrochen</string>
+    <string name="delete_done">Löschen erfolgreich</string>
     <string name="delete_canceled">Löschen abgebrochen</string>
     <string name="cannot_open_file">Datei kann nicht geöffnet werden</string>
     <string name="no_application_to_open_file">Keine Anwendung auf diesem Gerät kann diese Datei öffnen</string>

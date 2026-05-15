@@ -26,7 +26,7 @@
     <string name="samba_settings_title">Configurações de pastas compartilhadas</string>
     <string name="samba_settings_summary">Configurar nomes de usuário e senhas para acessar pastas compartilhadas na sua rede privada</string>
     <string name="samba_profiles">Perfis de pastas compartilhadas</string>
-    <string name="samba_delete_settings">Você deseja realmente excluir esta configuração?</string>
+    <string name="samba_delete_settings">Tem certeza de que deseja excluir esta configuração?</string>
     <string name="samba_add_server">Adicionar um servidor</string>
     <string name="samba_server">Definir um servidor</string>
     <string name="samba_share">Definir um compartilhamento</string>
@@ -48,7 +48,7 @@
     <string name="receive_p2p_here">receber aqui via WiFi Direct</string>
     <string name="empty_message">Descobrir dispositivos de destino disponíveis&#8230;&lt;br/&gt;O dispositivo de destino deve ativar &lt;b&gt;&lt;i&gt;%s&lt;/i&gt;&lt;/b&gt; opção</string>
     <string name="wifip2p_waiting">A transferência por WiFi Direct começará em breve</string>
-    <string name="connect_to_target">Conectando ao alvo</string>
+    <string name="connect_to_target">Conectando ao destino…</string>
     <string name="upload_in_progress">Upload em andamento&#8230;</string>
     <string name="file_uploading">Seu arquivo está carregando</string>
     <string name="back_cancel">Pressione voltar para cancelar</string>
@@ -90,7 +90,7 @@
     <string name="error_host_not_found">Host não encontrado</string>
     <string name="error_unknown_host">Host desconhecido</string>
     <string name="error_no_connection">Não é possível conectar ao host</string>
-    <string name="error_credentials">Não foi possível listar as pastas: verifique suas credenciais</string>
+    <string name="error_credentials">Não foi possível listar o diretório: verifique suas credenciais</string>
     <string name="error_no_permission">Esta conta não pode listar este diretório</string>
     <string name="error_file_not_found">Arquivo não encontrado</string>
     <string name="error_time_out">Tempo esgotado</string>
@@ -106,7 +106,7 @@
     <string name="pasting_cut_one">Movendo um arquivo (%1$s/%2$s)</string>
     <string name="pasting_cut_many">Movendo: %1$d/%2$d arquivos (%3$s/%4$s)</string>
     <string name="pasting_copy_speed">&#160;&#160;%1$s kB/s</string>
-    <string name="delete">Apagar</string>
+    <string name="delete">Excluir</string>
     <string name="rename">Renomear</string>
     <string name="details">Detalhes</string>
     <string name="refresh_directory">Atualizar pasta</string>
@@ -121,16 +121,16 @@
     <string name="enable_network_shares">Ativar compartilhamento de rede</string>
     <string name="go_top">Voltar ao Topo</string>
     <string name="uncheck_impossible">Impossível alterar a seleção quando a pasta pai está selecionada</string>
-    <string name="confirm_delete_one">Você deseja realmente excluí-lo?</string>
+    <string name="confirm_delete_one">Tem certeza de que deseja excluí-lo?</string>
     <string name="confirm_delete_parent_folder">Parece que a pasta principal não contém nenhum outro vídeo, deletar?</string>
-    <string name="confirm_delete_many">Você deseja realmente excluí-los?</string>
+    <string name="confirm_delete_many">Tem certeza de que deseja excluí-los?</string>
     <string name="enter_new_name">Nome:</string>
     <string name="file_name">Nome do arquivo</string>
     <string name="folder_name">Nome da pasta</string>
     <string name="run_in_background">Minimizar</string>
-    <string name="confirm_deleting_cancellation">Você deseja realmente cancelar a exclusão?</string>
-    <string name="confirm_copying_cancellation">Você deseja realmente cancelar a cópia?</string>
-    <string name="confirm_moving_cancellation">Você deseja realmente cancelar a movimentação?</string>
+    <string name="confirm_deleting_cancellation">Tem certeza de que deseja cancelar a exclusão?</string>
+    <string name="confirm_copying_cancellation">Tem certeza de que deseja cancelar a cópia?</string>
+    <string name="confirm_moving_cancellation">Tem certeza de que deseja cancelar a movimentação?</string>
     <string name="cannot_create_directory">Não é possível criar nova pasta</string>
     <string name="cannot_create_file">Não é possível criar novo arquivo</string>
     <string name="cannot_delete_directory">Não é possível excluir a pasta</string>
@@ -157,7 +157,7 @@
     <string name="cut_file_success_many">Arquivos movidos</string>
     <string name="cut_directory_failed_one">A pasta não foi movida</string>
     <string name="cut_directory_failed_many">As pastas não foram movidas</string>
-    <string name="cut_file_failed_one">Arquivo não foi movido</string>
+    <string name="cut_file_failed_one">O arquivo não foi movido</string>
     <string name="cut_file_failed_many">Os arquivos não foram movidos</string>
     <string name="pasting_done">Colagem concluída</string>
     <string name="copy_done">Cópia com sucesso</string>
@@ -170,7 +170,7 @@
     <string name="no_application_to_open_file">Nenhum aplicativo neste dispositivo pode abrir este arquivo</string>
     <string name="delete_still_ongoing">Excluindo em segundo plano</string>
     <string name="copy_on_device">Baixar vídeo no dispositivo</string>
-    <string name="copy_on_device_multi">Download no dispositivo</string>
+    <string name="copy_on_device_multi">Baixar no dispositivo</string>
     <string name="storage_swapped_primary">principal</string>
     <string name="storage_swapped_secondary">secundário</string>
     <string name="yes">"Sim"</string>
@@ -235,10 +235,10 @@
     <string name="nomedia_create">Remover da biblioteca</string>
     <string name="nomedia_remove">Adicionar à biblioteca de mídia</string>
     <string name="nomedia_fail">Falha, não foi possível remover esta pasta da biblioteca de mídia</string>
-    <string name="nomedia_warning">O conteúdo multimídia desta pasta não aparecerá mais nos aplicativos multimídia.\nTem certeza que deseja continuar?</string>
+    <string name="nomedia_warning">O conteúdo multimídia desta pasta não aparecerá mais nos aplicativos multimídia.\nTem certeza de que deseja prosseguir?</string>
     <!-- Folder Picker -->
     <string name="choose_a_folder">Escolha uma pasta</string>
-    <string name="choose_a_folder_help">Navegue até a pasta que você deseja selecionar e pressione OK. Use o botão VOLTAR para subir um nível.</string>
+    <string name="choose_a_folder_help">Navegue até a pasta que deseja selecionar e pressione OK. Use o botão VOLTAR para subir um nível.</string>
     <string name="current_choice">Escolha atual:</string>
     <string name="no_selection">nenhuma seleção</string>
     <string name="external_storage_fake_name">Armazenamento do dispositivo</string>
@@ -251,7 +251,7 @@
     <string name="listing_sort_by_name">Organizar por nome</string>
     <string name="listing_sort_by_size">Ordenar por tamanho</string>
     <string name="listing_sort_by_date">Ordenar por data</string>
-    <string name="listing_ascending">Ordem Crescente</string>
-    <string name="listing_descending">Ordem Decrescente</string>
+    <string name="listing_ascending">Crescente</string>
+    <string name="listing_descending">Decrescente</string>
     <string name="acquire_external_usb_permission">O gerenciador de arquivos precisa de permissão especial para acessar o armazenamento externo. Selecione o seu armazenamento na próxima tela</string>
 </resources>
