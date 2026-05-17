@@ -14,6 +14,7 @@
 
 package com.archos.filecorelibrary.samba;
 
+import android.os.Build;
 import android.os.FileObserver;
 import android.util.Log;
 
@@ -111,20 +112,32 @@ public class SambaConfigurationCache {
 
         private static final int OBSERVER_FLAGS = FileObserver.MODIFY | FileObserver.CLOSE_WRITE | FileObserver.DELETE_SELF;
 
+        @SuppressWarnings("deprecation")
         private FileObserver getObserver() {
-            return new FileObserver(mFilePath, OBSERVER_FLAGS) {
-                @Override
-                public void onEvent(int event, String path) {
-                    // delete or modify invalidates the file
-                    mHasChanged.set(true);
-                    // deleting the file also invalidates the observer
-                    if (event == FileObserver.DELETE_SELF) {
-                        mObserver = null;
-                        // invalidate file date
-                        mFileDate = -1;
+            // File-based constructor added API 29; String constructor deprecated but functional on API 23-28
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return new FileObserver(new File(mFilePath), OBSERVER_FLAGS) {
+                    @Override
+                    public void onEvent(int event, String path) {
+                        mHasChanged.set(true);
+                        if (event == FileObserver.DELETE_SELF) {
+                            mObserver = null;
+                            mFileDate = -1;
+                        }
                     }
-                }
-            };
+                };
+            } else {
+                return new FileObserver(mFilePath, OBSERVER_FLAGS) {
+                    @Override
+                    public void onEvent(int event, String path) {
+                        mHasChanged.set(true);
+                        if (event == FileObserver.DELETE_SELF) {
+                            mObserver = null;
+                            mFileDate = -1;
+                        }
+                    }
+                };
+            }
         }
     }
 }
