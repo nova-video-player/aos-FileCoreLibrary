@@ -16,6 +16,7 @@ package com.archos.filecorelibrary;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -338,9 +339,7 @@ public class CopyCutEngine {
                             Uri toIndex = target;
                             if (toIndex.getScheme() == null)
                                 toIndex = Uri.parse("file://" + toIndex.toString());
-                            Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                            scanIntent.setData(toIndex);
-                            mContext.sendBroadcast(scanIntent);
+                            MediaScannerConnection.scanFile(mContext, new String[]{toIndex.getPath()}, null, null);
                         }
                         mUiHandler.post(new Runnable() {
                             @Override

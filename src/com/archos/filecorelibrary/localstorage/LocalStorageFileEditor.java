@@ -134,6 +134,7 @@ public class LocalStorageFileEditor extends FileEditor {
         }
     }
 
+    @SuppressWarnings("deprecation") // ACTION_MEDIA_SCANNER_SCAN_FILE used as internal IPC (setPackage targets Nova's own receiver only)
     private void scanFile(Uri toIndex, boolean isAddingDirectory) {
         if (isAddingDirectory) {
             ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), new File(toIndex.getPath()));
