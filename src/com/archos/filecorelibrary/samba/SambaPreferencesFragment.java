@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
@@ -38,6 +40,13 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
     static private LinkedList<String> mSingleSettings;
     private PreferenceCategory mProfiles;
 
+    private final ActivityResultLauncher<Intent> mPasswordLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == 17 /*SharedPasswordRequest.SAMBA_PASSWORD*/)
+                    refreshPreferences();
+            });
+
     //@Override
     //public void onCreate(Bundle savedInstanceState) {
     @Override
@@ -48,12 +57,6 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
         mProfiles = (PreferenceCategory) findPreference(KEY_PROFILE_LIST);
         mProfiles.setOrderingAsAdded(true);
 
-    }
-
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        //TODO fix me
-        //getListView().setOnItemLongClickListener(this);
     }
 
     public boolean onItemLongClick(AdapterView<?> av, View v, int position, long id) {
@@ -113,51 +116,9 @@ public class SambaPreferencesFragment extends PreferenceFragmentCompat implement
         i.putExtra("share",sss.getShare());
         i.putExtra("username",sss.getUsername());
         i.putExtra("password",sss.getPassword());
-        startActivityForResult(i, 0);
+        mPasswordLauncher.launch(i);
 
         return true;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (resultCode == 17/*SharedPasswordRequest.SAMBA_PASSWORD*/){
-            refreshPreferences();
-        }
-    }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        MenuItem item = menu.add(0, 0, Menu.NONE, R.string.samba_add_server);
-//        item.setIcon(android.R.drawable.ic_menu_add);
-//        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        final View textEntryView = inflater.inflate(R.layout.shared_folder_path, null);
-//
-//        AlertDialog dialog = new AlertDialog.Builder(getActivity())
-//                .setIcon(android.R.drawable.ic_dialog_alert)
-//                .setTitle(R.string.samba_settings_title)
-//                .setView(textEntryView)
-//                .setPositiveButton(android.R.string.ok,
-//                        new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                EditText serverET = (EditText) textEntryView
-//                                        .findViewById(R.id.server_edit);
-//                                String server = serverET.getText().toString().trim();
-//                                EditText shareET = (EditText) textEntryView
-//                    .findViewById(R.id.share_edit);
-//                String share = shareET.getText().toString().trim();
-//                Intent i = new Intent(getActivity(), SharedPasswordRequest.class);
-//                i.putExtra("server",server);
-//                i.putExtra("share",share);
-//                startActivityForResult(i, 0);
-//
-//                            }
-//                        }).setNegativeButton(android.R.string.cancel, null).create();
-//        dialog.show();
-//        return true;
-//    }
 }
