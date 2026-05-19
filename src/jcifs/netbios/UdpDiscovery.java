@@ -173,7 +173,6 @@ public class UdpDiscovery implements InternalDiscovery {
                             } catch (Exception ignored) {
                                 if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", ignored);
                                 else log.warn("doTcpDiscovery: caught Exception");
-
                             }
                         }
                     }
@@ -201,7 +200,6 @@ public class UdpDiscovery implements InternalDiscovery {
                             try {
                                 response.readWireFormat(rcv_buf.array(), 0);
                             } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
-                                log.error("UdpDiscoveryThread", e);
                                 if (log.isTraceEnabled()) log.error("UdpDiscoveryThread", e);
                                 else log.warn("doTcpDiscovery: caught ArrayIndexOutOfBoundsException");
                             }
