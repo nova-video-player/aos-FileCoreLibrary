@@ -96,6 +96,7 @@ public class ExtStorageReceiver extends BroadcastReceiver {
                         if (log.isDebugEnabled()) log.debug("onReceive: uri is {}", uri);
                     } else {
                         log.warn("onReceive: uri is null for action {}!", action);
+                        return;
                     }
                 }
 
