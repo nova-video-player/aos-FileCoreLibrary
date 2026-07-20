@@ -50,7 +50,7 @@ import jcifs.util.transport.TransportException;
 
 /**
  * This is simple HTTP local server for streaming InputStream to apps which are capable to read data from url.
- * Random access input stream is optionally supported, depending if file can be opened in this mode. 
+ * Random access input stream is optionally supported, depending if file can be opened in this mode.
  */
 public class StreamOverHttp {
 	private static final Logger log = LoggerFactory.getLogger(StreamOverHttp.class);
@@ -70,7 +70,7 @@ public class StreamOverHttp {
 	/**
 	 * Some HTTP response status codes
 	 */
-	private static final String 
+	private static final String
 	HTTP_BADREQUEST = "400 Bad Request",
 	HTTP_416 = "416 Range not satisfiable",
 	HTTP_INTERNALERROR = "500 Internal Server Error";
@@ -125,7 +125,7 @@ public class StreamOverHttp {
         mainThread.start();
     }
 
-	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};
+	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt", "sup"};
 
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
 		if(mSubList!=null)
