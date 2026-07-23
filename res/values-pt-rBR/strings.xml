@@ -24,7 +24,7 @@
     <string name="fast_scroll_numeric_alphabet">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- Samba share settings -->
     <string name="samba_settings_title">Configurações de pastas compartilhadas</string>
-    <string name="samba_settings_summary">Configurar nomes de usuário e senhas para acessar pastas compartilhadas na sua rede privada</string>
+    <string name="samba_settings_summary">Configure nomes de usuário e senhas para acessar pastas compartilhadas na sua rede privada.</string>
     <string name="samba_profiles">Perfis de pastas compartilhadas</string>
     <string name="samba_delete_settings">Tem certeza de que deseja excluir esta configuração?</string>
     <string name="samba_add_server">Adicionar um servidor</string>
@@ -199,7 +199,7 @@
     <string name="cannot_open_shortcut">O conteúdo deste atalho está indisponível no momento.\nPor favor, verifique se você tem as permissões necessárias.</string>
     <string name="network_shortcuts">Atalhos de rede</string>
     <string name="media_servers">Servidores de Mídia</string>
-    <string name="shortcut_list_empty">Para criar atalhos para as pastas remotas favoritas, clique nas pastas de destino e selecione \"%s\" na barra de ação superior.</string>
+    <string name="shortcut_list_empty">Para criar atalhos para suas pastas remotas favoritas, mantenha pressionada a pasta desejada e selecione \"%s\" na barra de ações superior.</string>
     <!-- DLNA -->
     <string name="dlna_share">Compartilhamento de mídia</string>
     <string name="video">Vídeo</string>

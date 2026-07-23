@@ -32,8 +32,10 @@
     <string name="samba_share">Konfigurovať zdieľanie</string>
     <string name="refresh">Obnoviť</string>
     <string name="network_timeout">Je nám ľúto, vzdialený priečinok nie je prístupný.\nPrekontrolujte sieťové pripojenie a skúste to znova.</string>
-    <string name="samba_loading">Počkajte prosím, kým sa načíta zdielaný priečinok&#8230;</string>
-    <string name="samba_reloading">Počkajte prosím, kým sa opätovne načíta zdielaný priečinok&#8230;</string>
+    <string name="samba_loading">Počkajte prosím, kým sa načíta zdielaný priečinok&#8230;
+</string>
+    <string name="samba_reloading">Počkajte prosím, kým sa opätovne načíta zdielaný priečinok&#8230;
+</string>
     <string name="samba_password_request_title">Žiadosť o heslo do zdieľaného priečinka</string>
     <string name="samba_domain">Doména</string>
     <string name="samba_username">Užívateľské meno</string>
