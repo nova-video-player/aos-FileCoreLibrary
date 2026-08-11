@@ -27,43 +27,87 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jcifs.CIFSException;
-import jcifs.context.BaseContext;
 import jcifs.CIFSContext;
+import jcifs.SmbTransport;
 import jcifs.config.PropertyConfiguration;
+import jcifs.context.BaseContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
-import jcifs.smb.SmbAuthException;
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
+import jcifs.smb.SmbTransportInternal;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 
 public class JcifsUtils {
 
     private static final Logger log = LoggerFactory.getLogger(JcifsUtils.class);
 
-    // when enabling LIMIT_PROTOCOL_NEGO smbFile will use strict SMBv1 or SMBv2 contexts to avoid SMBv1 negotiations or SMBv2 negotiations
-    // this is a hack to get around some issues seen with jcifs-ng
-    // note to self: do not try to revert to false since it does not work (HP printer, livebox smbV1 broken with smbV2 enabled) but jcifs.smb.useRawNTLM=true solves this!
-    // update note to self: true creates protocol identification issues it seems (not threadsafe with multiple parallel requests?)
+    // Kept for source compatibility. Protocol selection now uses exclusive transport negotiation
+    // instead of the old listFiles()-based strict negotiation path.
+    @Deprecated
     public final static boolean LIMIT_PROTOCOL_NEGO = false;
     public final static boolean RESOLUTION_CACHE_INJECTION = false;
+    @Deprecated
     public final static boolean PREVENT_MULTIPLE_TIME_SERVER_PROBING = true;
 
     // SMB2 multi-credit transport buffer size (1 MiB) for large read/write operations
     private static final int SMB2_TRANSPORT_BUFFER_SIZE = 1048576;
+    private static final long COMPATIBILITY_MODE_CACHE_MS = 5 * 60 * 1000L;
+    private static final long UNKNOWN_PROTOCOL_CACHE_MS = 30 * 1000L;
 
     private static Properties prop = null;
     private static CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
 
-    private static HashMap<String, Boolean> listServersSmb2 = new HashMap<>();
-    private static HashMap<String, Boolean> listServersBeingProbed = new HashMap<>();
+    public enum SmbProtocolMode {
+        SMB2_OR_LATER,
+        SMB2_COMPATIBILITY,
+        SMB1,
+        SMB1_COMPATIBILITY,
+        UNKNOWN
+    }
+
+    private static final class SmbEndpoint {
+        private static final int DEFAULT_SMB_PORT = 445;
+
+        final String server;
+        final int port;
+
+        SmbEndpoint(String server, int port) {
+            this.server = server.toLowerCase(Locale.ROOT);
+            this.port = port > 0 ? port : DEFAULT_SMB_PORT;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) return true;
+            if (!(other instanceof SmbEndpoint)) return false;
+            SmbEndpoint endpoint = (SmbEndpoint) other;
+            return port == endpoint.port && server.equals(endpoint.server);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * server.hashCode() + port;
+        }
+
+        @Override
+        public String toString() {
+            return server + ':' + port;
+        }
+    }
+
+    private static final ConcurrentHashMap<SmbEndpoint, SmbProtocolMode> serverProtocolModes = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<SmbEndpoint, Long> serverProtocolModeExpirations = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<SmbEndpoint, FutureTask<SmbProtocolMode>> serverProtocolProbes = new ConcurrentHashMap<>();
 
     private static Context mContext;
 
-    private static Boolean prefChanged = false;
+    private static volatile boolean prefChanged = false;
 
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile JcifsUtils sInstance;
@@ -97,6 +141,7 @@ public class JcifsUtils {
         baseContextSmb2 = createContext(true);
         baseContextSmb1Only = createContextOnly(false);
         baseContextSmb2Only = createContextOnly(true);
+        clearServerProtocolCache();
     }
 
     private static CIFSContext createContext(boolean isSmb2) {
@@ -220,6 +265,7 @@ public class JcifsUtils {
     public static void notifyPrefChange() {
         if (log.isDebugEnabled()) log.debug("notifyPrefChange: preference changed");
         prefChanged = true;
+        clearServerProtocolCache();
     }
 
     private static void checkPrefChange() {
@@ -230,14 +276,26 @@ public class JcifsUtils {
         }
     }
 
-    public static void declareServerSmbV2(String server, boolean isSmbV2) {
-        if (log.isDebugEnabled()) log.debug("declareServerSmbV2 for {} {}", server, isSmbV2);
-        listServersSmb2.put(server, isSmbV2);
+    public static void clearServerProtocolCache() {
+        serverProtocolModes.clear();
+        serverProtocolModeExpirations.clear();
+        serverProtocolProbes.clear();
     }
 
+    /** @deprecated protocol modes are now populated from transport negotiation. */
+    @Deprecated
+    public static void declareServerSmbV2(String server, boolean isSmbV2) {
+        if (server == null || server.isEmpty()) return;
+        SmbProtocolMode mode = isSmbV2 ? SmbProtocolMode.SMB2_OR_LATER : SmbProtocolMode.SMB1;
+        SmbEndpoint endpoint = new SmbEndpoint(server, -1);
+        serverProtocolModes.put(endpoint, mode);
+        serverProtocolModeExpirations.remove(endpoint);
+    }
+
+    /** @deprecated probes are coalesced internally per server and port. */
+    @Deprecated
     public static void declareServerBeingProbed(String server, boolean probed) {
-        if (log.isDebugEnabled()) log.debug("declareServerBeingProbed for {} {}", server, probed);
-        listServersBeingProbed.put(server, probed);
+        // No-op retained for source compatibility.
     }
 
     private static CIFSContext getCifsContext(Uri uri, Boolean isSmbV2) {
@@ -254,11 +312,11 @@ public class JcifsUtils {
         return context;
     }
 
-    private static CIFSContext getCifsContextOnly(Uri uri, Boolean isSmbV2) {
+    private static CIFSContext getCifsContextOnly(Uri uri, boolean isSmbV2) {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
-        if (cred != null) {
-            if (log.isDebugEnabled()) log.debug("getCifsContext using credentials for {}", uri);
+        if (cred != null && !cred.getUsername().isEmpty()) {
+            if (log.isDebugEnabled()) log.debug("getCifsContextOnly using credentials for {}", uri);
             NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
             context = getBaseContextOnly(isSmbV2).withCredentials(auth);
         } else {
@@ -268,97 +326,143 @@ public class JcifsUtils {
         return context;
     }
 
-    // isServerSmbV2 returns true/false/null, null is do not know
-    public static Boolean isServerSmbV2(String server, int port) throws MalformedURLException {
-        Boolean isSmbV2 = listServersSmb2.get(server);
-        Boolean isServerBeingProbed = listServersBeingProbed.get(server);
-        // do not multiple probe one same server until we know first result
-        if (isServerBeingProbed != null && isServerBeingProbed) {
-            if (log.isDebugEnabled()) log.debug("isServerSmbV2: {} already being probed in parallel returning null if debouncing", server);
-            if (PREVENT_MULTIPLE_TIME_SERVER_PROBING) return null;
+    private static SmbEndpoint getEndpoint(Uri uri) throws MalformedURLException {
+        Uri resolvedUri = Uri.parse(getIpUriString(uri));
+        String server = resolvedUri.getHost();
+        if (server == null || server.isEmpty()) {
+            throw new MalformedURLException("SMB URI has no server: " + uri);
         }
-        declareServerBeingProbed(server, true);
-        if (log.isDebugEnabled()) log.debug("isServerSmbV2 for {} previous state is {}", server, isSmbV2);
-        if (isSmbV2 == null) { // let's probe server root
-            Uri uri;
-            if (port != -1) uri = Uri.parse("smb://" + server + ":" + port + "/");
-            else uri = Uri.parse("smb://" + server + '/');
-            SmbFile smbFile = null;
-            try {
-                if (log.isDebugEnabled()) log.debug("isServerSmbV2: probing {} to check if smbV2", uri);
-                CIFSContext ctx = getCifsContextOnly(uri, true);
-                smbFile = new SmbFile(getIpUriString(uri), ctx);
-                smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
-                declareServerSmbV2(server, true);
-                if (log.isDebugEnabled()) log.debug("isServerSmbV2 for {} returning true", server);
-                declareServerBeingProbed(server, false);
-                return true;
-            } catch (SmbAuthException authE) {
-                if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbAutException in probing SMB2, state for {}  returning null", server, authE);
-                else log.warn("isServerSmbV2: caught SmbAutException in probing SMB2, state for {}  returning null", server);
-                declareServerBeingProbed(server, false);
-                return null;
-            } catch (SmbException smbE) {
-                if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbException in probing SMB2 ", smbE);
-                else log.warn("isServerSmbV2: caught SmbException in probing SMB2");
-                try {
-                    if (log.isDebugEnabled()) log.debug("isServerSmbV2: it is not smbV2 probing {} to check if smbV1", uri);
-                    CIFSContext ctx = getCifsContextOnly(uri, false);
-                    smbFile = new SmbFile(getIpUriString(uri), ctx);
-                    smbFile.listFiles(); // getType is pure smbV1, exists identifies smbv2 even smbv1, only list provides a result
-                    declareServerSmbV2(server, false);
-                    if (log.isDebugEnabled()) log.debug("isServerSmbV2 for {} returning false", server);
-                    declareServerBeingProbed(server, false);
-                    return false;
-                } catch (SmbAuthException authE2) {
-                    if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbAutException in probing SMB1, state for {}  returning null ", server, authE2);
-                    else log.warn("isServerSmbV2: caught SmbAutException in probing SMB1, state for {}  returning null", server);
-                    declareServerBeingProbed(server, false);
-                    return null;
-                } catch (SmbException smbE2) {
-                    log.warn("isServerSmbV2: caught SmbException in probing SMB1, returning null");
-                    if (log.isTraceEnabled()) log.warn("isServerSmbV2: caught SmbException in probing SMB1, returning null", smbE2);
-                    else log.warn("isServerSmbV2: caught SmbException in probing SMB1, returning null");
-                    declareServerBeingProbed(server, false);
-                    return null;
-                }
+        return new SmbEndpoint(server, resolvedUri.getPort());
+    }
+
+    private static boolean probeTransport(CIFSContext context, SmbEndpoint endpoint) throws IOException {
+        try (SmbTransport transport = context.getTransportPool().getSmbTransport(
+                context, endpoint.server, endpoint.port, true, false)) {
+            SmbTransportInternal internal = transport.unwrap(SmbTransportInternal.class);
+            internal.ensureConnected();
+            return internal.isSMB2();
+        }
+    }
+
+    private static SmbProtocolMode probeServerProtocol(SmbEndpoint endpoint) {
+        IOException mixedFailure;
+        try {
+            boolean isSmb2 = probeTransport(getBaseContext(true), endpoint);
+            return isSmb2 ? SmbProtocolMode.SMB2_OR_LATER : SmbProtocolMode.SMB1;
+        } catch (IOException e) {
+            mixedFailure = e;
+            if (log.isDebugEnabled()) log.debug("Mixed SMB negotiation failed for {}", endpoint, e);
+        }
+
+        // Some non-compliant servers reject the SMB1 multi-protocol negotiate packet.
+        // Check direct SMB2 before falling back to direct SMB1 so a transient mixed-mode
+        // failure cannot immediately classify an SMB2-capable endpoint as SMB1.
+        try {
+            if (probeTransport(getBaseContextOnly(true), endpoint)) {
+                return SmbProtocolMode.SMB2_COMPATIBILITY;
             }
-        } else {
-            declareServerBeingProbed(server, false);
-            return isSmbV2;
+        } catch (IOException e) {
+            if (log.isDebugEnabled()) log.debug("SMB2-only negotiation failed for {}", endpoint, e);
         }
+
+        try {
+            if (!probeTransport(getBaseContextOnly(false), endpoint)) {
+                return SmbProtocolMode.SMB1_COMPATIBILITY;
+            }
+        } catch (IOException e) {
+            if (log.isTraceEnabled()) log.warn("Unable to determine SMB dialect for {}", endpoint, mixedFailure);
+            else log.warn("Unable to determine SMB dialect for {}", endpoint);
+            return SmbProtocolMode.UNKNOWN;
+        }
+
+        return SmbProtocolMode.UNKNOWN;
+    }
+
+    private static SmbProtocolMode getServerProtocolMode(SmbEndpoint endpoint) {
+        SmbProtocolMode cached = serverProtocolModes.get(endpoint);
+        if (cached != null) {
+            Long expiration = serverProtocolModeExpirations.get(endpoint);
+            if (expiration == null || System.currentTimeMillis() < expiration) {
+                return cached;
+            }
+            serverProtocolModes.remove(endpoint, cached);
+            serverProtocolModeExpirations.remove(endpoint, expiration);
+        }
+
+        FutureTask<SmbProtocolMode> newProbe = new FutureTask<>(() -> probeServerProtocol(endpoint));
+        FutureTask<SmbProtocolMode> probe = serverProtocolProbes.putIfAbsent(endpoint, newProbe);
+        if (probe == null) {
+            probe = newProbe;
+            probe.run();
+        }
+
+        try {
+            SmbProtocolMode result = probe.get();
+            serverProtocolModes.put(endpoint, result);
+            if (result == SmbProtocolMode.SMB1_COMPATIBILITY || result == SmbProtocolMode.SMB2_COMPATIBILITY) {
+                // A compatibility result follows a failed mixed negotiation. Recheck it
+                // periodically instead of making a transient failure permanent.
+                serverProtocolModeExpirations.put(endpoint,
+                        System.currentTimeMillis() + COMPATIBILITY_MODE_CACHE_MS);
+            } else if (result == SmbProtocolMode.UNKNOWN) {
+                // Prevent sequential file operations from immediately repeating three
+                // connection attempts against an unavailable endpoint.
+                serverProtocolModeExpirations.put(endpoint,
+                        System.currentTimeMillis() + UNKNOWN_PROTOCOL_CACHE_MS);
+            } else {
+                serverProtocolModeExpirations.remove(endpoint);
+            }
+            return result;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return SmbProtocolMode.UNKNOWN;
+        } catch (ExecutionException e) {
+            if (log.isTraceEnabled()) log.warn("SMB protocol probe failed for {}", endpoint, e.getCause());
+            else log.warn("SMB protocol probe failed for {}", endpoint);
+            return SmbProtocolMode.UNKNOWN;
+        } finally {
+            serverProtocolProbes.remove(endpoint, probe);
+        }
+    }
+
+    public static SmbProtocolMode getServerProtocolMode(Uri uri) throws MalformedURLException {
+        return getServerProtocolMode(getEndpoint(uri));
+    }
+
+    // Compatibility API: true means SMB2+, false means SMB1, null means unknown.
+    public static Boolean isServerSmbV2(String server, int port) throws MalformedURLException {
+        if (server == null || server.isEmpty()) {
+            throw new MalformedURLException("SMB server is empty");
+        }
+        SmbProtocolMode mode = getServerProtocolMode(new SmbEndpoint(server, port));
+        if (mode == SmbProtocolMode.SMB2_OR_LATER || mode == SmbProtocolMode.SMB2_COMPATIBILITY) return true;
+        if (mode == SmbProtocolMode.SMB1 || mode == SmbProtocolMode.SMB1_COMPATIBILITY) return false;
+        return null;
     }
 
     public static NovaSmbFile getSmbFile(Uri uri) throws MalformedURLException {
-        if (LIMIT_PROTOCOL_NEGO)
-            return getSmbFileStrictNego(uri);
-        else
-            return getSmbFileAllProtocols(uri, isSMBv2Enabled());
+        if (!isSMBv2Enabled()) {
+            return new NovaSmbFile(uri, getCifsContextOnly(uri, false));
+        }
+        return getSmbFileStrictNego(uri);
     }
 
     public static NovaSmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
-        Boolean isSmbV2 = isServerSmbV2(uri.getHost(), uri.getPort());
-        CIFSContext context = null;
-        if (isSmbV2 == null) { // server type not identified, default to smbV2&1 auto
-            context = getBaseContext(true);
-            if (log.isDebugEnabled()) log.debug("getSmbFileStrictNego: server NOT identified passing smbv2/smbv1 capable context for uri {}", uri);
+        SmbProtocolMode mode = getServerProtocolMode(uri);
+        CIFSContext context;
+        if (mode == SmbProtocolMode.SMB2_OR_LATER) {
+            // Keep multi-protocol negotiation for normal SMB2 servers. Besides being
+            // the established path, this preserves server-root share enumeration.
+            context = getCifsContext(uri, true);
+        } else if (mode == SmbProtocolMode.SMB2_COMPATIBILITY) {
+            context = getCifsContextOnly(uri, true);
+        } else if (mode == SmbProtocolMode.SMB1 || mode == SmbProtocolMode.SMB1_COMPATIBILITY) {
+            context = getCifsContextOnly(uri, false);
         } else {
-            if (isSmbV2) { // provide smbV2 only
-                context = getBaseContextOnly(true);
-                if (log.isDebugEnabled()) log.debug("getSmbFileStrictNego: server already identified as smbv2 processing uri {}", uri);
-            } else { // if dont't know (null) or smbV2 provide smbV2 only to try out. Fallback needs to be implemented in each calls
-                context = getBaseContextOnly(false);
-                if (log.isDebugEnabled()) log.debug("getSmbFileStrictNego: server already identified as smbv1 processing uri {}", uri);
-            }
+            context = getCifsContext(uri, true);
         }
-        CIFSContext ctx = null;
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
-        if (cred != null && ! cred.getUsername().isEmpty()) {
-            NtlmPasswordAuthenticator auth = new NtlmPasswordAuthenticator(cred.getDomain(), cred.getUsername(), cred.getPassword());
-            ctx = context.withCredentials(auth);
-        } else
-            ctx = context.withGuestCrendentials();
-        return new NovaSmbFile(uri, ctx);
+        if (log.isDebugEnabled()) log.debug("Using SMB protocol mode {} for {}", mode, uri);
+        return new NovaSmbFile(uri, context);
     }
 
     public static NovaSmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException {
