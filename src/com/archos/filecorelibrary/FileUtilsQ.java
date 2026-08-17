@@ -394,21 +394,41 @@ public class FileUtilsQ {
         return contentUri;
     }
 
+    private static volatile File sPublicAppDir = null;
+
     public static String getNovaPublicAppDirPath(Context context) {
         return getNovaPublicAppDirFile(context).getPath();
     }
 
     public static File getNovaPublicAppDirFile(Context context) {
-        String externalStorageState = Environment.getExternalStorageState();
-        // at this point externalStorageState might not be ready
-        if (externalStorageState != null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
-            File externalFilesDir = context.getExternalFilesDir(null);
-            if (externalFilesDir != null) return externalFilesDir;
-            else return DEFAULT_PUBLIC_APP_FILE;
-        } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
-            // TOFIX doing wild guess but should in reality wait for result to be available
-            log.warn("FileUtilsQ: getNovaPublicAppDirFile getExternalStorageState {} is not mounted!", Environment.getExternalStorageState());
-            return DEFAULT_PUBLIC_APP_FILE;
+        if (sPublicAppDir != null) {
+            return sPublicAppDir;
+        }
+        synchronized (FileUtilsQ.class) {
+            if (sPublicAppDir != null) {
+                return sPublicAppDir;
+            }
+            String externalStorageState = Environment.getExternalStorageState();
+            // at this point externalStorageState might not be ready
+            if (externalStorageState != null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
+                try {
+                    File extDir = Environment.getExternalStorageDirectory();
+                    String pkgName = (context != null) ? context.getPackageName() : "org.courville.nova";
+                    File appDir = (extDir != null) ? new File(extDir, "Android/data/" + pkgName + "/files") : DEFAULT_PUBLIC_APP_FILE;
+                    sPublicAppDir = appDir;
+                    publicAppDirectory = appDir.getPath();
+                    return sPublicAppDir;
+                } catch (Exception e) {
+                    log.error("getNovaPublicAppDirFile: error constructing public app dir path", e);
+                    sPublicAppDir = DEFAULT_PUBLIC_APP_FILE;
+                    publicAppDirectory = DEFAULT_PUBLIC_APP_DIR;
+                    return sPublicAppDir;
+                }
+            } else { // happens on bravia TVs... https://bug.courville.org/app/1/bug/1009/report
+                // TOFIX doing wild guess but should in reality wait for result to be available
+                log.warn("FileUtilsQ: getNovaPublicAppDirFile getExternalStorageState {} is not mounted!", externalStorageState);
+                return DEFAULT_PUBLIC_APP_FILE;
+            }
         }
     }
 }
