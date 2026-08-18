@@ -60,8 +60,7 @@ public class JcifsUtils {
     private static final long COMPATIBILITY_MODE_CACHE_MS = 5 * 60 * 1000L;
     private static final long UNKNOWN_PROTOCOL_CACHE_MS = 30 * 1000L;
 
-    private static Properties prop = null;
-    private static CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
+    private static volatile CIFSContext baseContextSmb1, baseContextSmb2, baseContextSmb1Only, baseContextSmb2Only;
 
     public enum SmbProtocolMode {
         SMB2_OR_LATER,
@@ -135,7 +134,7 @@ public class JcifsUtils {
         reCreateAllContexts();
     }
 
-    public static void reCreateAllContexts() {
+    public static synchronized void reCreateAllContexts() {
         if (log.isDebugEnabled()) log.debug("JcifsUtils: reCreateAllContexts");
         baseContextSmb1 = createContext(false);
         baseContextSmb2 = createContext(true);
@@ -145,8 +144,11 @@ public class JcifsUtils {
     }
 
     private static CIFSContext createContext(boolean isSmb2) {
-        prop = new Properties();
-        prop.putAll(System.getProperties());
+        Properties prop = new Properties();
+        Properties sysProps = System.getProperties();
+        synchronized (sysProps) {
+            prop.putAll(sysProps);
+        }
 
         // reduce network calls for attributes
         prop.put("jcifs.smb.client.attrExpirationPeriod", "30000"); // 30 seconds
@@ -191,8 +193,11 @@ public class JcifsUtils {
     }
 
     private static CIFSContext createContextOnly(boolean isSmb2) {
-        prop = new Properties();
-        prop.putAll(System.getProperties());
+        Properties prop = new Properties();
+        Properties sysProps = System.getProperties();
+        synchronized (sysProps) {
+            prop.putAll(sysProps);
+        }
 
         // reduce network calls for attributes
         prop.put("jcifs.smb.client.attrExpirationPeriod", "30000"); // 30 seconds
@@ -242,10 +247,18 @@ public class JcifsUtils {
         //return isSmb2 ? baseContextSmb2 : baseContextSmb1;
         checkPrefChange();
         if (isSmb2) {
-            if (baseContextSmb2 == null) baseContextSmb2 = createContext(true);
+            if (baseContextSmb2 == null) {
+                synchronized (JcifsUtils.class) {
+                    if (baseContextSmb2 == null) baseContextSmb2 = createContext(true);
+                }
+            }
             return baseContextSmb2;
         } else {
-            if (baseContextSmb1 == null) baseContextSmb1 = createContext(false);
+            if (baseContextSmb1 == null) {
+                synchronized (JcifsUtils.class) {
+                    if (baseContextSmb1 == null) baseContextSmb1 = createContext(false);
+                }
+            }
             return baseContextSmb1;
         }
     }
@@ -254,10 +267,18 @@ public class JcifsUtils {
         //return isSmb2 ? baseContextSmb2Only : baseContextSmb1Only;
         checkPrefChange();
         if (isSmb2) {
-            if (baseContextSmb2Only == null) baseContextSmb2Only = createContextOnly(true);
+            if (baseContextSmb2Only == null) {
+                synchronized (JcifsUtils.class) {
+                    if (baseContextSmb2Only == null) baseContextSmb2Only = createContextOnly(true);
+                }
+            }
             return baseContextSmb2Only;
         } else {
-            if (baseContextSmb1Only == null) baseContextSmb1Only = createContextOnly(false);
+            if (baseContextSmb1Only == null) {
+                synchronized (JcifsUtils.class) {
+                    if (baseContextSmb1Only == null) baseContextSmb1Only = createContextOnly(false);
+                }
+            }
             return baseContextSmb1Only;
         }
     }
@@ -268,7 +289,7 @@ public class JcifsUtils {
         clearServerProtocolCache();
     }
 
-    private static void checkPrefChange() {
+    private static synchronized void checkPrefChange() {
         if (prefChanged) {
             if (log.isDebugEnabled()) log.debug("JcifsUtils: reCreateAllContexts after preference change");
             prefChanged = false;
