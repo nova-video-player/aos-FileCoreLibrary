@@ -95,9 +95,9 @@ public class JcifListingEngine extends ListingEngine {
                     if (log.isDebugEnabled()) log.debug("SmbFileFilter: neither file nor directory: {}", filename);
                     return false;
                 }
-            } catch (SmbException e) {
-                if (log.isTraceEnabled()) log.error("SmbFileFilter: caught SmbException: ", e);
-                else log.error("SmbFileFilter: caught SmbException");
+            } catch (Exception e) {
+                if (log.isTraceEnabled()) log.error("SmbFileFilter: caught Exception: ", e);
+                else log.error("SmbFileFilter: caught Exception");
             }
             return false;
         }
@@ -245,6 +245,17 @@ public class JcifListingEngine extends ListingEngine {
             catch (final MalformedURLException e) {
                 if (log.isTraceEnabled()) log.error("JcifListingThread: MalformedURLException for {}", mUri.toString(), e);
                 else log.error("JcifListingThread: MalformedURLException for {}", mUri.toString());
+                mUiHandler.post(new Runnable() {
+                    public void run() {
+                        if (!mAbort && mListener != null) { // do not report error if aborted
+                            mListener.onListingFatalError(e, ErrorEnum.ERROR_UNKNOWN);
+                        }
+                    }
+                });
+            }
+            catch (final Exception e) {
+                if (log.isTraceEnabled()) log.error("JcifListingThread: Exception for {}", mUri.toString(), e);
+                else log.error("JcifListingThread: Exception for {}", mUri.toString());
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (!mAbort && mListener != null) { // do not report error if aborted

@@ -54,21 +54,30 @@ public class JcifsRawLister extends RawLister {
             mUri = Uri.parse(uriString);
         }
         NovaSmbFile nSmbFile = getSmbFile(mUri);
-        SmbFile[] listFiles = getSmbFile(mUri).smbFile.listFiles();
-        if (listFiles != null) {
-            ArrayList<MetaFile2> files = new ArrayList<>();
-            for(SmbFile f : listFiles){
-                String filename = f.getName();
-                if (isDotDirectoryEntry(filename)) {
-                    continue;
+        if (nSmbFile == null || nSmbFile.smbFile == null) {
+            return null;
+        }
+        try {
+            SmbFile[] listFiles = nSmbFile.smbFile.listFiles();
+            if (listFiles != null) {
+                ArrayList<MetaFile2> files = new ArrayList<>();
+                for(SmbFile f : listFiles){
+                    String filename = f.getName();
+                    if (isDotDirectoryEntry(filename)) {
+                        continue;
+                    }
+                    // better verify that it is a file or directory before adding
+                    if(f.isFile() || f.isDirectory()) {
+                        if (log.isTraceEnabled()) log.trace("found {}", f.getPath());
+                        files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
+                    }
                 }
-                // better verify that it is a file or directory before adding
-                if(f.isFile() || f.isDirectory()) {
-                    if (log.isTraceEnabled()) log.trace("found {}", f.getPath());
-                    files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
-                }
+                return files;
             }
-            return files;
+        } catch (SmbException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("getFileList: caught exception for {}", mUri, e);
         }
         return null;
     }
