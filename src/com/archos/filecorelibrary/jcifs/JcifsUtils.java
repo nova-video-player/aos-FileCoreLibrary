@@ -21,6 +21,7 @@ import android.net.Uri;
 
 import androidx.preference.PreferenceManager;
 
+import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import org.slf4j.Logger;
@@ -111,13 +112,24 @@ public class JcifsUtils {
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile JcifsUtils sInstance;
 
+    private static Context getContext() {
+        if (mContext != null) return mContext;
+        Context globalContext = ArchosUtils.getGlobalContext();
+        if (globalContext != null) {
+            mContext = globalContext.getApplicationContext();
+            return mContext;
+        }
+        return null;
+    }
+
     // get the instance, context is used for initial context injection
     public static JcifsUtils getInstance(Context context) {
+        if (context == null) context = ArchosUtils.getGlobalContext();
         if (context == null) log.warn("getInstance: context passed is null!!!");
-        else if (mContext == null) mContext = context;
+        else if (mContext == null) mContext = context.getApplicationContext();
         if (sInstance == null) {
             synchronized(JcifsUtils.class) {
-                if (sInstance == null) sInstance = new JcifsUtils(context.getApplicationContext());
+                if (sInstance == null && context != null) sInstance = new JcifsUtils(context.getApplicationContext());
             }
         }
         return sInstance;
@@ -492,13 +504,23 @@ public class JcifsUtils {
     }
 
     public static boolean isSMBv2Enabled() {
-        if (log.isDebugEnabled()) log.debug("isSMBv2Enabled={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true));
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smbv2", true);
+        Context context = getContext();
+        if (context == null) {
+            log.warn("isSMBv2Enabled: context is null, returning default true");
+            return true;
+        }
+        if (log.isDebugEnabled()) log.debug("isSMBv2Enabled={}", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_smbv2", true));
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_smbv2", true);
     }
 
     public static boolean isResolverBcastFirst() {
-        if (log.isDebugEnabled()) log.debug("isResolverBcastFirst={}", PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false));
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_smb_resolv", false);
+        Context context = getContext();
+        if (context == null) {
+            log.warn("isResolverBcastFirst: context is null, returning default false");
+            return false;
+        }
+        if (log.isDebugEnabled()) log.debug("isResolverBcastFirst={}", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_smb_resolv", false));
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_smb_resolv", false);
     }
 
 }
