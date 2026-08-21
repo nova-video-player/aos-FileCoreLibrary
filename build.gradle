@@ -39,6 +39,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 36
         multiDexEnabled = true
+        consumerProguardFiles 'proguard-project.txt'
     }
 
     tasks.withType(JavaCompile).configureEach {
