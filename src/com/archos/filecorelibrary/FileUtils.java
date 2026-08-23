@@ -559,6 +559,6 @@ public class FileUtils {
 
     public static void caughtException(Throwable e, String method, String exceptionType) {
         if (log.isTraceEnabled()) log.error("{}: caught {} ", method, exceptionType, e);
-        else log.warn("{}: caught {}", method, exceptionType);
+        else log.warn("{}: caught {} ({})", method, exceptionType, e != null ? e.toString() : "null");
     }
 }
