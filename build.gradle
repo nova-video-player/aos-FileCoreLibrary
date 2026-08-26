@@ -10,7 +10,7 @@ repositories {
 allprojects {
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile).configureEach {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Xmaxwarns" << "10000"
         }
         // to generate the required jar dependencies e.g. cling seamless
         preBuild.dependsOn(ndkBuild)
