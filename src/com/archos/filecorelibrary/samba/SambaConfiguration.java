@@ -575,8 +575,8 @@ public class SambaConfiguration {
 	protected static String removeExternalSpaces(String s){
 
 		if(s.isEmpty() || (s.length()<2 && ' '==s.charAt(0)))
-            return "";
-        while(' '==s.charAt(0) && s.length()>1){
+			return "";
+		while(' '==s.charAt(0) && s.length()>1){
 			s=s.substring(1);
 		}
 		while(' '==s.charAt(s.length()-1)){

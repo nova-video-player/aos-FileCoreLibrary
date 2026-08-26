@@ -172,9 +172,12 @@ public class DocumentUriBuilder {
 
     public static String getNameFromContentProvider(Uri uri){
         Cursor c= ArchosUtils.getGlobalContext().getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME},null,null, null);
-        if(c!=null&&c.getCount()>0&&c.getColumnIndex(OpenableColumns.DISPLAY_NAME)>=0){
-            c.moveToFirst();
-            return c.getString(  c.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+        if(c!=null&&c.getCount()>0){
+            int columnIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            if (columnIndex>=0) {
+                c.moveToFirst();
+                return c.getString(columnIndex);
+            }
         }
         return null;
     }

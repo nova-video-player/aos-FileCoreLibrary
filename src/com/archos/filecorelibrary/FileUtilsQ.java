@@ -277,7 +277,8 @@ public class FileUtilsQ {
         Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
         String text = null;
         if (cursor.moveToNext()) {
-            text = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
+            int columnIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
+            if (columnIndex >= 0) text = cursor.getString(columnIndex);
         }
         cursor.close();
         return text;
@@ -373,20 +374,32 @@ public class FileUtilsQ {
         cursor = contentResolver.query(mediaUri, projection, selection,
                 new String[] {uri.getPath()}, null);
         int id;
+        int columnIndex;
         if (cursor != null && cursor.moveToFirst()) {
             if (isVideo) {
-                id = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.VideoColumns._ID));
-                contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+                columnIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns._ID);
+                if (columnIndex >= 0) {
+                    id = cursor.getInt(columnIndex);
+                    contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+                }
             } else if (isImage) {
-                id = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
-                contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+                columnIndex = cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID);
+                if (columnIndex >= 0) {
+                    id = cursor.getInt(columnIndex);
+                    contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+                }
             } else if (isAudio) {
-                id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID));
-                contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+                columnIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID);
+                if (columnIndex >= 0) {
+                    id = cursor.getInt(columnIndex);
+                    contentUri = Uri.withAppendedPath(mediaUri, "" + id);
+                }
             } else {
-                //id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
-                id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
-                contentUri = MediaStore.Files.getContentUri("external",id);
+                columnIndex = cursor.getColumnIndex(MediaStore.MediaColumns._ID);
+                if (columnIndex >= 0) {
+                    id = cursor.getInt(columnIndex);
+                    contentUri = MediaStore.Files.getContentUri("external",id);
+                }
             }
         }
         if (cursor != null) cursor.close();

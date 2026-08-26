@@ -510,10 +510,10 @@ public class StreamOverHttp {
 
 					/* else
             	   is.skip(startFrom);*/
-            	   headers.put("Content-Length", "" + sendCount);
+					headers.put("Content-Length", "" + sendCount);
 
-            	   String rangeSpec = "bytes " + startFrom + "-" + endAt + "/" + length;
-            	   headers.put("Content-Range", rangeSpec);
+					String rangeSpec = "bytes " + startFrom + "-" + endAt + "/" + length;
+					headers.put("Content-Range", rangeSpec);
 				}
 				headers.put("Access-Control-Allow-Origin", "*");
 				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null, this);
