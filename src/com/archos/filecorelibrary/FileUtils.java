@@ -428,6 +428,7 @@ public class FileUtils {
     }
 
     // dump intent into string for debug purposes
+    @SuppressWarnings("deprecation") // bundle.get: debug dumping only
     public static String intentToString(Intent intent) {
         if (intent == null)
             return "";
