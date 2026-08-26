@@ -87,6 +87,7 @@ public class NetUtils implements DefaultLifecycleObserver {
     /**
      * Returns true if connected to the internet, and false otherwise
      */
+    @SuppressWarnings("deprecation") // getAllNetworks: diagnostic network enumeration
     public boolean isOnWAN() {
         mIsOnWAN = false;
         for (Network network : mConnectivityMgr.getAllNetworks()) {
@@ -104,6 +105,7 @@ public class NetUtils implements DefaultLifecycleObserver {
     /**
      * Returns true if connected to the local network, and false otherwise
      */
+    @SuppressWarnings("deprecation") // getAllNetworks: diagnostic network enumeration
     public boolean isOnLAN() {
         mIsOnLAN = false;
         for (Network network : mConnectivityMgr.getAllNetworks()) {
@@ -140,6 +142,7 @@ public class NetUtils implements DefaultLifecycleObserver {
         return NO_NETWORK_AVAILABLE;
     }
 
+    @SuppressWarnings("deprecation") // getAllNetworks: diagnostic network enumeration
     public int getAvailableNetworksCount() {
         int count = 0;
         Network[] allNetworks = mConnectivityMgr.getAllNetworks(); // added in API 21 (Lollipop)
@@ -154,6 +157,7 @@ public class NetUtils implements DefaultLifecycleObserver {
         return count;
     }
 
+    @SuppressWarnings("deprecation") // getAllNetworks: diagnostic network enumeration
     public List<Integer> getAvailableNetworks() {
         List<Integer> activeNetworks = new ArrayList<>();
         Network[] allNetworks; // added in API 21 (Lollipop)

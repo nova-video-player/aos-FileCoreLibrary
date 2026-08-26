@@ -198,6 +198,7 @@ public class NetworkState {
         return null;
     }
 
+    @SuppressWarnings("deprecation") // getAllNetworks: diagnostic network count
     public int getAvailableNetworksCount() {
         int count = 0;
         Network[] allNetworks = mConnectivityManager.getAllNetworks(); // added in API 21 (Lollipop)

@@ -475,6 +475,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         return null;
     }
 
+    @SuppressWarnings("deprecation") // getAllNetworks: network enumeration for discovery
     private LinkProperties getLP(ConnectivityManager connMgr, int cap) {
         Network[] nets = connMgr.getAllNetworks();
         for (Network n: nets) {
@@ -529,6 +530,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                 && (inetAddress instanceof Inet4Address);
     }
 
+    @SuppressWarnings("deprecation") // pre-Q wifi.isConnected and TYPE_WIFI fallback
     private String initIpAddress() {
         if (ArchosFeatures.isChromeOS(mContext))
             return getDoubleNatIpAddress();
