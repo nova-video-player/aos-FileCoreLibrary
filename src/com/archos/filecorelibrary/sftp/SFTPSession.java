@@ -131,6 +131,7 @@ public class SFTPSession {
         return uri.buildUpon().path("").build();
     }
 
+    @SuppressWarnings("deprecation") // session.setPassword(String): legacy JSch API
     public synchronized Session getSession(Uri path) throws JSchException{
         String username="anonymous";
 

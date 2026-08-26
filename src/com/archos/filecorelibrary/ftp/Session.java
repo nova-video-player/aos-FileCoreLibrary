@@ -106,6 +106,7 @@ public class Session {
             }
     }
 
+    @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
     public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();
@@ -158,6 +159,7 @@ public class Session {
         return ftp;
     }
 
+    @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
     public FTPSClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();

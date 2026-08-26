@@ -15,6 +15,9 @@
 package com.archos.environment;
 
 import android.content.Context;
+import android.content.pm.InstallSourceInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -35,9 +38,20 @@ public final class ArchosUtils {
         return android.os.Build.MANUFACTURER.equalsIgnoreCase("amazon");
     }
 
+    @SuppressWarnings("deprecation") // getInstallerPackageName: pre-R fallback
     public static boolean isInstalledfromPlayStore(Context context) {
         final List<String> playStoreInstallerPackageNames = new ArrayList<>(Arrays.asList("com.android.vending", "com.google.android.feedback"));
-        final String installerPackageName = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+        String installerPackageName;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                InstallSourceInfo info = context.getPackageManager().getInstallSourceInfo(context.getPackageName());
+                installerPackageName = info != null ? info.getInstallingPackageName() : null;
+            } catch (PackageManager.NameNotFoundException e) {
+                installerPackageName = null;
+            }
+        } else {
+            installerPackageName = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+        }
         if (DBG)
             Log.d(TAG, "isInstalledfromPlayStore: installerPackageName = " + installerPackageName);
         return installerPackageName != null && playStoreInstallerPackageNames.contains(installerPackageName);
