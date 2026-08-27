@@ -78,14 +78,7 @@ android {
 
 tasks.register('ndkBuild', Exec) {
     workingDir = "../"
-
-    outputs.files(
-        "libs/arm64-v8a/libfilecoreutils.so",
-        "libs/armeabi-v7a/libfilecoreutils.so",
-        "libs/x86/libfilecoreutils.so",
-        "libs/x86_64/libfilecoreutils.so"
-    )
-    //OutputFiles/OutputDirectories
+    // Let GNU Make manage native C/C++ dependency checking
     List<String> myCmd = new ArrayList<String>()
     myCmd.add("make")
     myCmd.add("native_libnativehelper")
