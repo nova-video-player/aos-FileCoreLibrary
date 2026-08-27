@@ -381,7 +381,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     public void abort() {
         mIsAborted = true;
         // use iterator and copy to avoid ConcurrentModificationException
-        List<InternalDiscovery> copyInternalDiscovery = new CopyOnWriteArrayList(mInternalDiscoveries);
+        List<InternalDiscovery> copyInternalDiscovery = new CopyOnWriteArrayList<>(mInternalDiscoveries);
         Iterator<InternalDiscovery> iterator = copyInternalDiscovery.iterator();
         while (iterator.hasNext()) {
             InternalDiscovery discovery = iterator.next(); // java.util.ConcurrentModificationException

@@ -47,7 +47,7 @@ public class ZipRawLister extends RawLister {
             remains = path.substring(toTest.length() + 1);//remove first "/"
 
         ZipFile zf = new ZipFile(toTest);
-        ArrayList<ZipEntry> entries = (ArrayList<ZipEntry>) Collections.list(zf.entries());
+        List<? extends ZipEntry> entries = Collections.list(zf.entries());
         if (entries == null) {
 
             return null;

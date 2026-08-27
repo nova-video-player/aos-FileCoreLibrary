@@ -114,7 +114,7 @@ public class ZipListingEngine extends ListingEngine {
                     remains = path.substring(toTest.length()+1);//remove first "/"
                 try {
                     ZipFile zf = new ZipFile(toTest);
-                    ArrayList <ZipEntry>entries = (ArrayList<ZipEntry>) Collections.list(zf.entries());
+                    ArrayList<? extends ZipEntry> entries = Collections.list(zf.entries());
                     if (entries == null) {
                         postError(ErrorEnum.ERROR_UNKNOWN);
                         return;
