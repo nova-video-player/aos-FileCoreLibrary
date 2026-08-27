@@ -473,9 +473,9 @@ public class FileUtils {
             String packageName = context.getApplicationInfo().packageName;
 
             if (sdCard.canWrite()) {
-                String currentDbPath = String.format("//data//%s//databases//%s",
+                String currentDbPath = String.format(Locale.ROOT, "//data//%s//databases//%s",
                         packageName, dbFileName);
-                String backupDbPath = String.format("%s-%s", packageName, dbFileName);
+                String backupDbPath = String.format(Locale.ROOT, "%s-%s", packageName, dbFileName);
                 File currentDb = new File(dataDir, currentDbPath);
                 File backupDb = new File(sdCard, backupDbPath);
 
