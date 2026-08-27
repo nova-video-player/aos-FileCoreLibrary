@@ -79,13 +79,12 @@ android {
 tasks.register('ndkBuild', Exec) {
     workingDir = "../"
 
-    outputs.upToDateWhen {
-        file("libs/arm64-v8a/libfilecoreutils.so").exists()
-        file("libs/armeabi-v7a/libfilecoreutils.so").exists()
-        file("libs/x86/libfilecoreutils.so").exists()
-        file("libs/x86_64/libfilecoreutils.so").exists()
-        //file("libs/jcifs-ng.jar").exists()
-    }
+    outputs.files(
+        "libs/arm64-v8a/libfilecoreutils.so",
+        "libs/armeabi-v7a/libfilecoreutils.so",
+        "libs/x86/libfilecoreutils.so",
+        "libs/x86_64/libfilecoreutils.so"
+    )
     //OutputFiles/OutputDirectories
     List<String> myCmd = new ArrayList<String>()
     myCmd.add("make")
