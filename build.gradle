@@ -69,8 +69,8 @@ android {
         exclude 'META-INF/versions/**/OSGI-INF/MANIFEST.MF'
     }
     lint {
-        abortOnError true
-        checkReleaseBuilds false
+        abortOnError = true
+        checkReleaseBuilds = false
         disable 'MissingTranslation', 'ExtraTranslation', 'MissingQuantity', 'ImpliedQuantity'
         enable 'SuspiciousIndentation'
     }
