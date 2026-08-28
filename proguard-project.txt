@@ -7,12 +7,11 @@
 -keep class net.engio.mbassy.** { *; }
 -keep class net.schmizz.sshj.** { *; }
 -keep class com.jcraft.jsch.** { *; }
--keep class com.thegrizzlylabs.sardineandroid.** { *; }
--keep class org.simpleframework.xml.** { *; }
+# sardine-android supplies its own consumer rules for SimpleXML and its
+# reflection-based model classes; do not keep the complete libraries here.
 -keep class jcifs.** { *; }
 -dontwarn jcifs.**
 
 #### Security & Logging ####
--keep class org.bouncycastle.** { *; }
 -keep class org.slf4j.** { *; }
 -keep class ch.qos.logback.** { *; }

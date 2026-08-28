@@ -26,7 +26,7 @@ import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import net.schmizz.sshj.AndroidConfig;
-import net.schmizz.sshj.DefaultConfig;
+import net.schmizz.sshj.DefaultSecurityProviderConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -82,7 +82,9 @@ public class SshjUtils {
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient == null || !sshClient.isConnected()) {
                 if (log.isTraceEnabled()) log.trace("getSshClient: sshClient is null or not connected for {}, connecting to {}", uri, server);
-                DefaultConfig sshjConfig = new DefaultConfig();
+                // SSHJ's supplied configuration disables automatic Bouncy Castle registration
+                // and uses Android's default JCA providers.
+                DefaultSecurityProviderConfig sshjConfig = new DefaultSecurityProviderConfig();
                 sshClient = new SSHClient(sshjConfig);
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
                 if (port != -1) sshClient.connect(server, port);

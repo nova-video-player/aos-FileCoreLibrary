@@ -34,9 +34,12 @@ import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbTransportInternal;
+import jcifs.util.Crypto;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.security.Provider;
+import java.security.Security;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -142,6 +145,13 @@ public class JcifsUtils {
 
     private JcifsUtils(Context context) {
         mContext = context;
+        // JCIFS needs MD4. Force its supported provider hook to use Android's
+        // built-in BC provider rather than constructing the bundled provider.
+        Provider androidBcProvider = Security.getProvider("BC");
+        if (androidBcProvider == null) {
+            throw new IllegalStateException("Android BC security provider is unavailable");
+        }
+        Crypto.initProvider(androidBcProvider);
         if (log.isDebugEnabled()) log.debug("JcifsUtils: initializing contexts");
         reCreateAllContexts();
     }

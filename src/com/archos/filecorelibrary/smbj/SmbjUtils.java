@@ -32,7 +32,7 @@ import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.protocol.transport.TransportException;
-import com.hierynomus.security.bc.BCSecurityProvider;
+import com.hierynomus.security.jce.JceSecurityProvider;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -87,7 +87,8 @@ public class SmbjUtils {
         mContext = context;
         if (log.isDebugEnabled()) log.debug("SmbjUtils: initializing contexts");
         smbConfig = SmbConfig.builder()
-                .withSecurityProvider(new BCSecurityProvider())
+                // Use Android's JCA providers rather than SMBJ's direct Bouncy Castle adapter.
+                .withSecurityProvider(new JceSecurityProvider())
                 .withMultiProtocolNegotiate(true)
                 .withSigningRequired(false)
                 .build();
