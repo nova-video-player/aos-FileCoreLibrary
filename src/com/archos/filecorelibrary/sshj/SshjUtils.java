@@ -28,6 +28,7 @@ import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import net.schmizz.sshj.AndroidConfig;
 import net.schmizz.sshj.DefaultSecurityProviderConfig;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.SecurityUtils;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
@@ -37,6 +38,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SshjUtils {
@@ -85,6 +92,7 @@ public class SshjUtils {
                 // SSHJ's supplied configuration disables automatic Bouncy Castle registration
                 // and uses Android's default JCA providers.
                 DefaultSecurityProviderConfig sshjConfig = new DefaultSecurityProviderConfig();
+                disableUnsupportedHostKeyAlgorithms(sshjConfig);
                 sshClient = new SSHClient(sshjConfig);
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
                 if (port != -1) sshClient.connect(server, port);
@@ -109,6 +117,49 @@ public class SshjUtils {
                 caughtException(ioe, "SshjUtils:getSshClient", "IOException, throwing IOException");
                 throw ioe;
             }
+        }
+    }
+
+    /**
+     * AndroidKeyStore advertises an Ed25519 KeyFactory but only accepts
+     * keystore-backed keys. SSH server host keys are encoded X.509 keys, so
+     * SSHJ must use Conscrypt (AndroidOpenSSL) when it provides Ed25519.
+     */
+    private static boolean configureEd25519Provider() {
+        Provider provider = Security.getProvider("AndroidOpenSSL");
+        if (provider != null && provider.getService("KeyFactory", "Ed25519") != null) {
+            SecurityUtils.setSecurityProvider(provider.getName());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Do not advertise host-key algorithms whose exact KeyFactory is absent,
+     * or is AndroidKeyStore (which accepts only keystore-backed keys). This
+     * lets the server choose a compatible RSA/ECDSA/Ed25519 alternative.
+     */
+    private static void disableUnsupportedHostKeyAlgorithms(DefaultSecurityProviderConfig sshjConfig) {
+        boolean ed25519Supported = configureEd25519Provider();
+        boolean ecdsaSupported = hasUsableKeyFactory("ECDSA");
+        List<net.schmizz.sshj.common.Factory.Named<com.hierynomus.sshj.key.KeyAlgorithm>> keyAlgorithms =
+                new ArrayList<>();
+        for (net.schmizz.sshj.common.Factory.Named<com.hierynomus.sshj.key.KeyAlgorithm> factory
+                : sshjConfig.getKeyAlgorithms()) {
+            String name = factory.getName();
+            if ((!ed25519Supported && name.contains("ed25519"))
+                    || (!ecdsaSupported && name.contains("ecdsa"))) continue;
+            keyAlgorithms.add(factory);
+        }
+        sshjConfig.setKeyAlgorithms(keyAlgorithms);
+    }
+
+    private static boolean hasUsableKeyFactory(String algorithm) {
+        try {
+            Provider provider = KeyFactory.getInstance(algorithm).getProvider();
+            return !provider.getName().startsWith("AndroidKeyStore");
+        } catch (NoSuchAlgorithmException e) {
+            return false;
         }
     }
 
