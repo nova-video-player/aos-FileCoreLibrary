@@ -54,7 +54,7 @@ public class ListingEngineFactory {
         }
         // use jcifs-ng if no smbshare is provided i.e. uri is "/"
         else if (uri.getScheme().equals("smbj")) {
-            if (uri.getPath().equals("/")) return new JcifListingEngine(context, uri);
+            if (uri.getPath() == null || uri.getPath().isEmpty() || uri.getPath().equals("/")) return new JcifListingEngine(context, uri);
             else return new SmbjListingEngine(context, uri);
         }
         else if (uri.getScheme().equals("zip")) {

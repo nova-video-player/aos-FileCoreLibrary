@@ -27,6 +27,7 @@ import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.smbj.session.SMB2GuestSigningRequiredException;
 import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
@@ -92,6 +93,9 @@ public class SmbjListingEngine extends ListingEngine {
                 var acceptedDiskShareLst = new ArrayList<FileIdBothDirectoryInformation>();
                 List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withReadRetry(mUri, () -> {
                     DiskShare share = smbjUtils.getSmbShare(mUri);
+                    if (share == null) {
+                        throw new IOException("Failed to connect to SMB share: share is null for " + mUri);
+                    }
                     return share.list(filePath);
                 });
 
@@ -196,6 +200,15 @@ public class SmbjListingEngine extends ListingEngine {
                     public void run() {
                         if (!mAbort && mListener != null) {
                             mListener.onListingUpdate(allFiles);
+                        }
+                    }
+                });
+            } catch (SMB2GuestSigningRequiredException smbgse) {
+                caughtException(smbgse, "SmbjListingEngine:SmbjListingThread", "SMB2GuestSigningRequiredException for " + mUri);
+                mUiHandler.post(new Runnable() {
+                    public void run() {
+                        if (!mAbort && mListener != null) { // do not report error if aborted
+                            mListener.onCredentialRequired(smbgse);
                         }
                     }
                 });

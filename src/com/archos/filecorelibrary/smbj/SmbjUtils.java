@@ -128,7 +128,14 @@ public class SmbjUtils {
                 throw new IOException("Invalid credentials: username or password is null");
             }
             // need to regenerate smbSession in this case too
-            AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
+            AuthenticationContext ac;
+            if ("anonymous".equals(username) && (password == null || password.isEmpty())) {
+                ac = AuthenticationContext.anonymous();
+            } else if ("guest".equalsIgnoreCase(username) && (password == null || password.isEmpty())) {
+                ac = AuthenticationContext.guest();
+            } else {
+                ac = new AuthenticationContext(username, password != null ? password.toCharArray() : new char[0], domain);
+            }
             if (ac == null) {
                 log.error("getSmbConnection: AuthenticationContext is null for uri {}", uri);
                 throw new IOException("Failed to create AuthenticationContext");
@@ -137,8 +144,8 @@ public class SmbjUtils {
             try {
                 smbSession = smbConnection.authenticate(ac);
             } catch (SMB2GuestSigningRequiredException e) {
-                log.error("getSmbConnection: caught SMB2GuestSigningRequiredException {} for uri {} -> throwing IOException instead", e.getMessage(), uri);
-                throw new IOException("getSmbConnection: SMB2GuestSigningRequiredException");
+                log.error("getSmbConnection: caught SMB2GuestSigningRequiredException {} for uri {}", e.getMessage(), uri);
+                throw e;
             }
             smbjSessions.put(cred, smbSession);
         }
@@ -273,7 +280,7 @@ public class SmbjUtils {
         // shareName can be null when asking for smbj://server/
         if (shareName == null) {
             log.warn("getSmbShare: returning null shareName for uri {}", uri);
-            return null;
+            throw new IOException("Cannot connect to SMB share: share name is missing or null for " + uri);
         }
         DiskShare smbShare = smbjShares.get(cred);
         if (smbShare == null || !shareName.equals(getShareName(Uri.parse(cred.getUriString()))) || !smbShare.isConnected()) {
@@ -287,6 +294,9 @@ public class SmbjUtils {
                     if (log.isTraceEnabled()) log.trace("getSmbShare: saving smbShare {}, smbshare={}", shareName, smbShare);
                     smbjShares.put(cred, smbShare);
                 } catch (SMBRuntimeException e) {
+                    if (e instanceof SMBApiException) {
+                        throw (SMBApiException) e;
+                    }
                     if (e.getCause() instanceof SocketException) {
                         // Try to reconnect
                         getSmbConnection(uri);
@@ -296,16 +306,20 @@ public class SmbjUtils {
                             smbjShares.put(cred, smbShare);
                         } else {
                             log.error("getSmbShare: caught SMBRuntimeException but smbSession is null after reconnecting! {} for uri {}, sharename={} -> throwing IOException instead", e.getMessage(), uri, shareName);
-                            throw new IOException("getSmbShare: smbSession is null after reconnecting!");
+                            throw new IOException("getSmbShare: smbSession is null after reconnecting!", e);
                         }
                     } else {
                         log.error("getSmbShare: caught exception {} for uri {}, sharename={} -> throwing IOException instead", e.getMessage(), uri, shareName);
-                        throw new IOException("getSmbShare: smbSession is null after reconnecting!");
+                        throw new IOException("getSmbShare: caught SMBRuntimeException", e);
                     }
                 }
             } else log.warn("getSmbShare: smbSession is null!");
         }
         if (log.isDebugEnabled()) log.debug("getSmbShare: for uri {}, sharename={}, smbShare={}, isConnected={}", uri, shareName, smbShare, (smbShare != null)?smbShare.isConnected():"false");
+        if (smbShare == null) {
+            log.error("getSmbShare: smbShare is null for uri {}, sharename={}", uri, shareName);
+            throw new IOException("Failed to connect to SMB share: " + shareName + " for " + uri);
+        }
         return smbShare;
     }
 

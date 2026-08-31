@@ -25,6 +25,7 @@ import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.smbj.session.SMB2GuestSigningRequiredException;
 import com.hierynomus.smbj.share.DiskShare;
 
 import org.slf4j.Logger;
@@ -54,6 +55,9 @@ public class SmbjRawLister extends RawLister {
             final String shareName = getShareName(mUri);
             List<FileIdBothDirectoryInformation> diskShareLst = smbjUtils.withReadRetry(mUri, () -> {
                 DiskShare share = smbjUtils.getSmbShare(mUri);
+                if (share == null) {
+                    throw new IOException("Failed to connect to SMB share: share is null for " + mUri);
+                }
                 return share.list(filePath);
             });
             for (var fileOrDir : diskShareLst) {
@@ -66,6 +70,9 @@ public class SmbjRawLister extends RawLister {
                 files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
             }
             return files;
+        } catch (SMB2GuestSigningRequiredException e) {
+            log.warn("SMB2GuestSigningRequiredException listing smbj files", e);
+            throw new AuthenticationException();
         } catch (SMBApiException se) { // most likely an Authentication error
             if (se.getMessage().contains("STATUS_ACCESS_DENIED")) throw new AuthenticationException();
             else log.warn("Caught SMBApiException");

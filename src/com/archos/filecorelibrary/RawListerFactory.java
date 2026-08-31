@@ -38,7 +38,7 @@ public class RawListerFactory {
     public static RawLister getRawListerForUrl(Uri uri) {
 
         if ("smb".equals(uri.getScheme())) {
-            if (isSMBjEnabled()) return new SmbjRawLister(uri);
+            if (isSMBjEnabled() && uri.getPath() != null && !uri.getPath().isEmpty() && !uri.getPath().equals("/")) return new SmbjRawLister(uri);
             else return new JcifsRawLister(uri);
         }
         else if ("ftp".equals(uri.getScheme()) || "ftps".equals(uri.getScheme())) {
@@ -68,7 +68,8 @@ public class RawListerFactory {
             return new WebdavRawLister(uri);
         }
         else if("smbj".equals(uri.getScheme())) {
-            return new SmbjRawLister(uri);
+            if (uri.getPath() == null || uri.getPath().isEmpty() || uri.getPath().equals("/")) return new JcifsRawLister(uri);
+            else return new SmbjRawLister(uri);
         }
         else {
             throw new IllegalArgumentException("not implemented yet for "+uri);
