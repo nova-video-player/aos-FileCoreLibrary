@@ -38,7 +38,6 @@ import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.common.SMBRuntimeException;
 import com.hierynomus.smbj.connection.Connection;
-import com.hierynomus.smbj.session.SMB2GuestSigningRequiredException;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 
@@ -111,8 +110,21 @@ public class SmbjUtils {
         String domain = cred.getDomain();
         int port = uri.getPort();
         Connection smbConnection = smbjConnections.get(cred);
-        if (smbConnection == null || !smbConnection.isConnected()) {
-            if (log.isTraceEnabled()) log.trace("getSmbConnection: smbConnection is null or not connected for {}, connecting to {}", uri, server);
+        // a connection can be TCP-connected yet have no authenticated session if a previous
+        // authenticate() call failed (e.g. STATUS_ACCESS_DENIED for another share on the same
+        // server): treat that as needing a fresh connection/authentication too, otherwise every
+        // subsequent call for this cred silently skips authentication forever (session stays null)
+        if (smbConnection == null || !smbConnection.isConnected() || smbjSessions.get(cred) == null) {
+            if (log.isTraceEnabled()) log.trace("getSmbConnection: smbConnection is null, not connected or has no session for {}, connecting to {}", uri, server);
+            if (smbConnection != null) {
+                try {
+                    smbConnection.close(true);
+                } catch (Exception e) {
+                    log.warn("getSmbConnection: failed closing stale connection for {}: {}", uri, e.getMessage());
+                }
+                smbjConnections.remove(cred, smbConnection);
+                smbjSessions.remove(cred);
+            }
             SMBClient smbClient;
             if (smbConfig != null) smbClient = new SMBClient(smbConfig);
             else smbClient = new SMBClient();
@@ -143,8 +155,17 @@ public class SmbjUtils {
             Session smbSession;
             try {
                 smbSession = smbConnection.authenticate(ac);
-            } catch (SMB2GuestSigningRequiredException e) {
-                log.error("getSmbConnection: caught SMB2GuestSigningRequiredException {} for uri {}", e.getMessage(), uri);
+            } catch (SMBRuntimeException e) {
+                // authentication failed (e.g. SMB2GuestSigningRequiredException, STATUS_ACCESS_DENIED,
+                // STATUS_LOGON_FAILURE): drop the connection so we don't leave a connected-but-
+                // unauthenticated entry cached that would silently skip re-authentication next time
+                log.error("getSmbConnection: caught {} authenticating for uri {} -> dropping connection", e.getClass().getSimpleName(), uri, e);
+                smbjConnections.remove(cred, smbConnection);
+                try {
+                    smbConnection.close(true);
+                } catch (Exception ce) {
+                    log.warn("getSmbConnection: failed closing connection after auth failure for {}: {}", uri, ce.getMessage());
+                }
                 throw e;
             }
             smbjSessions.put(cred, smbSession);
