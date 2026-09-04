@@ -26,6 +26,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.Locale;
 
 public class MdnsDiscovery implements InternalDiscovery {
 
@@ -83,7 +84,7 @@ public class MdnsDiscovery implements InternalDiscovery {
                 if (log.isDebugEnabled()) log.debug("NsdServiceInfo: IPv4 address {}", IPv4.getHostAddress());
                 //log.debug("NsdServiceInfo: IPv6 address {}", IPv6.getHostAddress());
                 String uri = "smb://" + IPv4.getHostAddress() + "/";
-                mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName().toUpperCase(), uri);
+                mSmbListener.onShareFound("nogroup", nsdServiceInfo.getServiceName().toUpperCase(Locale.ROOT), uri);
             } catch (UnknownHostException e) {
                 log.error("onServiceResolved: caught UnknownHostException for {}/{}", nsdServiceInfo.getServiceName(), getResolvedHost(nsdServiceInfo).getHostAddress(), e);
             } catch (ClassCastException cce) {

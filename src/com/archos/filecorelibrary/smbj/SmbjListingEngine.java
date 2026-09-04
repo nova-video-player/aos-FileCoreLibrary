@@ -212,15 +212,28 @@ public class SmbjListingEngine extends ListingEngine {
                         }
                     }
                 });
-            } catch (SMBApiException smbe) { // auth exception most probably
+            } catch (SMBApiException smbe) {
                 caughtException(smbe, "SmbjListingEngine:SmbjListingThread", "SMBApiException for " + mUri);
-                mUiHandler.post(new Runnable() {
-                    public void run() {
-                        if (!mAbort && mListener != null) { // do not report error if aborted
-                            mListener.onCredentialRequired(smbe);
+                if (isAuthStatus(smbe)) {
+                    // most likely wrong/missing credentials: let the user re-enter them
+                    mUiHandler.post(new Runnable() {
+                        public void run() {
+                            if (!mAbort && mListener != null) { // do not report error if aborted
+                                mListener.onCredentialRequired(smbe);
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    // not a credentials problem (e.g. share unavailable, DFS/network issue): report
+                    // as a fatal error instead of re-prompting for credentials that won't help
+                    mUiHandler.post(new Runnable() {
+                        public void run() {
+                            if (!mAbort && mListener != null) { // do not report error if aborted
+                                mListener.onListingFatalError(smbe, ErrorEnum.ERROR_UNKNOWN);
+                            }
+                        }
+                    });
+                }
             } catch (final IOException e) {
                 ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
                 if (e.getCause() instanceof UnknownHostException) {
@@ -256,6 +269,21 @@ public class SmbjListingEngine extends ListingEngine {
                     }
                 });
             }
+        }
+    }
+
+    /** True when the SMB status is a genuine credentials problem, as opposed to a later
+     * share/network availability issue that re-prompting for credentials won't fix. */
+    private static boolean isAuthStatus(SMBApiException e) {
+        switch (e.getStatus()) {
+            case STATUS_LOGON_FAILURE:
+            case STATUS_ACCESS_DENIED:
+            case STATUS_ACCOUNT_DISABLED:
+            case STATUS_PASSWORD_EXPIRED:
+            case STATUS_LOGON_TYPE_NOT_GRANTED:
+                return true;
+            default:
+                return false;
         }
     }
 }

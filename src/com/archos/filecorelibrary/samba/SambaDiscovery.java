@@ -144,15 +144,15 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
     public static String getIpFromShareName(String shareName) {
         if (shareName == null) return null;
-        return shareNameResolver.get(shareName.toUpperCase());
+        return shareNameResolver.get(shareName.toUpperCase(Locale.ROOT));
     }
 
     public static void registerShareNameIP(String shareName, String shareIp) {
-        if (shareIp != null && shareName != null) shareNameResolver.put(shareName.toUpperCase(), shareIp);
+        if (shareIp != null && shareName != null) shareNameResolver.put(shareName.toUpperCase(Locale.ROOT), shareIp);
     }
 
     public static void deRegisterShareNameIP(String shareName) {
-        shareNameResolver.remove(shareName.toUpperCase());
+        if (shareName != null) shareNameResolver.remove(shareName.toUpperCase(Locale.ROOT));
     }
 
     public static void flushShareNameResolver() {
@@ -187,7 +187,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                 if (curShare.getName().equalsIgnoreCase(shareName)) {
                     alreadyFound = true;
                     if (shareName != null) {
-                        if (shareName.toUpperCase().equals(shareName)) {
+                        if (shareName.toUpperCase(Locale.ROOT).equals(shareName)) {
                             // if shareName is upperCase let's use this one instead of probably the mdns one
                             if (log.isDebugEnabled()) log.debug("addIfNeeded: replacing probable mdns discovery removing {}", shareAddress);
                             shIter.remove();
