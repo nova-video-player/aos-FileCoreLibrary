@@ -284,8 +284,16 @@ public class FileUtils {
     // provides the basename
     public static String getName(Uri uri){
         if(uri!=null) {
-            // note that getLastPathSegment() does not return the last segment it could omit the fragment i.e. for /toto/tata/agent#327.mp4 provide only agent
-            String name = uri.getLastPathSegment() + (uri.getFragment() != null ? "#" + uri.getFragment() : "");
+            // note that getLastPathSegment() treats '#' as a fragment delimiter: it does not only
+            // truncate the last segment (i.e. for /toto/tata/agent#327.mp4 provide only agent), it also
+            // drops everything after a '#' appearing in an *earlier* segment (i.e. a folder literally
+            // named "#") since the fragment then consumes the remainder of the URI. Work on the raw
+            // string form instead (like removeLastSegment()) so a literal '#' anywhere in the path is
+            // treated as a normal character; avoid encodeUri() here since it would double-encode
+            // already percent-encoded content:// document ids.
+            String str = uri.toString();
+            int lastSlash = str.lastIndexOf('/');
+            String name = (lastSlash >= 0 && lastSlash < str.length() - 1) ? Uri.decode(str.substring(lastSlash + 1)) : null;
             if (name == null || name.isEmpty()) {
                 if (uri.toString().lastIndexOf("/") >= 0 && uri.toString().lastIndexOf("/") < (uri.toString().length() - 1))
                     name = uri.toString().substring(uri.toString().lastIndexOf("/") + 1);
@@ -352,7 +360,8 @@ public class FileUtils {
     // get sharename for a smb uri i.e. get first path after hostname
     public static String getShareName(Uri uri) {
         if (uri == null) return null;
-        List<String> pathSegments = uri.getPathSegments();
+        // need to encode uri to escape problematic caracters like '#'
+        List<String> pathSegments = encodeUri(uri).getPathSegments();
         if (pathSegments != null && !pathSegments.isEmpty()) {
             if (log.isDebugEnabled()) log.debug("getShareName: uri={} -> {} -> {}", uri, Arrays.toString(pathSegments.toArray()), pathSegments.get(0));
             return pathSegments.get(0);
