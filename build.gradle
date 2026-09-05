@@ -118,7 +118,7 @@ dependencies {
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'stax', module: 'stax'
     }
-    implementation 'com.hierynomus:smbj:0.15.0'
+    implementation 'com.github.nova-video-player:smbj:v0.15.1-nova'
     // Exclude BouncyCastle from sshj (which requests 1.80) to avoid duplicate class conflicts with smbj (1.85.2).
     // sshj's 1.80 bcpkix dependency pins bcutil-jdk18on to [1.80, 1.81), leading to duplicate IANAObjectIdentifiers
     // classes between bcutil-jdk18on-1.80.2 and bcprov-jdk18on-1.85.2.
