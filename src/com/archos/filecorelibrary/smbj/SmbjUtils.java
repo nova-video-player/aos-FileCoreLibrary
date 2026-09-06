@@ -141,19 +141,19 @@ public class SmbjUtils {
             if (log.isTraceEnabled()) log.trace("getSmbConnection: {} -> {}", server, serverIP);
             smbConnection = (port != -1) ? smbClient.connect(serverIP, port) : smbClient.connect(serverIP);
             smbjConnections.put(cred, smbConnection);
-            // check that auth information is valid
-            if (username == null || password == null) {
-                log.error("getSmbConnection: username or password is null for uri {}", uri);
-                throw new IOException("Invalid credentials: username or password is null");
+            if (password == null) {
+                password = "";
+            }
+            if (username == null) {
+                username = "";
             }
             // need to regenerate smbSession in this case too
             AuthenticationContext ac;
-            if ("anonymous".equals(username) && (password == null || password.isEmpty())) {
-                ac = AuthenticationContext.anonymous();
-            } else if ("guest".equalsIgnoreCase(username) && (password == null || password.isEmpty())) {
+            if ((username.isEmpty() || "guest".equalsIgnoreCase(username) || "anonymous".equalsIgnoreCase(username))
+                    && password.isEmpty()) {
                 ac = AuthenticationContext.guest();
             } else {
-                ac = new AuthenticationContext(username, password != null ? password.toCharArray() : new char[0], domain);
+                ac = new AuthenticationContext(username, password.toCharArray(), domain);
             }
             if (ac == null) {
                 log.error("getSmbConnection: AuthenticationContext is null for uri {}", uri);
