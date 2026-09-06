@@ -72,7 +72,7 @@ public class SmbjFile2 extends MetaFile2 {
 
     public SmbjFile2(FileAllInformation fileInformation, Uri uri) {
         mUriString = uri.toString();
-        mName = encodeUri(uri).getLastPathSegment();
+        mName = FileUtils.getName(uri);
         mIsDirectory = fileInformation.getStandardInformation().isDirectory();
         mIsFile = !mIsDirectory;
         mLastModified = fileInformation.getBasicInformation().getChangeTime().toDate().getTime();

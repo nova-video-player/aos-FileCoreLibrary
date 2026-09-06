@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
 
 public class SmbjUtils {
 
@@ -54,6 +56,11 @@ public class SmbjUtils {
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, Session> smbjSessions = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, DiskShare> smbjShares = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, Connection> smbjConnections = new ConcurrentHashMap<>();
+    // Guards the share/session/connection for a given credential against being torn down by
+    // resetConnection() while another thread is still actively using it (see withRetry/withReadRetry):
+    // readers (actual SMB operations) hold the read lock for the duration of the call, resetConnection()
+    // takes the write lock, so a share can never be closed underneath an in-flight operation.
+    static private final ConcurrentHashMap<NetworkCredentialsDatabase.Credential, ReentrantReadWriteLock> smbjShareLocks = new ConcurrentHashMap<>();
     private static Context mContext;
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile SmbjUtils sInstance;
@@ -238,16 +245,7 @@ public class SmbjUtils {
      * that we ran out of credits. Safe for all operations (including mutating ones).
      */
     public <T> T withRetry(Uri uri, CheckedSupplier<T> supplier) throws Exception {
-        try {
-            return supplier.get();
-        } catch (Exception e) {
-            if (isOutOfCredits(e)) {
-                log.warn("withRetry: out of credits for {}, resetting connection and retrying", uri);
-                resetConnection(uri);
-                return supplier.get();
-            }
-            throw e;
-        }
+        return executeWithRetry(uri, supplier, this::isOutOfCredits, "withRetry");
     }
 
     /**
@@ -256,16 +254,52 @@ public class SmbjUtils {
      * ONLY use this for idempotent operations (directory listing, exists, etc.).
      */
     public <T> T withReadRetry(Uri uri, CheckedSupplier<T> supplier) throws Exception {
+        return executeWithRetry(uri, supplier, this::isRetryableReadError, "withReadRetry");
+    }
+
+    /**
+     * Runs supplier while holding the per-credential read lock, so resetConnection() (which
+     * physically closes the cached share/session/connection) cannot run concurrently with it: two
+     * threads can both be reading at once, but a reset always waits for every in-flight reader to
+     * finish first, and no new reader can start while a reset is in progress. Without this, one
+     * thread's retry-triggered resetConnection() could close a DiskShare that another thread was
+     * still actively using, surfacing as "DiskShare has already been closed" in the middle of an
+     * unrelated listing/exists/read call.
+     */
+    private <T> T executeWithRetry(Uri uri, CheckedSupplier<T> supplier, Predicate<Exception> isRetryable, String tag) throws Exception {
+        ReentrantReadWriteLock lock = lockFor(uri);
+        Exception firstError;
+        lock.readLock().lock();
         try {
             return supplier.get();
         } catch (Exception e) {
-            if (isRetryableReadError(e)) {
-                log.warn("withReadRetry: error (out of credits or transport) for {}, resetting connection and retrying", uri);
-                resetConnection(uri);
-                return supplier.get();
-            }
-            throw e;
+            firstError = e;
+        } finally {
+            lock.readLock().unlock();
         }
+        if (!isRetryable.test(firstError)) throw firstError;
+        log.warn("{}: error (out of credits or transport) for {}, resetting connection and retrying", tag, uri, firstError);
+        // must not hold the read lock while resetting (a thread cannot upgrade its own read lock to
+        // a write lock without releasing it first, that would deadlock waiting on itself)
+        lock.writeLock().lock();
+        try {
+            resetConnection(uri);
+        } finally {
+            lock.writeLock().unlock();
+        }
+        lock.readLock().lock();
+        try {
+            return supplier.get();
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    private ReentrantReadWriteLock lockFor(Uri uri) {
+        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        if (cred == null)
+            cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
+        return smbjShareLocks.computeIfAbsent(cred, c -> new ReentrantReadWriteLock());
     }
 
     public boolean isRetryableReadError(Throwable t) {

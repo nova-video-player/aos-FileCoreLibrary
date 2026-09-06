@@ -18,6 +18,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileComparator;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.ListingEngine;
 import com.thegrizzlylabs.sardineandroid.DavResource;
 
@@ -44,7 +45,7 @@ public class WebdavListingEngine extends ListingEngine {
     public WebdavListingEngine(Context context, Uri uri) {
         super(context);
         if(!uri.toString().endsWith("/"))// directory must end with "/"
-            mUri = Uri.withAppendedPath(uri,"");
+            mUri = Uri.parse(uri.toString() + "/");
         else mUri = uri;
         mListingThread = new WebdavListingThread();
     }
@@ -90,13 +91,13 @@ public class WebdavListingEngine extends ListingEngine {
                     if (davResource.isDirectory()) {
                         if (keepDirectory(filename)) {
                             if (log.isTraceEnabled()) log.trace("WebdavListingThread: adding directory {}", davResource.getPath());
-                            directories.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
+                            directories.add(new WebdavFile2(davResource, FileUtils.buildChildUri(mUri, davResource.getName())));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
                             if (log.isTraceEnabled()) log.trace("WebdavListingThread: adding file {}", davResource.getPath());
                             //listFiles.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
-                            files.add(new WebdavFile2(davResource, mUri.buildUpon().appendEncodedPath(davResource.getName()).build()));
+                            files.add(new WebdavFile2(davResource, FileUtils.buildChildUri(mUri, davResource.getName())));
                         }
                     }
                 }

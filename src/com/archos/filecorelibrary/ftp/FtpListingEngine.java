@@ -18,6 +18,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileComparator;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.ListingEngine;
 
 import org.apache.commons.net.ftp.FTP;
@@ -166,7 +167,7 @@ public class FtpListingEngine extends ListingEngine {
                 final ArrayList<FTPFile2> directories = new ArrayList<FTPFile2>();
                 final ArrayList<FTPFile2> files = new ArrayList<FTPFile2>();
                 for (FTPFile f : listFiles){
-                    FTPFile2 sf = new FTPFile2(f, Uri.withAppendedPath(mUri, f.getName()));
+                    FTPFile2 sf = new FTPFile2(f, FileUtils.buildChildUri(mUri, f.getName()));
                     if (sf.isDirectory()) {
                         if (log.isTraceEnabled()) log.trace("FtpListingThread: add directory {}", sf.getName());
                         directories.add(sf);

@@ -292,13 +292,16 @@ public class FileUtils {
             // treated as a normal character; avoid encodeUri() here since it would double-encode
             // already percent-encoded content:// document ids.
             String str = uri.toString();
+            if (str.endsWith("/")) {
+                str = str.substring(0, str.length() - 1);
+            }
             int lastSlash = str.lastIndexOf('/');
             String name = (lastSlash >= 0 && lastSlash < str.length() - 1) ? Uri.decode(str.substring(lastSlash + 1)) : null;
             if (name == null || name.isEmpty()) {
-                if (uri.toString().lastIndexOf("/") >= 0 && uri.toString().lastIndexOf("/") < (uri.toString().length() - 1))
-                    name = uri.toString().substring(uri.toString().lastIndexOf("/") + 1);
+                if (str.lastIndexOf("/") >= 0 && str.lastIndexOf("/") < (str.length() - 1))
+                    name = str.substring(str.lastIndexOf("/") + 1);
                 else
-                    name = uri.toString();
+                    name = str;
             }
             if(name!=null&&"content".equals(uri.getScheme())){
                 String[] parts = name.split(":");
@@ -398,42 +401,49 @@ public class FileUtils {
 
     public static Uri encodeUri(Uri uri) {
         String uriString = uri.toString();
-        String uriEncodedString ="";
+        StringBuilder uriEncodedString = new StringBuilder();
         if (uri.getScheme() != null) {
-            uriEncodedString += uri.getScheme() + "://";
+            uriEncodedString.append(uri.getScheme()).append("://");
             uriString = uriString.substring((uri.getScheme() + "://").length());
             // Extract the authority (host:port) to not recode the : in the port
-            String authority = uriString.split("/")[0];
-            if (authority.contains(":")) {
-                String[] parts = authority.split(":");
-                uriEncodedString += parts[0] + ":" + parts[1]; // Keep the port as is
-                uriString = uriString.substring(authority.length());
+            int slashIndex = uriString.indexOf('/');
+            String authority;
+            if (slashIndex != -1) {
+                authority = uriString.substring(0, slashIndex);
+                uriString = uriString.substring(slashIndex); // starts with '/'
             } else {
-                uriEncodedString += authority;
-                uriString = uriString.substring(authority.length());
+                authority = uriString;
+                uriString = "";
+            }
+            if (authority.contains(":")) {
+                String[] parts = authority.split(":", 2);
+                uriEncodedString.append(parts[0]).append(":").append(parts[1]); // Keep the port as is
+            } else {
+                uriEncodedString.append(authority);
             }
         }
-        int i= 0;
-        for(String seg : uriString.split("/")){ //split instead of using uri. get path segments because when weird characters such as # %, path segments don't work properly
-            seg = seg.replace("/","");
-            if(i!=0 && uriString.startsWith("/")) {
-                uriEncodedString += "/";
+        boolean endsWithSlash = uriString.endsWith("/");
+        String[] segments = uriString.split("/");
+        int count = 0;
+        for (String seg : segments) {
+            if (seg.isEmpty()) {
+                continue;
             }
-            uriEncodedString+=Uri.encode(seg);
-            i++;
+            uriEncodedString.append("/").append(Uri.encode(Uri.decode(seg)));
+            count++;
         }
-        if(uriEncodedString.startsWith("//")) {
-            uriEncodedString = uriEncodedString.substring(1);
+        if (endsWithSlash || count == 0) {
+            uriEncodedString.append("/");
         }
         if (log.isDebugEnabled()) log.debug("encodeUri: results in uriEncodedString={}", uriEncodedString);
-        return Uri.parse(uriEncodedString);
+        return Uri.parse(uriEncodedString.toString());
     }
 
     public static Uri buildChildUri(Uri parent, String childName){
         if("content".equals(parent.getScheme())){
             return Uri.parse(DocumentUriBuilder.buildDocumentUriUsingTree(parent).toString()+Uri.encode("/")+childName);
         }
-        return Uri.withAppendedPath(parent, childName);
+        return parent.buildUpon().appendPath(childName).build();
     }
 
     // dump intent into string for debug purposes

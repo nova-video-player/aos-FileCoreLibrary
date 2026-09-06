@@ -20,6 +20,7 @@ import static com.archos.filecorelibrary.FileUtils.getShareName;
 import static com.archos.filecorelibrary.FileUtils.isDotDirectoryEntry;
 import static com.archos.filecorelibrary.smbj.SmbjUtils.isDirectory;
 
+import com.archos.filecorelibrary.FileUtils;
 import android.content.Context;
 import android.net.Uri;
 
@@ -54,7 +55,7 @@ public class SmbjListingEngine extends ListingEngine {
     public SmbjListingEngine(Context context, Uri uri) {
         super(context);
         if(!uri.toString().endsWith("/"))// directory must end with "/"
-            mUri = Uri.withAppendedPath(uri,"");
+            mUri = Uri.parse(uri.toString() + "/");
         else mUri = uri;
         mListingThread = new SmbjListingThread();
     }
@@ -112,12 +113,12 @@ public class SmbjListingEngine extends ListingEngine {
                     if (isDirectory(fileOrDir)) {
                         if (keepDirectory(filename)) {
                             if (log.isTraceEnabled()) log.trace("SmbjListingThread: adding directory {}", fullFilename);
-                            directories.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
+                            directories.add(new SmbjFile2(fileOrDir, FileUtils.buildChildUri(mUri, filename)));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
                             if (log.isTraceEnabled()) log.trace("SmbjListingThread: adding file {}", fullFilename);
-                            files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
+                            files.add(new SmbjFile2(fileOrDir, FileUtils.buildChildUri(mUri, filename)));
                         }
                     }
                 }

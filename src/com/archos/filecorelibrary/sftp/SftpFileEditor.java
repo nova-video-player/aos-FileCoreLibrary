@@ -25,6 +25,9 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,6 +36,8 @@ import java.io.OutputStream;
 import java.net.UnknownHostException;
 
 public class SftpFileEditor  extends FileEditor{
+
+    private static final Logger log = LoggerFactory.getLogger(SftpFileEditor.class);
 
     private static final String TAG = "SftpFileEditor";
     private static final boolean DBG = false;
@@ -48,6 +53,7 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public boolean mkdir() {
+        if (log.isDebugEnabled()) log.debug("mkdir: {}", mUri.getPath());
         Channel channel = null;
         try {
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
@@ -58,9 +64,9 @@ public class SftpFileEditor  extends FileEditor{
             return true;
         }
         catch (SftpException e) {
-
+            log.warn("mkdir: SftpException for {}", mUri, e);
         } catch (JSchException e) {
-            e.printStackTrace();
+            log.warn("mkdir: JSchException for {}", mUri, e);
         } finally {
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
@@ -123,6 +129,7 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public InputStream getInputStream() throws FileNotFoundException, JSchException, SftpException {
+        if (log.isDebugEnabled()) log.debug("getInputStream: {}", mUri.getPath());
         Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
         InputStream is = ((ChannelSftp)channel).get(mUri.getPath());
         return wrapInputStream(is, channel);
@@ -130,6 +137,7 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
+        if (log.isDebugEnabled()) log.debug("getInputStream: {} from {}", mUri.getPath(), from);
         final Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
         InputStream is = ((ChannelSftp)channel).get(mUri.getPath(), null, from);
         return wrapInputStream(is, channel);
@@ -137,6 +145,7 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public OutputStream getOutputStream() throws FileNotFoundException, JSchException, SftpException {
+        if (log.isDebugEnabled()) log.debug("getOutputStream: {}", mUri.getPath());
         final Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
         final OutputStream sftpOS = ((ChannelSftp)channel).put(mUri.getPath());
         return new OutputStream() {
@@ -171,11 +180,13 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public Boolean delete() throws Exception {
+        if (log.isDebugEnabled()) log.debug("delete: {}", mUri.getPath());
         Channel channel = null;
         try {
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
             ((ChannelSftp)channel).rm(mUri.getPath());
         } catch (JSchException e) {
+            log.warn("delete: JSchException for {}", mUri, e);
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
                 SFTPSession.getInstance().releaseSession(channel);
@@ -185,6 +196,7 @@ public class SftpFileEditor  extends FileEditor{
             else
                 throw new AuthenticationException();
         } catch (SftpException e) {
+            log.warn("delete: SftpException for {}", mUri, e);
             throw new Exception("permission");
         } finally {
             if(channel!=null&&channel.isConnected()) {
@@ -197,6 +209,7 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public boolean rename(String newName){
+        if (log.isDebugEnabled()) log.debug("rename: {} to {}", mUri.getPath(), newName);
         Channel channel = null;
         try {
              channel = SFTPSession.getInstance().getSFTPChannel(mUri);
@@ -205,7 +218,7 @@ public class SftpFileEditor  extends FileEditor{
             SFTPSession.getInstance().releaseSession(channel);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("rename: failed to rename {} to {}", mUri, newName, e);
         }finally {
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
@@ -219,6 +232,7 @@ public class SftpFileEditor  extends FileEditor{
     public boolean move(Uri uri) {
         if(!mUri.getScheme().equals(uri.getScheme())|| !mUri.getHost().equals(uri.getHost())||mUri.getPort()!=uri.getPort())
             return false;
+        if (log.isDebugEnabled()) log.debug("move: {} to {}", mUri, uri);
         Channel channel = null;
         try {
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);
@@ -227,7 +241,7 @@ public class SftpFileEditor  extends FileEditor{
             SFTPSession.getInstance().releaseSession(channel);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("move: failed to move {} to {}", mUri, uri, e);
         }finally {
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
@@ -240,6 +254,7 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public boolean exists() {
+        if (log.isTraceEnabled()) log.trace("exists: checking {}", mUri.getPath());
         Channel channel = null;
         try {
             channel = SFTPSession.getInstance().getSFTPChannel(mUri);

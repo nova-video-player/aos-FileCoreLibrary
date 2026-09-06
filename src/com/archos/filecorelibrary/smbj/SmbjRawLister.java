@@ -20,6 +20,7 @@ import static com.archos.filecorelibrary.FileUtils.isDotDirectoryEntry;
 
 import android.net.Uri;
 
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
@@ -67,7 +68,7 @@ public class SmbjRawLister extends RawLister {
                 }
                 final String fullFilename = "/" + shareName + "/" + filename;
                 if (log.isTraceEnabled()) log.trace("getFileList: adding {}", fullFilename);
-                files.add(new SmbjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
+                files.add(new SmbjFile2(fileOrDir, FileUtils.buildChildUri(mUri, filename)));
             }
             return files;
         } catch (SMB2GuestSigningRequiredException e) {

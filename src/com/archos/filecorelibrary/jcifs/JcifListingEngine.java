@@ -53,7 +53,7 @@ public class JcifListingEngine extends ListingEngine {
     public JcifListingEngine(Context context, Uri uri) {
         super(context);
         if(!uri.toString().endsWith("/"))// directory must end with "/"
-            mUri = Uri.withAppendedPath(uri,"");
+            mUri = Uri.parse(uri.toString() + "/");
         else mUri = uri;
         mListingThread = new JcifListingThread();
     }

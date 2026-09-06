@@ -18,6 +18,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileComparator;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.ListingEngine;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -26,6 +27,9 @@ import com.jcraft.jsch.ChannelSftp.LsEntrySelector;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +42,8 @@ import java.util.Vector;
  *
  */
 public class SFtpListingEngine extends ListingEngine {
+
+    private static final Logger log = LoggerFactory.getLogger(SFtpListingEngine.class);
 
     private final static String TAG = "FtpListingEngine";
 
@@ -82,17 +88,20 @@ public class SFtpListingEngine extends ListingEngine {
                     return CONTINUE;
                 }
                 if (entry.getAttrs().isLink()) {
+                    if (log.isTraceEnabled()) log.trace("listEntries: keeping link {}", filename);
                     vector.addElement(entry);
                 }
                 else if (entry.getAttrs().isDir()) {
                     if (keepDirectory(filename)) {
+                        if (log.isTraceEnabled()) log.trace("listEntries: keeping directory {}", filename);
                         vector.addElement(entry);
-                    }
+                    } else if (log.isTraceEnabled()) log.trace("listEntries: skipping directory {}", filename);
                 }
                 else {
                      if (keepFile(filename)) {
+                         if (log.isTraceEnabled()) log.trace("listEntries: keeping file {}", filename);
                         vector.addElement(entry);
-                    }
+                    } else if (log.isTraceEnabled()) log.trace("listEntries: skipping file {}", filename);
                 }
                 return CONTINUE;
             }
@@ -106,6 +115,7 @@ public class SFtpListingEngine extends ListingEngine {
         public void run(){
             Channel channel = null;
             try {
+                if (log.isDebugEnabled()) log.debug("SFtpListingThread: listFiles for: {}", mUri);
                 channel = SFTPSession.getInstance().getSFTPChannel(mUri);
                 if(channel==null&&!mAbort ){
                     mUiHandler.post(new Runnable() {
@@ -164,7 +174,7 @@ public class SFtpListingEngine extends ListingEngine {
                             String filename = ls.getFilename();
                             String path = channelSftp.readlink(mUri.getPath()+"/"+ls.getFilename());
                             SftpATTRS stat = channelSftp.stat(path);
-                            Uri newUri = Uri.withAppendedPath(mUri, ls.getFilename());
+                            Uri newUri = FileUtils.buildChildUri(mUri, ls.getFilename());
                             SFTPFile2 sf = new SFTPFile2 ( stat, ls.getFilename(),newUri);
                             if(stat.isDir()&&keepDirectory(filename)){
                                 directories.add(sf);
@@ -175,10 +185,11 @@ public class SFtpListingEngine extends ListingEngine {
                                 }
                             }
                         } catch (SftpException e) {
+                            log.warn("SFtpListingThread: failed to resolve symlink {}", ls.getFilename(), e);
                         }
                     }
                     else {
-                        SFTPFile2 sf = new SFTPFile2(ls.getAttrs(), ls.getFilename(), Uri.withAppendedPath(mUri, ls.getFilename()));
+                        SFTPFile2 sf = new SFTPFile2(ls.getAttrs(), ls.getFilename(), FileUtils.buildChildUri(mUri, ls.getFilename()));
                         if (sf.isDirectory()) {
                             directories.add(sf);
                         }
@@ -251,6 +262,7 @@ public class SFtpListingEngine extends ListingEngine {
                 channel.disconnect();
                 SFTPSession.getInstance().releaseSession(channel);
             } catch (final SftpException e) {
+                log.warn("SFtpListingThread: SftpException for {}", mUri, e);
                 if(channel!=null&&channel.isConnected()) {
                     channel.disconnect();
                     SFTPSession.getInstance().releaseSession(channel);
@@ -264,6 +276,7 @@ public class SFtpListingEngine extends ListingEngine {
                 });
             }  
             catch (final JSchException e1) {
+                log.warn("SFtpListingThread: JSchException for {}", mUri, e1);
                 if(channel!=null&&channel.isConnected()) {
                     channel.disconnect();
                     SFTPSession.getInstance().releaseSession(channel);

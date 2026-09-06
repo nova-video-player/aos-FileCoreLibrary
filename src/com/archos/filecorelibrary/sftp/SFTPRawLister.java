@@ -16,6 +16,7 @@ package com.archos.filecorelibrary.sftp;
 
 import android.net.Uri;
 
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
@@ -26,17 +27,22 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
 
 /**
- * returns 
+ * returns
  * @author alexandre
  *
  */
 public class SFTPRawLister extends RawLister {
+
+    private static final Logger log = LoggerFactory.getLogger(SFTPRawLister.class);
 
     public SFTPRawLister(Uri uri) {
         super(uri);
@@ -44,6 +50,7 @@ public class SFTPRawLister extends RawLister {
 
     @Override
     public ArrayList<MetaFile2> getFileList() throws IOException, AuthenticationException, SftpException, JSchException {
+        if (log.isDebugEnabled()) log.debug("getFileList: listing {}", mUri);
         Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
 
         if(channel==null){
@@ -65,18 +72,19 @@ public class SFTPRawLister extends RawLister {
             for (LsEntry ls : vec) {
                 if (ls.getFilename().equals(".") || ls.getFilename().equals(".."))
                     continue;
+                if (log.isTraceEnabled()) log.trace("getFileList: entry {} isLink={} isDir={}", ls.getFilename(), ls.getAttrs().isLink(), ls.getAttrs().isDir());
                 if (ls.getAttrs().isLink()) {
                     try {
                         String path = channelSftp.readlink(mUri.getPath() + "/" + ls.getFilename());
                         SftpATTRS stat = channelSftp.stat(path);
-                        Uri newUri = Uri.withAppendedPath(mUri, ls.getFilename());
+                        Uri newUri = FileUtils.buildChildUri(mUri, ls.getFilename());
                         SFTPFile2 sf = new SFTPFile2(stat, ls.getFilename(), newUri);
                         files.add(sf);
                     } catch (SftpException e) {
-                        e.printStackTrace();
+                        log.warn("getFileList: failed to resolve symlink {}", ls.getFilename(), e);
                     }
                 } else {
-                    SFTPFile2 sf = new SFTPFile2(ls.getAttrs(), ls.getFilename(), Uri.withAppendedPath(mUri, ls.getFilename()));
+                    SFTPFile2 sf = new SFTPFile2(ls.getAttrs(), ls.getFilename(), FileUtils.buildChildUri(mUri, ls.getFilename()));
                     files.add(sf);
                 }
             }
@@ -84,6 +92,7 @@ public class SFTPRawLister extends RawLister {
             SFTPSession.getInstance().releaseSession(channel);
             return files;
         }catch (Exception e){
+            log.warn("getFileList: failed to list {}", mUri, e);
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
                 SFTPSession.getInstance().releaseSession(channel);

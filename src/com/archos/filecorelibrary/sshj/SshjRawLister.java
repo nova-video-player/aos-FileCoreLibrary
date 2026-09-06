@@ -19,6 +19,7 @@ import static com.archos.filecorelibrary.sshj.SshjUtils.getSftpPath;
 
 import android.net.Uri;
 
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
@@ -56,7 +57,7 @@ public class SshjRawLister extends RawLister {
             for (var fileOrDir : remoteResourceInfos) {
                 final String filename = fileOrDir.getName();
                 if (log.isTraceEnabled()) log.trace("getFileList: adding {}", filename);
-                files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
+                files.add(new SshjFile2(fileOrDir, FileUtils.buildChildUri(mUri, filename)));
             }
             return files;
         } catch (IOException ioe) {

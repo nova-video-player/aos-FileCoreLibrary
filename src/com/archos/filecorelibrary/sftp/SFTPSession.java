@@ -23,10 +23,16 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SFTPSession {
+
+    private static final Logger log = LoggerFactory.getLogger(SFTPSession.class);
+
     private static SFTPSession sshSession = null;
     //Keep a cached Session ( = connection) per server
     private ConcurrentHashMap<Credential, Session> currentSessions;
@@ -43,6 +49,7 @@ public class SFTPSession {
 	}
 
 	public synchronized Channel getSFTPChannel(Uri cred) throws JSchException{
+        if (log.isDebugEnabled()) log.debug("getSFTPChannel: opening sftp channel for {}", cred);
         Session session = getSession(cred);
         if(session !=null){
             try {
@@ -52,6 +59,7 @@ public class SFTPSession {
                 return channel;
             } catch (JSchException e) {
                 //channel isn't openable, we have to reset the session !
+                log.warn("getSFTPChannel: failed to open channel for {}, resetting session and retrying", cred, e);
                 removeSession(cred);
                 Session session2 = getSession(cred);
                 if (session2 != null) {
@@ -63,7 +71,7 @@ public class SFTPSession {
                         acquireSession(channel);
                         return channel;
                     } catch (JSchException e1) {
-                        // TODO Auto-generated catch block
+                        log.warn("getSFTPChannel: retry failed for {}", cred, e1);
                         throw e1;
                     }
                 }
@@ -75,6 +83,7 @@ public class SFTPSession {
     private synchronized void acquireSession(Channel channel){
         try {
             Session session = channel.getSession();
+            if (log.isTraceEnabled()) log.trace("acquireSession: acquiring channel {} for session {}", channel, session);
             HashSet<Channel> channels = usedSessions.get(session);
             if(channels == null) {
                 channels = new HashSet<>();
@@ -82,12 +91,14 @@ public class SFTPSession {
             }
             channels.add(channel);
         } catch (JSchException e) {
+            log.warn("acquireSession: failed to get session for channel {}", channel, e);
         }
     }
 
     public synchronized void releaseSession(Channel channel) {
         try {
             Session session = channel.getSession();
+            if (log.isTraceEnabled()) log.trace("releaseSession: releasing channel {} for session {}", channel, session);
             HashSet<Channel> channels = usedSessions.get(session);
             boolean deleted = channels.remove(channel);
             //We already deleted this channel before
@@ -95,11 +106,12 @@ public class SFTPSession {
             if(channels.isEmpty()) {
                 //If this is our current session for this credential, keep it
                 if(currentSessions.values().contains(session)) return;
+                if (log.isDebugEnabled()) log.debug("releaseSession: no more channels in use, disconnecting session {}", session);
                 session.disconnect();
                 usedSessions.remove(session);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("releaseSession: failed to release channel {}", channel, e);
         }
     }
 
@@ -110,6 +122,7 @@ public class SFTPSession {
     on every request
      */
     public synchronized void removeSession(Uri cred) {
+        if (log.isDebugEnabled()) log.debug("removeSession: removing session(s) for {}", cred);
         for(Credential c : currentSessions.keySet()){
             Uri uri = Uri.parse(c.getUriString());
             if(!uri.getHost().equals(cred.getHost()) || uri.getPort()!=cred.getPort())
@@ -120,6 +133,7 @@ public class SFTPSession {
             //Since we are removing this session from currentSessions
             //The session will be disconnected in releaseChannel
             if(!doNotDisconnect) {
+                if (log.isTraceEnabled()) log.trace("removeSession: disconnecting session {} for {}", s, c);
                 s.disconnect();
             }
             currentSessions.remove(c);
@@ -147,11 +161,14 @@ public class SFTPSession {
         if(session!=null){
             if(!session.isConnected())
                 try {
+                    if (log.isDebugEnabled()) log.debug("getSession: reconnecting stale session for {}", path);
                     session.connect();
                 } catch (JSchException e1) {
+                    log.warn("getSession: failed to reconnect stale session for {}, removing and retrying", path, e1);
                     removeSession(path);
                     return getSession(path);
                 }
+            else if (log.isTraceEnabled()) log.trace("getSession: reusing session for {}", path);
             return session;
         }
         JSch jsch=new JSch();
@@ -160,6 +177,7 @@ public class SFTPSession {
             port = 22;
         }
         try {
+            if (log.isDebugEnabled()) log.debug("getSession: opening new session for {}@{}:{}", username, path.getHost(), port);
             session = jsch.getSession(username, path.getHost(), port);
             session.setPassword(password);
             java.util.Properties config = new java.util.Properties();
@@ -169,7 +187,7 @@ public class SFTPSession {
             currentSessions.put(cred, session);
             return session;
         } catch (JSchException e) {
-            // TODO Auto-generated catch block
+            log.warn("getSession: failed to open new session for {}", path, e);
             throw e;
 
         }

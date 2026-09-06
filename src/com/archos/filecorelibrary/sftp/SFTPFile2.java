@@ -29,11 +29,15 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.UnknownHostException;
 
 public class SFTPFile2 extends MetaFile2 {
+
+    private static final Logger log = LoggerFactory.getLogger(SFTPFile2.class);
 
     private static final long serialVersionUID = 2L;
 
@@ -67,6 +71,7 @@ public class SFTPFile2 extends MetaFile2 {
         mCanRead = true;
         mCanWrite = true;
         mLength = stat.getSize();
+        if (log.isTraceEnabled()) log.trace("SFTPFile2: uri={}, mName={}, isDirectory={}, lastModified={}, length={}", mUriString, mName, mIsDirectory, mLastModified, mLength);
     }
 
     @SuppressWarnings("unused")
@@ -143,6 +148,7 @@ public class SFTPFile2 extends MetaFile2 {
      *
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
+        if (log.isDebugEnabled()) log.debug("fromUri: {}, path={}", uri, uri.getPath());
         Channel channel = null;
         try {
             channel = SFTPSession.getInstance().getSFTPChannel(uri);
@@ -151,6 +157,7 @@ public class SFTPFile2 extends MetaFile2 {
             SFTPSession.getInstance().releaseSession(channel);
             return new SFTPFile2(attrs,FileUtils.getName(uri), uri);
         } catch (JSchException e) {
+            log.warn("fromUri: JSchException for {}", uri, e);
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
                 SFTPSession.getInstance().releaseSession(channel);
@@ -160,6 +167,7 @@ public class SFTPFile2 extends MetaFile2 {
             else
                 throw new AuthenticationException();
         } catch (SftpException e) {
+            log.warn("fromUri: SftpException for {}", uri, e);
             if(channel!=null&&channel.isConnected()) {
                 channel.disconnect();
                 SFTPSession.getInstance().releaseSession(channel);

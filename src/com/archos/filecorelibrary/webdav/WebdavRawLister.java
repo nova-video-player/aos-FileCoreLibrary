@@ -16,6 +16,7 @@ package com.archos.filecorelibrary.webdav;
 
 import android.net.Uri;
 
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 import com.archos.filecorelibrary.AuthenticationException;
@@ -46,7 +47,7 @@ public class WebdavRawLister extends RawLister {
             // First answer is ourselves, ignore it
             resources.remove(0);
             for (var res : resources) {
-                files.add(new WebdavFile2(res, mUri.buildUpon().appendEncodedPath(res.getName()).build()));
+                files.add(new WebdavFile2(res, FileUtils.buildChildUri(mUri, res.getName())));
             }
             return files;
         } catch (Throwable t) {

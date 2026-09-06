@@ -56,7 +56,7 @@ public class WebdavFile2 extends MetaFile2 {
                 log.warn("uriToHttp: redirect resolution failed for " + httpUri + ", using original");
                 return httpUri;
             }
-            String path = httpUri.getPath();
+            String path = httpUri.getEncodedPath();
             if (path == null) path = "";
             return Uri.parse(resolvedUrl + path);
         } catch (Exception e) {

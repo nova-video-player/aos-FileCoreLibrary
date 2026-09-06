@@ -23,6 +23,7 @@ import android.net.Uri;
 
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileComparator;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.ListingEngine;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 
@@ -53,7 +54,7 @@ public class SshjListingEngine extends ListingEngine {
     public SshjListingEngine(Context context, Uri uri) {
         super(context);
         if(!uri.toString().endsWith("/"))// directory must end with "/"
-            mUri = Uri.withAppendedPath(uri,"");
+            mUri = Uri.parse(uri.toString() + "/");
         else mUri = uri;
         mListingThread = new SshjListingThread();
     }
@@ -98,12 +99,12 @@ public class SshjListingEngine extends ListingEngine {
                     if (fileOrDir.isDirectory()) {
                         if (keepDirectory(filename)) {
                             if (log.isTraceEnabled()) log.trace("SshjListingThread: adding directory {}", filename);
-                            directories.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
+                            directories.add(new SshjFile2(fileOrDir, FileUtils.buildChildUri(mUri, filename)));
                         }
                     } else { // this is a file
                         if (keepFile(filename)) {
                             if (log.isTraceEnabled()) log.trace("SshjListingThread: adding file {}", filename);
-                            files.add(new SshjFile2(fileOrDir, mUri.buildUpon().appendEncodedPath(filename).build()));
+                            files.add(new SshjFile2(fileOrDir, FileUtils.buildChildUri(mUri, filename)));
                         }
                     }
                 }
