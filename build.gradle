@@ -33,6 +33,10 @@ android {
             //disable automatic jni build rules
             jni.srcDirs = []
         }
+        test {
+            java.srcDirs = ['test/java']
+            resources.srcDirs = ['test/resources']
+        }
     }
 
     defaultConfig {
@@ -74,6 +78,18 @@ android {
         disable 'MissingTranslation', 'ExtraTranslation', 'MissingQuantity', 'ImpliedQuantity'
         enable 'SuspiciousIndentation'
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            forkEvery = 1
+            systemProperty 'nova.test.speedtestCsv', System.getProperty('nova.test.speedtestCsv')
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen {false}
+                showStandardStreams = true
+            }
+        }
+    }
 }
 
 tasks.register('ndkBuild', Exec) {
@@ -101,6 +117,11 @@ configurations.configureEach {
     exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "log4j", module: "log4j"
     exclude group: 'jcifs', module: 'jcifs' // try to avoid conflict with jcifs-ng on Konka Android TV 2861
+}
+
+// to avoid duplicate SLF4J providers (logback-android vs logback-classic) in unit tests
+configurations.matching { it.name.toLowerCase().contains("unittest") }.configureEach {
+    exclude group: 'com.github.tony19', module: 'logback-android'
 }
 
 dependencies {
@@ -133,5 +154,10 @@ dependencies {
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.5.0'
     implementation 'io.sentry:sentry:8.53.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
+    testImplementation 'androidx.test:core:1.7.0'
+    testImplementation 'ch.qos.logback:logback-classic:1.6.3'
 }
 
