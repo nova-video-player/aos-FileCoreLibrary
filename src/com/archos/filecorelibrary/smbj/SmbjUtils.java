@@ -146,6 +146,18 @@ public class SmbjUtils {
             }
             if (username == null) {
                 username = "";
+            } else {
+                int ci = username.indexOf('@');
+                if (ci > 0) {
+                    domain = username.substring(ci + 1);
+                    username = username.substring(0, ci);
+                } else {
+                    ci = username.indexOf('\\');
+                    if (ci > 0) {
+                        domain = username.substring(0, ci);
+                        username = username.substring(ci + 1);
+                    }
+                }
             }
             // need to regenerate smbSession in this case too
             AuthenticationContext ac;
