@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
@@ -83,7 +84,7 @@ public class JcifsFile2 extends MetaFile2 {
 
     private void buildJcifsFile2(NovaSmbFile nFile) throws SmbException {
         buildJcifsFile2(nFile.smbFile);
-        mUriString = nFile.getCanonicalPath();
+        mUriString = FileUtils.encodeUri(Uri.parse(nFile.getCanonicalPath())).toString();
         mName = nFile.getName();
         if (mIsDirectory && mName.endsWith("/")) {
             mName = mName.substring(0, mName.length()-1);
@@ -98,7 +99,7 @@ public class JcifsFile2 extends MetaFile2 {
             throw new IllegalArgumentException("JcifsFile2: file cannot be null");
         }
         // Only use methods doing no network access here
-        mUriString = file.getCanonicalPath();
+        mUriString = FileUtils.encodeUri(Uri.parse(file.getCanonicalPath())).toString();
         String name  = file.getName();
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();

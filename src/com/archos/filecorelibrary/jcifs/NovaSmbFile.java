@@ -19,6 +19,8 @@ import static com.archos.filecorelibrary.samba.SambaDiscovery.getIpFromShareName
 
 import android.net.Uri;
 
+import com.archos.filecorelibrary.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +45,9 @@ public class NovaSmbFile {
         if (log.isTraceEnabled()) log.trace("getIpUriString: uri {}, shareName {}, shareNameIp {}", uri, shareName, getIpFromShareName(shareName));
         if (log.isTraceEnabled()) log.trace("getIpUriString: shareNameResolver hashtable {}", dumpShareNameResolver());
         String shareNameIP = getIpFromShareName(shareName);
-        if (shareNameIP == null) return uri.toString();
-        else return uri.toString().replaceFirst(shareName, shareNameIP);
+        String decodedUri = FileUtils.decodeUri(uri);
+        if (shareNameIP == null) return decodedUri;
+        else return decodedUri.replaceFirst(shareName, shareNameIP);
     }
 
     public String getCanonicalPath() {
@@ -61,12 +64,13 @@ public class NovaSmbFile {
         if (log.isTraceEnabled()) log.trace("NovaSmbFile: shareNameResolver hashtable {}", dumpShareNameResolver());
         String shareNameIP = getIpFromShareName(shareName);
         if (log.isTraceEnabled()) log.trace("NovaSmbFile: uri {}, shareName {}, shareNameIP {}", uri, shareName, shareNameIP);
+        String uriDecoded = FileUtils.decodeUri(uri);
         if (shareNameIP == null) {
-            smbFile = new SmbFile(uri.toString(), cifsContext);
+            smbFile = new SmbFile(uriDecoded, cifsContext);
             shareIP = shareName;
         } else {
             shareIP = shareNameIP;
-            smbFile = new SmbFile(uri.toString().replaceFirst(shareName, shareIP), cifsContext);
+            smbFile = new SmbFile(uriDecoded.replaceFirst(shareName, shareIP), cifsContext);
         }
     }
 }

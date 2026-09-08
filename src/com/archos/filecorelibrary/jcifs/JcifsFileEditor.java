@@ -27,6 +27,7 @@ import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 
 import android.net.Uri;
 import android.util.Log;
@@ -93,7 +94,8 @@ public class JcifsFileEditor extends FileEditor{
         try {
             SmbFile from = getSmbFile(mUri).smbFile;
             if (from != null) {
-                SmbFile to = getSmbFile(Uri.parse(from.getParent() + newName)).smbFile;
+                Uri toUri = FileUtils.buildChildUri(FileUtils.getParentUrl(mUri), newName);
+                SmbFile to = getSmbFile(toUri).smbFile;
                 if (log.isDebugEnabled()) log.debug("rename: {} to {}", from, to);
                 if (to != null) {
                     from.renameTo(to);

@@ -153,16 +153,27 @@ public class FileUtils {
     }
 
     public static Uri removeLastSegment(Uri uri){
-        int index;
+        if (uri == null) return null;
         String str = uri.toString();
         if (log.isTraceEnabled()) log.trace("removeLastSegment input: {}", str);
+        int minSlashIndex = 0;
+        int schemeEnd = str.indexOf("://");
+        if (schemeEnd >= 0) {
+            int authorityStart = schemeEnd + 3;
+            int firstSlashAfterAuthority = str.indexOf(SEPARATOR, authorityStart);
+            if (firstSlashAfterAuthority < 0) {
+                return null;
+            }
+            minSlashIndex = firstSlashAfterAuthority;
+        }
+        int index;
         if (str.endsWith(SEPARATOR))
             index = str.lastIndexOf(SEPARATOR, str.length()-2);
         else index = str.lastIndexOf(SEPARATOR);
-        if (index <= 0) return null;
+        if (index < minSlashIndex || index <= 0) return null;
         if (log.isTraceEnabled()) log.trace("removeLastSegment output: {}", str.substring(0, index + 1));
         // MUST keep the trailing "/" for samba
-        return Uri.parse(str.substring(0, index + 1));
+        return encodeUri(Uri.parse(str.substring(0, index + 1)));
     }
 
     /**
@@ -432,18 +443,53 @@ public class FileUtils {
             uriEncodedString.append("/").append(Uri.encode(Uri.decode(seg)));
             count++;
         }
-        if (endsWithSlash || count == 0) {
+        if (endsWithSlash) {
             uriEncodedString.append("/");
         }
         if (log.isDebugEnabled()) log.debug("encodeUri: results in uriEncodedString={}", uriEncodedString);
         return Uri.parse(uriEncodedString.toString());
     }
 
+    public static String decodeUri(Uri uri) {
+        if (uri == null) return null;
+        String uriString = uri.toString();
+        StringBuilder uriDecodedString = new StringBuilder();
+        if (uri.getScheme() != null) {
+            uriDecodedString.append(uri.getScheme()).append("://");
+            uriString = uriString.substring((uri.getScheme() + "://").length());
+            int slashIndex = uriString.indexOf('/');
+            String authority;
+            if (slashIndex != -1) {
+                authority = uriString.substring(0, slashIndex);
+                uriString = uriString.substring(slashIndex);
+            } else {
+                authority = uriString;
+                uriString = "";
+            }
+            uriDecodedString.append(authority);
+        }
+        boolean endsWithSlash = uriString.endsWith("/");
+        String[] segments = uriString.split("/");
+        int count = 0;
+        for (String seg : segments) {
+            if (seg.isEmpty()) {
+                continue;
+            }
+            uriDecodedString.append("/").append(Uri.decode(seg));
+            count++;
+        }
+        if (endsWithSlash) {
+            uriDecodedString.append("/");
+        }
+        if (log.isDebugEnabled()) log.debug("decodeUri: results in uriDecodedString={}", uriDecodedString);
+        return uriDecodedString.toString();
+    }
+
     public static Uri buildChildUri(Uri parent, String childName){
         if("content".equals(parent.getScheme())){
             return Uri.parse(DocumentUriBuilder.buildDocumentUriUsingTree(parent).toString()+Uri.encode("/")+childName);
         }
-        return parent.buildUpon().appendPath(childName).build();
+        return encodeUri(parent).buildUpon().fragment(null).appendPath(childName).build();
     }
 
     // dump intent into string for debug purposes
