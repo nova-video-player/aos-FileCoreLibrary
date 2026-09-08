@@ -42,10 +42,8 @@ public class WebdavRawLister extends RawLister {
             var httpUri = WebdavFile2.uriToHttp(mUri);
 
             var files = new ArrayList<MetaFile2>();
-            var resources = sardine.list(httpUri.toString());
-
-            // First answer is ourselves, ignore it
-            resources.remove(0);
+            var resources = WebdavResourceList.children(httpUri.getPath(),
+                    sardine.list(httpUri.toString()));
             for (var res : resources) {
                 files.add(new WebdavFile2(res, FileUtils.buildChildUri(mUri, res.getName())));
             }

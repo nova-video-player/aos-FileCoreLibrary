@@ -171,8 +171,12 @@ public class WebdavFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         var sardine = WebdavUtils.peekInstance().getSardine(uri);
         Uri httpUri = WebdavFile2.uriToHttp(uri);
-        List<DavResource> resources = sardine.list(httpUri.toString());
-        return new WebdavFile2(resources.get(0), uri);
+        List<DavResource> resources = sardine.list(httpUri.toString(), 0);
+        DavResource resource = WebdavResourceList.forDepthZero(httpUri.getPath(), resources);
+        if (resource == null) {
+            throw new IOException("WebDAV server did not return the requested resource: " + httpUri);
+        }
+        return new WebdavFile2(resource, uri);
 
     }
 }
