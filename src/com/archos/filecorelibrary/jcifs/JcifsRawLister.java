@@ -43,6 +43,14 @@ public class JcifsRawLister extends RawLister {
 
     private static final Logger log = LoggerFactory.getLogger(JcifsRawLister.class);
 
+    // not exposed by jcifs.smb.NtStatus but returned by servers when a pooled tree/file
+    // handle was closed concurrently (e.g. jcifs-ng's "Disconnected tree while still in
+    // use" case): retrying with a freshly resolved SmbFile recovers from it.
+    private static final int NT_STATUS_FILE_CLOSED = 0xC0000128;
+    private static final int NT_STATUS_CONNECTION_DISCONNECTED = 0xC000020C;
+    private static final int NT_STATUS_CONNECTION_RESET = 0xC000020D;
+    private static final int NT_STATUS_NETWORK_NAME_DELETED = 0xC00000c9;
+
     public JcifsRawLister(Uri uri) {
         super(uri);
     }
@@ -58,27 +66,44 @@ public class JcifsRawLister extends RawLister {
             return null;
         }
         try {
-            SmbFile[] listFiles = nSmbFile.smbFile.listFiles();
-            if (listFiles != null) {
-                ArrayList<MetaFile2> files = new ArrayList<>();
-                for(SmbFile f : listFiles){
-                    String filename = f.getName();
-                    if (isDotDirectoryEntry(filename)) {
-                        continue;
-                    }
-                    // better verify that it is a file or directory before adding
-                    if(f.isFile() || f.isDirectory()) {
-                        if (log.isTraceEnabled()) log.trace("found {}", f.getPath());
-                        files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
-                    }
-                }
-                return files;
-            }
+            return list(nSmbFile);
         } catch (SmbException e) {
-            throw e;
+            if (!isRetryable(e)) throw e;
+            log.warn("getFileList: retryable error for {}, retrying with a fresh handle", mUri, e);
+            NovaSmbFile retryFile = getSmbFile(mUri);
+            if (retryFile == null || retryFile.smbFile == null) throw e;
+            return list(retryFile);
         } catch (Exception e) {
             log.error("getFileList: caught exception for {}", mUri, e);
         }
         return null;
+    }
+
+    private List<MetaFile2> list(NovaSmbFile nSmbFile) throws SmbException {
+        SmbFile[] listFiles = nSmbFile.smbFile.listFiles();
+        if (listFiles != null) {
+            ArrayList<MetaFile2> files = new ArrayList<>();
+            for(SmbFile f : listFiles){
+                String filename = f.getName();
+                if (isDotDirectoryEntry(filename)) {
+                    continue;
+                }
+                // better verify that it is a file or directory before adding
+                if(f.isFile() || f.isDirectory()) {
+                    if (log.isTraceEnabled()) log.trace("found {}", f.getPath());
+                    files.add(new JcifsFile2(f, nSmbFile.shareName, nSmbFile.shareIP));
+                }
+            }
+            return files;
+        }
+        return null;
+    }
+
+    private static boolean isRetryable(SmbException e) {
+        int status = e.getNtStatus();
+        return status == NT_STATUS_FILE_CLOSED
+                || status == NT_STATUS_CONNECTION_DISCONNECTED
+                || status == NT_STATUS_CONNECTION_RESET
+                || status == NT_STATUS_NETWORK_NAME_DELETED;
     }
 }
