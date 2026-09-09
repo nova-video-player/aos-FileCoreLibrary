@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import jcifs.smb.NtStatus;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -227,20 +228,31 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
             catch (final SmbException e) {
-                ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
-                if (e.getCause() instanceof UnknownHostException) {
-                    error = ErrorEnum.ERROR_UNKNOWN_HOST;
-                }
-                final ErrorEnum fError = error;
-                if (log.isTraceEnabled()) log.error("JcifListingThread: SmbException ({}) for {}", getErrorStringResId(error), mUri.toString(), e);
-                else log.error("JcifListingThread: SmbException ({}) for {}", getErrorStringResId(error), mUri.toString());
-                mUiHandler.post(new Runnable() {
-                    public void run() {
-                        if (!mAbort && mListener != null) { // do not report error if aborted
-                            mListener.onListingFatalError(e, fError);
+                if (log.isTraceEnabled()) log.error("JcifListingThread: SmbException (ntStatus=0x{}) for {}: {}", Integer.toHexString(e.getNtStatus()), mUri.toString(), e.getMessage(), e);
+                else log.error("JcifListingThread: SmbException (ntStatus=0x{}) for {}: {}", Integer.toHexString(e.getNtStatus()), mUri.toString(), e.getMessage());
+                if (isAuthStatus(e)) {
+                    mUiHandler.post(new Runnable() {
+                        public void run() {
+                            if (!mAbort && mListener != null) { // do not report error if aborted
+                                log.warn("JcifListingThread: reporting SmbException via onCredentialRequired to listener");
+                                mListener.onCredentialRequired(e);
+                            }
                         }
+                    });
+                } else {
+                    ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
+                    if (e.getCause() instanceof UnknownHostException) {
+                        error = ErrorEnum.ERROR_UNKNOWN_HOST;
                     }
-                });
+                    final ErrorEnum fError = error;
+                    mUiHandler.post(new Runnable() {
+                        public void run() {
+                            if (!mAbort && mListener != null) { // do not report error if aborted
+                                mListener.onListingFatalError(e, fError);
+                            }
+                        }
+                    });
+                }
             }
             catch (final MalformedURLException e) {
                 if (log.isTraceEnabled()) log.error("JcifListingThread: MalformedURLException for {}", mUri.toString(), e);
@@ -276,5 +288,39 @@ public class JcifListingEngine extends ListingEngine {
                 });
             }
         }
+    }
+
+    /**
+     * Returns true when the SmbException indicates an authentication or share permission failure
+     * so that the user can be prompted for credentials instead of aborting with a fatal error.
+     */
+    private static boolean isAuthStatus(SmbException e) {
+        int status = e.getNtStatus();
+        switch (status) {
+            case NtStatus.NT_STATUS_ACCESS_DENIED:
+            case NtStatus.NT_STATUS_LOGON_FAILURE:
+            case NtStatus.NT_STATUS_ACCOUNT_DISABLED:
+            case NtStatus.NT_STATUS_PASSWORD_EXPIRED:
+            case NtStatus.NT_STATUS_LOGON_TYPE_NOT_GRANTED:
+            case NtStatus.NT_STATUS_ACCOUNT_RESTRICTION:
+            case NtStatus.NT_STATUS_INVALID_LOGON_HOURS:
+            case NtStatus.NT_STATUS_INVALID_WORKSTATION:
+            case NtStatus.NT_STATUS_PASSWORD_MUST_CHANGE:
+            case NtStatus.NT_STATUS_ACCOUNT_LOCKED_OUT:
+            case NtStatus.NT_STATUS_NETWORK_ACCESS_DENIED:
+            case NtStatus.NT_STATUS_BAD_NETWORK_NAME:
+                return true;
+            default:
+                break;
+        }
+        String msg = e.getMessage();
+        if (msg != null) {
+            String lower = msg.toLowerCase();
+            if (lower.contains("access is denied") || lower.contains("logon failure")
+                    || lower.contains("bad network name") || lower.contains("cannot be found")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

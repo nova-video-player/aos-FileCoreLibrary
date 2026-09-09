@@ -74,11 +74,10 @@ public class NetworkCredentialsDatabase {
         String mDomain;
         boolean mIsTemporary;
         public Credential(String username, String password, String uriString, String domain, boolean isTemporary){
-            mUsername = username;
-            mPassword = password;
+            mPassword = password != null ? password : "";
             mUriString = uriString;
-            mDomain = domain;
             mIsTemporary = isTemporary;
+            setCredentials(username, domain);
         }
         public String getUriString(){
             return mUriString;
@@ -92,9 +91,28 @@ public class NetworkCredentialsDatabase {
         public String getDomain(){
             return mDomain;
         }
-        public void setPassword(String password){mPassword = password;}
-        public void setUsername(String username){mUsername = username;}
-        public void setDomain(String domain){mDomain = domain;}
+        public void setPassword(String password){mPassword = password != null ? password : "";}
+        public void setUsername(String username){setCredentials(username, mDomain);}
+        public void setDomain(String domain){setCredentials(mUsername, domain);}
+        private void setCredentials(String username, String domain) {
+            String u = username != null ? username.trim() : "";
+            String d = domain != null ? domain.trim() : "";
+            if (d.isEmpty() && !u.isEmpty()) {
+                int ci = u.indexOf('@');
+                if (ci > 0) {
+                    d = u.substring(ci + 1).trim();
+                    u = u.substring(0, ci).trim();
+                } else {
+                    ci = u.indexOf('\\');
+                    if (ci > 0) {
+                        d = u.substring(0, ci).trim();
+                        u = u.substring(ci + 1).trim();
+                    }
+                }
+            }
+            mUsername = u;
+            mDomain = d;
+        }
         public boolean isTemporary(){
             return mIsTemporary;
         }
