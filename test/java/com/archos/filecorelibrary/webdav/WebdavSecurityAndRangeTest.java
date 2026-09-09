@@ -372,4 +372,94 @@ public class WebdavSecurityAndRangeTest {
             assertEquals("Temporary file must be deleted after failed upload", countBefore, countAfter);
         }
     }
+
+    @Test
+    public void testDepthZeroSelectExactMatchWhenMultiple() throws Exception {
+        Uri queryUri = Uri.parse("http://example.com/media/Movie.mkv");
+        DavResource exactRes = createDavResource("/media/Movie.mkv", false);
+        DavResource canonicalRes = createDavResource("/canonical/Movie.mkv", false);
+
+        // When exact match is present alongside another resource, exact match is chosen
+        DavResource selected = WebdavFile2.selectResourceForDepthZero(
+            java.util.Arrays.asList(canonicalRes, exactRes), queryUri);
+        assertEquals("Exact match should be preferred", exactRes, selected);
+    }
+
+    @Test
+    public void testDepthZeroAcceptsSingleCanonicalHref() throws Exception {
+        Uri aliasUri = Uri.parse("http://example.com/alias/Movie.mkv");
+        DavResource canonicalRes = createDavResource("/real-path/Movie.mkv", false);
+
+        // When server returns a single resource with a canonical/alternate href, accept it
+        DavResource selected = WebdavFile2.selectResourceForDepthZero(
+            Collections.singletonList(canonicalRes), aliasUri);
+        assertEquals("Single canonical resource should be accepted for alias", canonicalRes, selected);
+    }
+
+    @Test
+    public void testDepthZeroRejectsAmbiguousNonMatchingResponses() throws Exception {
+        Uri queryUri = Uri.parse("http://example.com/alias/Movie.mkv");
+        DavResource res1 = createDavResource("/real-path/Movie1.mkv", false);
+        DavResource res2 = createDavResource("/real-path/Movie2.mkv", false);
+
+        // When multiple resources are returned and neither matches exact href, reject as ambiguous
+        DavResource selected = WebdavFile2.selectResourceForDepthZero(
+            java.util.Arrays.asList(res1, res2), queryUri);
+        assertNull("Ambiguous multi-resource response without exact match should return null", selected);
+    }
+
+    @Test
+    public void testDepthZeroRejectsEmptyResponse() throws Exception {
+        Uri queryUri = Uri.parse("http://example.com/nonexistent.mkv");
+        DavResource selected = WebdavFile2.selectResourceForDepthZero(
+            Collections.emptyList(), queryUri);
+        assertNull("Empty response should return null", selected);
+    }
+
+    @Test
+    public void testFromUriIssuesDepthZeroRequest() throws Exception {
+        try (MockWebServer server = new MockWebServer()) {
+            // Sardine expects a 207 Multi-Status XML body for PROPFIND
+            String multistatusBody = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
+                + "<D:multistatus xmlns:D=\"DAV:\">\n"
+                + "  <D:response>\n"
+                + "    <D:href>/video.mkv</D:href>\n"
+                + "    <D:propstat>\n"
+                + "      <D:prop>\n"
+                + "        <D:getcontentlength>1048576</D:getcontentlength>\n"
+                + "        <D:getlastmodified>Wed, 09 Sep 2026 12:00:00 GMT</D:getlastmodified>\n"
+                + "      </D:prop>\n"
+                + "      <D:status>HTTP/1.1 200 OK</D:status>\n"
+                + "    </D:propstat>\n"
+                + "  </D:response>\n"
+                + "</D:multistatus>";
+
+            // 1st request: HEAD / used by resolveRedirect
+            server.enqueue(new MockResponse().setResponseCode(200));
+            // 2nd request: PROPFIND used by fromUri
+            server.enqueue(new MockResponse()
+                .setResponseCode(207)
+                .setHeader("Content-Type", "application/xml; charset=utf-8")
+                .setBody(multistatusBody));
+
+            server.start();
+
+            Uri webdavUri = Uri.parse("webdav://" + server.getHostName() + ":" + server.getPort() + "/video.mkv");
+            com.archos.filecorelibrary.MetaFile2 metaFile = WebdavFile2.fromUri(webdavUri);
+
+            assertNotNull("MetaFile2 must be successfully returned", metaFile);
+            assertEquals("video.mkv", metaFile.getName());
+            assertEquals(1048576L, metaFile.length());
+
+            // 1st request was HEAD (resolveRedirect)
+            RecordedRequest headReq = server.takeRequest();
+            assertEquals("HEAD", headReq.getMethod());
+
+            // 2nd request was PROPFIND (fromUri)
+            RecordedRequest propfindReq = server.takeRequest();
+            assertEquals("PROPFIND", propfindReq.getMethod());
+            assertEquals("/video.mkv", propfindReq.getPath());
+            assertEquals("fromUri must issue Depth: 0 header", "0", propfindReq.getHeader("Depth"));
+        }
+    }
 }
