@@ -127,13 +127,15 @@ configurations.matching { it.name.toLowerCase().contains("unittest") }.configure
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     //api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
-    api 'com.github.nova-video-player:jcifs-ng:v2.1.10-multicredit3'
+    //api 'com.github.nova-video-player:jcifs-ng:v2.1.10-multicredit3'
+    api files('libs/jcifs-ng.jar')
     // upgrading for later release i.e. 0.2.25 or 2.27.0 will break the build since it has switched to java 24
-    api 'com.github.mwiede:jsch:2.28.7'
+    // testing Nova fork with public setLocalPacketSize/setLocalWindowSize(Max) for SFTP throughput tuning (see SFTPSession)
+    api 'com.github.nova-video-player:jsch-mwiede:jsch-2.28.7-readahead'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.13.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.9'
-    implementation('com.github.nova-video-player:sardine-android:0.0.2') {
+    implementation('com.github.nova-video-player:sardine-android:v0.9-nova') {
         // the published JitPack artifact doesn't propagate the exclusions from local sardine-android build.gradle
         exclude group: 'xpp3', module: 'xpp3'
         exclude group: 'stax', module: 'stax-api'
@@ -159,5 +161,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.16.1'
     testImplementation 'androidx.test:core:1.7.0'
     testImplementation 'ch.qos.logback:logback-classic:1.6.3'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:5.5.0'
+    testImplementation 'com.squareup.okhttp3:okhttp-tls:5.5.0'
 }
 

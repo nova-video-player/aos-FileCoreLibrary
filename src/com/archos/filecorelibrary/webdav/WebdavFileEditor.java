@@ -16,6 +16,7 @@ package com.archos.filecorelibrary.webdav;
 
 import static com.archos.filecorelibrary.FileUtils.caughtException;
 
+import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
@@ -26,7 +27,8 @@ import com.thegrizzlylabs.sardineandroid.impl.SardineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,37 +71,75 @@ public class WebdavFileEditor extends FileEditor {
         }
         var req = reqBuilder.build();
         var resp = mHttpClient.newCall(req).execute();
+        try {
+            if (from >= 0) {
+                if (resp.code() == 416) {
+                    throw new IOException("HTTP 416: Range Not Satisfiable for offset " + from);
+                }
+                if (resp.code() != 206) {
+                    throw new IOException("Server returned HTTP " + resp.code() + " instead of 206 Partial Content for range offset " + from);
+                }
+                var contentRange = resp.header("Content-Range");
+                if (contentRange == null || !validateExactContentRangeStart(contentRange, from)) {
+                    throw new IOException("Content-Range missing or invalid: expected start " + from + ", got: " + contentRange);
+                }
+            } else if (!resp.isSuccessful()) {
+                throw new IOException("HTTP error " + resp.code() + ": " + resp.message());
+            }
 
-        // For 206 Partial Content responses, extract total size from Content-Range
-        // header (format: "bytes start-end/total") rather than Content-Length which
-        // only reflects the partial response size
-        var contentRange = resp.header("Content-Range");
-        if (contentRange != null && contentRange.contains("/")) {
-            var totalStr = contentRange.substring(contentRange.indexOf('/') + 1).trim();
-            if (!"*".equals(totalStr)) {
-                try {
-                    mLength = Long.parseLong(totalStr);
-                    if (log.isTraceEnabled()) log.trace("getInputStream: got total length {} from Content-Range: {}", mLength, contentRange);
-                } catch (NumberFormatException e) {
-                    log.warn("getInputStream: failed to parse Content-Range total: {}", contentRange);
+            var body = resp.body();
+            if (body == null) {
+                throw new IOException("Empty response body for: " + uri);
+            }
+
+            // For 206 Partial Content responses, extract total size from Content-Range
+            // header (format: "bytes start-end/total") rather than Content-Length which
+            // only reflects the partial response size
+            var contentRange = resp.header("Content-Range");
+            if (contentRange != null && contentRange.contains("/")) {
+                var totalStr = contentRange.substring(contentRange.indexOf('/') + 1).trim();
+                if (!"*".equals(totalStr)) {
+                    try {
+                        mLength = Long.parseLong(totalStr);
+                        if (log.isTraceEnabled()) log.trace("getInputStream: got total length {} from Content-Range: {}", mLength, contentRange);
+                    } catch (NumberFormatException e) {
+                        log.warn("getInputStream: failed to parse Content-Range total: {}", contentRange);
+                    }
                 }
             }
-        }
 
-        // Fall back to Content-Length if Content-Range was not available
-        if (mLength < 0) {
-            var length = resp.header("Content-Length");
-            if (length != null) {
-                try {
-                    mLength = Long.parseLong(length);
-                    if (log.isTraceEnabled()) log.trace("getInputStream: got length {} from Content-Length", mLength);
-                } catch (NumberFormatException e) {
-                    log.warn("getInputStream: failed to parse Content-Length: {}", length);
+            // Fall back to Content-Length if Content-Range was not available
+            if (mLength < 0) {
+                var length = resp.header("Content-Length");
+                if (length != null) {
+                    try {
+                        mLength = Long.parseLong(length);
+                        if (log.isTraceEnabled()) log.trace("getInputStream: got length {} from Content-Length", mLength);
+                    } catch (NumberFormatException e) {
+                        log.warn("getInputStream: failed to parse Content-Length: {}", length);
+                    }
                 }
             }
-        }
 
-        return resp.body().byteStream();
+            return body.byteStream();
+        } catch (Exception e) {
+            resp.close();
+            throw e;
+        }
+    }
+
+    static boolean validateExactContentRangeStart(String contentRange, long expectedStart) {
+        // Format: "bytes <start>-<end>/<total>"
+        try {
+            if (!contentRange.startsWith("bytes ")) return false;
+            String rangePart = contentRange.substring(6).trim();
+            int dashIdx = rangePart.indexOf('-');
+            if (dashIdx == -1) return false;
+            long actualStart = Long.parseLong(rangePart.substring(0, dashIdx).trim());
+            return actualStart == expectedStart;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -176,12 +216,25 @@ public class WebdavFileEditor extends FileEditor {
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-        return new ByteArrayOutputStream() {
+        Context context = WebdavUtils.getContext();
+        File cacheDir = context != null ? context.getCacheDir() : null;
+        File tempFile = File.createTempFile("webdav_upload_", ".tmp", cacheDir);
+        return new FileOutputStream(tempFile) {
+            private boolean isClosed = false;
+
             @Override
             public void close() throws IOException {
-                var u = WebdavFile2.uriToHttp(mUri);
-                var fileContent = toByteArray();
-                mSardine.put(u.toString(), fileContent);
+                if (isClosed) return;
+                isClosed = true;
+                try {
+                    super.close();
+                    var u = WebdavFile2.uriToHttp(mUri);
+                    mSardine.put(u.toString(), tempFile, "application/octet-stream");
+                } finally {
+                    if (tempFile.exists() && !tempFile.delete()) {
+                        log.warn("getOutputStream: failed to delete temp upload file {}", tempFile.getAbsolutePath());
+                    }
+                }
             }
         };
     }

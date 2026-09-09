@@ -17,6 +17,8 @@ package com.archos.filecorelibrary.webdav;
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.annotation.Nullable;
+
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
@@ -43,7 +45,13 @@ public class WebdavUtils {
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpSardine> sardines = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpClient> httpClients = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<Uri, String> resolvedRedirects = new ConcurrentHashMap<>();
-    private static final OkHttpClient redirectClient = new OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build();
+    private static final OkHttpClient DEFAULT_REDIRECT_CLIENT = new OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build();
+    private static volatile OkHttpClient sRedirectClient = DEFAULT_REDIRECT_CLIENT;
+
+    /** Visible only for tests to inject custom SSL configurations safely */
+    static void setRedirectClientForTesting(@Nullable OkHttpClient client) {
+        sRedirectClient = (client != null) ? client : DEFAULT_REDIRECT_CLIENT;
+    }
     private static Context mContext;
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile WebdavUtils sInstance;
@@ -63,6 +71,10 @@ public class WebdavUtils {
     /** may return null but no Context required */
     public static WebdavUtils peekInstance() {
         return sInstance;
+    }
+
+    public static Context getContext() {
+        return mContext;
     }
 
     private WebdavUtils(Context context) {
@@ -87,18 +99,39 @@ public class WebdavUtils {
                         log.trace("OkHttpSardine: webdav {}", msg);
                     }});
                 logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+                logging.redactHeader("Authorization");
                 builder.addInterceptor(logging);
             }
-            // Add preemptive authentication to avoid 401 round-trip when credentials are available
+            // Add preemptive authentication scoped strictly to matching origin
+            final String authHost = uri.getHost();
+            final int authPort = uri.getPort() != -1 ? uri.getPort() : ("https".equalsIgnoreCase(uri.getScheme()) || "webdavs".equalsIgnoreCase(uri.getScheme()) ? 443 : 80);
+            final boolean wasHttps = "https".equalsIgnoreCase(uri.getScheme()) || "webdavs".equalsIgnoreCase(uri.getScheme());
             final String preemptiveCredential = Credentials.basic(username, password, StandardCharsets.UTF_8);
+
             builder.addInterceptor(new Interceptor() {
                 @Override
                 public Response intercept(Chain chain) throws IOException {
                     Request request = chain.request();
                     if (request.header("Authorization") == null && !username.equals("anonymous")) {
-                        request = request.newBuilder()
-                            .header("Authorization", preemptiveCredential)
-                            .build();
+                        var reqUrl = request.url();
+                        // Block sending credentials in cleartext if originally configured as HTTPS
+                        if (wasHttps && !reqUrl.isHttps()) {
+                            log.warn("intercept: blocked attaching credentials over insecure HTTP for {}", reqUrl);
+                        } else if (authHost != null && authHost.equalsIgnoreCase(reqUrl.host()) && authPort == reqUrl.port()) {
+                            request = request.newBuilder()
+                                .header("Authorization", preemptiveCredential)
+                                .build();
+                        } else {
+                            // Target authority differs from client's base authority; lookup credentials for target
+                            NetworkCredentialsDatabase.Credential targetCred =
+                                NetworkCredentialsDatabase.getInstance().getCredential(reqUrl.toString());
+                            if (targetCred != null && !targetCred.getUsername().equals("anonymous")) {
+                                String targetCredential = Credentials.basic(targetCred.getUsername(), targetCred.getPassword(), StandardCharsets.UTF_8);
+                                request = request.newBuilder()
+                                    .header("Authorization", targetCredential)
+                                    .build();
+                            }
+                        }
                     }
                     return chain.proceed(request);
                 }
@@ -109,16 +142,40 @@ public class WebdavUtils {
                     if (response.request().header("Authorization") != null) {
                         return null;
                     }
-                    String credential = Credentials.basic(username, password, StandardCharsets.UTF_8);
+                    var reqUrl = response.request().url();
+                    if (wasHttps && !reqUrl.isHttps()) {
+                        log.warn("authenticate: blocked authenticating over insecure HTTP for {}", reqUrl);
+                        return null;
+                    }
+                    final String u;
+                    final String p;
+                    if (authHost != null && authHost.equalsIgnoreCase(reqUrl.host()) && authPort == reqUrl.port()) {
+                        // Original authority
+                        u = username;
+                        p = password;
+                    } else {
+                        // Cross-origin target authority: require explicit matching credentials
+                        NetworkCredentialsDatabase.Credential targetCred =
+                            NetworkCredentialsDatabase.getInstance().getCredential(reqUrl.toString());
+                        if (targetCred != null && !targetCred.getUsername().equals("anonymous")) {
+                            u = targetCred.getUsername();
+                            p = targetCred.getPassword();
+                        } else {
+                            return null;
+                        }
+                    }
+                    if ("anonymous".equals(u)) {
+                        return null;
+                    }
+                    String credential = Credentials.basic(u, p, StandardCharsets.UTF_8);
                     return response.request().newBuilder().header("Authorization", credential).build();
                 }
             });
             builder.followRedirects(true);
             builder.followSslRedirects(true); // Handle SSL redirect
-            // Set the custom client to the Sardine instance
+            // Set the custom client to the Sardine instance (do not call sardine.setCredentials as it replaces the scoped authenticator)
             var client = builder.build();
             sardine = new OkHttpSardine(client);
-            sardine.setCredentials(username, password);
             httpClients.put(cred, client);
             sardines.put(cred, sardine);
             return sardine;
@@ -153,19 +210,32 @@ public class WebdavUtils {
         }
 
         Request request = new Request.Builder().url(baseUrl + "/").head().build();
-        try (Response response = redirectClient.newCall(request).execute()) {
+        try (Response response = sRedirectClient.newCall(request).execute()) {
             if (response.code() == 301 || response.code() == 302 || response.code() == 307 || response.code() == 308) {
                 String location = response.header("Location");
                 if (location != null && !location.isEmpty()) {
                     try {
-                        Uri redirectUri = Uri.parse(location);
-                        if (redirectUri.getHost() != null && redirectUri.getScheme() != null) {
-                            String redirectBase = redirectUri.getScheme() + "://" + redirectUri.getHost();
-                            if (redirectUri.getPort() != -1) {
-                                redirectBase += ":" + redirectUri.getPort();
+                        java.net.URI baseUriObj = new java.net.URI(baseUrl + "/");
+                        java.net.URI resolvedUriObj = baseUriObj.resolve(location);
+                        String resolvedScheme = resolvedUriObj.getScheme();
+                        if (resolvedUriObj.getHost() != null && resolvedScheme != null) {
+                            if ("https".equalsIgnoreCase(uri.getScheme()) && "http".equalsIgnoreCase(resolvedScheme)) {
+                                log.warn("resolveRedirect: blocked insecure HTTPS to HTTP downgrade from {} to {}", uri, resolvedUriObj);
+                            } else {
+                                String rawPath = resolvedUriObj.getRawPath();
+                                if (rawPath != null && rawPath.endsWith("/")) {
+                                    rawPath = rawPath.substring(0, rawPath.length() - 1);
+                                }
+                                String redirectBase = resolvedScheme + "://" + resolvedUriObj.getHost();
+                                if (resolvedUriObj.getPort() != -1) {
+                                    redirectBase += ":" + resolvedUriObj.getPort();
+                                }
+                                if (rawPath != null && !rawPath.isEmpty()) {
+                                    redirectBase += rawPath;
+                                }
+                                resolved = redirectBase;
+                                if (log.isDebugEnabled()) log.debug("resolveRedirect: resolved " + key + " to " + resolved);
                             }
-                            resolved = redirectBase;
-                            if (log.isDebugEnabled()) log.debug("resolveRedirect: resolved " + key + " to " + resolved);
                         } else {
                             log.warn("resolveRedirect: invalid redirect URL format: " + location);
                         }

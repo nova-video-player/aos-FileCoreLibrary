@@ -44,17 +44,26 @@ public class WebdavRawLister extends RawLister {
             var files = new ArrayList<MetaFile2>();
             var resources = sardine.list(httpUri.toString());
 
-            // First answer is ourselves, ignore it
-            resources.remove(0);
             for (var res : resources) {
+                if (WebdavFile2.isSelfResource(res, httpUri)) {
+                    continue;
+                }
                 files.add(new WebdavFile2(res, FileUtils.buildChildUri(mUri, res.getName())));
             }
             return files;
-        } catch (Throwable t) {
-            log.warn("Failed listing webdav files uri={}", mUri, t);
-            if(t.getMessage() != null && t.getMessage().contains("401 Un")) throw new AuthenticationException();
+        } catch (com.thegrizzlylabs.sardineandroid.impl.SardineException e) {
+            log.warn("Failed listing webdav files uri={}", mUri, e);
+            if (e.getStatusCode() == 401) {
+                throw new AuthenticationException();
+            }
+            throw e;
+        } catch (IOException e) {
+            log.warn("Failed listing webdav files uri={}", mUri, e);
+            if (e.getMessage() != null && e.getMessage().contains("401")) {
+                throw new AuthenticationException();
+            }
+            throw e;
         }
-        return null;
     }
 
 }

@@ -58,11 +58,23 @@ public class WebdavFile2 extends MetaFile2 {
             }
             String path = httpUri.getEncodedPath();
             if (path == null) path = "";
+            if (!path.isEmpty() && !path.startsWith("/")) {
+                path = "/" + path;
+            }
             return Uri.parse(resolvedUrl + path);
         } catch (Exception e) {
             log.warn("uriToHttp: redirect resolution error for " + httpUri + ", using original", e);
             return httpUri;
         }
+    }
+
+    public static boolean isSelfResource(DavResource res, Uri directoryUri) {
+        String resPath = res.getPath();
+        String dirPath = directoryUri.getPath();
+        if (resPath == null || dirPath == null) return false;
+        String r = resPath.endsWith("/") ? resPath.substring(0, resPath.length() - 1) : resPath;
+        String d = dirPath.endsWith("/") ? dirPath.substring(0, dirPath.length() - 1) : dirPath;
+        return r.equals(d);
     }
 
     private static final long serialVersionUID = 2L;

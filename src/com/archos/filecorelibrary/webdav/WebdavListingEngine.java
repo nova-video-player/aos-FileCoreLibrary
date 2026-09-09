@@ -17,10 +17,12 @@ package com.archos.filecorelibrary.webdav;
 import android.content.Context;
 import android.net.Uri;
 
+import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileComparator;
 import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.ListingEngine;
 import com.thegrizzlylabs.sardineandroid.DavResource;
+import com.thegrizzlylabs.sardineandroid.impl.SardineException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,7 @@ public class WebdavListingEngine extends ListingEngine {
 
     final private Uri mUri;
     final private WebdavListingThread mListingThread;
-    private boolean mAbort = false;
+    private volatile boolean mAbort = false;
 
     public WebdavListingEngine(Context context, Uri uri) {
         super(context);
@@ -78,15 +80,15 @@ public class WebdavListingEngine extends ListingEngine {
                 var sardine = WebdavUtils.peekInstance().getSardine(mUri);
                 var httpUri = WebdavFile2.uriToHttp(mUri);
 
-                var acceptedDavResources = new ArrayList<DavResource>();
                 var davResources = sardine.list(httpUri.toString()); // can generate IllegalArgumentException Invalid URL port: ":7802"
 
                 final ArrayList<WebdavFile2> directories = new ArrayList<>();
                 final ArrayList<WebdavFile2> files = new ArrayList<>();
 
-                // First answer is ourselves, ignore it
-                davResources.remove(0);
                 for (var davResource : davResources) {
+                    if (WebdavFile2.isSelfResource(davResource, httpUri)) {
+                        continue;
+                    }
                     final String filename = davResource.getName();
                     if (davResource.isDirectory()) {
                         if (keepDirectory(filename)) {
@@ -104,30 +106,11 @@ public class WebdavListingEngine extends ListingEngine {
 
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
-                    mUiHandler.post(new Runnable() {
-                        public void run() {
-                            if (mListener != null) { // always report end even when aborted
-                                mListener.onListingEnd();
-                            }
-                        }
-                    });
                     return;
                 }
 
                 // Avoid to have time-out triggered while doing the "post-processing" of the list
                 noTimeOut();
-
-                // Check Error in reading the directory.
-                if (acceptedDavResources == null) {
-                    mUiHandler.post(new Runnable() {
-                        public void run() {
-                            if (!mAbort && mListener != null) { // do not report error if aborted
-                                mListener.onListingFatalError(null, ErrorEnum.ERROR_UNKNOWN);
-                            }
-                        }
-                    });
-                    return;
-                }
 
                 // sorting entries
                 final Comparator<? super WebdavFile2> comparator = new FileComparator().selectFileComparator(mSortOrder);
@@ -165,13 +148,6 @@ public class WebdavListingEngine extends ListingEngine {
                 // Check if abort occurred (Well, checking here again in case the sorting is very long, for some reason...)
                 if (mAbort) {
                     if (log.isDebugEnabled()) log.debug("WebdavListingThread: abort");
-                    mUiHandler.post(new Runnable() {
-                        public void run() {
-                            if (mListener != null) { // always report end even when aborted
-                                mListener.onListingEnd();
-                            }
-                        }
-                    });
                     return;
                 }
 
@@ -184,19 +160,28 @@ public class WebdavListingEngine extends ListingEngine {
                     }
                 });
             }
-            // TODO MARC
-            /*
-            catch (final AuthenticationException e) {
-                if (log.isTraceEnabled()) log.error("WebdavListingThread: SmbAuthException for {}", mUri.toString(), e);
-                else log.warn("WebdavListingThread: SmbAuthException for {}", mUri.toString());
-                mUiHandler.post(new Runnable() {
-                    public void run() {
-                        if (!mAbort && mListener != null) { // do not report error if aborted
-                            mListener.onCredentialRequired(e);
+            catch (final SardineException e) {
+                if (e.getStatusCode() == 401) {
+                    if (log.isTraceEnabled()) log.error("WebdavListingThread: AuthenticationException for {}", mUri.toString(), e);
+                    else log.warn("WebdavListingThread: AuthenticationException for {}", mUri.toString());
+                    mUiHandler.post(new Runnable() {
+                        public void run() {
+                            if (!mAbort && mListener != null) {
+                                mListener.onCredentialRequired(new AuthenticationException());
+                            }
                         }
-                    }
-                });
-            } */
+                    });
+                } else {
+                    log.error("WebdavListingThread: SardineException ({}) for {}", e.getStatusCode(), mUri.toString(), e);
+                    mUiHandler.post(new Runnable() {
+                        public void run() {
+                            if (!mAbort && mListener != null) {
+                                mListener.onListingFatalError(e, ErrorEnum.ERROR_UNKNOWN);
+                            }
+                        }
+                    });
+                }
+            }
             catch (final IOException | IllegalArgumentException e) {
                 ErrorEnum error = ErrorEnum.ERROR_UNKNOWN;
                 if (e.getCause() instanceof UnknownHostException) {
