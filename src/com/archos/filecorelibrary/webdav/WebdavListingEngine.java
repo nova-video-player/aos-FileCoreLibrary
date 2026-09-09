@@ -79,13 +79,12 @@ public class WebdavListingEngine extends ListingEngine {
                 var httpUri = WebdavFile2.uriToHttp(mUri);
 
                 var acceptedDavResources = new ArrayList<DavResource>();
-                var davResources = sardine.list(httpUri.toString()); // can generate IllegalArgumentException Invalid URL port: ":7802"
+                var davResources = WebdavResourceList.children(httpUri.getPath(),
+                        sardine.list(httpUri.toString())); // can generate IllegalArgumentException Invalid URL port: ":7802"
 
                 final ArrayList<WebdavFile2> directories = new ArrayList<>();
                 final ArrayList<WebdavFile2> files = new ArrayList<>();
 
-                // First answer is ourselves, ignore it
-                davResources.remove(0);
                 for (var davResource : davResources) {
                     final String filename = davResource.getName();
                     if (davResource.isDirectory()) {
