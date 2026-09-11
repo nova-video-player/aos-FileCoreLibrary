@@ -69,12 +69,29 @@ public class WebdavFile2 extends MetaFile2 {
     }
 
     public static boolean isSelfResource(DavResource res, Uri directoryUri) {
-        String resPath = res.getPath();
-        String dirPath = directoryUri.getPath();
-        if (resPath == null || dirPath == null) return false;
-        String r = resPath.endsWith("/") ? resPath.substring(0, resPath.length() - 1) : resPath;
-        String d = dirPath.endsWith("/") ? dirPath.substring(0, dirPath.length() - 1) : dirPath;
-        return r.equals(d);
+        return isSelfResource(res, normalizeWebdavPath(directoryUri.getPath()));
+    }
+
+    /**
+     * Normalizes a WebDAV resource path for equality comparisons. Package-private so listing
+     * callers can perform this once per directory rather than once per response entry.
+     */
+    static String normalizeWebdavPath(String path) {
+        if (path == null) return null;
+        int end = path.length();
+        while (end > 1 && path.charAt(end - 1) == '/') {
+            end--;
+        }
+        return end == path.length() ? path : path.substring(0, end);
+    }
+
+    /**
+     * Compares a resource against an already-normalized directory path.
+     */
+    static boolean isSelfResource(DavResource res, String normalizedDirectoryPath) {
+        if (res == null || normalizedDirectoryPath == null) return false;
+        String normalizedResourcePath = normalizeWebdavPath(res.getPath());
+        return normalizedDirectoryPath.equals(normalizedResourcePath);
     }
 
     private static final long serialVersionUID = 2L;
@@ -181,8 +198,9 @@ public class WebdavFile2 extends MetaFile2 {
         if (resources == null || resources.isEmpty()) {
             return null;
         }
+        String normalizedRequestedPath = normalizeWebdavPath(httpUri.getPath());
         for (DavResource res : resources) {
-            if (isSelfResource(res, httpUri)) {
+            if (isSelfResource(res, normalizedRequestedPath)) {
                 return res;
             }
         }

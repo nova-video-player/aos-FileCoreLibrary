@@ -84,9 +84,10 @@ public class WebdavListingEngine extends ListingEngine {
 
                 final ArrayList<WebdavFile2> directories = new ArrayList<>();
                 final ArrayList<WebdavFile2> files = new ArrayList<>();
+                final String normalizedDirectoryPath = WebdavFile2.normalizeWebdavPath(httpUri.getPath());
 
                 for (var davResource : davResources) {
-                    if (WebdavFile2.isSelfResource(davResource, httpUri)) {
+                    if (WebdavFile2.isSelfResource(davResource, normalizedDirectoryPath)) {
                         continue;
                     }
                     final String filename = davResource.getName();
