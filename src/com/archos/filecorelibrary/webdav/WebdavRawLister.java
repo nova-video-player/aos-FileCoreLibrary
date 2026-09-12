@@ -42,7 +42,7 @@ public class WebdavRawLister extends RawLister {
             var httpUri = WebdavFile2.uriToHttp(mUri);
 
             var files = new ArrayList<MetaFile2>();
-            var resources = sardine.list(httpUri.toString());
+            var resources = WebdavUtils.listResources(sardine, httpUri.toString(), 1);
             var normalizedDirectoryPath = WebdavFile2.normalizeWebdavPath(httpUri.getPath());
 
             for (var res : resources) {

@@ -213,7 +213,7 @@ public class WebdavFile2 extends MetaFile2 {
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         var sardine = WebdavUtils.peekInstance().getSardine(uri);
         Uri httpUri = WebdavFile2.uriToHttp(uri);
-        List<DavResource> resources = sardine.list(httpUri.toString(), 0);
+        List<DavResource> resources = WebdavUtils.listResources(sardine, httpUri.toString(), 0);
         DavResource resource = selectResourceForDepthZero(resources, httpUri);
         if (resource == null) {
             throw new IOException("WebDAV server did not return the requested resource: " + httpUri);

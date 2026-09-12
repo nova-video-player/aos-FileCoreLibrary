@@ -460,6 +460,11 @@ public class WebdavSecurityAndRangeTest {
             assertEquals("PROPFIND", propfindReq.getMethod());
             assertEquals("/video.mkv", propfindReq.getPath());
             assertEquals("fromUri must issue Depth: 0 header", "0", propfindReq.getHeader("Depth"));
+            String requestBody = propfindReq.getBody().readUtf8();
+            assertTrue("PROPFIND must request resourcetype", requestBody.contains("resourcetype"));
+            assertTrue("PROPFIND must request content length", requestBody.contains("getcontentlength"));
+            assertTrue("PROPFIND must request last-modified time", requestBody.contains("getlastmodified"));
+            assertFalse("PROPFIND must not request allprop", requestBody.contains("allprop"));
         }
     }
 }

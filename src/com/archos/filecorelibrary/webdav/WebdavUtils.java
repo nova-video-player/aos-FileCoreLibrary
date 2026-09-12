@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
+import com.thegrizzlylabs.sardineandroid.DavResource;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 
 import org.slf4j.Logger;
@@ -29,6 +30,9 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Set;
+import javax.xml.namespace.QName;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Authenticator;
@@ -45,6 +49,15 @@ public class WebdavUtils {
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpSardine> sardines = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, OkHttpClient> httpClients = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<Uri, String> resolvedRedirects = new ConcurrentHashMap<>();
+    /**
+     * The only live properties needed to construct and sort WebdavFile2 entries. Requesting
+     * allprop makes large directory scans unnecessarily expensive on many WebDAV servers.
+     */
+    private static final Set<QName> LISTING_PROPERTIES = Set.of(
+            // OkHttpSardine requires a non-empty QName prefix when serializing a <prop> request.
+            new QName("DAV:", "resourcetype", "D"),
+            new QName("DAV:", "getcontentlength", "D"),
+            new QName("DAV:", "getlastmodified", "D"));
     private static final OkHttpClient DEFAULT_REDIRECT_CLIENT = new OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build();
     private static volatile OkHttpClient sRedirectClient = DEFAULT_REDIRECT_CLIENT;
 
@@ -75,6 +88,10 @@ public class WebdavUtils {
 
     public static Context getContext() {
         return mContext;
+    }
+
+    static List<DavResource> listResources(OkHttpSardine sardine, String url, int depth) throws IOException {
+        return sardine.list(url, depth, LISTING_PROPERTIES);
     }
 
     private WebdavUtils(Context context) {
