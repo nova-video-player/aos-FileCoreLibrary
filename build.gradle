@@ -83,6 +83,7 @@ android {
         unitTests.all {
             forkEvery = 1
             systemProperty 'nova.test.speedtestCsv', System.getProperty('nova.test.speedtestCsv')
+            systemProperty 'nova.test.webdavPropfindCsv', System.getProperty('nova.test.webdavPropfindCsv')
             testLogging {
                 events "passed", "skipped", "failed", "standardOut", "standardError"
                 outputs.upToDateWhen {false}
@@ -164,5 +165,3 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:5.5.0'
     testImplementation 'com.squareup.okhttp3:okhttp-tls:5.5.0'
 }
-
-            systemProperty 'nova.test.webdavPropfindCsv', System.getProperty('nova.test.webdavPropfindCsv')
