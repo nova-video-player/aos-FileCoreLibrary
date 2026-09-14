@@ -91,7 +91,16 @@ public class WebdavUtils {
     }
 
     static List<DavResource> listResources(OkHttpSardine sardine, String url, int depth) throws IOException {
-        return sardine.list(url, depth, LISTING_PROPERTIES);
+        try {
+            return sardine.list(url, depth, LISTING_PROPERTIES);
+        } catch (com.thegrizzlylabs.sardineandroid.impl.SardineException e) {
+            int code = e.getStatusCode();
+            if (code == 400 || code == 405 || code == 501) {
+                log.warn("listResources: selective propfind failed with code {}, falling back to allprop for {}", code, url);
+                return sardine.list(url, depth, true);
+            }
+            throw e;
+        }
     }
 
     private WebdavUtils(Context context) {

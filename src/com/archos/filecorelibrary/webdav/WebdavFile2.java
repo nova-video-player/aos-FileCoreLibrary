@@ -61,6 +61,18 @@ public class WebdavFile2 extends MetaFile2 {
             if (!path.isEmpty() && !path.startsWith("/")) {
                 path = "/" + path;
             }
+
+            Uri resolvedUri = Uri.parse(resolvedUrl);
+            String resolvedPath = resolvedUri.getEncodedPath();
+            if (resolvedPath != null && !resolvedPath.isEmpty() && !"/".equals(resolvedPath)) {
+                if (resolvedPath.endsWith("/")) {
+                    resolvedPath = resolvedPath.substring(0, resolvedPath.length() - 1);
+                }
+                if (path.equals(resolvedPath) || path.startsWith(resolvedPath + "/")) {
+                    path = path.substring(resolvedPath.length());
+                }
+            }
+
             return Uri.parse(resolvedUrl + path);
         } catch (Exception e) {
             log.warn("uriToHttp: redirect resolution error for " + httpUri + ", using original", e);

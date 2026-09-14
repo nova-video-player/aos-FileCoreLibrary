@@ -467,4 +467,71 @@ public class WebdavSecurityAndRangeTest {
             assertFalse("PROPFIND must not request allprop", requestBody.contains("allprop"));
         }
     }
+
+    @Test
+    public void testSelectivePropfindFallbackToAllpropOn405() throws Exception {
+        try (MockWebServer server = new MockWebServer()) {
+            String allpropMultistatusBody = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
+                + "<D:multistatus xmlns:D=\"DAV:\">\n"
+                + "  <D:response>\n"
+                + "    <D:href>/video.mkv</D:href>\n"
+                + "    <D:propstat>\n"
+                + "      <D:prop>\n"
+                + "        <D:getcontentlength>2097152</D:getcontentlength>\n"
+                + "        <D:getlastmodified>Wed, 09 Sep 2026 12:00:00 GMT</D:getlastmodified>\n"
+                + "      </D:prop>\n"
+                + "      <D:status>HTTP/1.1 200 OK</D:status>\n"
+                + "    </D:propstat>\n"
+                + "  </D:response>\n"
+                + "</D:multistatus>";
+
+            // 1st request: HEAD / used by resolveRedirect
+            server.enqueue(new MockResponse().setResponseCode(200));
+            // 2nd request: selective PROPFIND returns 405 Method Not Allowed
+            server.enqueue(new MockResponse().setResponseCode(405));
+            // 3rd request: fallback allprop PROPFIND returns 207 Multi-Status
+            server.enqueue(new MockResponse()
+                .setResponseCode(207)
+                .setHeader("Content-Type", "application/xml; charset=utf-8")
+                .setBody(allpropMultistatusBody));
+
+            server.start();
+
+            Uri webdavUri = Uri.parse("webdav://" + server.getHostName() + ":" + server.getPort() + "/video.mkv");
+            com.archos.filecorelibrary.MetaFile2 metaFile = WebdavFile2.fromUri(webdavUri);
+
+            assertNotNull("MetaFile2 must be successfully returned via allprop fallback", metaFile);
+            assertEquals("video.mkv", metaFile.getName());
+            assertEquals(2097152L, metaFile.length());
+
+            server.takeRequest(); // HEAD
+            RecordedRequest selectiveReq = server.takeRequest(); // 1st PROPFIND (selective)
+            assertEquals("PROPFIND", selectiveReq.getMethod());
+            assertTrue("Selective PROPFIND must have custom prop body", selectiveReq.getBody().readUtf8().contains("resourcetype"));
+
+            RecordedRequest fallbackReq = server.takeRequest(); // 2nd PROPFIND (allprop fallback)
+            assertEquals("PROPFIND", fallbackReq.getMethod());
+            assertEquals("Fallback PROPFIND must preserve Depth header", "0", fallbackReq.getHeader("Depth"));
+            assertTrue("Fallback PROPFIND must request allprop", fallbackReq.getBody().readUtf8().contains("allprop"));
+        }
+    }
+
+    @Test
+    public void testUriToHttpDeduplicatesMountPath() throws Exception {
+        try (MockWebServer server = new MockWebServer()) {
+            // Root HEAD / redirects to /remote.php/webdav/
+            server.enqueue(new MockResponse()
+                .setResponseCode(302)
+                .setHeader("Location", "http://" + server.getHostName() + ":" + server.getPort() + "/remote.php/webdav/"));
+
+            server.start();
+
+            // Shortcut URI already contains the mount prefix /remote.php/webdav/
+            Uri shortcutUri = Uri.parse("webdav://" + server.getHostName() + ":" + server.getPort() + "/remote.php/webdav/Movies/video.mkv");
+            Uri httpUri = WebdavFile2.uriToHttp(shortcutUri);
+
+            // Path should not be duplicated as /remote.php/webdav/remote.php/webdav/Movies/video.mkv
+            assertEquals("http://" + server.getHostName() + ":" + server.getPort() + "/remote.php/webdav/Movies/video.mkv", httpUri.toString());
+        }
+    }
 }
