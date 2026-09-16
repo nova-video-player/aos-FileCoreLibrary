@@ -42,6 +42,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SshjUtils {
 
     private static final Logger log = LoggerFactory.getLogger(SshjUtils.class);
+    // sshj defaults to a 32KB max packet size and a 2MB window (same as jsch's stock defaults),
+    // which caps achievable SFTP throughput. Raise both, mirroring the tuning applied to jsch's
+    // SFTPSession, to check whether it closes the throughput gap for the sshj backend too.
+    private static final int SSHJ_MAX_PACKET_SIZE = 64 * 1024;
+    private static final long SSHJ_WINDOW_SIZE = 64L * SSHJ_MAX_PACKET_SIZE;
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, SSHClient> sshClients = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, SFTPClient> sftpClients = new ConcurrentHashMap<>();
     private static Context mContext;
@@ -85,6 +90,8 @@ public class SshjUtils {
                 DefaultConfig sshjConfig = new DefaultConfig();
                 sshClient = new SSHClient(sshjConfig);
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+                sshClient.getConnection().setMaxPacketSize(SSHJ_MAX_PACKET_SIZE);
+                sshClient.getConnection().setWindowSize(SSHJ_WINDOW_SIZE);
                 if (port != -1) sshClient.connect(server, port);
                 else sshClient.connect(server);
                 sshClient.authPassword(username, password.toCharArray());
