@@ -65,7 +65,6 @@ public class SFTPSession {
                 Channel channel = session.openChannel("sftp");
                 channel.setLocalPacketSize(SFTP_LOCAL_PACKET_SIZE);
                 channel.setLocalWindowSizeMax(SFTP_LOCAL_WINDOW_SIZE_MAX);
-                channel.setLocalWindowSize(SFTP_LOCAL_WINDOW_SIZE_MAX);
                 channel.connect();
                 acquireSession(channel);
                 return channel;
@@ -81,7 +80,6 @@ public class SFTPSession {
                         channel = session2.openChannel("sftp");
                         channel.setLocalPacketSize(SFTP_LOCAL_PACKET_SIZE);
                         channel.setLocalWindowSizeMax(SFTP_LOCAL_WINDOW_SIZE_MAX);
-                        channel.setLocalWindowSize(SFTP_LOCAL_WINDOW_SIZE_MAX);
                         channel.connect();
                         acquireSession(channel);
                         return channel;
