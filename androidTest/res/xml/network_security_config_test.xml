@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Scoped to the androidTest APK only (SpeedTestTransferTest etc.): permits cleartext HTTP solely
+  to localhost, since StreamOverHttp (the local httpproxy that feeds the player, exercised here
+  via HttpURLConnection to http://localhost:<port>) is plaintext by design as a loopback-only
+  proxy. All other cleartext traffic remains blocked, matching default Android 9+ (API 28+)
+  behavior for anything other than localhost.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
