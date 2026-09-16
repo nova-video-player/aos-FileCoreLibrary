@@ -33,6 +33,15 @@ public class SFTPSession {
 
     private static final Logger log = LoggerFactory.getLogger(SFTPSession.class);
 
+    // jsch defaults each pipelined SFTP READ request to a 32KB local packet size, which caps
+    // achievable throughput regardless of pipelining depth. Raise it so that each of the up to
+    // 16 in-flight requests (see ChannelSftp's request_max ramp-up) can carry more data per
+    // round trip; the local window is scaled up to match so it isn't the new bottleneck.
+    // Servers that only support shorter reads still work since jsch detects short reads and
+    // re-requests the remainder.
+    private static final int SFTP_LOCAL_PACKET_SIZE = 64 * 1024;
+    private static final int SFTP_LOCAL_WINDOW_SIZE_MAX = 64 * SFTP_LOCAL_PACKET_SIZE;
+
     private static SFTPSession sshSession = null;
     //Keep a cached Session ( = connection) per server
     private ConcurrentHashMap<Credential, Session> currentSessions;
@@ -54,6 +63,9 @@ public class SFTPSession {
         if(session !=null){
             try {
                 Channel channel = session.openChannel("sftp");
+                channel.setLocalPacketSize(SFTP_LOCAL_PACKET_SIZE);
+                channel.setLocalWindowSizeMax(SFTP_LOCAL_WINDOW_SIZE_MAX);
+                channel.setLocalWindowSize(SFTP_LOCAL_WINDOW_SIZE_MAX);
                 channel.connect();
                 acquireSession(channel);
                 return channel;
@@ -67,6 +79,9 @@ public class SFTPSession {
 
                         Channel channel;
                         channel = session2.openChannel("sftp");
+                        channel.setLocalPacketSize(SFTP_LOCAL_PACKET_SIZE);
+                        channel.setLocalWindowSizeMax(SFTP_LOCAL_WINDOW_SIZE_MAX);
+                        channel.setLocalWindowSize(SFTP_LOCAL_WINDOW_SIZE_MAX);
                         channel.connect();
                         acquireSession(channel);
                         return channel;
