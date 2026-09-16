@@ -132,7 +132,7 @@ dependencies {
     api 'com.github.nova-video-player:jcifs-ng:v2.1.11-nova3'
     // upgrading for later release i.e. 0.2.25 or 2.27.0 will break the build since it has switched to java 24
     // testing Nova fork with public setLocalPacketSize/setLocalWindowSize(Max) for SFTP throughput tuning (see SFTPSession)
-    api 'com.github.nova-video-player:jsch-mwiede:jsch-2.28.7-readahead2'
+    api 'com.github.nova-video-player:jsch-mwiede:jsch-2.28.7-readahead3'
     // desugar is needed no avoid  commons-net java.time.Duration ClassNotFoundException after 3.8.0
     implementation 'commons-net:commons-net:3.13.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.4.9'
