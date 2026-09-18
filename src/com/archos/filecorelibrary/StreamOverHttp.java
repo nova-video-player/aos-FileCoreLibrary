@@ -17,6 +17,8 @@ package com.archos.filecorelibrary;
 import static com.archos.filecorelibrary.FileUtils.caughtException;
 
 import android.net.Uri;
+import android.database.Cursor;
+import android.provider.OpenableColumns;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.contentstorage.ContentStorageFileEditor;
@@ -27,11 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Locale;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -43,10 +47,8 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jcifs.util.transport.TransportException;
 
 /**
  * This is simple HTTP local server for streaming InputStream to apps which are capable to read data from url.
@@ -66,6 +68,11 @@ public class StreamOverHttp {
 	private final AtomicInteger mNextRequestId = new AtomicInteger(1);
 	private volatile int mActiveMediaRequestId = 0;
 	private volatile HttpSession mActiveMediaSession;
+	private final Object mSessionLock = new Object();
+	private final Set<HttpSession> mSessions = new HashSet<>();
+	private boolean mClosed;
+	private static final int MAX_SESSIONS = 16;
+	private static final int MAX_HEADER_BYTES = 65536;
 
 	/**
 	 * Some HTTP response status codes
@@ -185,396 +192,318 @@ public class StreamOverHttp {
 		return getUri(FileUtils.getName(posterLocalUri));
 	}
 
+	private static class RequestException extends IOException {
+		final String status;
+		RequestException(String status, String message) { super(message); this.status = status; }
+	}
+
 	private class HttpSession implements Runnable {
 		private boolean canSeek;
-		private volatile InputStream is;
+		private InputStream is; // publication and ownership transfers use this session's monitor
 		private final Socket socket;
 		private final int requestId;
-		private Properties mPre=null;
-		private int mRlen=-1;
-		private InputStream mInS=null;
-		private String fileMimeType =""; // this might be changed we a subtitle is sent
-		private long length;
+		private final Thread worker;
+		private final Properties requestHeaders = new Properties();
+		private String fileMimeType;
+		private long length = -1;
+		private long requestedStart;
+		private long requestedEnd = -1;
+		private boolean partialResponse;
 		private boolean supersedableMediaRequest;
-		private long requestedStart = -1;
 		private volatile boolean forceClosed;
+		private boolean responseStarted;
+		private int cleanupTasks = 1; // guarded by mSessionLock; includes the worker
 
-		HttpSession(Socket s, String fileMimeType){
+		HttpSession(Socket socket, String fileMimeType) {
+			this.socket = socket;
 			this.fileMimeType = fileMimeType;
-			socket = s;
 			requestId = mNextRequestId.getAndIncrement();
-			if (log.isDebugEnabled()) log.debug("Stream over localhost: serving request on {}", s.getInetAddress());
-			Thread t = new Thread(this, "Http response");
-			t.setDaemon(true);
-			t.start();
+			worker = new Thread(this, "Http response");
+			worker.setDaemon(true);
+			synchronized (mSessionLock) {
+				if (mClosed || mSessions.size() >= MAX_SESSIONS) {
+					closeSocket();
+					return;
+				}
+				mSessions.add(this);
+				worker.start();
+			}
 		}
 
-		private void markActiveMediaRequest() {
+		private void markActiveMediaRequest() throws IOException {
 			if (!supersedableMediaRequest) return;
-			HttpSession previousSession = mActiveMediaSession;
-			int previous = mActiveMediaRequestId;
-			mActiveMediaRequestId = requestId;
-			mActiveMediaSession = this;
-			if (log.isDebugEnabled()) {
-				log.debug("http session activate: uri={} request_id={} previous_id={} from={}",
-						mUri, requestId, previous, requestedStart);
+			HttpSession previous;
+			synchronized (mSessionLock) {
+				if (mClosed || requestId < mActiveMediaRequestId) throw new IOException("Request superseded");
+				previous = mActiveMediaSession;
+				mActiveMediaSession = this;
+				mActiveMediaRequestId = requestId;
 			}
-			if (previousSession != null && previousSession != this) {
-				previousSession.closeSupersededSession(requestId);
-			}
-		}
-
-		private boolean isSuperseded() {
-			return supersedableMediaRequest && mActiveMediaRequestId != 0 && mActiveMediaRequestId != requestId;
+			if (previous != null && previous != this) previous.cancel();
 		}
 
 		private boolean isCancelled() {
-			return forceClosed || isSuperseded();
+			return forceClosed || (supersedableMediaRequest && requestId < mActiveMediaRequestId);
 		}
 
-		private void closeSupersededSession(int activeRequestId) {
-			if (!supersedableMediaRequest || forceClosed) return;
-			forceClosed = true;
-			if (log.isDebugEnabled()) {
-				log.debug("http session force-close: uri={} request_id={} active_id={} from={}",
-						mUri, requestId, activeRequestId, requestedStart);
+		private void closeSocket() {
+			try { socket.close(); } catch (IOException ignored) { }
+		}
+
+		private void closeInput(InputStream input) {
+			if (input == null) return;
+			try { input.close(); }
+			catch (Exception e) { caughtException(e, "StreamOverHttp:closeInput", "Closing upstream input"); }
+		}
+
+		private synchronized InputStream takeInput() {
+			InputStream input = is;
+			is = null;
+			return input;
+		}
+
+		private void publishInput(InputStream input) throws IOException {
+			if (input == null) throw new IOException("No upstream input");
+			synchronized (this) {
+				if (!isCancelled()) { is = input; return; }
 			}
-			try {
-				socket.close();
-			} catch (IOException e) {
-				caughtException(e, "StreamOverHttp:closeSupersededSession", "IOException closing superseded socket");
+			closeInput(input);
+			throw new IOException("Request cancelled while opening input");
+		}
+
+		private void cancel() {
+			synchronized (this) {
+				if (forceClosed) return;
+				forceClosed = true;
+			}
+			closeSocket();
+			worker.interrupt();
+			// Some backends need close() to unblock read(), and close itself may wait
+			// for network I/O. Never make playback stop or the replacement request wait.
+			InputStream input;
+			synchronized (this) {
+				input = takeInput();
+				if (input != null) {
+					synchronized (mSessionLock) { cleanupTasks++; }
+				}
+			}
+			if (input != null) {
+				Thread closer = new Thread(() -> {
+					try { closeInput(input); } finally { finishTask(); }
+				}, "Http input close");
+				closer.setDaemon(true);
+				closer.start();
 			}
 		}
 
-		public void run(){
+		private void finishTask() {
+			synchronized (mSessionLock) {
+				// Keep stalled closes in the admission limit as well as stalled reads.
+				if (--cleanupTasks == 0) mSessions.remove(this);
+				if (mActiveMediaSession == this) mActiveMediaSession = null;
+			}
+		}
+
+		public void run() {
 			try {
 				openInputStream();
-				handleResponse(socket);
-			} catch(IOException e) {
-				caughtException(e, "StreamOverHttp:HttpSession", "IOException while running for " + mUri);
-			} finally {
-				if (mActiveMediaSession == this) {
-					mActiveMediaSession = null;
-					if (mActiveMediaRequestId == requestId) {
-						mActiveMediaRequestId = 0;
-					}
-				}
-				try {
-					socket.close();
-				} catch(Exception e) {
-					caughtException(e, "StreamOverHttp:HttpSession", "Exception closing socket with " + mUri);
-				}
-				if(is!=null) {
-					try {
-						is.close();
-					} catch(IOException e) {
-						caughtException(e, "StreamOverHttp:HttpSession", "IOException closing input stream with " + mUri);
-					}
-				}
-			}
-		}
-
-		private void openInputStream() throws IOException{
-			long requestStartedNs = System.nanoTime();
-			boolean isAskingPoster = false;
-			boolean needsToStream = false;
-			long startFrom = 0;
-			mPre = new Properties();
-			mInS = socket.getInputStream();
-			String path=null;
-			if(mInS != null){
-				byte[] buf = new byte[BUFFER_SIZE];
-				mRlen = mInS.read(buf, 0, buf.length);
-				ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, mRlen);
-				BufferedReader hin = new BufferedReader(new InputStreamReader(hbis));
-				try {
-					String encodedPath;
-						if((encodedPath=decodeHeader(socket, hin, mPre))!=null){
-							String range = mPre.getProperty("range");
-							if(range!=null) {
-								range = range.substring(6);
-
-								int minus = range.indexOf('-');
-								String startR = range.substring(0, minus);
-								startFrom = Long.parseLong(startR);
-								needsToStream = true;
-								requestedStart = startFrom;
-								if (log.isDebugEnabled()) log.debug("openInputStream: range request uri={} from={} raw_range={}", mUri, startFrom, mPre.getProperty("range"));
-							}
-							path = Uri.decode(encodedPath);
-						}
-				} catch (InterruptedException e) {
-					caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException");
-				}
-			}
-
-			try {
-				canSeek = true;
-				/*
-				 * first, we retrieve main metafile
-				 */
-				if(mMetaFile==null&&mUri!=null) {
-					try {
-						mMetaFile = MetaFile2Factory.getMetaFileForUrl(mUri);
-					} catch(Exception e) {
-						caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException retrieving metafile");
-					}
-				}
-				/*
-					some players like MXPlayer try to find subs associated with http urls
-				 */
-
-				MetaFile2 metaFile2=null;
-				MetaFile2 subFallback = null;
-				/*
-					Players such as mx player will look for subs having the exact same name as video file.
-					But with AVP, when we download a sub file, its name is like *.eng.srt
-					an easy hack is to send any sub with the asked extension when no sub with the exact same name has been found:
-					if we have :
-					name.srt
-					name.eng.srt
-
-					send name.srt
-
-					if it ask for
-					name.srt
-					but we only have
-					name.eng.srt
-					send
-					name.eng.srt
-				 */
-				if(path!=null){
-					String name = FileUtils.getName(Uri.parse(path));
-					if(mPosterLocalUri!=null&&name!=null&&name.equals(FileUtils.getName(mPosterLocalUri))){//if asking for poster
-						isAskingPoster = true;
-						if(!isResourcePoster(mPosterLocalUri))
-							metaFile2 = MetaFile2Factory.getMetaFileForUrl(mPosterLocalUri);
-					} else {
-						if (!mName.equals(name)) {
-							List<MetaFile2> subs = getSubtitleList(mUri);
-							String extension = MimeUtils.getExtension(path);
-							for (MetaFile2 sub : subs) {
-								if (sub.getName().equals(name)) {
-									metaFile2 = sub;
-									break;
-								}
-								if (sub.getExtension().equals(extension))
-									subFallback = sub;
-							}
-							if (metaFile2 == null)
-								metaFile2 = subFallback;
-							if (metaFile2 != null)
-								canSeek = false;
-						}
-					}
-				}
-
-					if(metaFile2==null&&!isAskingPoster)
-						metaFile2 = mMetaFile;
-					supersedableMediaRequest = needsToStream && !isAskingPoster && metaFile2 == mMetaFile;
-					if (supersedableMediaRequest) {
-						markActiveMediaRequest();
-					}
-					if(metaFile2!=null) { //mMetafile can be null
-						if(metaFile2.length()!=0)
-							length = metaFile2.length();
-					try {
-						var fe = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext());
-						is = fe.getInputStream(startFrom);
-						var l = fe.length();
-						if (log.isTraceEnabled()) log.trace("HttpSession:openInputStream: got length {}", l);
-						if (l > 0 && length <=0) length = l;
-					 } catch (IOException ioexception) {
-						if (log.isDebugEnabled()) log.debug("openInputStream: caught IOException ", ioexception);
-						if (ioexception.getMessage().equals("Illegal seek")){
-							is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream();
-							canSeek = false;
-						}
-					}
-				}else {
-					if (isAskingPoster && isResourcePoster(mPosterLocalUri)) {
-						//special case, inputstream on resource
-						is = ArchosUtils.getGlobalContext().getResources().openRawResource(mPosterGenericResource);
-					} else {
-						try {
-							is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream(startFrom);
-						} catch (IOException ioexception) {
-							if (log.isDebugEnabled()) log.debug("openInputStream: caught IOException ", ioexception);
-							if (ioexception.getMessage().equals("Illegal seek")){
-								is = FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext()).getInputStream();
-								canSeek = false;
-							}
-						}
-					}
-				}if(is==null)
-					return;
-				if(length==0)
-					length = is.available();
-				if(length == 0 && "content".equalsIgnoreCase(mUri.getScheme()))
-					length = ((ContentStorageFileEditor)FileEditorFactory.getFileEditorForUrl(mUri, ArchosUtils.getGlobalContext())).getSize();
-				if (log.isDebugEnabled()) {
-					log.debug("openInputStream: ready uri={} scheme={} from={} canSeek={} needsToStream={} length={} path={} total_ms={}",
-							mUri,
-							mUri != null ? mUri.getScheme() : "null",
-							startFrom,
-							canSeek,
-							needsToStream,
-							length,
-							path,
-							(System.nanoTime() - requestStartedNs) / 1_000_000.0);
-				}
-
+				handleResponse();
 			} catch (Exception e) {
-				caughtException(e, "StreamOverHttp:openInputStream", "Exception");
+				if (!isCancelled()) {
+					caughtException(e, "StreamOverHttp:HttpSession", "Request failed for " + mUri);
+					if (!responseStarted) sendError(socket,
+							e instanceof RequestException ? ((RequestException)e).status : HTTP_INTERNALERROR,
+							"Unable to serve request");
+				}
+			} finally {
+				closeSocket();
+				closeInput(takeInput());
+				finishTask();
 			}
 		}
 
-		private void handleResponse(Socket socket) throws TransportException {
+		private String readRequest() throws IOException {
+			socket.setSoTimeout(10000);
+			InputStream input = new BufferedInputStream(socket.getInputStream());
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			int tail = 0;
+			while (tail != 0x0d0a0d0a) {
+				int value = input.read();
+				if (value < 0) throw new EOFException("Incomplete HTTP request");
+				if (bytes.size() >= MAX_HEADER_BYTES) throw new RequestException(HTTP_BADREQUEST, "Headers too large");
+				bytes.write(value);
+				tail = (tail << 8) | value;
+			}
+			socket.setSoTimeout(0);
+			String[] lines = new String(bytes.toByteArray(), StandardCharsets.ISO_8859_1).split("\r\n");
+			String[] request = lines[0].split(" +");
+			if (request.length != 3 || !"GET".equals(request[0]) || !request[2].startsWith("HTTP/1."))
+				throw new RequestException(HTTP_BADREQUEST, "Invalid request line");
+			for (int i = 1; i < lines.length; ++i) {
+				int colon = lines[i].indexOf(':');
+				if (colon <= 0) throw new RequestException(HTTP_BADREQUEST, "Invalid header");
+				String name = lines[i].substring(0, colon).trim().toLowerCase(Locale.ROOT);
+				if ("range".equals(name) && requestHeaders.containsKey(name))
+					throw new RequestException(HTTP_416, "Multiple ranges unsupported");
+				requestHeaders.setProperty(name, lines[i].substring(colon + 1).trim());
+			}
+			return Uri.decode(request[1]);
+		}
+
+		private void resolveRange() throws IOException {
+			String range = requestHeaders.getProperty("range");
+			// HTTP permits ignoring Range. Unknown-size/nonseekable inputs are sent
+			// from byte zero, delimited by connection close, without invented lengths.
+			if (range == null || !canSeek || length < 0) return;
+			if (!range.matches("bytes=[0-9]*-[0-9]*")) throw new RequestException(HTTP_416, "Invalid range");
+			String[] ends = range.substring(6).split("-", -1);
 			try {
-				if (isSuperseded()) {
-					if (log.isDebugEnabled()) {
-						log.debug("handleResponse: superseded before response uri={} request_id={} active_id={} from={}",
-								mUri, requestId, mActiveMediaRequestId, requestedStart);
-					}
-					return;
-				}
-				InputStream inS = socket.getInputStream();
-				if(inS == null&&mInS==null)
-					return;
-				else if(inS == null)
-					inS = mInS; //we have already touched the stream
-
-				byte[] buf = new byte[BUFFER_SIZE];
-				int rlen =mRlen;
-				if(mRlen<0)
-					rlen= inS.read(buf, 0, buf.length);
-				if(rlen < 0&&mRlen<0)
-					return;
-				else if (rlen < 0)
-					rlen = mRlen; // we already have the length (ssh)
-
-				// Create a BufferedReader for parsing the header.
-				ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, rlen);
-				BufferedReader hin = new BufferedReader(new InputStreamReader(hbis));
-				Properties pre = new Properties();
-
-				// Decode the header into params and header java properties
-				boolean decode = decodeHeader(socket, hin, pre)!=null;
-				if(!decode&&mPre==null)
-					return;
-				else if(!decode)
-					pre = mPre; // properties have already been decoded (ssh)
-
-				String range = pre.getProperty("range");
-
-				Properties headers = new Properties();
-				if(length!=-1)
-					headers.put("Content-Length", String.valueOf(length));
-				headers.put("Accept-Ranges", canSeek ? "bytes" : "none");
-				long sendCount;
-				String status;
-				if(range==null || !canSeek) {
-					status = "200 OK";
-					sendCount = length;
+				if (ends[0].isEmpty()) {
+					long suffix = Long.parseLong(ends[1]);
+					if (suffix <= 0) throw new NumberFormatException();
+					requestedStart = Math.max(0, length - suffix);
+					requestedEnd = length - 1;
 				} else {
-					if(!range.startsWith("bytes=")){
-						sendError(socket, HTTP_416, null);
-						return;
+					requestedStart = Long.parseLong(ends[0]);
+					requestedEnd = ends[1].isEmpty() ? length - 1 : Math.min(Long.parseLong(ends[1]), length - 1);
+				}
+			} catch (NumberFormatException e) { throw new RequestException(HTTP_416, "Invalid range"); }
+			if (requestedStart >= length || requestedEnd < requestedStart) throw new RequestException(HTTP_416, "Unsatisfiable range");
+			partialResponse = true;
+		}
+
+		private void openInputStream() throws Exception {
+			String path = readRequest();
+			boolean isAskingPoster = false;
+			canSeek = true;
+			if(mMetaFile==null&&mUri!=null) {
+				try {
+					mMetaFile = MetaFile2Factory.getMetaFileForUrl(mUri);
+				} catch(Exception e) {
+					caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException retrieving metafile");
+				}
+			}
+			/*
+				some players like MXPlayer try to find subs associated with http urls
+			 */
+
+			MetaFile2 metaFile2=null;
+			MetaFile2 subFallback = null;
+			/*
+				Players such as mx player will look for subs having the exact same name as video file.
+				But with AVP, when we download a sub file, its name is like *.eng.srt
+				an easy hack is to send any sub with the asked extension when no sub with the exact same name has been found:
+				if we have :
+				name.srt
+				name.eng.srt
+
+				send name.srt
+
+				if it ask for
+				name.srt
+				but we only have
+				name.eng.srt
+				send
+				name.eng.srt
+			 */
+			if(path!=null){
+				String name = FileUtils.getName(Uri.parse(path));
+				if(mPosterLocalUri!=null&&name!=null&&name.equals(FileUtils.getName(mPosterLocalUri))){//if asking for poster
+					isAskingPoster = true;
+					if(!isResourcePoster(mPosterLocalUri))
+						metaFile2 = MetaFile2Factory.getMetaFileForUrl(mPosterLocalUri);
+				} else {
+					if (!mName.equals(name)) {
+						List<MetaFile2> subs = getSubtitleList(mUri);
+						String extension = MimeUtils.getExtension(path);
+						for (MetaFile2 sub : subs) {
+							if (sub.getName().equals(name)) {
+								metaFile2 = sub;
+								break;
+							}
+							if (sub.getExtension().equals(extension))
+								subFallback = sub;
+						}
+						if (metaFile2 == null)
+							metaFile2 = subFallback;
+						if (metaFile2 != null)
+							canSeek = false;
 					}
-					if (log.isDebugEnabled()) log.debug("handleResponse : {}", range);
-					range = range.substring(6); // removes "bytes="
-					long startFrom = 0, endAt = -1;
-					int minus = range.indexOf('-');
-					if(minus > 0) {
-						try {
-							String startR = range.substring(0, minus);
-							startFrom = Long.parseLong(startR);
-							String endR = range.substring(minus + 1);
-							if (endR.length() > 0) endAt = Long.parseLong(endR);
-						} catch(NumberFormatException nfe) {
-							caughtException(nfe, "StreamOverHttp:handleResponse", "NumberFormatException");
+				}
+			}
+
+			if(metaFile2==null&&!isAskingPoster)
+				metaFile2 = mMetaFile;
+
+			supersedableMediaRequest = !isAskingPoster && metaFile2 == mMetaFile;
+			markActiveMediaRequest();
+			if (isCancelled()) throw new IOException("Request cancelled");
+			if (isAskingPoster && isResourcePoster(mPosterLocalUri)) {
+				canSeek = false;
+				publishInput(ArchosUtils.getGlobalContext().getResources().openRawResource(mPosterGenericResource));
+				return;
+			}
+			Uri target = metaFile2 != null ? metaFile2.getUri() : mUri;
+			FileEditor editor = FileEditorFactory.getFileEditorForUrl(target, ArchosUtils.getGlobalContext());
+			if (metaFile2 != null && metaFile2.length() > 0) length = metaFile2.length();
+			try {
+				long editorLength = editor.length();
+				if (editorLength >= 0) length = editorLength;
+				if (length < 0 && editor instanceof ContentStorageFileEditor) {
+					try (Cursor cursor = ArchosUtils.getGlobalContext().getContentResolver().query(
+							target, new String[] { OpenableColumns.SIZE }, null, null, null)) {
+						if (cursor != null && cursor.moveToFirst()) {
+							int column = cursor.getColumnIndex(OpenableColumns.SIZE);
+							if (column >= 0 && !cursor.isNull(column)) length = cursor.getLong(column);
 						}
 					}
-					if(startFrom >= length){
-						sendError(socket, HTTP_416, null);
-						inS.close();
-						return;
+				}
+			} catch (Exception e) {
+				// Length is optional; absence must not prevent sequential playback.
+				log.debug("Unable to determine stream length", e);
+			}
+			resolveRange();
+			try {
+				if (isCancelled()) throw new IOException("Request cancelled");
+				publishInput(editor.getInputStream(requestedStart));
+				// HTTP/WebDAV editors may learn the total size only from opening
+				// their response. Keep range support when metadata did not know it.
+				if (length < 0) {
+					try { length = editor.length(); }
+					catch (Exception e) { log.debug("Stream length still unknown", e); }
+					if (length >= 0) {
+						resolveRange();
+						if (requestedStart > 0) {
+							closeInput(takeInput());
+							if (isCancelled()) throw new IOException("Request cancelled");
+							publishInput(editor.getInputStream(requestedStart));
+						}
 					}
-					if(endAt < 0)
-						endAt = length - 1;
-					sendCount = (endAt - startFrom + 1);
-					if (log.isDebugEnabled()) log.debug("handleResponse: startFrom = {} + endAt={} sendCount={} (length = {})", startFrom, endAt, sendCount, length);
-					if(sendCount < 0)
-						sendCount = 0;
-					status = "206 Partial Content";
-
-					/* else
-            	   is.skip(startFrom);*/
-					headers.put("Content-Length", "" + sendCount);
-
-					String rangeSpec = "bytes " + startFrom + "-" + endAt + "/" + length;
-					headers.put("Content-Range", rangeSpec);
 				}
-				headers.put("Access-Control-Allow-Origin", "*");
-				sendResponse(socket, status, fileMimeType, headers, is, sendCount, buf, null, this);
-				if (log.isDebugEnabled()) log.debug("Http stream finished");
-			} catch(IOException ioe) {
-				caughtException(ioe, "StreamOverHttp:handleResponse", "IOException");
-				try{
-					sendError(socket, HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-				} catch(Throwable t) {
-					caughtException(t, "StreamOverHttp:handleResponse", "Throwable");
-				}
-			} catch(InterruptedException ie) {
-				// thrown by sendError, ignore and exit the thread
-				caughtException(ie, "StreamOverHttp:handleResponse", "InterruptedException");
+			} catch (IOException e) {
+				if (!"Illegal seek".equals(e.getMessage())) throw e;
+				canSeek = false;
+				partialResponse = false;
+				requestedStart = 0;
+				publishInput(editor.getInputStream());
 			}
 		}
 
-		/**
-		 * decode header and returns requested path
-		 * @param socket
-		 * @param in
-		 * @param pre
-		 * @return
-		 * @throws InterruptedException
-		 */
-		private String decodeHeader(Socket socket, BufferedReader in, Properties pre) throws InterruptedException{
-			String path=null;
-			try{
-				// Read the request line
-				String inLine = in.readLine();
-				if(inLine == null)
-					return null;
-				StringTokenizer st = new StringTokenizer(inLine);
-				if(!st.hasMoreTokens())
-					sendError(socket, HTTP_BADREQUEST, "Syntax error");
-
-				String method = st.nextToken();
-				if(!method.equals("GET"))
-					return null;
-
-				if(!st.hasMoreTokens())
-					sendError(socket, HTTP_BADREQUEST, "Missing URI");
-				path = st.nextToken();
-				while(true) {
-					String line = in.readLine();
-					if(line==null)
-						break;
-					if(log.isDebugEnabled() && line.length()>0)
-						if (log.isDebugEnabled()) log.debug("decodeHeader {}", line);
-					int p = line.indexOf(':');
-					if(p<0)
-						continue;
-					final String atr = line.substring(0, p).trim().toLowerCase();
-					final String val = line.substring(p + 1).trim();
-					pre.put(atr, val);
-				}
-			}catch(IOException ioe){
-				caughtException(ioe, "StreamOverHttp:decodeHeader", "IOException");
-				sendError(socket, HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-			}
-			return path;
+		private void handleResponse() throws IOException {
+			if (isCancelled()) return;
+			Properties headers = new Properties();
+			headers.setProperty("Accept-Ranges", canSeek && length >= 0 ? "bytes" : "none");
+			headers.setProperty("Connection", "close");
+			headers.setProperty("Access-Control-Allow-Origin", "*");
+			long count = partialResponse ? requestedEnd - requestedStart + 1 : length;
+			if (count >= 0) headers.setProperty("Content-Length", Long.toString(count));
+			if (partialResponse) headers.setProperty("Content-Range", "bytes " + requestedStart + "-" + requestedEnd + "/" + length);
+			InputStream input;
+			synchronized (this) { input = is; }
+			if (input == null || isCancelled()) return;
+			responseStarted = true;
+			sendResponse(socket, partialResponse ? "206 Partial Content" : "200 OK", fileMimeType,
+					headers, input, count, new byte[BUFFER_SIZE], null, this);
 		}
 	}
 
@@ -611,13 +540,14 @@ public class StreamOverHttp {
 		return Uri.parse(url);
 	}
 
-	public void close(){
-		if (log.isDebugEnabled()) log.debug("Closing stream over http");
-		try{
-			serverSocket.close();
-		} catch(Exception e) {
-			caughtException(e, "StreamOverHttp:close", "Exception");
+	public void close() {
+		List<HttpSession> sessions;
+		synchronized (mSessionLock) {
+			mClosed = true;
+			sessions = new ArrayList<>(mSessions);
 		}
+		try { serverSocket.close(); } catch (IOException ignored) { }
+		for (HttpSession session : sessions) session.cancel();
 	}
 
 	/**
@@ -632,53 +562,21 @@ public class StreamOverHttp {
 		}
 	}
 
-	private void copyStream(InputStream in, OutputStream out, byte[] tmpBuf, long maxSize, HttpSession session) throws IOException{
-		if (log.isDebugEnabled()) log.debug("copyStream");
-		int count;
-
-		while(maxSize>0) {
-			if (session != null && session.isCancelled()) {
-				if (log.isDebugEnabled()) {
-					log.debug("copyStream: abort superseded uri={} request_id={} active_id={} from={} remaining={}",
-							mUri, session.requestId, mActiveMediaRequestId, session.requestedStart, maxSize);
-				}
-				break;
+	private void copyStream(InputStream in, OutputStream out, byte[] buffer, long remaining, HttpSession session) throws IOException {
+		while (remaining != 0) {
+			if (session != null && session.isCancelled()) return;
+			int count = in.read(buffer, 0, remaining < 0 ? buffer.length : (int)Math.min(remaining, buffer.length));
+			if (count < 0) {
+				if (remaining > 0) throw new EOFException("Upstream ended before Content-Length");
+				return;
 			}
-			if (log.isDebugEnabled()) log.debug("copyStream: looping maxSize= {}", maxSize);
-			count = (int) Math.min(maxSize, (long)tmpBuf.length);
-			if (log.isDebugEnabled()) log.debug("copyStream: looping count= {}", count);
-			try {
-				count = in.read(tmpBuf, 0, count);
-			} catch (RuntimeException e) {
-				if (session != null && session.isCancelled()) {
-					if (log.isDebugEnabled()) {
-						log.debug("copyStream: swallow cancelled read failure uri={} request_id={} active_id={} from={}",
-								mUri, session.requestId, mActiveMediaRequestId, session.requestedStart);
-					}
-					break;
-				}
-				throw new IOException("copyStream: input read failed", e);
-			}
-			if (log.isDebugEnabled()) log.debug("copyStream: looping count after in.read {}", count);
-			if(count<0)
-				break;
-			if (log.isDebugEnabled()) log.debug("copyStream: looping tmpBuf is of length {} writing count {}", tmpBuf.length, count);
-			try {
-				out.write(tmpBuf, 0, count); // TODO MARC CRASH HERE
-				out.flush();
-			} catch (IOException e) {
-				if (session != null && session.isCancelled()) {
-					if (log.isDebugEnabled()) {
-						log.debug("copyStream: swallow cancelled write failure uri={} request_id={} active_id={} from={}",
-								mUri, session.requestId, mActiveMediaRequestId, session.requestedStart);
-					}
-					break;
-				}
-				throw e;
-			}
-			maxSize -= count;
+			if (count == 0) throw new IOException("Upstream read made no progress");
+			if (session != null && session.isCancelled()) return;
+			out.write(buffer, 0, count);
+			if (remaining > 0) remaining -= count;
 		}
 	}
+
 	/**
 	 * Sends given response to the socket, and closes the socket.
 	 */
@@ -688,7 +586,7 @@ public class StreamOverHttp {
 		try {
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out);
-			bin = new BufferedInputStream(isInput, BUFFER_SIZE*10);
+			if (isInput != null) bin = new BufferedInputStream(isInput, BUFFER_SIZE*10);
 			{
 				String retLine = "HTTP/1.0 " + status + " \r\n";
 				pw.print(retLine);
@@ -709,6 +607,7 @@ public class StreamOverHttp {
 			}
 			pw.print("\r\n");
 			pw.flush();
+			if (pw.checkError()) throw new IOException("Failed to write response headers");
 			if(isInput != null)
 				copyStream(bin, out, buf, sendCount, session);
 			else if(errMsg!=null) {
@@ -717,20 +616,13 @@ public class StreamOverHttp {
 			}
 			out.flush();
 			out.close();
-		} catch(IOException e) {
-			caughtException(e, "StreamOverHttp:sendResponse", "IOException");
 		} finally {
 			try {
 				socket.close();
 			} catch(Throwable t) {
 				caughtException(t, "StreamOverHttp:sendResponse", "Throwable closing socket");
 			}
-			if (bin != null)
-				try{
-					bin.close();
-				} catch(Throwable t) {
-					caughtException(t, "StreamOverHttp:sendResponse", "Throwable closing bin");
-				}
+			// HttpSession owns upstream close, including cancellation during read().
 		}
 	}
 }
