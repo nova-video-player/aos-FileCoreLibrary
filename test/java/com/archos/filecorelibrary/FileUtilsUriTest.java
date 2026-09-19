@@ -102,4 +102,16 @@ public class FileUtilsUriTest {
         String decoded = FileUtils.decodeUri(child);
         assertEquals("smb://10.0.2.3:4455/share/dir/#Alive.archos.nfo", decoded);
     }
+
+    @Test
+    public void testGetNameWithQueryParams() {
+        Uri contentUri = Uri.parse("content://com.archos.media.videocommunity/external/video/media/12345?blocking=1&orig_id=12345");
+        assertEquals("12345", FileUtils.getName(contentUri));
+
+        Uri httpUri = Uri.parse("https://example.com/videos/movie.mp4?token=secret&expires=123456");
+        assertEquals("movie.mp4", FileUtils.getName(httpUri));
+
+        Uri smbUri = Uri.parse("smb://server/share/dir/%23Alive.mkv");
+        assertEquals("#Alive.mkv", FileUtils.getName(smbUri));
+    }
 }

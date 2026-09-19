@@ -303,6 +303,10 @@ public class FileUtils {
             // treated as a normal character; avoid encodeUri() here since it would double-encode
             // already percent-encoded content:// document ids.
             String str = uri.toString();
+            int queryIndex = str.indexOf('?');
+            if (queryIndex >= 0) {
+                str = str.substring(0, queryIndex);
+            }
             if (str.endsWith("/")) {
                 str = str.substring(0, str.length() - 1);
             }
