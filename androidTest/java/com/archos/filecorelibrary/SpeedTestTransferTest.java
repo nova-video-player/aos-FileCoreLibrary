@@ -58,17 +58,22 @@ import java.util.Locale;
  * (-D) do not propagate into the instrumented app process on-device, the on-device CSV path is
  * supplied via an instrumentation runner argument instead:
  * <pre>
- *   adb push /absolute/path/to/servers.csv /sdcard/nova-speedtest.csv
- *   cd Video
- *   ./gradlew :FileCoreLibrary:connectedDebugAndroidTest --tests "*SpeedTestTransferTest" \
- *       -Pandroid.testInstrumentationRunnerArguments.speedtestCsv=/sdcard/nova-speedtest.csv
+ *   adb shell am instrument -w -r \
+ *       -e class com.archos.filecorelibrary.SpeedTestTransferTest \
+ *       -e speedtestCsv /data/user/0/com.archos.filecorelibrary.test/files/servers.csv \
+ *       -e speedtestUpstreamBufferBytes 1048576 \
+ *       com.archos.filecorelibrary.test/androidx.test.runner.AndroidJUnitRunner
  * </pre>
+ * See TEST.md for APK installation and CSV setup. The upstream buffer defaults to
+ * 81920 bytes; this explicit benchmark setting is independent of playback mode.
  */
 @RunWith(AndroidJUnit4.class)
 public class SpeedTestTransferTest {
 
     private static final String CSV_PATH_ARG = "speedtestCsv";
+    private static final String UPSTREAM_BUFFER_ARG = "speedtestUpstreamBufferBytes";
     private static final int BUFFER_SIZE = 256 * 1024;
+    private int upstreamBufferSize;
 
     private static final class Row {
         final Uri uri;
@@ -102,9 +107,12 @@ public class SpeedTestTransferTest {
     public void setUp() {
         Bundle args = InstrumentationRegistry.getArguments();
         csvPath = args != null ? args.getString(CSV_PATH_ARG) : null;
-        assumeTrue("Pass -Pandroid.testInstrumentationRunnerArguments." + CSV_PATH_ARG
-                        + "=/on-device/path/to/servers.csv to run this test",
+        assumeTrue("Pass -e " + CSV_PATH_ARG + " /on-device/path/to/servers.csv to run this test",
                 csvPath != null && new File(csvPath).isFile());
+
+        upstreamBufferSize = Integer.parseInt(args.getString(UPSTREAM_BUFFER_ARG,
+                Integer.toString(StreamOverHttp.DEFAULT_UPSTREAM_BUFFER_SIZE)));
+        if (upstreamBufferSize <= 0) throw new IllegalArgumentException(UPSTREAM_BUFFER_ARG + " must be positive");
 
         Application app = ApplicationProvider.getApplicationContext();
         ArchosUtils.setGlobalContext(app);
@@ -118,6 +126,9 @@ public class SpeedTestTransferTest {
     public void compareTransferRates() throws Exception {
         List<Row> rows = parseCsv(csvPath);
         assumeTrue("CSV file has no usable rows: " + csvPath, !rows.isEmpty());
+
+        System.out.println(String.format(Locale.US, "HTTP upstream buffer: %d bytes; HTTP client buffer: %d bytes",
+                upstreamBufferSize, BUFFER_SIZE));
 
         List<Result> results = new ArrayList<>();
         for (Row row : rows) {
@@ -138,7 +149,7 @@ public class SpeedTestTransferTest {
         StreamOverHttp stream = null;
         try {
             String mimeType = MimeUtils.guessMimeTypeFromExtension(row.uri.getLastPathSegment());
-            stream = new StreamOverHttp(row.uri, mimeType);
+            stream = new StreamOverHttp(row.uri, mimeType, upstreamBufferSize);
             Uri localUri = stream.getEncodedUri(FileUtils.getName(row.uri));
 
             HttpURLConnection conn = (HttpURLConnection) new URL(localUri.toString()).openConnection();
@@ -166,7 +177,7 @@ public class SpeedTestTransferTest {
     private void printResults(List<Result> results) {
         System.out.println();
         System.out.println(String.format(Locale.US, "%-10s %-55s %14s %10s %12s",
-                "PROTOCOL", "URL", "BYTES", "SECONDS", "MB/s"));
+                "PROTOCOL", "URL", "BYTES", "SECONDS", "MiB/s"));
         for (Result r : results) {
             if (r.error != null) {
                 System.out.println(String.format(Locale.US, "%-10s %-55s %s",

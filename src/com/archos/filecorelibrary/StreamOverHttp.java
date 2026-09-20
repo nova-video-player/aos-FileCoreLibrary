@@ -22,6 +22,7 @@ import android.provider.OpenableColumns;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.contentstorage.ContentStorageFileEditor;
+import com.archos.filecorelibrary.jcifs.JcifsFileEditor;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
@@ -63,6 +64,10 @@ public class StreamOverHttp {
 	private String fileMimeType;
 	private static final int BUFFER_SIZE = 8192;
 	static final int DEFAULT_UPSTREAM_BUFFER_SIZE = BUFFER_SIZE * 10;
+	private static final int PLAYBACK_UPSTREAM_BUFFER_SIZE = 1024 * 1024;
+	/** Playback may batch backend reads; metadata and generic readers retain modest buffering. */
+	public enum ReadMode { DEFAULT, PLAYBACK }
+	private final ReadMode mReadMode;
 	private final int mUpstreamBufferSize;
 	private ServerSocket serverSocket;
 	private Thread mainThread;
@@ -89,39 +94,33 @@ public class StreamOverHttp {
 	private int mPosterGenericResource;
 
 	public StreamOverHttp(MetaFile2 f, String forceMimeType) throws IOException{
-		mUpstreamBufferSize = DEFAULT_UPSTREAM_BUFFER_SIZE;
-		mMetaFile = f;
-		mUri= f.getUri();
-		mName = f.getName();
-		fileMimeType = forceMimeType!=null ? forceMimeType : "*/*";
-		serverSocket = new ServerSocket(0);
-		mainThread = new Thread(new Runnable(){
-			public void run(){
-				try {
-					while(true) {
-						Socket accept = serverSocket.accept();
-						new HttpSession(accept,fileMimeType);
-					}
-				} catch(IOException e) {
-					caughtException(e, "StreamOverHttp:StreamOverHttp", "IOException for " + mUri);
-				}
-			}
+		this(f, forceMimeType, ReadMode.DEFAULT);
+	}
 
-		});
-		mainThread.setName("Stream over HTTP");
-		mainThread.setDaemon(true);
-		mainThread.start();
+	public StreamOverHttp(MetaFile2 f, String forceMimeType, ReadMode readMode) throws IOException{
+		this(f.getUri(), f, forceMimeType, readMode, DEFAULT_UPSTREAM_BUFFER_SIZE);
 	}
     public StreamOverHttp(final Uri uri, final String forceMimeType) throws IOException{
-		this(uri, forceMimeType, DEFAULT_UPSTREAM_BUFFER_SIZE);
+		this(uri, forceMimeType, ReadMode.DEFAULT);
+	}
+
+	public StreamOverHttp(Uri uri, String forceMimeType, ReadMode readMode) throws IOException{
+		this(uri, null, forceMimeType, readMode, DEFAULT_UPSTREAM_BUFFER_SIZE);
 	}
 
 	// Package-private overload for controlled transfer benchmarks.
 	StreamOverHttp(final Uri uri, final String forceMimeType, int upstreamBufferSize) throws IOException{
+		this(uri, null, forceMimeType, ReadMode.DEFAULT, upstreamBufferSize);
+	}
+
+	private StreamOverHttp(Uri uri, MetaFile2 file, String forceMimeType, ReadMode readMode, int upstreamBufferSize) throws IOException{
 		if (upstreamBufferSize <= 0) throw new IllegalArgumentException("Upstream buffer size must be positive");
+		if (readMode == null) throw new NullPointerException("readMode");
+		mReadMode = readMode;
 		mUpstreamBufferSize = upstreamBufferSize;
+		mMetaFile = file;
 		mUri = uri;
-		mName = FileUtils.getName(mUri);
+		mName = file != null ? file.getName() : FileUtils.getName(uri);
         fileMimeType = forceMimeType!=null ? forceMimeType : "*/*";
         serverSocket = new ServerSocket(0);
         mainThread = new Thread(new Runnable(){
@@ -141,6 +140,15 @@ public class StreamOverHttp {
         mainThread.setDaemon(true);
         mainThread.start();
     }
+
+	int upstreamBufferSize(FileEditor editor, boolean primaryMedia) {
+		if (!primaryMedia) return DEFAULT_UPSTREAM_BUFFER_SIZE;
+		// Select the actual backend: smb:// can also be routed to SMBJ, which
+		// already prefetches. Metadata callers never opt into playback batching.
+		if (mReadMode == ReadMode.PLAYBACK && editor instanceof JcifsFileEditor)
+			return PLAYBACK_UPSTREAM_BUFFER_SIZE;
+		return mUpstreamBufferSize;
+	}
 
 	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};
 
@@ -222,6 +230,7 @@ public class StreamOverHttp {
 		private boolean supersedableMediaRequest;
 		private volatile boolean forceClosed;
 		private boolean responseStarted;
+		private int upstreamBufferSize = DEFAULT_UPSTREAM_BUFFER_SIZE;
 		private int cleanupTasks = 1; // guarded by mSessionLock; includes the worker
 
 		HttpSession(Socket socket, String fileMimeType) {
@@ -455,6 +464,7 @@ public class StreamOverHttp {
 			}
 			Uri target = metaFile2 != null ? metaFile2.getUri() : mUri;
 			FileEditor editor = FileEditorFactory.getFileEditorForUrl(target, ArchosUtils.getGlobalContext());
+			upstreamBufferSize = upstreamBufferSize(editor, supersedableMediaRequest);
 			if (metaFile2 != null && metaFile2.length() > 0) length = metaFile2.length();
 			try {
 				long editorLength = editor.length();
@@ -592,11 +602,12 @@ public class StreamOverHttp {
 	 */
 	private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg, HttpSession session) throws IOException {
 		if (log.isDebugEnabled()) log.debug("sendResponse");
-		BufferedInputStream bin = null;
+		InputStream bin = null;
 		try {
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out);
-			if (isInput != null) bin = new BufferedInputStream(isInput, mUpstreamBufferSize);
+			if (isInput != null) bin = bufferResponseInput(isInput, sendCount,
+					session != null ? session.upstreamBufferSize : DEFAULT_UPSTREAM_BUFFER_SIZE);
 			{
 				String retLine = "HTTP/1.0 " + status + " \r\n";
 				pw.print(retLine);
@@ -634,5 +645,38 @@ public class StreamOverHttp {
 			}
 			// HttpSession owns upstream close, including cancellation during read().
 		}
+	}
+
+	/** Limit refills, not just socket writes, so a short range never fetches the following bytes. */
+	static InputStream bufferResponseInput(InputStream input, long length, int bufferSize) {
+		if (bufferSize <= 0) throw new IllegalArgumentException("Upstream buffer size must be positive");
+		if (length < 0) return new BufferedInputStream(input, bufferSize);
+		InputStream bounded = new InputStream() {
+			private long remaining = length;
+
+			@Override public int read() throws IOException {
+				if (remaining == 0) return -1;
+				int value = input.read();
+				if (value >= 0) remaining--;
+				return value;
+			}
+
+			@Override public int read(byte[] b, int off, int len) throws IOException {
+				if (off < 0 || len < 0 || len > b.length - off) throw new IndexOutOfBoundsException();
+				if (len == 0) return 0;
+				if (remaining == 0) return -1;
+				int count = input.read(b, off, (int)Math.min(remaining, len));
+				if (count > 0) remaining -= count;
+				return count;
+			}
+
+			@Override public int available() throws IOException {
+				return (int)Math.min(remaining, input.available());
+			}
+
+			@Override public void close() throws IOException { input.close(); }
+		};
+		if (length == 0) return bounded;
+		return new BufferedInputStream(bounded, (int)Math.min(length, bufferSize));
 	}
 }

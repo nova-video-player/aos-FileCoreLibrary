@@ -73,7 +73,8 @@ import java.util.Locale;
  *       -Dnova.test.speedtestCsv=/absolute/path/to/servers.csv \
  *       -Dnova.test.speedtestUpstreamBufferBytes=1048576
  * </pre>
- * The upstream buffer defaults to Nova's production value (81920 bytes). Changing this
+ * The upstream buffer defaults to the general-purpose value (81920 bytes), independently
+ * of the playback policy (1 MiB for jcifs). Changing this
  * property varies the proxy's reads from the remote backend; the HTTP client buffer and
  * the proxy's socket-write buffer remain fixed.
  */
