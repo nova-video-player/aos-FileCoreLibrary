@@ -70,15 +70,21 @@ import java.util.Locale;
  * Usage:
  * <pre>
  *   ./gradlew :FileCoreLibrary:testDebugUnitTest --tests "*SpeedTestTransferTest" \
- *       -Dnova.test.speedtestCsv=/absolute/path/to/servers.csv
+ *       -Dnova.test.speedtestCsv=/absolute/path/to/servers.csv \
+ *       -Dnova.test.speedtestUpstreamBufferBytes=1048576
  * </pre>
+ * The upstream buffer defaults to Nova's production value (81920 bytes). Changing this
+ * property varies the proxy's reads from the remote backend; the HTTP client buffer and
+ * the proxy's socket-write buffer remain fixed.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 33)
 public class SpeedTestTransferTest {
 
     private static final String CSV_PATH_PROPERTY = "nova.test.speedtestCsv";
+    private static final String UPSTREAM_BUFFER_PROPERTY = "nova.test.speedtestUpstreamBufferBytes";
     private static final int BUFFER_SIZE = 256 * 1024;
+    private int upstreamBufferSize;
 
     private static final class Row {
         final Uri uri;
@@ -112,6 +118,10 @@ public class SpeedTestTransferTest {
         assumeTrue("Set -D" + CSV_PATH_PROPERTY + "=/absolute/path/to/servers.csv to run this test",
                 csvPath != null && new File(csvPath).isFile());
 
+        upstreamBufferSize = Integer.parseInt(System.getProperty(UPSTREAM_BUFFER_PROPERTY,
+                Integer.toString(StreamOverHttp.DEFAULT_UPSTREAM_BUFFER_SIZE)));
+        if (upstreamBufferSize <= 0) throw new IllegalArgumentException(UPSTREAM_BUFFER_PROPERTY + " must be positive");
+
         Application app = ApplicationProvider.getApplicationContext();
         ArchosUtils.setGlobalContext(app);
         JcifsUtils.getInstance(app);
@@ -125,6 +135,9 @@ public class SpeedTestTransferTest {
         String csvPath = System.getProperty(CSV_PATH_PROPERTY);
         List<Row> rows = parseCsv(csvPath);
         assumeTrue("CSV file has no usable rows: " + csvPath, !rows.isEmpty());
+
+        System.out.println(String.format(Locale.US, "HTTP upstream buffer: %d bytes; HTTP client buffer: %d bytes",
+                upstreamBufferSize, BUFFER_SIZE));
 
         List<Result> results = new ArrayList<>();
         for (Row row : rows) {
@@ -145,7 +158,7 @@ public class SpeedTestTransferTest {
         StreamOverHttp stream = null;
         try {
             String mimeType = MimeUtils.guessMimeTypeFromExtension(row.uri.getLastPathSegment());
-            stream = new StreamOverHttp(row.uri, mimeType);
+            stream = new StreamOverHttp(row.uri, mimeType, upstreamBufferSize);
             Uri localUri = stream.getEncodedUri(FileUtils.getName(row.uri));
 
             HttpURLConnection conn = (HttpURLConnection) new URL(localUri.toString()).openConnection();
@@ -173,7 +186,7 @@ public class SpeedTestTransferTest {
     private void printResults(List<Result> results) {
         System.out.println();
         System.out.println(String.format(Locale.US, "%-10s %-55s %14s %10s %12s",
-                "PROTOCOL", "URL", "BYTES", "SECONDS", "MB/s"));
+                "PROTOCOL", "URL", "BYTES", "SECONDS", "MiB/s"));
         for (Result r : results) {
             if (r.error != null) {
                 System.out.println(String.format(Locale.US, "%-10s %-55s %s",

@@ -62,6 +62,8 @@ public class StreamOverHttp {
 
 	private String fileMimeType;
 	private static final int BUFFER_SIZE = 8192;
+	static final int DEFAULT_UPSTREAM_BUFFER_SIZE = BUFFER_SIZE * 10;
+	private final int mUpstreamBufferSize;
 	private ServerSocket serverSocket;
 	private Thread mainThread;
 	private MetaFile2 mMetaFile;
@@ -87,6 +89,7 @@ public class StreamOverHttp {
 	private int mPosterGenericResource;
 
 	public StreamOverHttp(MetaFile2 f, String forceMimeType) throws IOException{
+		mUpstreamBufferSize = DEFAULT_UPSTREAM_BUFFER_SIZE;
 		mMetaFile = f;
 		mUri= f.getUri();
 		mName = f.getName();
@@ -110,6 +113,13 @@ public class StreamOverHttp {
 		mainThread.start();
 	}
     public StreamOverHttp(final Uri uri, final String forceMimeType) throws IOException{
+		this(uri, forceMimeType, DEFAULT_UPSTREAM_BUFFER_SIZE);
+	}
+
+	// Package-private overload for controlled transfer benchmarks.
+	StreamOverHttp(final Uri uri, final String forceMimeType, int upstreamBufferSize) throws IOException{
+		if (upstreamBufferSize <= 0) throw new IllegalArgumentException("Upstream buffer size must be positive");
+		mUpstreamBufferSize = upstreamBufferSize;
 		mUri = uri;
 		mName = FileUtils.getName(mUri);
         fileMimeType = forceMimeType!=null ? forceMimeType : "*/*";
@@ -586,7 +596,7 @@ public class StreamOverHttp {
 		try {
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out);
-			if (isInput != null) bin = new BufferedInputStream(isInput, BUFFER_SIZE*10);
+			if (isInput != null) bin = new BufferedInputStream(isInput, mUpstreamBufferSize);
 			{
 				String retLine = "HTTP/1.0 " + status + " \r\n";
 				pw.print(retLine);
