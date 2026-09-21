@@ -168,7 +168,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.19'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.5.0'
-    implementation 'io.sentry:sentry:8.56.0'
+    implementation 'io.sentry:sentry:8.57.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.17'
