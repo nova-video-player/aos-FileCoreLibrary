@@ -22,7 +22,6 @@ import java.net.SocketException;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -314,12 +313,7 @@ public class FtpFileEditor extends FileEditor {
         try {
             ftp = getClient();
             if (ftp != null) {
-                FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
-                if (ftpFile != null) return true;
-                FTPFile[] files = ftp.listFiles(mUri.getPath());
-                if (files != null && files.length == 1) return true;
-                String sizeStr = ftp.getSize(mUri.getPath());
-                return sizeStr != null;
+                return FtpUtils.resolveFTPFile(ftp, mUri) != null;
             }
         } catch (Exception e) {
             log.warn("exists: failed to check existence for {}", mUri, e);
@@ -336,24 +330,9 @@ public class FtpFileEditor extends FileEditor {
         try {
             ftp = getClient();
             if (ftp != null) {
-                String sizeStr = ftp.getSize(mUri.getPath());
-                if (sizeStr != null) {
-                    try {
-                        long size = Long.parseLong(sizeStr.trim());
-                        if (log.isDebugEnabled()) log.debug("length: SIZE command for {}: {}", mUri.getPath(), size);
-                        return size;
-                    } catch (NumberFormatException ignored) {}
-                }
-                FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
-                if (ftpFile != null && ftpFile.getSize() >= 0) {
-                    if (log.isDebugEnabled()) log.debug("length: mlistFile for {}: {}", mUri.getPath(), ftpFile.getSize());
-                    return ftpFile.getSize();
-                }
-                FTPFile[] files = ftp.listFiles(mUri.getPath());
-                if (files != null && files.length == 1 && files[0].getSize() >= 0) {
-                    if (log.isDebugEnabled()) log.debug("length: listFiles for {}: {}", mUri.getPath(), files[0].getSize());
-                    return files[0].getSize();
-                }
+                long size = FtpUtils.getFileSize(ftp, mUri.getPath());
+                if (log.isDebugEnabled()) log.debug("length: for {}: {}", mUri.getPath(), size);
+                return size;
             }
         } catch (Exception e) {
             log.warn("length: failed to get length for {}", mUri, e);

@@ -16,9 +16,6 @@ package com.archos.filecorelibrary.ftp;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -42,12 +39,8 @@ public class Session {
     private static final int CONNECT_TIMEOUT_MS = 15000; // 15 seconds
 
     private static Session sSession = null;
-    private static ConcurrentHashMap<Credential, FTPSClient> ftpsClients;
-    private static ConcurrentHashMap<Credential, FTPClient> ftpClients;
 
     public Session() {
-        ftpClients = new ConcurrentHashMap<Credential, FTPClient>();
-        ftpsClients = new ConcurrentHashMap<Credential, FTPSClient>();
     }
 
     public static synchronized Session getInstance() {
@@ -56,33 +49,13 @@ public class Session {
         return sSession;
     }
 
+    /**
+     * Kept for compatibility with external callers (Video and MediaLib modules)
+     * which call removeFTPClient on authentication failure or session reset.
+     */
     public synchronized void removeFTPClient(Uri cred) {
         if (cred == null || cred.getHost() == null) return;
-        int port = cred.getPort() < 0 ? 21 : cred.getPort();
-        if (log.isDebugEnabled()) log.debug("removeFTPClient: removing client(s) for {}", cred);
-        if ("ftps".equals(cred.getScheme())) {
-            Iterator<Entry<Credential, FTPSClient>> it = ftpsClients.entrySet().iterator();
-            while (it.hasNext()) {
-                Entry<Credential, FTPSClient> e = it.next();
-                Uri uri = Uri.parse(e.getKey().getUriString());
-                int p = uri.getPort() < 0 ? 21 : uri.getPort();
-                if (cred.getHost().equalsIgnoreCase(uri.getHost()) && port == p) {
-                    close(e.getValue());
-                    it.remove();
-                }
-            }
-        } else {
-            Iterator<Entry<Credential, FTPClient>> it = ftpClients.entrySet().iterator();
-            while (it.hasNext()) {
-                Entry<Credential, FTPClient> e = it.next();
-                Uri uri = Uri.parse(e.getKey().getUriString());
-                int p = uri.getPort() < 0 ? 21 : uri.getPort();
-                if (cred.getHost().equalsIgnoreCase(uri.getHost()) && port == p) {
-                    close(e.getValue());
-                    it.remove();
-                }
-            }
-        }
+        if (log.isDebugEnabled()) log.debug("removeFTPClient: client reset requested for {}", cred);
     }
 
     public static void close(FTPClient ftp) {
@@ -133,8 +106,7 @@ public class Session {
         }
     }
 
-    @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
-    public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
+    private FTPClient connectNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();
         if (port < 0) port = 21; // default port
@@ -157,25 +129,25 @@ public class Session {
         ftp.setReceieveDataSocketBufferSize(DATA_SOCKET_RECEIVE_BUFFER_SIZE);
         ftp.setSendDataSocketBufferSize(DATA_SOCKET_SEND_BUFFER_SIZE);
 
-        //try to connect
+        // try to connect
         ftp.connect(path.getHost(), port);
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            if (log.isDebugEnabled()) log.debug("getNewFTPClient: connected to {}", path);
-            //enter passive mode
+            if (log.isDebugEnabled()) log.debug("connectNewFTPClient: connected to {}", path);
+            // enter passive mode
             ftp.enterLocalPassiveMode();
             // Send keepalive to preserve control channel every 5mn
             ftp.setControlKeepAliveTimeout(300);
-            //login to server
+            // login to server
             if (!ftp.login(username, password)) {
-                if (log.isDebugEnabled()) log.debug("getNewFTPClient: failed to login now logout + disconnect");
+                if (log.isDebugEnabled()) log.debug("connectNewFTPClient: failed to login now logout + disconnect");
                 close(ftp);
                 throw new AuthenticationException();
             }
             if (mode >= 0) ftp.setFileType(mode);
             int reply = ftp.getReplyCode();
-            //FTPReply stores a set of constants for FTP reply codes.
+            // FTPReply stores a set of constants for FTP reply codes.
             if (!FTPReply.isPositiveCompletion(reply)) {
-                if (log.isDebugEnabled()) log.debug("getNewFTPClient: cannot setFileType logout + disconnect");
+                if (log.isDebugEnabled()) log.debug("connectNewFTPClient: cannot setFileType logout + disconnect");
                 close(ftp);
                 return null;
             }
@@ -187,7 +159,26 @@ public class Session {
     }
 
     @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
-    public FTPSClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
+    public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
+        try {
+            return connectNewFTPClient(path, mode);
+        } catch (AuthenticationException e) {
+            // Never retry on authentication failure
+            throw e;
+        } catch (IOException e) {
+            log.warn("getNewFTPClient: connection to {} failed ({}), retrying once", path, e.getMessage());
+            try {
+                return connectNewFTPClient(path, mode);
+            } catch (AuthenticationException ae) {
+                throw ae;
+            } catch (IOException retryEx) {
+                log.error("getNewFTPClient: retry connection to {} failed: {}", path, retryEx.getMessage());
+                throw retryEx;
+            }
+        }
+    }
+
+    private FTPSClient connectNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
         int port = path.getPort();
         if (port < 0) port = 21; // default port
@@ -210,11 +201,11 @@ public class Session {
         ftp.setReceieveDataSocketBufferSize(DATA_SOCKET_RECEIVE_BUFFER_SIZE);
         ftp.setSendDataSocketBufferSize(DATA_SOCKET_SEND_BUFFER_SIZE);
 
-        //try to connect
+        // try to connect
         ftp.connect(path.getHost(), port);
         if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            if (log.isDebugEnabled()) log.debug("getNewFTPSClient: connected to {}", path);
-            //enter passive mode
+            if (log.isDebugEnabled()) log.debug("connectNewFTPSClient: connected to {}", path);
+            // enter passive mode
             ftp.enterLocalPassiveMode();
             // Set protection buffer size
             ftp.execPBSZ(0);
@@ -223,9 +214,9 @@ public class Session {
             // Send keepalive to preserve control channel every 5mn
             ftp.setControlKeepAliveTimeout(300);
             ftp.setControlEncoding("UTF-8");
-            //login to server
+            // login to server
             if (!ftp.login(username, password)) {
-                if (log.isDebugEnabled()) log.debug("getNewFTPSClient: failed to login now logout + disconnect");
+                if (log.isDebugEnabled()) log.debug("connectNewFTPSClient: failed to login now logout + disconnect");
                 close(ftp);
                 throw new AuthenticationException();
             }
@@ -233,7 +224,7 @@ public class Session {
 
             int reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
-                if (log.isDebugEnabled()) log.debug("getNewFTPSClient: cannot setFileType logout + disconnect");
+                if (log.isDebugEnabled()) log.debug("connectNewFTPSClient: cannot setFileType logout + disconnect");
                 close(ftp);
                 return null;
             }
@@ -241,54 +232,27 @@ public class Session {
             close(ftp);
             return null;
         }
-        if (log.isDebugEnabled()) log.debug("getNewFTPSClient: all went well, returning ftpsClient");
+        if (log.isDebugEnabled()) log.debug("connectNewFTPSClient: all went well, returning ftpsClient");
         return ftp;
     }
 
-    // Note that ftpClient is not thread safe thus reusing is not really an option here
-    public synchronized FTPClient getFTPClient(Uri uri) throws SocketException, IOException, AuthenticationException {
-        NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
-        Credential cred = database.getCredential(uri.toString());
-        if (cred == null)
-            cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
-        FTPClient ftpclient = ftpClients.get(cred);
-        if (ftpclient != null && ftpclient.isConnected()) {
-            if (log.isDebugEnabled()) log.debug("getFTPClient: reusing ftp session for {}", uri);
-            return ftpclient;
+    @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
+    public FTPSClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
+        try {
+            return connectNewFTPSClient(path, mode);
+        } catch (AuthenticationException e) {
+            // Never retry on authentication failure
+            throw e;
+        } catch (IOException e) {
+            log.warn("getNewFTPSClient: connection to {} failed ({}), retrying once", path, e.getMessage());
+            try {
+                return connectNewFTPSClient(path, mode);
+            } catch (AuthenticationException ae) {
+                throw ae;
+            } catch (IOException retryEx) {
+                log.error("getNewFTPSClient: retry connection to {} failed: {}", path, retryEx.getMessage());
+                throw retryEx;
+            }
         }
-        FTPClient ftp = getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
-        // No previous session found, open a new one
-        if (log.isDebugEnabled()) log.debug("getFTPClient: create new ftp session for {}", uri);
-        if (ftp == null) return null;
-        Uri key = buildKeyFromUri(uri);
-        if (log.isDebugEnabled()) log.debug("getFTPClient: new ftp session created with key {}", key);
-        ftpClients.put(cred, ftp);
-        return ftp;
-    }
-
-    // Note that ftpsClient is not thread safe thus reusing is not really an option here
-    public synchronized FTPSClient getFTPSClient(Uri uri) throws SocketException, IOException, AuthenticationException {
-        NetworkCredentialsDatabase database = NetworkCredentialsDatabase.getInstance();
-        Credential cred = database.getCredential(uri.toString());
-        if (cred == null)
-            cred = new Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
-        FTPSClient ftpclient = ftpsClients.get(cred);
-        if (ftpclient != null && ftpclient.isConnected()) {
-            if (log.isDebugEnabled()) log.debug("getFTPSClient: reusing ftp session for {}", uri);
-            return ftpclient;
-        }
-        // No previous session found, open a new one
-        if (log.isDebugEnabled()) log.debug("getFTPSClient: create new ftp session for {}", uri);
-        FTPSClient ftp = getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
-        if (ftp == null) return null;
-        Uri key = buildKeyFromUri(uri);
-        if (log.isDebugEnabled()) log.debug("getFTPSClient: new ftp session created with key {}", key);
-        ftpsClients.put(cred, ftp);
-        return ftp;
-    }
-
-    private Uri buildKeyFromUri(Uri uri) {
-        // We use the Uri without the path segment as key: for example, "ftp://blabla.com:21/toto/titi" gives a "ftp://blabla.com:21" key
-        return uri.buildUpon().path("").build();
     }
 }

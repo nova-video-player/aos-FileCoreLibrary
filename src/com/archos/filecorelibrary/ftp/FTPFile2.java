@@ -25,7 +25,6 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
-import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
@@ -152,30 +151,7 @@ public class FTPFile2 extends MetaFile2 {
                 ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
             }
             if (ftp != null) {
-                FTPFile ftpFile = null;
-                if (ftp.featureValue("MLST") != null) {
-                    ftpFile = ftp.mlistFile(uri.getPath());
-                } else {
-                    if (log.isDebugEnabled()) log.debug("fromUri: ftp server does not report MLST feature for {}", uri);
-                }
-                if (ftpFile == null) {
-                    FTPFile[] files = ftp.listFiles(uri.getPath());
-                    if (files != null && files.length == 1) {
-                        ftpFile = files[0];
-                    }
-                }
-                if (ftpFile == null) {
-                    String sizeStr = ftp.getSize(uri.getPath());
-                    if (sizeStr != null) {
-                        try {
-                            long size = Long.parseLong(sizeStr.trim());
-                            ftpFile = new FTPFile();
-                            ftpFile.setName(FileUtils.getName(uri));
-                            ftpFile.setSize(size);
-                            ftpFile.setType(FTPFile.FILE_TYPE);
-                        } catch (NumberFormatException ignored) {}
-                    }
-                }
+                FTPFile ftpFile = FtpUtils.resolveFTPFile(ftp, uri);
                 if (ftpFile != null) {
                     if (log.isDebugEnabled()) log.debug("fromUri: successfully resolved ftpFile for {}, size={}", uri, ftpFile.getSize());
                     return new FTPFile2(ftpFile, uri);
