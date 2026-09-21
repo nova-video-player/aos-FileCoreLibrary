@@ -125,6 +125,9 @@ public class Session {
         ftp.setDefaultTimeout(CONNECT_TIMEOUT_MS);
         ftp.setConnectTimeout(CONNECT_TIMEOUT_MS);
         ftp.setAutodetectUTF8(true); // must be done before connecting
+        ftp.setStrictMultilineParsing(true); // enforce matching reply codes on multiline replies
+        // Default to UNIX parser to avoid unhandled SYST responses (e.g. "End of list")
+        ftp.configure(new org.apache.commons.net.ftp.FTPClientConfig(org.apache.commons.net.ftp.FTPClientConfig.SYST_UNIX));
         ftp.setBufferSize(BUFFER_SIZE);
         ftp.setReceieveDataSocketBufferSize(DATA_SOCKET_RECEIVE_BUFFER_SIZE);
         ftp.setSendDataSocketBufferSize(DATA_SOCKET_SEND_BUFFER_SIZE);
@@ -197,6 +200,9 @@ public class Session {
         ftp.setDefaultTimeout(CONNECT_TIMEOUT_MS);
         ftp.setConnectTimeout(CONNECT_TIMEOUT_MS);
         ftp.setAutodetectUTF8(true); // must be done before connecting
+        ftp.setStrictMultilineParsing(true); // enforce matching reply codes on multiline replies
+        // Default to UNIX parser to avoid unhandled SYST responses (e.g. "End of list")
+        ftp.configure(new org.apache.commons.net.ftp.FTPClientConfig(org.apache.commons.net.ftp.FTPClientConfig.SYST_UNIX));
         ftp.setBufferSize(BUFFER_SIZE);
         ftp.setReceieveDataSocketBufferSize(DATA_SOCKET_RECEIVE_BUFFER_SIZE);
         ftp.setSendDataSocketBufferSize(DATA_SOCKET_SEND_BUFFER_SIZE);

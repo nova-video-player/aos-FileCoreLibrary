@@ -54,7 +54,7 @@ public class FtpUtils {
             } else {
                 if (log.isDebugEnabled()) log.debug("resolveFTPFile: ftp server does not report MLST feature for {}", uri);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("resolveFTPFile: mlistFile threw exception for {}", path, e);
         }
 
@@ -65,7 +65,7 @@ public class FtpUtils {
                 if (files != null && files.length == 1) {
                     ftpFile = files[0];
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn("resolveFTPFile: listFiles threw exception for {}", path, e);
             }
         }
@@ -104,7 +104,7 @@ public class FtpUtils {
                     return size;
                 } catch (NumberFormatException ignored) {}
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("getFileSize: getSize failed for {}", path, e);
         }
 
@@ -115,7 +115,7 @@ public class FtpUtils {
                 if (log.isDebugEnabled()) log.debug("getFileSize: mlistFile for {}: {}", path, ftpFile.getSize());
                 return ftpFile.getSize();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("getFileSize: mlistFile failed for {}", path, e);
         }
 
@@ -126,7 +126,7 @@ public class FtpUtils {
                 if (log.isDebugEnabled()) log.debug("getFileSize: listFiles for {}: {}", path, files[0].getSize());
                 return files[0].getSize();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("getFileSize: listFiles failed for {}", path, e);
         }
 
