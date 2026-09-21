@@ -142,21 +142,22 @@ public class FTPFile2 extends MetaFile2 {
      */
     public static MetaFile2 fromUri(Uri uri) throws Exception {
         if (log.isDebugEnabled()) log.debug("fromUri: {}", uri);
-        if (uri.getScheme().equals("ftps")) {
-            // ftpClient is not thread safe: using a new instance (need to close afterwards)
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
-            if (ftp.featureValue("MLST") == null) log.error("fromUri: ftp server does not support MLST!!!");
-            FTPFile ftpFile = ftp.mlistFile(uri.getPath());
-            Session.closeNewFTPSClient(ftp);
-            if (ftpFile != null) return new FTPFile2(ftpFile,uri);
-            else log.warn("fromUri: ftps detected but ftpfile is null!");
-        } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
-            if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
-            FTPFile ftpFile = ftp.mlistFile(uri.getPath());
-            Session.closeNewFTPClient(ftp);
-            if (ftpFile != null) return new FTPFile2(ftpFile,uri);
-            else log.warn("fromUri: ftp detected but ftpfile is null!");
+        FTPClient ftp = null;
+        try {
+            if ("ftps".equals(uri.getScheme())) {
+                // ftpClient is not thread safe: using a new instance (need to close afterwards)
+                ftp = Session.getInstance().getNewFTPSClient(uri, FTP.BINARY_FILE_TYPE);
+            } else {
+                ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
+            }
+            if (ftp != null) {
+                if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
+                FTPFile ftpFile = ftp.mlistFile(uri.getPath());
+                if (ftpFile != null) return new FTPFile2(ftpFile, uri);
+                else log.warn("fromUri: ftp detected but ftpfile is null!");
+            }
+        } finally {
+            Session.close(ftp);
         }
         log.warn("fromUri: uh! returning null!!!");
         return null;

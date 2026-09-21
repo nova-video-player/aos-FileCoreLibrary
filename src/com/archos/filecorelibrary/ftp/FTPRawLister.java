@@ -21,21 +21,18 @@ import java.util.List;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
-
 /**
- * returns 
+ * returns
  * @author alexandre
  *
  */
@@ -47,30 +44,34 @@ public class FTPRawLister extends RawLister {
         super(uri);
     }
 
+    @Override
     public List<MetaFile2> getFileList() throws IOException, AuthenticationException {
-        FTPFile[] listFiles;
-        if (log.isDebugEnabled()) log.debug("getFileList");
-        if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-            ftp.cwd(mUri.getPath());
-            listFiles = ftp.listFiles();
-            Session.closeNewFTPSClient(ftp);
-        } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-            ftp.cwd(mUri.getPath());
-            listFiles = ftp.listFiles();
-            Session.closeNewFTPClient(ftp);
+        if (log.isDebugEnabled()) log.debug("getFileList: listing {}", mUri);
+        FTPFile[] listFiles = null;
+        FTPClient ftp = null;
+        try {
+            if ("ftps".equals(mUri.getScheme())) {
+                ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+            } else {
+                ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+            }
+            if (ftp != null) {
+                ftp.cwd(mUri.getPath());
+                listFiles = ftp.listFiles();
+            }
+        } finally {
+            Session.close(ftp);
         }
 
-        if(listFiles==null)
+        if (listFiles == null)
             return null;
         ArrayList<MetaFile2> list = new ArrayList<MetaFile2>();
-        for(FTPFile f : listFiles){
-            if(!f.getName().equals("..")|| !f.getName().equals(".")){
-                FTPFile2 sf = new FTPFile2(f , FileUtils.buildChildUri(mUri, f.getName()));
-                if (log.isTraceEnabled()) log.trace("FTPRawLister: add {}", sf.getName());
-                list.add(sf);   
-            }
+        for (FTPFile f : listFiles) {
+            if (f.getName().equals(".") || f.getName().equals(".."))
+                continue;
+            FTPFile2 sf = new FTPFile2(f, FileUtils.buildChildUri(mUri, f.getName()));
+            if (log.isTraceEnabled()) log.trace("FTPRawLister: add {}", sf.getName());
+            list.add(sf);
         }
         return list;
     }

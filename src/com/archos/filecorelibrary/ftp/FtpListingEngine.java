@@ -120,22 +120,20 @@ public class FtpListingEngine extends ListingEngine {
     private final class FtpListingThread extends Thread {
 
         public void run(){
-            Boolean isFtps = false;
-            FTPSClient ftps = null;
             FTPClient ftp = null;
             try {
                 if (log.isDebugEnabled()) log.debug("FtpListingThread:run");
                 FTPFile[] listFiles;
-                if (mUri.getScheme().equals("ftps")) {
-                    ftps = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-                    ftps.cwd(mUri.getPath());
-                    listFiles = ftps.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
-                    isFtps = true;
+                if ("ftps".equals(mUri.getScheme())) {
+                    ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
                 } else {
                     ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-                    ftp.cwd(mUri.getPath());
-                    listFiles = ftp.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
                 }
+                if (ftp == null) {
+                    throw new IOException("Failed to connect to " + mUri);
+                }
+                ftp.cwd(mUri.getPath());
+                listFiles = ftp.listFiles(null, mFileFilter);  // list files(path) doesn't work when white spaces in names
 
                 // Check if timeout or abort occurred
                 if (timeOutHasOccurred() || mAbort) {
@@ -176,8 +174,7 @@ public class FtpListingEngine extends ListingEngine {
                         files.add(sf);
                     }
                 }
-                if (isFtps) ftps.cwd("/");
-                else ftp.cwd("/");
+                ftp.cwd("/");
 
                 // sorting entries
                 final Comparator<? super FTPFile2> comparator = new FileComparator().selectFileComparator(mSortOrder);
@@ -263,8 +260,7 @@ public class FtpListingEngine extends ListingEngine {
                     }
                 });
             } finally {
-                if (isFtps) Session.closeNewFTPSClient(ftps);
-                else Session.closeNewFTPClient(ftp);
+                Session.close(ftp);
                 mUiHandler.post(new Runnable() {
                     public void run() {
                         if (mListener != null) { // always report end even when aborted or ended

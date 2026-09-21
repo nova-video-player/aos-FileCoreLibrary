@@ -23,7 +23,6 @@ import java.net.SocketException;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,14 @@ public class FtpFileEditor extends FileEditor {
 
     public FtpFileEditor(Uri uri) {
         super(uri);
-        // TODO Auto-generated constructor stub
+    }
+
+    private FTPClient getClient() throws SocketException, IOException, AuthenticationException {
+        if ("ftps".equals(mUri.getScheme())) {
+            return Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+        } else {
+            return Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
+        }
     }
 
     @Override
@@ -46,142 +52,301 @@ public class FtpFileEditor extends FileEditor {
 
     @Override
     public boolean mkdir() {
+        if (log.isDebugEnabled()) log.debug("mkdir: {}", mUri.getPath());
+        FTPClient ftp = null;
         try {
-            if (mUri.getScheme().equals("ftps")) {
-                FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-                Boolean isOk = ftp.makeDirectory(mUri.getPath());
-                Session.closeNewFTPSClient(ftp);
-                return isOk;
-            } else {
-                FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-                Boolean isOk = ftp.makeDirectory(mUri.getPath());
-                Session.closeNewFTPClient(ftp);
-                return isOk;
+            ftp = getClient();
+            if (ftp != null) {
+                return ftp.makeDirectory(mUri.getPath());
             }
         } catch (AuthenticationException e) {
-            // TODO Auto-generated catch block
-            log.error("Caught AuthenticationException: ",e);
+            log.error("mkdir: Caught AuthenticationException: ", e);
         } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            log.error("Caught SocketException: ",e);
+            log.error("mkdir: Caught SocketException: ", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            log.error("Caught IOException: ",e);
+            log.error("mkdir: Caught IOException: ", e);
+        } finally {
+            Session.close(ftp);
         }
         return false;
     }
 
+    private InputStream wrapInputStream(final InputStream is, final FTPClient ftp) {
+        return new InputStream() {
+            private boolean mClosed = false;
+
+            @Override
+            public void close() throws IOException {
+                if (mClosed) return;
+                mClosed = true;
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.warn("wrapInputStream: caught IOException closing data stream: {}", e.getMessage());
+                } finally {
+                    try {
+                        ftp.completePendingCommand();
+                    } catch (Exception e) {
+                        log.warn("wrapInputStream: caught Exception completing pending command: {}", e.getMessage());
+                    } finally {
+                        Session.close(ftp);
+                    }
+                }
+            }
+
+            @Override
+            public int read() throws IOException {
+                return is.read();
+            }
+
+            @Override
+            public int read(byte[] b) throws IOException {
+                return is.read(b);
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return is.read(b, off, len);
+            }
+
+            @Override
+            public long skip(long n) throws IOException {
+                return is.skip(n);
+            }
+
+            @Override
+            public int available() throws IOException {
+                return is.available();
+            }
+
+            @Override
+            public void mark(int readlimit) {
+                is.mark(readlimit);
+            }
+
+            @Override
+            public void reset() throws IOException {
+                is.reset();
+            }
+
+            @Override
+            public boolean markSupported() {
+                return is.markSupported();
+            }
+        };
+    }
+
+    private OutputStream wrapOutputStream(final OutputStream os, final FTPClient ftp) {
+        return new OutputStream() {
+            private boolean mClosed = false;
+
+            @Override
+            public void write(int b) throws IOException {
+                os.write(b);
+            }
+
+            @Override
+            public void write(byte[] b) throws IOException {
+                os.write(b);
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                os.write(b, off, len);
+            }
+
+            @Override
+            public void flush() throws IOException {
+                os.flush();
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (mClosed) return;
+                mClosed = true;
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    log.warn("wrapOutputStream: caught IOException closing data stream: {}", e.getMessage());
+                } finally {
+                    try {
+                        ftp.completePendingCommand();
+                    } catch (Exception e) {
+                        log.warn("wrapOutputStream: caught Exception completing pending command: {}", e.getMessage());
+                    } finally {
+                        Session.close(ftp);
+                    }
+                }
+            }
+        };
+    }
+
     @Override
     public InputStream getInputStream() throws AuthenticationException, SocketException, IOException {
-        // TODO: missing way to close ftpClient, this creates leaks
-        if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri,FTP.BINARY_FILE_TYPE );
-            return ftp.retrieveFileStream(mUri.getPath());
-        } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-            return ftp.retrieveFileStream(mUri.getPath());
+        if (log.isDebugEnabled()) log.debug("getInputStream: {}", mUri.getPath());
+        FTPClient ftp = null;
+        try {
+            ftp = getClient();
+            if (ftp == null) {
+                throw new IOException("Failed to connect to " + mUri);
+            }
+            InputStream is = ftp.retrieveFileStream(mUri.getPath());
+            if (is == null) {
+                throw new IOException("Failed to retrieve file stream for " + mUri.getPath() + ", reply: " + ftp.getReplyString());
+            }
+            return wrapInputStream(is, ftp);
+        } catch (Throwable t) {
+            Session.close(ftp);
+            if (t instanceof AuthenticationException) throw (AuthenticationException) t;
+            if (t instanceof SocketException) throw (SocketException) t;
+            if (t instanceof IOException) throw (IOException) t;
+            if (t instanceof RuntimeException) throw (RuntimeException) t;
+            throw new IOException(t);
         }
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        // TODO: missing way to close ftpClient, this creates leaks
-        if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-            ftp.setRestartOffset(from); // will refuse in ascii mode
-            return ftp.retrieveFileStream(mUri.getPath());
-        } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-            ftp.setRestartOffset(from); // will refuse in ascii mode
-            return ftp.retrieveFileStream(mUri.getPath());
+        if (log.isDebugEnabled()) log.debug("getInputStream: {} from {}", mUri.getPath(), from);
+        FTPClient ftp = null;
+        try {
+            ftp = getClient();
+            if (ftp == null) {
+                throw new IOException("Failed to connect to " + mUri);
+            }
+            if (from > 0) {
+                ftp.setRestartOffset(from);
+            }
+            InputStream is = ftp.retrieveFileStream(mUri.getPath());
+            if (is == null) {
+                throw new IOException("Failed to retrieve file stream at offset " + from + " for " + mUri.getPath() + ", reply: " + ftp.getReplyString());
+            }
+            return wrapInputStream(is, ftp);
+        } catch (Throwable t) {
+            Session.close(ftp);
+            if (t instanceof Exception) throw (Exception) t;
+            throw new IOException(t);
         }
     }
 
     @Override
     public OutputStream getOutputStream() throws AuthenticationException, SocketException, IOException {
-        // TODO: missing way to close ftpClient, this creates leaks
-        if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-            return ftp.storeFileStream(mUri.getPath());
-        } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-            return ftp.storeFileStream(mUri.getPath());
+        if (log.isDebugEnabled()) log.debug("getOutputStream: {}", mUri.getPath());
+        FTPClient ftp = null;
+        try {
+            ftp = getClient();
+            if (ftp == null) {
+                throw new IOException("Failed to connect to " + mUri);
+            }
+            OutputStream os = ftp.storeFileStream(mUri.getPath());
+            if (os == null) {
+                throw new IOException("Failed to store file stream for " + mUri.getPath() + ", reply: " + ftp.getReplyString());
+            }
+            return wrapOutputStream(os, ftp);
+        } catch (Throwable t) {
+            Session.close(ftp);
+            if (t instanceof AuthenticationException) throw (AuthenticationException) t;
+            if (t instanceof SocketException) throw (SocketException) t;
+            if (t instanceof IOException) throw (IOException) t;
+            if (t instanceof RuntimeException) throw (RuntimeException) t;
+            throw new IOException(t);
         }
     }
 
     @Override
     public Boolean delete() throws SocketException, IOException, AuthenticationException {
-        Boolean isDeleteOK = null;
-        // TODO: missing way to close ftpClient, this creates leaks
-        if (mUri.getScheme().equals("ftps")) {
-            FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-            isDeleteOK = ftp.deleteFile(mUri.getPath());
-            Session.closeNewFTPSClient(ftp);
-        } else {
-            FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-            isDeleteOK = ftp.deleteFile(mUri.getPath());
-            Session.closeNewFTPClient(ftp);
+        if (log.isDebugEnabled()) log.debug("delete: {}", mUri.getPath());
+        FTPClient ftp = null;
+        try {
+            ftp = getClient();
+            if (ftp != null) {
+                return ftp.deleteFile(mUri.getPath());
+            }
+        } finally {
+            Session.close(ftp);
         }
-        return isDeleteOK;
+        return false;
     }
 
     @Override
     public boolean rename(String newName) {
+        if (log.isDebugEnabled()) log.debug("rename: {} to {}", mUri.getPath(), newName);
+        FTPClient ftp = null;
         try {
-            if (mUri.getScheme().equals("ftps")) {
-                FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-                ftp.rename(mUri.getPath(), new File(new File(mUri.getPath()).getParentFile(), newName).getAbsolutePath());
-                Session.closeNewFTPSClient(ftp);
-            } else {
-                FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-                ftp.rename(mUri.getPath(), new File(new File(mUri.getPath()).getParentFile(), newName).getAbsolutePath());
-                Session.closeNewFTPClient(ftp);
+            ftp = getClient();
+            if (ftp != null) {
+                String parent = new File(mUri.getPath()).getParent();
+                String targetPath = new File(parent, newName).getPath();
+                return ftp.rename(mUri.getPath(), targetPath);
             }
-            return true;
         } catch (Exception e) {
-            log.error("Caught Exception: ",e);
+            log.warn("rename: failed to rename {} to {}", mUri, newName, e);
+        } finally {
+            Session.close(ftp);
         }
         return false;
     }
 
     @Override
     public boolean move(Uri uri) {
+        if (!mUri.getScheme().equals(uri.getScheme()) || !mUri.getHost().equals(uri.getHost()) || mUri.getPort() != uri.getPort())
+            return false;
+        if (log.isDebugEnabled()) log.debug("move: {} to {}", mUri, uri);
+        FTPClient ftp = null;
         try {
-            if (mUri.getScheme().equals("ftps")) {
-                FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
-                ftp.rename(mUri.getPath(), uri.getPath());
-                Session.closeNewFTPSClient(ftp);
-            } else {
-                FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-                ftp.rename(mUri.getPath(), uri.getPath());
-                Session.closeNewFTPClient(ftp);
+            ftp = getClient();
+            if (ftp != null) {
+                return ftp.rename(mUri.getPath(), uri.getPath());
             }
-            return true;
         } catch (Exception e) {
-            log.error("Caught Exception: ",e);
+            log.warn("move: failed to move {} to {}", mUri, uri, e);
+        } finally {
+            Session.close(ftp);
         }
         return false;
     }
 
     @Override
     public boolean exists() {
+        if (log.isTraceEnabled()) log.trace("exists: checking {}", mUri.getPath());
+        FTPClient ftp = null;
         try {
-            if (mUri.getScheme().equals("ftps")) {
-                FTPSClient ftp = Session.getInstance().getNewFTPSClient(mUri, FTP.BINARY_FILE_TYPE);
+            ftp = getClient();
+            if (ftp != null) {
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
-                Boolean isOK = ftpFile != null;
-                Session.closeNewFTPSClient(ftp);
-                return isOK;
-            } else {
-                FTPClient ftp = Session.getInstance().getNewFTPClient(mUri, FTP.BINARY_FILE_TYPE);
-                FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
-                Boolean isOK = ftpFile != null;
-                Session.closeNewFTPClient(ftp);
-                return isOK;            }
+                return ftpFile != null;
+            }
         } catch (Exception e) {
-            log.error("Caught Exception: ",e);
+            log.warn("exists: failed to check existence for {}", mUri, e);
+        } finally {
+            Session.close(ftp);
         }
         return false;
     }
 
+    @Override
+    public long length() throws Exception {
+        if (log.isTraceEnabled()) log.trace("length: checking {}", mUri.getPath());
+        FTPClient ftp = null;
+        try {
+            ftp = getClient();
+            if (ftp != null) {
+                String sizeStr = ftp.getSize(mUri.getPath());
+                if (sizeStr != null) {
+                    try {
+                        return Long.parseLong(sizeStr.trim());
+                    } catch (NumberFormatException ignored) {}
+                }
+                FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
+                if (ftpFile != null) {
+                    return ftpFile.getSize();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("length: failed to get length for {}", mUri, e);
+        } finally {
+            Session.close(ftp);
+        }
+        return -1;
+    }
 }
