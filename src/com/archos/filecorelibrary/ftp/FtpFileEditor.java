@@ -221,6 +221,7 @@ public class FtpFileEditor extends FileEditor {
             if (is == null) {
                 throw new IOException("Failed to retrieve file stream at offset " + from + " for " + mUri.getPath() + ", reply: " + ftp.getReplyString());
             }
+            if (log.isDebugEnabled()) log.debug("getInputStream: successfully retrieved stream at offset {} for {}", from, mUri.getPath());
             return wrapInputStream(is, ftp);
         } catch (Throwable t) {
             Session.close(ftp);
@@ -314,7 +315,11 @@ public class FtpFileEditor extends FileEditor {
             ftp = getClient();
             if (ftp != null) {
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
-                return ftpFile != null;
+                if (ftpFile != null) return true;
+                FTPFile[] files = ftp.listFiles(mUri.getPath());
+                if (files != null && files.length == 1) return true;
+                String sizeStr = ftp.getSize(mUri.getPath());
+                return sizeStr != null;
             }
         } catch (Exception e) {
             log.warn("exists: failed to check existence for {}", mUri, e);
@@ -334,12 +339,20 @@ public class FtpFileEditor extends FileEditor {
                 String sizeStr = ftp.getSize(mUri.getPath());
                 if (sizeStr != null) {
                     try {
-                        return Long.parseLong(sizeStr.trim());
+                        long size = Long.parseLong(sizeStr.trim());
+                        if (log.isDebugEnabled()) log.debug("length: SIZE command for {}: {}", mUri.getPath(), size);
+                        return size;
                     } catch (NumberFormatException ignored) {}
                 }
                 FTPFile ftpFile = ftp.mlistFile(mUri.getPath());
-                if (ftpFile != null) {
+                if (ftpFile != null && ftpFile.getSize() >= 0) {
+                    if (log.isDebugEnabled()) log.debug("length: mlistFile for {}: {}", mUri.getPath(), ftpFile.getSize());
                     return ftpFile.getSize();
+                }
+                FTPFile[] files = ftp.listFiles(mUri.getPath());
+                if (files != null && files.length == 1 && files[0].getSize() >= 0) {
+                    if (log.isDebugEnabled()) log.debug("length: listFiles for {}: {}", mUri.getPath(), files[0].getSize());
+                    return files[0].getSize();
                 }
             }
         } catch (Exception e) {
@@ -347,6 +360,7 @@ public class FtpFileEditor extends FileEditor {
         } finally {
             Session.close(ftp);
         }
+        if (log.isDebugEnabled()) log.debug("length: returning -1 for {}", mUri.getPath());
         return -1;
     }
 }

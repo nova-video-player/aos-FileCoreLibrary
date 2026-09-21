@@ -112,6 +112,27 @@ public class Session {
         close(ftp);
     }
 
+    private void setupClientLogging(FTPClient ftp) {
+        if (log.isTraceEnabled()) {
+            ftp.addProtocolCommandListener(new org.apache.commons.net.ProtocolCommandListener() {
+                @Override
+                public void protocolCommandSent(org.apache.commons.net.ProtocolCommandEvent event) {
+                    if (log.isTraceEnabled()) {
+                        String msg = "PASS".equalsIgnoreCase(event.getCommand()) ? "******" : event.getMessage();
+                        log.trace("FTP command: {}", msg != null ? msg.trim() : "");
+                    }
+                }
+
+                @Override
+                public void protocolReplyReceived(org.apache.commons.net.ProtocolCommandEvent event) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("FTP reply: {} {}", event.getReplyCode(), event.getMessage() != null ? event.getMessage().trim() : "");
+                    }
+                }
+            });
+        }
+    }
+
     @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
     public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         // Use default port if not set
@@ -128,6 +149,7 @@ public class Session {
         }
 
         FTPClient ftp = new FTPClient();
+        setupClientLogging(ftp);
         ftp.setDefaultTimeout(CONNECT_TIMEOUT_MS);
         ftp.setConnectTimeout(CONNECT_TIMEOUT_MS);
         ftp.setAutodetectUTF8(true); // must be done before connecting
@@ -180,6 +202,7 @@ public class Session {
         }
 
         FTPSClient ftp = new FTPSClient("TLS", false);
+        setupClientLogging(ftp);
         ftp.setDefaultTimeout(CONNECT_TIMEOUT_MS);
         ftp.setConnectTimeout(CONNECT_TIMEOUT_MS);
         ftp.setAutodetectUTF8(true); // must be done before connecting

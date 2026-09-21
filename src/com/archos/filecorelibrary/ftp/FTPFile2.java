@@ -25,6 +25,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.FileUtils;
 import com.archos.filecorelibrary.MetaFile2;
 import com.archos.filecorelibrary.RawLister;
 
@@ -151,15 +152,41 @@ public class FTPFile2 extends MetaFile2 {
                 ftp = Session.getInstance().getNewFTPClient(uri, FTP.BINARY_FILE_TYPE);
             }
             if (ftp != null) {
-                if (ftp.featureValue("MLST") == null) log.warn("fromUri: ftp server does not support MLST!!!");
-                FTPFile ftpFile = ftp.mlistFile(uri.getPath());
-                if (ftpFile != null) return new FTPFile2(ftpFile, uri);
-                else log.warn("fromUri: ftp detected but ftpfile is null!");
+                FTPFile ftpFile = null;
+                if (ftp.featureValue("MLST") != null) {
+                    ftpFile = ftp.mlistFile(uri.getPath());
+                } else {
+                    if (log.isDebugEnabled()) log.debug("fromUri: ftp server does not report MLST feature for {}", uri);
+                }
+                if (ftpFile == null) {
+                    FTPFile[] files = ftp.listFiles(uri.getPath());
+                    if (files != null && files.length == 1) {
+                        ftpFile = files[0];
+                    }
+                }
+                if (ftpFile == null) {
+                    String sizeStr = ftp.getSize(uri.getPath());
+                    if (sizeStr != null) {
+                        try {
+                            long size = Long.parseLong(sizeStr.trim());
+                            ftpFile = new FTPFile();
+                            ftpFile.setName(FileUtils.getName(uri));
+                            ftpFile.setSize(size);
+                            ftpFile.setType(FTPFile.FILE_TYPE);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                }
+                if (ftpFile != null) {
+                    if (log.isDebugEnabled()) log.debug("fromUri: successfully resolved ftpFile for {}, size={}", uri, ftpFile.getSize());
+                    return new FTPFile2(ftpFile, uri);
+                } else {
+                    log.warn("fromUri: ftp detected but unable to resolve ftpFile for {}", uri);
+                }
             }
         } finally {
             Session.close(ftp);
         }
-        log.warn("fromUri: uh! returning null!!!");
+        log.warn("fromUri: returning null for {}", uri);
         return null;
     }
 }
