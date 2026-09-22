@@ -84,8 +84,9 @@ public class JcifsFile2 extends MetaFile2 {
 
     private void buildJcifsFile2(NovaSmbFile nFile) throws SmbException {
         buildJcifsFile2(nFile.smbFile);
-        mUriString = FileUtils.encodeUri(Uri.parse(nFile.getCanonicalPath())).toString();
+        mUriString = FileUtils.escapeUriPathDelimiters(nFile.getCanonicalPath());
         mName = nFile.getName();
+        if (log.isDebugEnabled()) log.debug("buildJcifsFile2(NovaSmbFile): canonicalPath=[{}], encodedUriString=[{}], name=[{}]", nFile.getCanonicalPath(), mUriString, mName);
         if (mIsDirectory && mName.endsWith("/")) {
             mName = mName.substring(0, mName.length()-1);
         } else {
@@ -99,8 +100,9 @@ public class JcifsFile2 extends MetaFile2 {
             throw new IllegalArgumentException("JcifsFile2: file cannot be null");
         }
         // Only use methods doing no network access here
-        mUriString = FileUtils.encodeUri(Uri.parse(file.getCanonicalPath())).toString();
+        mUriString = FileUtils.escapeUriPathDelimiters(file.getCanonicalPath());
         String name  = file.getName();
+        if (log.isDebugEnabled()) log.debug("buildJcifsFile2(SmbFile): canonicalPath=[{}], encodedUriString=[{}], name=[{}]", file.getCanonicalPath(), mUriString, name);
         mIsDirectory = file.isDirectory();
         mIsFile = file.isFile();
         mLastModified = file.lastModified();
