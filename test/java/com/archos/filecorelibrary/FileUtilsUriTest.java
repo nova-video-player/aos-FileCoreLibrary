@@ -104,6 +104,30 @@ public class FileUtilsUriTest {
     }
 
     @Test
+    public void testSpacesAndBracketsStayLiteral() {
+        // spaces and brackets are valid in a path and must not be percent-encoded, otherwise the
+        // same file gets a second, different URI in the media database
+        assertEquals("smb://server/download/the test/",
+                FileUtils.getParentUrl(Uri.parse("smb://server/download/the test/my movie.mkv")).toString());
+        assertEquals("smb://server/download/the test/",
+                FileUtils.removeLastSegment(Uri.parse("smb://server/download/the test/my movie.mkv")).toString());
+
+        Uri parent = Uri.parse("smb://server/download/the test/");
+        Uri child = FileUtils.buildChildUri(parent, "My Movie [1080p].mkv");
+        assertEquals("smb://server/download/the test/My Movie [1080p].mkv", child.toString());
+        assertEquals("My Movie [1080p].mkv", FileUtils.getName(child));
+
+        // '#' and '?' must still be escaped so the path survives a parse/format round trip
+        Uri hashChild = FileUtils.buildChildUri(parent, "#Alive.mkv");
+        assertEquals("smb://server/download/the test/%23Alive.mkv", hashChild.toString());
+        assertEquals("#Alive.mkv", FileUtils.getName(hashChild));
+        assertEquals("smb://server/download/the test/#Alive.mkv", FileUtils.decodeUri(hashChild));
+
+        // the folder path shown to the user is decoded so a folder named '#' is not displayed as %23
+        assertEquals("smb://server/download/#", FileUtils.decodeUri(Uri.parse("smb://server/download/%23")));
+    }
+
+    @Test
     public void testGetNameWithQueryParams() {
         Uri contentUri = Uri.parse("content://com.archos.media.videocommunity/external/video/media/12345?blocking=1&orig_id=12345");
         assertEquals("12345", FileUtils.getName(contentUri));

@@ -173,7 +173,7 @@ public class FileUtils {
         if (index < minSlashIndex || index <= 0) return null;
         if (log.isTraceEnabled()) log.trace("removeLastSegment output: {}", str.substring(0, index + 1));
         // MUST keep the trailing "/" for samba
-        return encodeUri(Uri.parse(str.substring(0, index + 1)));
+        return Uri.parse(str.substring(0, index + 1));
     }
 
     /**
@@ -489,11 +489,25 @@ public class FileUtils {
         return uriDecodedString.toString();
     }
 
+    /**
+     * Escapes only the characters that are meaningful to {@link Uri} parsing (the fragment and
+     * query delimiters '#' and '?') so that names containing them survive a parse/format round
+     * trip. Everything else (spaces, brackets, ...) is kept literal: those characters are valid
+     * in a path and must stay unencoded to remain identical to the paths already stored in the
+     * media database and to what remote servers expect.
+     */
+    public static String escapeUriPathDelimiters(String name) {
+        if (name == null) return null;
+        return name.replace("#", "%23").replace("?", "%3F");
+    }
+
     public static Uri buildChildUri(Uri parent, String childName){
         if("content".equals(parent.getScheme())){
             return Uri.parse(DocumentUriBuilder.buildDocumentUriUsingTree(parent).toString()+Uri.encode("/")+childName);
         }
-        return encodeUri(parent).buildUpon().fragment(null).appendPath(childName).build();
+        // appendEncodedPath (and not appendPath, which would percent-encode the name) keeps spaces
+        // and other benign characters literal, only escaping the URI delimiters
+        return parent.buildUpon().fragment(null).appendEncodedPath(escapeUriPathDelimiters(childName)).build();
     }
 
     // dump intent into string for debug purposes
