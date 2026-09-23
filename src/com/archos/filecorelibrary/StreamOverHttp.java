@@ -150,7 +150,7 @@ public class StreamOverHttp {
 		return mUpstreamBufferSize;
 	}
 
-	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};
+	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt", "sup"};
 
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
 		if(mSubList!=null)
