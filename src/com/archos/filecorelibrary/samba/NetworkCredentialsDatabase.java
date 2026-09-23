@@ -64,7 +64,7 @@ public class NetworkCredentialsDatabase {
 
     private static final String DATABASE_CREATE_CREDENTIALS =
             "create table "+CREDENTIALS_TABLE+" (" + KEY_PATH + " text not null primary key, "+KEY_USERNAME+" text, " + KEY_PASSWORD + " text, " + KEY_DOMAIN + " text);";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final int DATABASE_CREATE_VERSION = 1;
 
     public static class Credential implements Serializable{
@@ -97,22 +97,21 @@ public class NetworkCredentialsDatabase {
         private void setCredentials(String username, String domain) {
             String u = username != null ? username.trim() : "";
             String d = domain != null ? domain.trim() : "";
+            // A domain can be embedded in the username using the "DOMAIN" + backslash + "user"
+            // form. The "user@domain" form is deliberately NOT split: the username may be a full
+            // login such as an email address (e.g. pCloud WebDAV or a Microsoft account) which
+            // must be kept as is, otherwise authentication fails.
             if (d.isEmpty() && !u.isEmpty()) {
-                int ci = u.indexOf('@');
+                int ci = u.indexOf('\\');
                 if (ci > 0) {
-                    d = u.substring(ci + 1).trim();
-                    u = u.substring(0, ci).trim();
-                } else {
-                    ci = u.indexOf('\\');
-                    if (ci > 0) {
-                        d = u.substring(0, ci).trim();
-                        u = u.substring(ci + 1).trim();
-                    }
+                    d = u.substring(0, ci).trim();
+                    u = u.substring(ci + 1).trim();
                 }
             }
             mUsername = u;
             mDomain = d;
         }
+
         public boolean isTemporary(){
             return mIsTemporary;
         }
@@ -341,6 +340,17 @@ public class NetworkCredentialsDatabase {
             }
             if (oldVersion < 2) {
                 db.execSQL("ALTER TABLE " + CREDENTIALS_TABLE + " ADD COLUMN " + KEY_DOMAIN + " TEXT");
+            }
+            if (oldVersion < 3) {
+                // Credentials saved before the "@" split was removed had non-SMB logins (e.g. an
+                // email address) wrongly split into username and domain, breaking authentication
+                // (e.g. pCloud WebDAV). Restore the full login.
+                db.execSQL("UPDATE " + CREDENTIALS_TABLE
+                        + " SET " + KEY_USERNAME + " = " + KEY_USERNAME + " || '@' || " + KEY_DOMAIN
+                        + ", " + KEY_DOMAIN + " = ''"
+                        + " WHERE " + KEY_DOMAIN + " IS NOT NULL AND " + KEY_DOMAIN + " != ''"
+                        + " AND " + KEY_USERNAME + " IS NOT NULL AND " + KEY_USERNAME + " != ''"
+                        + " AND " + KEY_PATH + " NOT LIKE 'smb%'");
             }
         }
 
