@@ -22,6 +22,7 @@ import android.provider.OpenableColumns;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.contentstorage.ContentStorageFileEditor;
+import com.archos.filecorelibrary.smbj.SmbjUtils;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
@@ -134,6 +135,14 @@ public class StreamOverHttp {
 
 	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};
 
+	MetaFile2 getMetaFile(Uri uri) throws Exception {
+		return MetaFile2Factory.getMetaFileForUrl(uri);
+	}
+
+	FileEditor getFileEditor(Uri uri) {
+		return FileEditorFactory.getFileEditorForUrl(uri, ArchosUtils.getGlobalContext());
+	}
+
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
 		if(mSubList!=null)
 			return mSubList;
@@ -213,6 +222,7 @@ public class StreamOverHttp {
 		private volatile boolean forceClosed;
 		private boolean responseStarted;
 		private int cleanupTasks = 1; // guarded by mSessionLock; includes the worker
+		private boolean cooperativeCancellation; // guarded by this session's monitor
 
 		HttpSession(Socket socket, String fileMimeType) {
 			this.socket = socket;
@@ -272,11 +282,17 @@ public class StreamOverHttp {
 		}
 
 		private void cancel() {
+			boolean cooperative;
 			synchronized (this) {
 				if (forceClosed) return;
 				forceClosed = true;
+				cooperative = cooperativeCancellation;
 			}
 			closeSocket();
+			// Interrupting a jcifs response wait retires its shared SMB transport.
+			// Let the owner finish the outstanding operation (or its backend timeout)
+			// and close the input in finally, without racing read/open against close.
+			if (cooperative) return;
 			worker.interrupt();
 			// Some backends need close() to unblock read(), and close itself may wait
 			// for network I/O. Never make playback stop or the replacement request wait.
@@ -294,6 +310,14 @@ public class StreamOverHttp {
 				closer.setDaemon(true);
 				closer.start();
 			}
+		}
+
+		private synchronized void prepareUpstream(Uri uri) throws IOException {
+			if (isCancelled()) throw new IOException("Request cancelled");
+			// Metadata and directory listing can use jcifs before an input exists.
+			// Once selected, retain this policy through the worker's final close.
+			if (uri != null && "smb".equalsIgnoreCase(uri.getScheme()) && !SmbjUtils.isSMBjEnabled())
+				cooperativeCancellation = true;
 		}
 
 		private void finishTask() {
@@ -374,15 +398,17 @@ public class StreamOverHttp {
 
 		private void openInputStream() throws Exception {
 			String path = readRequest();
+			prepareUpstream(mUri);
 			boolean isAskingPoster = false;
 			canSeek = true;
 			if(mMetaFile==null&&mUri!=null) {
 				try {
-					mMetaFile = MetaFile2Factory.getMetaFileForUrl(mUri);
+					mMetaFile = getMetaFile(mUri);
 				} catch(Exception e) {
 					caughtException(e, "StreamOverHttp:openInputStream", "InterruptedException retrieving metafile");
 				}
 			}
+			if (isCancelled()) throw new IOException("Request cancelled");
 			/*
 				some players like MXPlayer try to find subs associated with http urls
 			 */
@@ -410,8 +436,10 @@ public class StreamOverHttp {
 				String name = FileUtils.getName(Uri.parse(path));
 				if(mPosterLocalUri!=null&&name!=null&&name.equals(FileUtils.getName(mPosterLocalUri))){//if asking for poster
 					isAskingPoster = true;
-					if(!isResourcePoster(mPosterLocalUri))
-						metaFile2 = MetaFile2Factory.getMetaFileForUrl(mPosterLocalUri);
+					if(!isResourcePoster(mPosterLocalUri)) {
+						prepareUpstream(mPosterLocalUri);
+						metaFile2 = getMetaFile(mPosterLocalUri);
+					}
 				} else {
 					if (!mName.equals(name)) {
 						List<MetaFile2> subs = getSubtitleList(mUri);
@@ -444,7 +472,8 @@ public class StreamOverHttp {
 				return;
 			}
 			Uri target = metaFile2 != null ? metaFile2.getUri() : mUri;
-			FileEditor editor = FileEditorFactory.getFileEditorForUrl(target, ArchosUtils.getGlobalContext());
+			prepareUpstream(target);
+			FileEditor editor = getFileEditor(target);
 			if (metaFile2 != null && metaFile2.length() > 0) length = metaFile2.length();
 			try {
 				long editorLength = editor.length();
