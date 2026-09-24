@@ -22,6 +22,7 @@ import android.provider.OpenableColumns;
 
 import com.archos.environment.ArchosUtils;
 import com.archos.filecorelibrary.contentstorage.ContentStorageFileEditor;
+import com.archos.filecorelibrary.jcifs.JcifsFileEditor;
 import com.archos.filecorelibrary.smbj.SmbjUtils;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -63,6 +64,8 @@ public class StreamOverHttp {
 
 	private String fileMimeType;
 	private static final int BUFFER_SIZE = 8192;
+	private static final int DEFAULT_UPSTREAM_BUFFER_SIZE = BUFFER_SIZE * 10;
+	private static final int JCIFS_UPSTREAM_BUFFER_SIZE = 64 * 1024;
 	private ServerSocket serverSocket;
 	private Thread mainThread;
 	private MetaFile2 mMetaFile;
@@ -143,6 +146,12 @@ public class StreamOverHttp {
 		return FileEditorFactory.getFileEditorForUrl(uri, ArchosUtils.getGlobalContext());
 	}
 
+	static int upstreamBufferSize(FileEditor editor) {
+		// An 80 KiB read needs two SMB2 credits on a large-MTU connection.
+		// Until jcifs adapts reads to its credit window, keep proxy reads at one.
+		return editor instanceof JcifsFileEditor ? JCIFS_UPSTREAM_BUFFER_SIZE : DEFAULT_UPSTREAM_BUFFER_SIZE;
+	}
+
 	public List<MetaFile2> getSubtitleList(Uri video) throws SftpException, AuthenticationException, JSchException, IOException {
 		if(mSubList!=null)
 			return mSubList;
@@ -221,6 +230,7 @@ public class StreamOverHttp {
 		private boolean supersedableMediaRequest;
 		private volatile boolean forceClosed;
 		private boolean responseStarted;
+		private int upstreamBufferSize = DEFAULT_UPSTREAM_BUFFER_SIZE;
 		private int cleanupTasks = 1; // guarded by mSessionLock; includes the worker
 		private boolean cooperativeCancellation; // guarded by this session's monitor
 
@@ -474,6 +484,7 @@ public class StreamOverHttp {
 			Uri target = metaFile2 != null ? metaFile2.getUri() : mUri;
 			prepareUpstream(target);
 			FileEditor editor = getFileEditor(target);
+			upstreamBufferSize = upstreamBufferSize(editor);
 			if (metaFile2 != null && metaFile2.length() > 0) length = metaFile2.length();
 			try {
 				long editorLength = editor.length();
@@ -611,11 +622,12 @@ public class StreamOverHttp {
 	 */
 	private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg, HttpSession session) throws IOException {
 		if (log.isDebugEnabled()) log.debug("sendResponse");
-		BufferedInputStream bin = null;
+		InputStream bin = null;
 		try {
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out);
-			if (isInput != null) bin = new BufferedInputStream(isInput, BUFFER_SIZE*10);
+			if (isInput != null) bin = bufferResponseInput(isInput, sendCount,
+					session != null ? session.upstreamBufferSize : DEFAULT_UPSTREAM_BUFFER_SIZE);
 			{
 				String retLine = "HTTP/1.0 " + status + " \r\n";
 				pw.print(retLine);
@@ -653,5 +665,38 @@ public class StreamOverHttp {
 			}
 			// HttpSession owns upstream close, including cancellation during read().
 		}
+	}
+
+	/** Bound backend refills as well as socket writes, including the final partial buffer. */
+	static InputStream bufferResponseInput(InputStream input, long length, int bufferSize) {
+		if (bufferSize <= 0) throw new IllegalArgumentException("Upstream buffer size must be positive");
+		if (length < 0) return new BufferedInputStream(input, bufferSize);
+		InputStream bounded = new InputStream() {
+			private long remaining = length;
+
+			@Override public int read() throws IOException {
+				if (remaining == 0) return -1;
+				int value = input.read();
+				if (value >= 0) remaining--;
+				return value;
+			}
+
+			@Override public int read(byte[] b, int off, int len) throws IOException {
+				if (off < 0 || len < 0 || len > b.length - off) throw new IndexOutOfBoundsException();
+				if (len == 0) return 0;
+				if (remaining == 0) return -1;
+				int count = input.read(b, off, (int)Math.min(remaining, len));
+				if (count > 0) remaining -= count;
+				return count;
+			}
+
+			@Override public int available() throws IOException {
+				return (int)Math.min(remaining, input.available());
+			}
+
+			@Override public void close() throws IOException { input.close(); }
+		};
+		if (length == 0) return bounded;
+		return new BufferedInputStream(bounded, (int)Math.min(length, bufferSize));
 	}
 }
