@@ -26,9 +26,9 @@ cd Video
 ```
 
 The override replaces the published jcifs-ng dependency and keeps its SLF4J and
-BouncyCastle dependencies. Without this property, builds still use nova9 and
-do not include the adaptive-credit fix. Keep the property on each build command
-until the fixed library is published and the default dependency is updated.
+BouncyCastle dependencies. Without this property, builds use nova10, which
+includes the adaptive-credit fix. The override is only needed when testing
+additional unpublished library changes.
 
 The patched library keeps 1 MiB playback reads when 16 credits are available,
 reduces regular-file reads to the current credit window, and waits for one credit
