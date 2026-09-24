@@ -65,11 +65,13 @@ public class StreamOverHttp {
 	private String fileMimeType;
 	private static final int BUFFER_SIZE = 8192;
 	static final int DEFAULT_UPSTREAM_BUFFER_SIZE = BUFFER_SIZE * 10;
+	private static final int JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE = 64 * 1024;
 	private static final int PLAYBACK_UPSTREAM_BUFFER_SIZE = 1024 * 1024;
 	/** Playback may batch backend reads; metadata and generic readers retain modest buffering. */
 	public enum ReadMode { DEFAULT, PLAYBACK }
 	private final ReadMode mReadMode;
 	private final int mUpstreamBufferSize;
+	private final boolean mExplicitUpstreamBufferSize;
 	private ServerSocket serverSocket;
 	private Thread mainThread;
 	private MetaFile2 mMetaFile;
@@ -99,26 +101,27 @@ public class StreamOverHttp {
 	}
 
 	public StreamOverHttp(MetaFile2 f, String forceMimeType, ReadMode readMode) throws IOException{
-		this(f.getUri(), f, forceMimeType, readMode, DEFAULT_UPSTREAM_BUFFER_SIZE);
+		this(f.getUri(), f, forceMimeType, readMode, DEFAULT_UPSTREAM_BUFFER_SIZE, false);
 	}
     public StreamOverHttp(final Uri uri, final String forceMimeType) throws IOException{
 		this(uri, forceMimeType, ReadMode.DEFAULT);
 	}
 
 	public StreamOverHttp(Uri uri, String forceMimeType, ReadMode readMode) throws IOException{
-		this(uri, null, forceMimeType, readMode, DEFAULT_UPSTREAM_BUFFER_SIZE);
+		this(uri, null, forceMimeType, readMode, DEFAULT_UPSTREAM_BUFFER_SIZE, false);
 	}
 
 	// Package-private overload for controlled transfer benchmarks.
 	StreamOverHttp(final Uri uri, final String forceMimeType, int upstreamBufferSize) throws IOException{
-		this(uri, null, forceMimeType, ReadMode.DEFAULT, upstreamBufferSize);
+		this(uri, null, forceMimeType, ReadMode.DEFAULT, upstreamBufferSize, true);
 	}
 
-	private StreamOverHttp(Uri uri, MetaFile2 file, String forceMimeType, ReadMode readMode, int upstreamBufferSize) throws IOException{
+	private StreamOverHttp(Uri uri, MetaFile2 file, String forceMimeType, ReadMode readMode, int upstreamBufferSize, boolean explicitUpstreamBufferSize) throws IOException{
 		if (upstreamBufferSize <= 0) throw new IllegalArgumentException("Upstream buffer size must be positive");
 		if (readMode == null) throw new NullPointerException("readMode");
 		mReadMode = readMode;
 		mUpstreamBufferSize = upstreamBufferSize;
+		mExplicitUpstreamBufferSize = explicitUpstreamBufferSize;
 		mMetaFile = file;
 		mUri = uri;
 		mName = file != null ? file.getName() : FileUtils.getName(uri);
@@ -143,12 +146,15 @@ public class StreamOverHttp {
     }
 
 	int upstreamBufferSize(FileEditor editor, boolean primaryMedia) {
-		if (!primaryMedia) return DEFAULT_UPSTREAM_BUFFER_SIZE;
-		// Select the actual backend: smb:// can also be routed to SMBJ, which
-		// already prefetches. Metadata callers never opt into playback batching.
-		if (mReadMode == ReadMode.PLAYBACK && editor instanceof JcifsFileEditor)
-			return PLAYBACK_UPSTREAM_BUFFER_SIZE;
-		return mUpstreamBufferSize;
+		// Keep metadata/sidecar jcifs reads within one SMB2 credit. Playback retains
+		// large refills for throughput; explicit benchmarks retain their requested size.
+		if (editor instanceof JcifsFileEditor) {
+			if (!primaryMedia) return JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE;
+			if (mExplicitUpstreamBufferSize) return mUpstreamBufferSize;
+			return mReadMode == ReadMode.PLAYBACK ? PLAYBACK_UPSTREAM_BUFFER_SIZE : JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE;
+		}
+		// smb:// may select SMBJ, which already prefetches.
+		return primaryMedia ? mUpstreamBufferSize : DEFAULT_UPSTREAM_BUFFER_SIZE;
 	}
 
 	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};

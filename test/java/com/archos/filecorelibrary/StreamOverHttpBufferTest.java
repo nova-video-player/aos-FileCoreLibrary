@@ -62,8 +62,8 @@ public class StreamOverHttpBufferTest {
         try {
             FileEditor editor = new JcifsFileEditor(SMB_URI);
             assertFirstReadSize(MIB, playback.upstreamBufferSize(editor, true));
-            assertFirstReadSize(81920, playback.upstreamBufferSize(editor, false));
-            assertFirstReadSize(81920, metadata.upstreamBufferSize(editor, true));
+            assertFirstReadSize(65536, playback.upstreamBufferSize(editor, false));
+            assertFirstReadSize(65536, metadata.upstreamBufferSize(editor, true));
         } finally {
             playback.close();
             metadata.close();
@@ -96,7 +96,7 @@ public class StreamOverHttpBufferTest {
         try {
             FileEditor editor = new JcifsFileEditor(SMB_URI);
             assertFirstReadSize(MIB, playback.upstreamBufferSize(editor, true));
-            assertFirstReadSize(81920, metadata.upstreamBufferSize(editor, true));
+            assertFirstReadSize(65536, metadata.upstreamBufferSize(editor, true));
         } finally {
             playback.close();
             metadata.close();
@@ -110,6 +110,65 @@ public class StreamOverHttpBufferTest {
             assertFirstReadSize(512 * 1024, proxy.upstreamBufferSize(new SmbjFileEditor(SMB_URI), true));
         } finally {
             proxy.close();
+        }
+    }
+
+    @Test
+    public void metadataHttpTransferWorksWithSingleCreditBackend() throws Exception {
+        assertHttpTransfer(false, StreamOverHttp.ReadMode.DEFAULT, 65536);
+    }
+
+    @Test
+    public void unknownLengthMetadataHttpTransferWorksWithSingleCreditBackend() throws Exception {
+        assertHttpTransfer(true, StreamOverHttp.ReadMode.DEFAULT, 65536);
+    }
+
+    @Test
+    public void playbackHttpTransferKeepsOneMiBRefills() throws Exception {
+        assertHttpTransfer(false, StreamOverHttp.ReadMode.PLAYBACK, MIB);
+    }
+
+    @Test
+    public void unknownLengthPlaybackHttpTransferKeepsOneMiBRefills() throws Exception {
+        assertHttpTransfer(true, StreamOverHttp.ReadMode.PLAYBACK, MIB);
+    }
+
+    private static void assertHttpTransfer(boolean unknownLength, StreamOverHttp.ReadMode mode, int refillSize) throws Exception {
+        RecordingInputStream source = new RecordingInputStream(10 * MIB + 317);
+        source.maxRequest = refillSize;
+        StreamOverHttp proxy = new StreamOverHttp(SMB_URI, "video/mp4", mode) {
+            @Override MetaFile2 getMetaFile(Uri uri) { return null; }
+            @Override FileEditor getFileEditor(Uri uri) {
+                return new JcifsFileEditor(uri) {
+                    @Override public long length() { return unknownLength ? -1 : source.length; }
+                    @Override public InputStream getInputStream(long from) { return source; }
+                };
+            }
+        };
+        HttpURLConnection connection = (HttpURLConnection)new URL(proxy.getUri("video.mkv").toString()).openConnection();
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+        try {
+            assertEquals(200, connection.getResponseCode());
+            assertEquals(unknownLength ? -1 : source.length, connection.getContentLength());
+            try (InputStream input = connection.getInputStream()) {
+                assertArrayEquals(expected(source.length), readAll(input));
+            }
+            assertEquals(Integer.valueOf(refillSize), source.requests.get(0));
+            if (!unknownLength) assertEquals(Integer.valueOf(317), source.requests.get(source.requests.size() - 1));
+        } finally {
+            connection.disconnect();
+            proxy.close();
+        }
+    }
+
+    @Test
+    public void explicitJcifsBenchmarkSizesAreNotReplacedByProductionDefaults() throws Exception {
+        for (int size : new int[] {65536, 81920, 524288, MIB}) {
+            StreamOverHttp proxy = new StreamOverHttp(SMB_URI, null, size);
+            try {
+                assertFirstReadSize(size, proxy.upstreamBufferSize(new JcifsFileEditor(SMB_URI), true));
+            } finally { proxy.close(); }
         }
     }
 
@@ -229,6 +288,7 @@ public class StreamOverHttpBufferTest {
         final int length;
         int position;
         int maxResult = Integer.MAX_VALUE;
+        int maxRequest = Integer.MAX_VALUE;
 
         RecordingInputStream(int length) { this.length = length; }
 
@@ -238,6 +298,7 @@ public class StreamOverHttpBufferTest {
         }
 
         @Override public int read(byte[] bytes, int off, int len) {
+            assertTrue("Backend request exceeds limit: " + len, len <= maxRequest);
             requests.add(len);
             if (position == length) return -1;
             int count = Math.min(Math.min(len, maxResult), length - position);

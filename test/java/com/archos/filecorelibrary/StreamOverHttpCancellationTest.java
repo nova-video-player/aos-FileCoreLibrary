@@ -53,7 +53,11 @@ public class StreamOverHttpCancellationTest {
         volatile boolean interrupted;
 
         Proxy(String scheme, Stage stage) throws IOException {
-            super(Uri.parse(scheme + "://server/share/video.mkv"), "video/mp4");
+            this(scheme, stage, ReadMode.DEFAULT);
+        }
+
+        Proxy(String scheme, Stage stage, ReadMode mode) throws IOException {
+            super(Uri.parse(scheme + "://server/share/video.mkv"), "video/mp4", mode);
             this.stage = stage;
         }
 
@@ -125,7 +129,11 @@ public class StreamOverHttpCancellationTest {
     }
 
     private void assertCooperative(Stage stage) throws Exception {
-        Proxy proxy = new Proxy("smb", stage);
+        assertCooperative(stage, StreamOverHttp.ReadMode.DEFAULT);
+    }
+
+    private void assertCooperative(Stage stage, StreamOverHttp.ReadMode mode) throws Exception {
+        Proxy proxy = new Proxy("smb", stage, mode);
         try (Socket socket = request(proxy, null)) {
             assertTrue(proxy.entered.await(2, TimeUnit.SECONDS));
             proxy.close();
@@ -151,8 +159,20 @@ public class StreamOverHttpCancellationTest {
     @Test public void cancelDuringReadDefersCloseToOwner() throws Exception { assertCooperative(Stage.READ); }
     @Test public void cancelDuringCleanupDoesNotInterruptClose() throws Exception { assertCooperative(Stage.CLOSE); }
 
+    @Test public void playbackCancellationDefersCloseToOwner() throws Exception {
+        assertCooperative(Stage.READ, StreamOverHttp.ReadMode.PLAYBACK);
+    }
+
     @Test public void replacementRangeCompletesWhileOldReadDrains() throws Exception {
-        Proxy proxy = new Proxy("smb", Stage.READ);
+        assertReplacement(StreamOverHttp.ReadMode.DEFAULT);
+    }
+
+    @Test public void playbackReplacementCompletesWhileOldReadDrains() throws Exception {
+        assertReplacement(StreamOverHttp.ReadMode.PLAYBACK);
+    }
+
+    private void assertReplacement(StreamOverHttp.ReadMode mode) throws Exception {
+        Proxy proxy = new Proxy("smb", Stage.READ, mode);
         try (Socket first = request(proxy, null)) {
             assertTrue(proxy.entered.await(2, TimeUnit.SECONDS));
             try (Socket second = request(proxy, "bytes=16-31")) {
