@@ -138,10 +138,21 @@ configurations.matching { it.name.toLowerCase().contains("unittest") }.configure
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
-    //api 'eu.agno3.jcifs:jcifs-ng:2.1.10'
-    //api files('libs/jcifs-ng.jar')
-    // Keep nova9's framing/credit fixes without read-ahead; the proxy batches playback at 1 MiB and metadata at 64 KiB.
-    api 'com.github.nova-video-player:jcifs-ng:v2.1.11-nova9'
+    // Test external/jcifs-ng before publishing it: -PjcifsNgJar=/absolute/path/to/jcifs-ng.jar
+    // Playback refills remain 1 MiB; adaptive wire reads require the patched library.
+    def jcifsNgJar = providers.gradleProperty('jcifsNgJar').orNull
+    if (jcifsNgJar != null) {
+        def localJcifs = file(jcifsNgJar)
+        if (!localJcifs.isFile()) {
+            throw new GradleException("jcifsNgJar does not point to a JAR file: ${localJcifs}")
+        }
+        api files(localJcifs)
+        // File dependencies have no POM: retain jcifs-ng's public dependencies.
+        api 'org.slf4j:slf4j-api:1.7.36'
+        api 'org.bouncycastle:bcprov-jdk18on:1.81'
+    } else {
+        api 'com.github.nova-video-player:jcifs-ng:v2.1.11-nova9'
+    }
     // upgrading for later release i.e. 0.2.25 or 2.27.0 will break the build since it has switched to java 24
     // testing Nova fork with public setLocalPacketSize/setLocalWindowSize(Max) for SFTP throughput tuning (see SFTPSession)
     api 'com.github.nova-video-player:jsch-mwiede:jsch-2.28.7-readahead3'
