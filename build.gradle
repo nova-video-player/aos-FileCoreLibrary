@@ -151,7 +151,7 @@ dependencies {
         api 'org.slf4j:slf4j-api:1.7.36'
         api 'org.bouncycastle:bcprov-jdk18on:1.81'
     } else {
-        api 'com.github.nova-video-player:jcifs-ng:v2.1.11-nova9'
+        api 'com.github.nova-video-player:jcifs-ng:v2.1.11-nova10'
     }
     // upgrading for later release i.e. 0.2.25 or 2.27.0 will break the build since it has switched to java 24
     // testing Nova fork with public setLocalPacketSize/setLocalWindowSize(Max) for SFTP throughput tuning (see SFTPSession)
