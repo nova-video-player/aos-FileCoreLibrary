@@ -20,6 +20,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.OwnedStreams;
 import com.archos.filecorelibrary.FileUtils;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 import com.thegrizzlylabs.sardineandroid.impl.SardineException;
@@ -70,7 +71,8 @@ public class WebdavFileEditor extends FileEditor {
             reqBuilder.headers(Headers.of(headers));
         }
         var req = reqBuilder.build();
-        var resp = mHttpClient.newCall(req).execute();
+        var call = mHttpClient.newCall(req);
+        var resp = call.execute();
         try {
             if (from >= 0) {
                 if (resp.code() == 416) {
@@ -121,7 +123,7 @@ public class WebdavFileEditor extends FileEditor {
                 }
             }
 
-            return body.byteStream();
+            return OwnedStreams.cancellableInput(body.byteStream(), resp::close, call::cancel);
         } catch (Exception e) {
             resp.close();
             throw e;

@@ -80,4 +80,33 @@ public class OwnedStreamsTest {
         closer.get(5, TimeUnit.SECONDS);
         assertEquals(1, handles.get());
     }
+
+    @Test public void cancellationUnblocksReadBeforeSerializingResponseClose() throws Exception {
+        CountDownLatch reading = new CountDownLatch(1), cancelled = new CountDownLatch(1);
+        AtomicInteger handles = new AtomicInteger(), streamCloses = new AtomicInteger();
+        java.util.concurrent.atomic.AtomicBoolean inRead = new java.util.concurrent.atomic.AtomicBoolean();
+        InputStream stream = OwnedStreams.cancellableInput(new InputStream() {
+            @Override public int read() throws IOException {
+                inRead.set(true);
+                reading.countDown();
+                try {
+                    if (!cancelled.await(2, TimeUnit.SECONDS)) throw new IOException("Cancellation did not unblock read");
+                    return -1;
+                } catch (InterruptedException e) { throw new IOException(e); }
+                finally { inRead.set(false); }
+            }
+            @Override public void close() {
+                assertFalse("Response adapter must not close during read", inRead.get());
+                streamCloses.incrementAndGet();
+            }
+        }, handles::incrementAndGet, cancelled::countDown);
+        FutureTask<Integer> reader = new FutureTask<>(stream::read);
+        new Thread(reader).start();
+        assertTrue(reading.await(2, TimeUnit.SECONDS));
+        stream.close();
+        stream.close();
+        assertEquals(Integer.valueOf(-1), reader.get(2, TimeUnit.SECONDS));
+        assertEquals(1, streamCloses.get());
+        assertEquals(1, handles.get());
+    }
 }

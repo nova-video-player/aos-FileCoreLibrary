@@ -68,6 +68,18 @@ public final class OwnedStreams {
         };
     }
 
+    /** Abort a thread-safe request before waiting for its non-thread-safe stream adapter. */
+    public static InputStream cancellableInput(InputStream stream, Closeable owner, Runnable cancel) {
+        return new FilterInputStream(input(stream, owner)) {
+            private final java.util.concurrent.atomic.AtomicBoolean closed = new java.util.concurrent.atomic.AtomicBoolean();
+            @Override public void close() throws IOException {
+                if (!closed.compareAndSet(false, true)) return;
+                try { cancel.run(); }
+                finally { in.close(); }
+            }
+        };
+    }
+
     public static OutputStream output(OutputStream stream, Closeable owner) {
         return new FilterOutputStream(stream) {
             private boolean closed;
