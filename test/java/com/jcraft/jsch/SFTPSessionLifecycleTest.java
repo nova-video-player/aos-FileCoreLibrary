@@ -128,4 +128,31 @@ public class SFTPSessionLifecycleTest {
             connect.get(2, java.util.concurrent.TimeUnit.SECONDS);
         } finally { release.countDown(); threads.shutdownNow(); }
     }
+
+    @Test public void metadataUsesOneRequestAndRetainsStreamOwnership() throws Exception {
+        ChannelSftp channel = new ChannelSftp() {
+            @Override public java.io.InputStream get(String path, SftpProgressMonitor monitor, long offset) {
+                assertEquals(1, getBulkRequests());
+                return new java.io.ByteArrayInputStream(new byte[100]);
+            }
+            @Override public void disconnect() { }
+        };
+        int[] releases = new int[1];
+        SFTPSession manager = new SFTPSession() {
+            @Override public Channel getSFTPChannel(Uri uri) { return channel; }
+            @Override public void releaseSession(Channel released) { releases[0]++; }
+        };
+        Field singleton = SFTPSession.class.getDeclaredField("sshSession");
+        singleton.setAccessible(true);
+        Object previous = singleton.get(null);
+        singleton.set(null, manager);
+        try (java.io.InputStream stream = new SftpFileEditor(URI).getInputStream(0,
+                new com.archos.filecorelibrary.ReadOptions(
+                        com.archos.filecorelibrary.ReadOptions.Purpose.METADATA, 17, true))) {
+            assertEquals(17, stream.read(new byte[80]));
+            assertEquals(-1, stream.read());
+            stream.close();
+            assertEquals(1, releases[0]);
+        } finally { singleton.set(null, previous); }
+    }
 }

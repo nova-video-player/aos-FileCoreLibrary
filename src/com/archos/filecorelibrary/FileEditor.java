@@ -48,6 +48,14 @@ public abstract class FileEditor {
     public boolean mkdir() { return false; };
     public abstract InputStream getInputStream() throws Exception;
     public abstract InputStream getInputStream(long from) throws Exception;
+    /** Sequential policy overload preserves provider/pipe support in legacy editors. */
+    public InputStream getInputStream(ReadOptions options) throws Exception {
+        return options.wrap(getInputStream());
+    }
+    /** Optional per-open policy; old implementations retain source and binary compatibility. */
+    public InputStream getInputStream(long from, ReadOptions options) throws Exception {
+        return options.wrap(getInputStream(from));
+    }
     public OutputStream getOutputStream() throws Exception { return null; };
     public Boolean delete() throws Exception { return null; };
     public boolean rename(String newName) { return false; };

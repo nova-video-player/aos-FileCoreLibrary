@@ -23,6 +23,8 @@ import android.net.Uri;
 import com.archos.environment.ObservableInputStream;
 import com.archos.environment.ObservableOutputStream;
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.ReadOptions;
+import com.archos.filecorelibrary.OwnedStreams;
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.msfscc.FileAttributes;
@@ -47,7 +49,7 @@ public class SmbjFileEditor extends FileEditor {
 
     private static final Logger log = LoggerFactory.getLogger(SmbjFileEditor.class);
 
-private SmbjUtils requireUtils() {
+    private SmbjUtils requireUtils() {
         SmbjUtils utils = SmbjUtils.peekInstance();
         if (utils == null) {
             throw new IllegalStateException("SmbjUtils instance is null");
@@ -55,49 +57,67 @@ private SmbjUtils requireUtils() {
         return utils;
     }
 
-    private File openReadOnlyFile(SmbjUtils utils) throws Exception {
+    private File openReadOnlyFile(SmbjUtils utils, ReadOptions options) throws Exception {
         return utils.getSmbShare(mUri).openFile(getFilePath(mUri),
                 EnumSet.of(AccessMask.FILE_READ_DATA),
                 EnumSet.of(FileAttributes.FILE_ATTRIBUTE_READONLY),
                 EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
                 SMB2CreateDisposition.FILE_OPEN,
-                EnumSet.of(SMB2CreateOptions.FILE_RANDOM_ACCESS));
-    }
-
-    private ObservableInputStream openObservableInputStream(long from) throws Exception {
-        if (log.isTraceEnabled()) {
-            log.trace("getInputStream: opening {}", mUri);
-        }
-        SmbjUtils utils = requireUtils();
-        File smbjFile = openReadOnlyFile(utils);
-        InputStream is = smbjFile.getInputStream();
-        if (from > 0) {
-            is.skip(from);
-        }
-        ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {
-            if (smbjFile != null) {
-                if (log.isTraceEnabled()) {
-                    log.trace("getInputStream: closing {}", mUri);
-                }
-                if (smbjFile.getDiskShare().isConnected()) {
-                    smbjFile.closeNoWait();
-                }
-            }
-        });
-        return ois;
+                options.smbjAccess == ReadOptions.SmbjAccess.UNSPECIFIED ? EnumSet.noneOf(SMB2CreateOptions.class)
+                        : EnumSet.of(options.smbjAccess == ReadOptions.SmbjAccess.SEQUENTIAL
+                        ? SMB2CreateOptions.FILE_SEQUENTIAL_ONLY : SMB2CreateOptions.FILE_RANDOM_ACCESS));
     }
 
     public SmbjFileEditor(Uri uri) { super(uri); }
 
-    @Override
-    public InputStream getInputStream() throws Exception {
-        return openObservableInputStream(0);
+    @Override public InputStream getInputStream() throws Exception {
+        return getInputStream(0);
+    }
+
+    @Override public InputStream getInputStream(long from) throws Exception {
+        return getInputStream(from, ReadOptions.DEFAULT);
     }
 
     @Override
-    public InputStream getInputStream(long from) throws Exception {
-        return openObservableInputStream(from);
+    public InputStream getInputStream(ReadOptions options) throws Exception {
+        return getInputStream(0, options);
+    }
+
+    @Override public InputStream getInputStream(long from, ReadOptions options) throws Exception {
+        if (from < 0) throw new IllegalArgumentException("Negative file offset");
+        File file = openReadOnlyFile(requireUtils(), options);
+        try {
+            InputStream input;
+            if (options.conservative()) {
+                // FileInputStream always prefetches. Demand reads avoid a spare 1 MiB
+                // request when serving a small range, poster or subtitle.
+                input = new InputStream() {
+                    private long position = from;
+                    @Override public int read() throws java.io.IOException {
+                        byte[] one = new byte[1];
+                        return read(one, 0, 1) < 0 ? -1 : one[0] & 255;
+                    }
+                    @Override public int read(byte[] b, int off, int len) {
+                        java.util.Objects.checkFromIndexSize(off, len, b.length);
+                        if (len == 0) return 0;
+                        int n = file.read(b, position, off, Math.min(len, 65536));
+                        if (n > 0) position += n;
+                        return n;
+                    }
+                };
+            } else {
+                input = file.getInputStream();
+                if (from > 0 && input.skip(from) != from)
+                    throw new java.io.IOException("Unable to seek SMBJ stream");
+            }
+            return options.wrap(OwnedStreams.input(input, () -> {
+                if (file.getDiskShare().isConnected()) file.closeNoWait();
+            }));
+        } catch (Throwable failure) {
+            try { file.closeNoWait(); }
+            catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
+            throw failure;
+        }
     }
 
 

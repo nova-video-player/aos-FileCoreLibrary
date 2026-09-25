@@ -23,6 +23,7 @@ import android.net.Uri;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.OwnedStreams;
+import com.archos.filecorelibrary.ReadOptions;
 
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.FileAttributes;
@@ -53,10 +54,23 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
+        return getInputStream(from, ReadOptions.DEFAULT);
+    }
+
+    @Override
+    public InputStream getInputStream(ReadOptions options) throws Exception {
+        return getInputStream(0, options);
+    }
+
+    @Override
+    public InputStream getInputStream(long from, ReadOptions options) throws Exception {
         if (from < 0) throw new IllegalArgumentException("Negative file offset");
         RemoteFile file = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
         try {
-            return OwnedStreams.input(file.new ReadAheadRemoteFileInputStream(16, from), file);
+            InputStream stream = options.conservative()
+                    ? file.new RemoteFileInputStream(from)
+                    : file.new ReadAheadRemoteFileInputStream(options.pipelineDepth(), from);
+            return options.wrap(OwnedStreams.input(stream, file));
         } catch (Throwable failure) {
             try { file.close(); } catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
             throw failure;

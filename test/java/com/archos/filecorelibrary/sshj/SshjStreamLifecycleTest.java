@@ -55,11 +55,16 @@ public class SshjStreamLifecycleTest {
     }
 
     private static class TrackingSftp extends SFTPClient {
-        int closes, handles;
+        int closes, handles, readCalls, readBytes;
         boolean failClose;
         TrackingSftp(SFTPEngine engine) { super(engine); }
         @Override public RemoteFile open(String path) {
             return new RemoteFile(engine, path, new byte[0]) {
+                @Override public int read(long offset, byte[] into, int off, int len) {
+                    readCalls++;
+                    readBytes += len;
+                    return len;
+                }
                 @Override public void close() throws IOException {
                     handles++;
                     if (failClose) throw new IOException("remote close failed");
@@ -155,5 +160,17 @@ public class SshjStreamLifecycleTest {
             release.countDown();
             close.get(2, java.util.concurrent.TimeUnit.SECONDS);
         } finally { release.countDown(); threads.shutdownNow(); }
+    }
+
+    @Test public void metadataUsesBoundedDemandReadsWithoutReadAhead() throws Exception {
+        try (InputStream in = new SshjFileEditor(URI).getInputStream(123,
+                new com.archos.filecorelibrary.ReadOptions(
+                        com.archos.filecorelibrary.ReadOptions.Purpose.METADATA, 17, true))) {
+            assertEquals(17, in.read(new byte[81920]));
+            assertEquals(-1, in.read());
+        }
+        assertEquals(1, sftp.readCalls);
+        assertEquals(17, sftp.readBytes);
+        assertEquals(1, sftp.handles);
     }
 }

@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.archos.filecorelibrary.FileEditor;
 import com.archos.filecorelibrary.OwnedStreams;
+import com.archos.filecorelibrary.ReadOptions;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -85,12 +86,13 @@ public class SftpFileEditor  extends FileEditor{
         }
     }
 
-    private InputStream openInputStream(long from) throws JSchException, SftpException {
+    private InputStream openInputStream(long from, ReadOptions options) throws JSchException, SftpException {
         if (from < 0) throw new IllegalArgumentException("Negative file offset");
         Channel channel = SFTPSession.getInstance().getSFTPChannel(mUri);
         try {
+            ((ChannelSftp) channel).setBulkRequests(options.pipelineDepth());
             InputStream stream = ((ChannelSftp) channel).get(mUri.getPath(), null, from);
-            return OwnedStreams.input(stream, () -> releaseChannel(channel));
+            return options.wrap(OwnedStreams.input(stream, () -> releaseChannel(channel)));
         } catch (Throwable failure) {
             try { releaseChannel(channel); }
             catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
@@ -100,12 +102,22 @@ public class SftpFileEditor  extends FileEditor{
 
     @Override
     public InputStream getInputStream() throws FileNotFoundException, JSchException, SftpException {
-        return openInputStream(0);
+        return openInputStream(0, ReadOptions.DEFAULT);
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        return openInputStream(from);
+        return openInputStream(from, ReadOptions.DEFAULT);
+    }
+
+    @Override
+    public InputStream getInputStream(ReadOptions options) throws Exception {
+        return getInputStream(0, options);
+    }
+
+    @Override
+    public InputStream getInputStream(long from, ReadOptions options) throws Exception {
+        return openInputStream(from, options);
     }
 
     @Override
