@@ -132,4 +132,28 @@ public class SshjStreamLifecycleTest {
         assertEquals(1, ssh.closes);
         assertEquals(1, sftp.closes);
     }
+
+    @Test public void stalledCloseDoesNotBlockAnotherServer() throws Exception {
+        java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+        Credential slow = new Credential("test", "", "sshj://slow.test", "", true);
+        NetworkCredentialsDatabase.getInstance().addCredential(slow);
+        cache("sshClients").put(slow, new TrackingSsh() {
+            @Override public void close() {
+                entered.countDown();
+                try { release.await(5, java.util.concurrent.TimeUnit.SECONDS); }
+                catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            }
+        });
+        java.util.concurrent.ExecutorService threads = java.util.concurrent.Executors.newFixedThreadPool(2);
+        try {
+            java.util.concurrent.Future<?> close = threads.submit(() ->
+                    SshjUtils.disconnectSshClient(Uri.parse("sshj://slow.test/file")));
+            assertTrue(entered.await(2, java.util.concurrent.TimeUnit.SECONDS));
+            assertSame(ssh, threads.submit(() -> SshjUtils.peekInstance().getSshClient(URI))
+                    .get(2, java.util.concurrent.TimeUnit.SECONDS));
+            release.countDown();
+            close.get(2, java.util.concurrent.TimeUnit.SECONDS);
+        } finally { release.countDown(); threads.shutdownNow(); }
+    }
 }

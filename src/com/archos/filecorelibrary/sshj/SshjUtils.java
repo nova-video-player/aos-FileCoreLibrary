@@ -19,6 +19,7 @@ import static com.archos.filecorelibrary.FileUtils.encodeUri;
 
 import android.content.Context;
 import android.net.Uri;
+import com.archos.filecorelibrary.ConnectionLocks;
 
 import androidx.preference.PreferenceManager;
 
@@ -44,6 +45,7 @@ public class SshjUtils {
     private static final Logger log = LoggerFactory.getLogger(SshjUtils.class);
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, SSHClient> sshClients = new ConcurrentHashMap<>();
     static private ConcurrentHashMap<NetworkCredentialsDatabase.Credential, SFTPClient> sftpClients = new ConcurrentHashMap<>();
+    private static final ConnectionLocks connectionLocks = new ConnectionLocks();
     private static Context mContext;
     // singleton, volatile to make double-checked-locking work correctly
     private static volatile SshjUtils sInstance;
@@ -71,8 +73,8 @@ public class SshjUtils {
     }
 
     public SSHClient getSshClient(Uri uri) throws IOException, AuthenticationException {
-        // Use the same monitor as the static close methods so cache replacement is atomic.
-        synchronized (SshjUtils.class) {
+        // Creation and retirement use the same endpoint monitor.
+        synchronized (connectionLocks.forUri(uri)) {
             return getSshClientLocked(uri);
         }
     }
@@ -130,7 +132,11 @@ public class SshjUtils {
         }
     }
 
-    public static synchronized void disconnectSshClient(Uri uri) {
+    public static void disconnectSshClient(Uri uri) {
+        synchronized (connectionLocks.forUri(uri)) { disconnectSshClientLocked(uri); }
+    }
+
+    private static void disconnectSshClientLocked(Uri uri) {
         closeSFTPClient(uri);
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         try {
@@ -150,7 +156,7 @@ public class SshjUtils {
     }
 
     public SFTPClient getSFTPClient(Uri uri) throws IOException, AuthenticationException {
-        synchronized (SshjUtils.class) {
+        synchronized (connectionLocks.forUri(uri)) {
             return getSFTPClientLocked(uri);
         }
     }
@@ -177,7 +183,11 @@ public class SshjUtils {
         return sftpClient;
     }
 
-    public static synchronized void closeSFTPClient(Uri uri)  {
+    public static void closeSFTPClient(Uri uri) {
+        synchronized (connectionLocks.forUri(uri)) { closeSFTPClientLocked(uri); }
+    }
+
+    private static void closeSFTPClientLocked(Uri uri) {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         try {
             if (cred == null)

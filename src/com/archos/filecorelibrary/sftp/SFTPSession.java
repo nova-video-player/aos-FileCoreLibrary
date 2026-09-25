@@ -15,6 +15,7 @@
 package com.archos.filecorelibrary.sftp;
 
 import android.net.Uri;
+import com.archos.filecorelibrary.ConnectionLocks;
 
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase.Credential;
@@ -33,6 +34,7 @@ public class SFTPSession {
 
     private static final Logger log = LoggerFactory.getLogger(SFTPSession.class);
 
+    private final ConnectionLocks connectionLocks = new ConnectionLocks();
     private static SFTPSession sshSession = null;
     //Keep a cached Session ( = connection) per server
     private ConcurrentHashMap<Credential, Session> currentSessions;
@@ -48,7 +50,11 @@ public class SFTPSession {
 		return sshSession;
 	}
 
-    public synchronized Channel getSFTPChannel(Uri cred) throws JSchException {
+    public Channel getSFTPChannel(Uri cred) throws JSchException {
+        synchronized (connectionLocks.forUri(cred)) { return getSFTPChannelLocked(cred); }
+    }
+
+    private Channel getSFTPChannelLocked(Uri cred) throws JSchException {
         for (int attempt = 0; attempt < 2; attempt++) {
             Channel channel = null;
             boolean acquired = false;
@@ -68,35 +74,39 @@ public class SFTPSession {
         throw new JSchException("Unable to open SFTP channel");
     }
 
-    private synchronized void acquireSession(Channel channel){
+    private void acquireSession(Channel channel){
         try {
             Session session = channel.getSession();
-            if (log.isTraceEnabled()) log.trace("acquireSession: acquiring channel {} for session {}", channel, session);
-            HashSet<Channel> channels = usedSessions.get(session);
-            if(channels == null) {
-                channels = new HashSet<>();
-                usedSessions.put(session, channels);
+            synchronized (session) {
+                if (log.isTraceEnabled()) log.trace("acquireSession: acquiring channel {} for session {}", channel, session);
+                HashSet<Channel> channels = usedSessions.get(session);
+                if(channels == null) {
+                    channels = new HashSet<>();
+                    usedSessions.put(session, channels);
+                }
+                channels.add(channel);
             }
-            channels.add(channel);
         } catch (JSchException e) {
             log.warn("acquireSession: failed to get session for channel {}", channel, e);
         }
     }
 
-    public synchronized void releaseSession(Channel channel) {
+    public void releaseSession(Channel channel) {
         try {
             Session session = channel.getSession();
-            if (log.isTraceEnabled()) log.trace("releaseSession: releasing channel {} for session {}", channel, session);
-            HashSet<Channel> channels = usedSessions.get(session);
-            // A failed acquisition or repeated close need not have a usage entry.
-            if (channels == null || !channels.remove(channel)) return;
-            if(channels.isEmpty()) {
-                usedSessions.remove(session);
-                // Keep the cached connection, but no empty usage entry.
-                if(currentSessions.values().contains(session)) return;
-                if (log.isDebugEnabled()) log.debug("releaseSession: no more channels in use, disconnecting session {}", session);
-                session.disconnect();
-                usedSessions.remove(session);
+            synchronized (session) {
+                if (log.isTraceEnabled()) log.trace("releaseSession: releasing channel {} for session {}", channel, session);
+                HashSet<Channel> channels = usedSessions.get(session);
+                // A failed acquisition or repeated close need not have a usage entry.
+                if (channels == null || !channels.remove(channel)) return;
+                if(channels.isEmpty()) {
+                    usedSessions.remove(session);
+                    // Keep the cached connection, but no empty usage entry.
+                    if(currentSessions.values().contains(session)) return;
+                    if (log.isDebugEnabled()) log.debug("releaseSession: no more channels in use, disconnecting session {}", session);
+                    session.disconnect();
+                    usedSessions.remove(session);
+                }
             }
         } catch (Exception e) {
             log.warn("releaseSession: failed to release channel {}", channel, e);
@@ -109,24 +119,23 @@ public class SFTPSession {
     For instance, scraping will ls / then ls /data, which would normally close the sftp connection
     on every request
      */
-    public synchronized void removeSession(Uri cred) {
-        if (log.isDebugEnabled()) log.debug("removeSession: removing session(s) for {}", cred);
-        for(Credential c : currentSessions.keySet()){
-            Uri uri = Uri.parse(c.getUriString());
-            if(!uri.getHost().equals(cred.getHost()) || uri.getPort()!=cred.getPort())
-                continue;
-            Session s = currentSessions.get(c);
-            HashSet<Channel> channels = usedSessions.get(s);
-            boolean doNotDisconnect = channels != null && !channels.isEmpty();
-            //If doNotDisconnect is true, it means there are still channels opened
-            //Since we are removing this session from currentSessions
-            //The session will be disconnected in releaseChannel
-            if(!doNotDisconnect) {
-                if (log.isTraceEnabled()) log.trace("removeSession: disconnecting session {} for {}", s, c);
-                s.disconnect();
-                usedSessions.remove(s);
+    public void removeSession(Uri cred) {
+        synchronized (connectionLocks.forUri(cred)) {
+            for (Credential c : currentSessions.keySet()) {
+                Uri uri = Uri.parse(c.getUriString());
+                if (connectionLocks.forUri(uri) != connectionLocks.forUri(cred)) continue;
+                Session session = currentSessions.get(c);
+                if (session == null) continue;
+                synchronized (session) {
+                    currentSessions.remove(c, session);
+                    HashSet<Channel> channels = usedSessions.get(session);
+                    if (channels == null || channels.isEmpty()) {
+                        usedSessions.remove(session);
+                        session.disconnect();
+                    }
+                    // Active retired sessions are closed by their last owner.
+                }
             }
-            currentSessions.remove(c);
         }
     }
 
@@ -135,8 +144,12 @@ public class SFTPSession {
         return uri.buildUpon().path("").build();
     }
 
+    public Session getSession(Uri path) throws JSchException {
+        synchronized (connectionLocks.forUri(path)) { return getSessionLocked(path); }
+    }
+
     @SuppressWarnings("deprecation") // session.setPassword(String): legacy JSch API
-    public synchronized Session getSession(Uri path) throws JSchException{
+    private Session getSessionLocked(Uri path) throws JSchException{
         String username="anonymous";
 
         String password = "";

@@ -101,4 +101,31 @@ public class SFTPSessionLifecycleTest {
             assertArrayEquals(new int[] {1, 1}, cleanup);
         } finally { singleton.set(null, previous); }
     }
+
+    @Test public void stalledReconnectDoesNotBlockAnotherServer() throws Exception {
+        SFTPSession manager = new SFTPSession();
+        java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+        TrackingSession slow = new TrackingSession() {
+            @Override public void connect() {
+                entered.countDown();
+                try { release.await(5, java.util.concurrent.TimeUnit.SECONDS); }
+                catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            }
+        };
+        TrackingSession fast = new TrackingSession() {
+            @Override public boolean isConnected() { return true; }
+        };
+        map(manager, "currentSessions").put(new Credential("anonymous", "", "sftp://slow.test", "", true), slow);
+        map(manager, "currentSessions").put(new Credential("anonymous", "", "sftp://fast.test", "", true), fast);
+        java.util.concurrent.ExecutorService threads = java.util.concurrent.Executors.newFixedThreadPool(2);
+        try {
+            java.util.concurrent.Future<?> connect = threads.submit(() -> manager.getSession(Uri.parse("sftp://slow.test/file")));
+            assertTrue(entered.await(2, java.util.concurrent.TimeUnit.SECONDS));
+            assertSame(fast, threads.submit(() -> manager.getSession(Uri.parse("sftp://fast.test/file")))
+                    .get(2, java.util.concurrent.TimeUnit.SECONDS));
+            release.countDown();
+            connect.get(2, java.util.concurrent.TimeUnit.SECONDS);
+        } finally { release.countDown(); threads.shutdownNow(); }
+    }
 }
