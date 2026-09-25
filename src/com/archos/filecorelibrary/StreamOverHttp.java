@@ -285,11 +285,29 @@ public class StreamOverHttp {
 			try { socket.close(); } catch (IOException ignored) { }
 		}
 
-		private void closeInput(InputStream input) {
-			if (input == null) return;
-			try { input.close(); }
-			catch (Exception e) { caughtException(e, "StreamOverHttp:closeInput", "Closing upstream input"); }
-		}
+        private boolean workerClosingInput; // guarded by this
+
+        private void closeInput(InputStream input) {
+            if (input == null) return;
+            boolean owner = Thread.currentThread() == worker;
+            boolean interrupted = false;
+            if (owner) {
+                synchronized (this) {
+                    workerClosingInput = true;
+                    // A cancelled read may leave the flag set. Protocol CLOSE still
+                    // needs to acquire credits / wait for its own response.
+                    interrupted = Thread.interrupted();
+                }
+            }
+            try { input.close(); }
+            catch (Exception e) { caughtException(e, "StreamOverHttp:closeInput", "Closing upstream input"); }
+            finally {
+                if (owner) {
+                    synchronized (this) { workerClosingInput = false; }
+                    if (interrupted) Thread.currentThread().interrupt();
+                }
+            }
+        }
 
 		private synchronized InputStream takeInput() {
 			InputStream input = is;
@@ -312,13 +330,15 @@ public class StreamOverHttp {
 				if (forceClosed) return;
 				forceClosed = true;
 				cooperative = cooperativeCancellation;
+                // Keep this decision atomic with entry into closeInput(). Never
+                // interrupt an owner already cleaning up a remote handle.
+                if (!cooperative && !workerClosingInput) worker.interrupt();
 			}
 			closeSocket();
 			// Interrupting a jcifs response wait retires its shared SMB transport.
 			// Let the owner finish the outstanding operation (or its backend timeout)
 			// and close the input in finally, without racing read/open against close.
 			if (cooperative) return;
-			worker.interrupt();
 			// Some backends need close() to unblock read(), and close itself may wait
 			// for network I/O. Never make playback stop or the replacement request wait.
 			InputStream input;
@@ -348,7 +368,10 @@ public class StreamOverHttp {
 		private void finishTask() {
 			synchronized (mSessionLock) {
 				// Keep stalled closes in the admission limit as well as stalled reads.
-				if (--cleanupTasks == 0) mSessions.remove(this);
+				if (--cleanupTasks == 0) {
+                    mSessions.remove(this);
+                    mSessionLock.notifyAll();
+                }
 				if (mActiveMediaSession == this) mActiveMediaSession = null;
 			}
 		}
@@ -594,6 +617,19 @@ public class StreamOverHttp {
 		}
 		return Uri.parse(url);
 	}
+
+    /** Diagnostic cleanup barrier, including asynchronous backend close tasks. */
+    boolean awaitIdle(long timeoutMillis) throws InterruptedException {
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+        synchronized (mSessionLock) {
+            while (!mSessions.isEmpty()) {
+                long left = deadline - System.nanoTime();
+                if (left <= 0) return false;
+                java.util.concurrent.TimeUnit.NANOSECONDS.timedWait(mSessionLock, left);
+            }
+            return true;
+        }
+    }
 
 	public void close() {
 		List<HttpSession> sessions;

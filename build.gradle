@@ -34,12 +34,12 @@ android {
             jni.srcDirs = []
         }
         test {
-            java.srcDirs = ['test/java']
+            java.srcDirs = ['test/java', 'testCommon/java']
             resources.srcDirs = ['test/resources']
         }
         androidTest {
             manifest.srcFile 'androidTest/AndroidManifest.xml'
-            java.srcDirs = ['androidTest/java']
+            java.srcDirs = ['androidTest/java', 'testCommon/java']
             res.srcDirs = ['androidTest/res']
         }
     }
