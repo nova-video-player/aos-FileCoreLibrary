@@ -37,6 +37,12 @@ public class ReadOptionsTest {
             assertEquals(2, calls[0]);
         }
     }
+    @Test public void diagnosticsRejectTruncationUnknownLengthAndWrongHash() throws Exception {
+        assertThrows(IOException.class, () -> TransferDiagnostic.verify(5, 6, "", ""));
+        assertThrows(IOException.class, () -> TransferDiagnostic.verify(5, -1, "", ""));
+        assertThrows(IOException.class, () -> TransferDiagnostic.verify(5, 5, "a", "b"));
+        TransferDiagnostic.verify(5, 5, "a", "a");
+    }
     @Test public void requestCapAllowsShortReadsWithoutChangingPlaybackDefaults() throws Exception {
         ReadOptions tuning = new ReadOptions(ReadOptions.Purpose.PLAYBACK, -1, false,
                 8, 4, ReadOptions.SmbjAccess.RANDOM);

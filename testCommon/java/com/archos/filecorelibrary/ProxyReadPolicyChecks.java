@@ -25,6 +25,9 @@ public abstract class ProxyReadPolicyChecks {
         volatile ReadOptions openedWith;
         final byte[] bytes = new byte[64];
         Proxy(ReadMode mode) throws IOException { super(Uri.parse("file:///fixture.mp4"), "video/mp4", mode); }
+        Proxy(StreamDiagnostics metrics) throws IOException {
+            super(Uri.parse("file:///fixture.mp4"), "video/mp4", 1048576, ReadOptions.DEFAULT, metrics);
+        }
         @Override MetaFile2 getMetaFile(Uri uri) { return null; }
         @Override FileEditor getFileEditor(Uri uri) {
             return new FileEditor(uri) {
@@ -74,6 +77,19 @@ public abstract class ProxyReadPolicyChecks {
             request(proxy, "bytes=16-", 48);
             assertEquals(ReadOptions.Purpose.METADATA, proxy.openedWith.purpose);
             assertTrue(proxy.openedWith.conservative());
+        } finally { proxy.close(); }
+    }
+    @Test public void countersTrackApiBytesAndOwnedCleanup() throws Exception {
+        StreamDiagnostics metrics = new StreamDiagnostics();
+        Proxy proxy = new Proxy(metrics);
+        try {
+            request(proxy, "bytes=16-31", 16);
+            assertEquals(16, metrics.requestedBytes.get());
+            assertEquals(16, metrics.returnedBytes.get());
+            assertEquals(16, metrics.deliveredBytes.get());
+            assertEquals(1, metrics.opened.get());
+            assertEquals(1, metrics.closed.get());
+            assertEquals(0, metrics.closeFailures.get());
         } finally { proxy.close(); }
     }
 }

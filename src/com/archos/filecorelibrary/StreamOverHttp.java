@@ -72,6 +72,8 @@ public class StreamOverHttp {
 	private final ReadMode mReadMode;
 	private final int mUpstreamBufferSize;
 	private final boolean mExplicitUpstreamBufferSize;
+	private final ReadOptions mDiagnosticOptions;
+	private final StreamDiagnostics mDiagnostics;
 	private ServerSocket serverSocket;
 	private Thread mainThread;
 	private MetaFile2 mMetaFile;
@@ -80,7 +82,7 @@ public class StreamOverHttp {
 	private volatile HttpSession mActiveMediaSession;
 	private final Object mSessionLock = new Object();
 	private final Set<HttpSession> mSessions = new HashSet<>();
-	private boolean mClosed;
+	private volatile boolean mClosed;
 	private static final int MAX_SESSIONS = 16;
 	private static final int MAX_HEADER_BYTES = 65536;
 
@@ -117,6 +119,18 @@ public class StreamOverHttp {
 	}
 
 	private StreamOverHttp(Uri uri, MetaFile2 file, String forceMimeType, ReadMode readMode, int upstreamBufferSize, boolean explicitUpstreamBufferSize) throws IOException{
+        this(uri, file, forceMimeType, readMode, upstreamBufferSize, explicitUpstreamBufferSize, null, null);
+    }
+
+    StreamOverHttp(Uri uri, String mime, int buffer, ReadOptions options, StreamDiagnostics diagnostics) throws IOException {
+        this(uri, null, mime, ReadMode.PLAYBACK, buffer, true, options, diagnostics);
+    }
+
+    private StreamOverHttp(Uri uri, MetaFile2 file, String forceMimeType, ReadMode readMode,
+            int upstreamBufferSize, boolean explicitUpstreamBufferSize,
+            ReadOptions diagnosticOptions, StreamDiagnostics diagnostics) throws IOException {
+        mDiagnosticOptions = diagnosticOptions;
+        mDiagnostics = diagnostics;
 		if (upstreamBufferSize <= 0) throw new IllegalArgumentException("Upstream buffer size must be positive");
 		if (readMode == null) throw new NullPointerException("readMode");
 		mReadMode = readMode;
@@ -135,7 +149,7 @@ public class StreamOverHttp {
                         new HttpSession(accept,fileMimeType);
                     }
                 } catch(IOException e) {
-					caughtException(e, "StreamOverHttp:StreamOverHttp", "IOException for " + mUri);
+					if (!mClosed) caughtException(e, "StreamOverHttp:StreamOverHttp", "IOException for " + mUri);
 				}
             }
 
@@ -317,6 +331,7 @@ public class StreamOverHttp {
 
 		private void publishInput(InputStream input) throws IOException {
 			if (input == null) throw new IOException("No upstream input");
+			if (mDiagnostics != null) input = mDiagnostics.track(input, this::isCancelled);
 			synchronized (this) {
 				if (!isCancelled()) { is = input; return; }
 			}
@@ -324,11 +339,16 @@ public class StreamOverHttp {
 			throw new IOException("Request cancelled while opening input");
 		}
 
+		private volatile long cancellationStarted;
 		private void cancel() {
 			boolean cooperative;
 			synchronized (this) {
 				if (forceClosed) return;
 				forceClosed = true;
+				if (mDiagnostics != null) {
+					cancellationStarted = System.nanoTime();
+					mDiagnostics.cancelled.incrementAndGet();
+				}
 				cooperative = cooperativeCancellation;
                 // Keep this decision atomic with entry into closeInput(). Never
                 // interrupt an owner already cleaning up a remote handle.
@@ -370,6 +390,9 @@ public class StreamOverHttp {
 				// Keep stalled closes in the admission limit as well as stalled reads.
 				if (--cleanupTasks == 0) {
                     mSessions.remove(this);
+                    if (mDiagnostics != null && cancellationStarted != 0)
+                        mDiagnostics.maxCancellationNanos.accumulateAndGet(
+                                System.nanoTime() - cancellationStarted, Math::max);
                     mSessionLock.notifyAll();
                 }
 				if (mActiveMediaSession == this) mActiveMediaSession = null;
@@ -522,6 +545,7 @@ public class StreamOverHttp {
 			Uri target = metaFile2 != null ? metaFile2.getUri() : mUri;
 			prepareUpstream(target);
 			FileEditor editor = getFileEditor(target);
+			if (mDiagnostics != null) mDiagnostics.backends.add(editor.getClass().getSimpleName());
 			upstreamBufferSize = upstreamBufferSize(editor, supersedableMediaRequest);
 			if (metaFile2 != null && metaFile2.length() > 0) length = metaFile2.length();
 			try {
@@ -573,7 +597,10 @@ public class StreamOverHttp {
             ReadOptions.Purpose purpose = supersedableMediaRequest
                     && (mReadMode == ReadMode.PLAYBACK || mExplicitUpstreamBufferSize)
                     ? ReadOptions.Purpose.PLAYBACK : ReadOptions.Purpose.METADATA;
-            return new ReadOptions(purpose, count, bounded);
+            ReadOptions tuning = mDiagnosticOptions;
+            return tuning == null ? new ReadOptions(purpose, count, bounded)
+                    : new ReadOptions(purpose, count, bounded, tuning.sftpDepth,
+                            tuning.requestBytes, tuning.smbjAccess);
         }
 
 		private void handleResponse() throws IOException {
@@ -673,6 +700,7 @@ public class StreamOverHttp {
 			if (count == 0) throw new IOException("Upstream read made no progress");
 			if (session != null && session.isCancelled()) return;
 			out.write(buffer, 0, count);
+			if (mDiagnostics != null) mDiagnostics.deliveredBytes.addAndGet(count);
 			if (remaining > 0) remaining -= count;
 		}
 	}

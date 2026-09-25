@@ -92,7 +92,11 @@ android {
         unitTests.includeAndroidResources = true
         unitTests.all {
             forkEvery = 1
-            systemProperty 'nova.test.speedtestCsv', System.getProperty('nova.test.speedtestCsv')
+            ['speedtestCsv', 'speedtestSftpDepth', 'speedtestRequestBytes', 'speedtestSmbjAccess',
+             'speedtestRepeats', 'speedtestStressIterations', 'speedtestSampleBytes'].each { key ->
+                def value = System.getProperty('nova.test.' + key)
+                if (value != null) systemProperty 'nova.test.' + key, value
+            }
             systemProperty 'nova.test.speedtestUpstreamBufferBytes', System.getProperty('nova.test.speedtestUpstreamBufferBytes', '81920')
             systemProperty 'nova.test.webdavPropfindCsv', System.getProperty('nova.test.webdavPropfindCsv')
             testLogging {
