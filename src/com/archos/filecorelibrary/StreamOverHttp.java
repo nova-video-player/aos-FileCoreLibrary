@@ -543,7 +543,7 @@ public class StreamOverHttp {
 			resolveRange();
 			try {
 				if (isCancelled()) throw new IOException("Request cancelled");
-				publishInput(editor.getInputStream(requestedStart));
+				publishInput(editor.getInputStream(requestedStart, readOptions()));
 				// HTTP/WebDAV editors may learn the total size only from opening
 				// their response. Keep range support when metadata did not know it.
 				if (length < 0) {
@@ -554,7 +554,7 @@ public class StreamOverHttp {
 						if (requestedStart > 0) {
 							closeInput(takeInput());
 							if (isCancelled()) throw new IOException("Request cancelled");
-							publishInput(editor.getInputStream(requestedStart));
+							publishInput(editor.getInputStream(requestedStart, readOptions()));
 						}
 					}
 				}
@@ -563,9 +563,18 @@ public class StreamOverHttp {
 				canSeek = false;
 				partialResponse = false;
 				requestedStart = 0;
-				publishInput(editor.getInputStream());
+				publishInput(readOptions().wrap(editor.getInputStream()));
 			}
 		}
+
+        private ReadOptions readOptions() {
+            boolean bounded = partialResponse && requestedEnd < length - 1;
+            long count = partialResponse ? requestedEnd - requestedStart + 1 : length;
+            ReadOptions.Purpose purpose = supersedableMediaRequest
+                    && (mReadMode == ReadMode.PLAYBACK || mExplicitUpstreamBufferSize)
+                    ? ReadOptions.Purpose.PLAYBACK : ReadOptions.Purpose.METADATA;
+            return new ReadOptions(purpose, count, bounded);
+        }
 
 		private void handleResponse() throws IOException {
 			if (isCancelled()) return;
