@@ -95,11 +95,14 @@ public class LocalStorageFileEditor extends FileEditor {
     @Override
     public InputStream getInputStream(long from) throws Exception {
         RandomAccessFile raf = new RandomAccessFile(new File(mUri.getPath()), "r");
-        if (raf != null) {
+        try {
             raf.seek(from);
             return Channels.newInputStream(raf.getChannel());
+        } catch (Throwable failure) {
+            try { raf.close(); }
+            catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
+            throw failure;
         }
-        return null;
     }
 
     public OutputStream getOutputStream() throws IOException {

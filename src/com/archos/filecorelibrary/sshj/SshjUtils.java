@@ -70,7 +70,14 @@ public class SshjUtils {
         if (log.isDebugEnabled()) log.debug("SshjUtils: initializing contexts");
     }
 
-    public synchronized SSHClient getSshClient(Uri uri) throws IOException, AuthenticationException {
+    public SSHClient getSshClient(Uri uri) throws IOException, AuthenticationException {
+        // Use the same monitor as the static close methods so cache replacement is atomic.
+        synchronized (SshjUtils.class) {
+            return getSshClientLocked(uri);
+        }
+    }
+
+    private SSHClient getSshClientLocked(Uri uri) throws IOException, AuthenticationException {
         try {
             NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
             if (cred == null)
@@ -81,13 +88,26 @@ public class SshjUtils {
             int port = uri.getPort();
             SSHClient sshClient = sshClients.get(cred);
             if (sshClient == null || !sshClient.isConnected()) {
+                // An SFTP client belongs to one SSH transport; never reuse it after reconnect.
+                closeSFTPClient(uri);
+                sshClients.remove(cred);
+                if (sshClient != null) {
+                    try { sshClient.close(); }
+                    catch (IOException e) { log.debug("Unable to close stale SSH connection", e); }
+                }
                 if (log.isTraceEnabled()) log.trace("getSshClient: sshClient is null or not connected for {}, connecting to {}", uri, server);
                 DefaultConfig sshjConfig = new DefaultConfig();
                 sshClient = new SSHClient(sshjConfig);
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-                if (port != -1) sshClient.connect(server, port);
-                else sshClient.connect(server);
-                sshClient.authPassword(username, password.toCharArray());
+                try {
+                    if (port != -1) sshClient.connect(server, port);
+                    else sshClient.connect(server);
+                    sshClient.authPassword(username, password.toCharArray());
+                } catch (IOException | RuntimeException failure) {
+                    try { sshClient.close(); }
+                    catch (IOException closeFailure) { failure.addSuppressed(closeFailure); }
+                    throw failure;
+                }
                 sshClients.put(cred, sshClient);
             } else {
                 if (log.isTraceEnabled()) log.trace("getSshClient: found non null connected sshClient for {}", uri);
@@ -111,13 +131,14 @@ public class SshjUtils {
     }
 
     public static synchronized void disconnectSshClient(Uri uri) {
+        closeSFTPClient(uri);
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         try {
             if (cred == null)
                 cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);
             SSHClient sshClient = sshClients.get(cred);
-            if (sshClient != null && sshClient.isConnected()) {
-                sshClient.disconnect();
+            if (sshClient != null) {
+                sshClient.close();
                 if (log.isTraceEnabled()) log.trace("disconnectSshClient: sshClient disconnected for {}", uri);
             }
         } catch (IOException e) {
@@ -128,7 +149,13 @@ public class SshjUtils {
         }
     }
 
-    public synchronized SFTPClient getSFTPClient(Uri uri) throws IOException, AuthenticationException {
+    public SFTPClient getSFTPClient(Uri uri) throws IOException, AuthenticationException {
+        synchronized (SshjUtils.class) {
+            return getSFTPClientLocked(uri);
+        }
+    }
+
+    private SFTPClient getSFTPClientLocked(Uri uri) throws IOException, AuthenticationException {
         NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
         if (cred == null)
             cred = new NetworkCredentialsDatabase.Credential("anonymous", "", buildKeyFromUri(uri).toString(), "", true);

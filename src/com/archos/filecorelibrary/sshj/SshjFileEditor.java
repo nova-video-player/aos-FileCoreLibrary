@@ -20,10 +20,9 @@ import static com.archos.filecorelibrary.sshj.SshjUtils.getSftpPath;
 
 import android.net.Uri;
 
-import com.archos.environment.ObservableInputStream;
-import com.archos.environment.ObservableOutputStream;
 import com.archos.filecorelibrary.AuthenticationException;
 import com.archos.filecorelibrary.FileEditor;
+import com.archos.filecorelibrary.OwnedStreams;
 
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.sftp.FileAttributes;
@@ -49,68 +48,31 @@ public class SshjFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
-        final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16);
-        /*
-        final ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {
-            try {
-                if (sshjFile != null) sshjFile.close();
-            } catch (IOException ioe) {
-                caughtException(ioe, "SshjFileEditor:getInputStream", "IOException" + mUri);
-                if (ioe instanceof SSHException) {
-                    SshjUtils.closeSFTPClient(mUri);
-                    SshjUtils.disconnectSshClient(mUri);
-                }
-            }
-        });
-        return ois;
-         */
-        return is;
+        return getInputStream(0);
     }
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
-        final InputStream is = sshjFile.new ReadAheadRemoteFileInputStream(16, from);
-        /*
-        final ObservableInputStream ois = new ObservableInputStream(is);
-        ois.onClose(() -> {
-            try {
-                if (sshjFile != null) sshjFile.close();
-            } catch (IOException ioe) {
-                caughtException(ioe, "SshjFileEditor:getInputStream", "IOException" + mUri);
-                if (ioe instanceof SSHException) {
-                    SshjUtils.closeSFTPClient(mUri);
-                    SshjUtils.disconnectSshClient(mUri);
-                }
-            }
-        });
-        return ois;
-         */
-        return is;
+        if (from < 0) throw new IllegalArgumentException("Negative file offset");
+        RemoteFile file = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri));
+        try {
+            return OwnedStreams.input(file.new ReadAheadRemoteFileInputStream(16, from), file);
+        } catch (Throwable failure) {
+            try { file.close(); } catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
+            throw failure;
+        }
     }
 
     @Override
     public OutputStream getOutputStream() throws Exception {
-        final RemoteFile sshjFile = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri), EnumSet.of(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
-        final OutputStream os = sshjFile.new RemoteFileOutputStream();
-        /*
-        final ObservableOutputStream oos = new ObservableOutputStream(os);
-        oos.onClose(() -> {
-            try {
-                if (sshjFile != null) sshjFile.close();
-            } catch (IOException ioe) {
-                caughtException(ioe, "SshjFileEditor:getOutputStream", "IOException" + mUri);
-                if (ioe instanceof SSHException) {
-                    SshjUtils.closeSFTPClient(mUri);
-                    SshjUtils.disconnectSshClient(mUri);
-                }
-            }
-        });
-        return oos;
-         */
-        return os;
+        RemoteFile file = SshjUtils.peekInstance().getSFTPClient(mUri).open(getSftpPath(mUri),
+                EnumSet.of(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
+        try {
+            return OwnedStreams.output(file.new RemoteFileOutputStream(), file);
+        } catch (Throwable failure) {
+            try { file.close(); } catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
+            throw failure;
+        }
     }
 
     @Override

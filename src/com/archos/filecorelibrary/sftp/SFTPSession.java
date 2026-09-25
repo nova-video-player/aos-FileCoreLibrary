@@ -42,42 +42,30 @@ public class SFTPSession {
         usedSessions = new ConcurrentHashMap<>();
     }
 
-	public static SFTPSession getInstance(){
+	public static synchronized SFTPSession getInstance(){
 		if(sshSession==null)
 			sshSession= new SFTPSession();
 		return sshSession;
 	}
 
-	public synchronized Channel getSFTPChannel(Uri cred) throws JSchException{
-        if (log.isDebugEnabled()) log.debug("getSFTPChannel: opening sftp channel for {}", cred);
-        Session session = getSession(cred);
-        if(session !=null){
+    public synchronized Channel getSFTPChannel(Uri cred) throws JSchException {
+        for (int attempt = 0; attempt < 2; attempt++) {
+            Channel channel = null;
+            boolean acquired = false;
             try {
-                Channel channel = session.openChannel("sftp");
+                channel = getSession(cred).openChannel("sftp");
                 channel.connect();
                 acquireSession(channel);
+                acquired = true;
                 return channel;
-            } catch (JSchException e) {
-                //channel isn't openable, we have to reset the session !
-                log.warn("getSFTPChannel: failed to open channel for {}, resetting session and retrying", cred, e);
+            } catch (JSchException failure) {
                 removeSession(cred);
-                Session session2 = getSession(cred);
-                if (session2 != null) {
-                    try {
-
-                        Channel channel;
-                        channel = session2.openChannel("sftp");
-                        channel.connect();
-                        acquireSession(channel);
-                        return channel;
-                    } catch (JSchException e1) {
-                        log.warn("getSFTPChannel: retry failed for {}", cred, e1);
-                        throw e1;
-                    }
-                }
+                if (attempt == 1) throw failure;
+            } finally {
+                if (!acquired && channel != null) channel.disconnect();
             }
         }
-        return null;
+        throw new JSchException("Unable to open SFTP channel");
     }
 
     private synchronized void acquireSession(Channel channel){
@@ -100,11 +88,11 @@ public class SFTPSession {
             Session session = channel.getSession();
             if (log.isTraceEnabled()) log.trace("releaseSession: releasing channel {} for session {}", channel, session);
             HashSet<Channel> channels = usedSessions.get(session);
-            boolean deleted = channels.remove(channel);
-            //We already deleted this channel before
-            if(!deleted) return;
+            // A failed acquisition or repeated close need not have a usage entry.
+            if (channels == null || !channels.remove(channel)) return;
             if(channels.isEmpty()) {
-                //If this is our current session for this credential, keep it
+                usedSessions.remove(session);
+                // Keep the cached connection, but no empty usage entry.
                 if(currentSessions.values().contains(session)) return;
                 if (log.isDebugEnabled()) log.debug("releaseSession: no more channels in use, disconnecting session {}", session);
                 session.disconnect();
@@ -128,13 +116,15 @@ public class SFTPSession {
             if(!uri.getHost().equals(cred.getHost()) || uri.getPort()!=cred.getPort())
                 continue;
             Session s = currentSessions.get(c);
-            boolean doNotDisconnect = usedSessions.get(s) != null;
+            HashSet<Channel> channels = usedSessions.get(s);
+            boolean doNotDisconnect = channels != null && !channels.isEmpty();
             //If doNotDisconnect is true, it means there are still channels opened
             //Since we are removing this session from currentSessions
             //The session will be disconnected in releaseChannel
             if(!doNotDisconnect) {
                 if (log.isTraceEnabled()) log.trace("removeSession: disconnecting session {} for {}", s, c);
                 s.disconnect();
+                usedSessions.remove(s);
             }
             currentSessions.remove(c);
         }
@@ -187,6 +177,7 @@ public class SFTPSession {
             currentSessions.put(cred, session);
             return session;
         } catch (JSchException e) {
+            if (session != null) session.disconnect();
             log.warn("getSession: failed to open new session for {}", path, e);
             throw e;
 

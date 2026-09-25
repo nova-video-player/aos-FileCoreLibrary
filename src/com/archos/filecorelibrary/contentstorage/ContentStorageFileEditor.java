@@ -15,11 +15,13 @@
 package com.archos.filecorelibrary.contentstorage;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
+import android.system.ErrnoException;
+import android.system.OsConstants;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.core.util.Pair;
 import android.util.Log;
@@ -31,12 +33,12 @@ import com.archos.filecorelibrary.MimeUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 
@@ -88,21 +90,72 @@ public class ContentStorageFileEditor extends FileEditor {
 
     @Override
     public InputStream getInputStream(long from) throws Exception {
-        ParcelFileDescriptor pfd = mContext.getContentResolver().openFileDescriptor(mUri, "r");
+        if (from < 0) throw new IllegalArgumentException("Negative file offset");
+        AssetFileDescriptor asset = mContext.getContentResolver().openAssetFileDescriptor(mUri, "r");
+        if (asset == null) throw new FileNotFoundException("Provider returned no descriptor");
+        return openAt(asset, from);
+    }
 
-        FileInputStream fis = new FileInputStream(pfd.getFileDescriptor());
-        FileChannel fileChannel = fis.getChannel();
-        fileChannel.position(from);
-        return fis;
+    // Takes ownership, including on a failed seek. Asset streams retain their parcel owner.
+    static InputStream openAt(AssetFileDescriptor asset, long from) throws IOException {
+        try {
+            long start = asset.getStartOffset();
+            long length = asset.getDeclaredLength();
+            if (from < 0 || start < 0 || from > Long.MAX_VALUE - start)
+                throw new IOException("Invalid asset offset");
+            if (length >= 0 && from > length) throw new IOException("Offset beyond asset");
+            FileInputStream stream = asset.createInputStream();
+            try {
+                stream.getChannel().position(start + from);
+            } catch (IOException e) {
+                // StreamOverHttp falls back to a sequential provider stream for pipes.
+                if (e.getCause() instanceof ErrnoException
+                        && ((ErrnoException) e.getCause()).errno == OsConstants.ESPIPE)
+                    throw new IOException("Illegal seek", e);
+                throw e;
+            }
+            if (length < 0) return stream;
+            return new FilterInputStream(stream) {
+                private long remaining = length - from;
+                @Override public int read() throws IOException {
+                    if (remaining == 0) return -1;
+                    int value = in.read();
+                    if (value >= 0) remaining--;
+                    return value;
+                }
+                @Override public int read(byte[] b, int off, int len) throws IOException {
+                    if (off < 0 || len < 0 || len > b.length - off)
+                        throw new IndexOutOfBoundsException();
+                    if (len == 0) return 0;
+                    if (remaining == 0) return -1;
+                    int count = in.read(b, off, (int) Math.min(len, remaining));
+                    if (count > 0) remaining -= count;
+                    return count;
+                }
+                @Override public long skip(long n) throws IOException {
+                    if (n <= 0 || remaining == 0) return 0;
+                    long count = Math.max(0, in.skip(Math.min(n, remaining)));
+                    remaining -= count;
+                    return count;
+                }
+                @Override public int available() throws IOException {
+                    return (int) Math.min(in.available(), remaining);
+                }
+            };
+        } catch (Throwable failure) {
+            try { asset.close(); }
+            catch (Throwable closeFailure) { failure.addSuppressed(closeFailure); }
+            throw failure;
+        }
     }
 
     public long getSize() throws FileNotFoundException {
-        Cursor returnCursor = mContext.getContentResolver().query(mUri, null, null, null, null);
-        if(returnCursor.getCount() == 0)
-            return 0;
-        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-        returnCursor.moveToFirst();
-        return returnCursor.getLong(sizeIndex);
+        try (Cursor cursor = mContext.getContentResolver().query(mUri,
+                new String[] { OpenableColumns.SIZE }, null, null, null)) {
+            if (cursor == null || !cursor.moveToFirst()) return 0;
+            int index = cursor.getColumnIndex(OpenableColumns.SIZE);
+            return index < 0 || cursor.isNull(index) ? 0 : cursor.getLong(index);
+        }
     }
 
     public OutputStream getOutputStream() throws IOException {
