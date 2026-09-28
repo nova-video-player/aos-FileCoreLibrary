@@ -235,9 +235,14 @@ public class WebdavUtils {
             baseUrl += ":" + uri.getPort();
         }
 
-        Request request = new Request.Builder().url(baseUrl + "/").head().build();
+        Request request = new Request.Builder().url(baseUrl + "/").method("OPTIONS", null).build();
         try (Response response = sRedirectClient.newCall(request).execute()) {
-            if (response.code() == 301 || response.code() == 302 || response.code() == 307 || response.code() == 308) {
+            // A Web UI can redirect HEAD/GET to its login page while the same URL is a valid
+            // WebDAV endpoint. Treat a DAV capability advertisement as authoritative and never
+            // infer a DAV mount path from a browser-oriented redirect alone.
+            if (response.header("DAV") != null) {
+                resolved = baseUrl;
+            } else if (response.code() == 301 || response.code() == 302 || response.code() == 307 || response.code() == 308) {
                 String location = response.header("Location");
                 if (location != null && !location.isEmpty()) {
                     try {
@@ -259,8 +264,12 @@ public class WebdavUtils {
                                 if (rawPath != null && !rawPath.isEmpty()) {
                                     redirectBase += rawPath;
                                 }
-                                resolved = redirectBase;
-                                if (log.isDebugEnabled()) log.debug("resolveRedirect: resolved " + key + " to " + resolved);
+                                if (isWebdavEndpoint(redirectBase)) {
+                                    resolved = redirectBase;
+                                    if (log.isDebugEnabled()) log.debug("resolveRedirect: resolved " + key + " to " + resolved);
+                                } else {
+                                    log.warn("resolveRedirect: ignoring redirect to non-WebDAV endpoint {}", redirectBase);
+                                }
                             }
                         } else {
                             log.warn("resolveRedirect: invalid redirect URL format: " + location);
@@ -279,5 +288,20 @@ public class WebdavUtils {
         }
         resolvedRedirects.put(key, resolved);
         return resolved;
+    }
+
+    /**
+     * Validates a redirect target without credentials before using it as a WebDAV base URL.
+     * OPTIONS is deliberately used instead of HEAD so web UI redirects cannot masquerade as
+     * WebDAV redirects.
+     */
+    private boolean isWebdavEndpoint(String url) {
+        Request request = new Request.Builder().url(url).method("OPTIONS", null).build();
+        try (Response response = sRedirectClient.newCall(request).execute()) {
+            return response.header("DAV") != null;
+        } catch (IOException e) {
+            log.warn("resolveRedirect: failed to validate redirect target {}", url, e);
+            return false;
+        }
     }
 }

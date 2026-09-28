@@ -197,9 +197,12 @@ public class WebdavSecurityAndRangeTest {
     @Test
     public void testRedirectWithBasePathPreservation() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
+            // Root OPTIONS redirects to the DAV mount; the target must advertise DAV before it
+            // is accepted as a redirect base.
             server.enqueue(new MockResponse()
                 .setResponseCode(302)
                 .setHeader("Location", "/remote.php/webdav/"));
+            server.enqueue(new MockResponse().setResponseCode(200).setHeader("DAV", "1, 2"));
             server.start();
 
             Uri originalUri = Uri.parse("webdav://" + server.getHostName() + ":" + server.getPort() + "/sub/file.txt");
@@ -210,6 +213,45 @@ public class WebdavSecurityAndRangeTest {
 
             Uri finalHttpUri = WebdavFile2.uriToHttp(originalUri);
             assertEquals("http://" + server.getHostName() + ":" + server.getPort() + "/remote.php/webdav/sub/file.txt", finalHttpUri.toString());
+        }
+    }
+
+    @Test
+    public void testDavOptionsPreventsLoginRedirectResolution() throws Exception {
+        try (MockWebServer server = new MockWebServer()) {
+            // InfiniDysk shape: browser HEAD/GET may redirect to /login, while OPTIONS proves
+            // that the configured endpoint itself is WebDAV-capable.
+            server.enqueue(new MockResponse().setResponseCode(200).setHeader("DAV", "1, 2"));
+            server.start();
+
+            Uri originalUri = Uri.parse("webdav://" + server.getHostName() + ":" + server.getPort() + "/videos/movie.mkv");
+            Uri finalHttpUri = WebdavFile2.uriToHttp(originalUri);
+
+            assertEquals("http://" + server.getHostName() + ":" + server.getPort() + "/videos/movie.mkv", finalHttpUri.toString());
+            RecordedRequest optionsRequest = server.takeRequest();
+            assertEquals("OPTIONS", optionsRequest.getMethod());
+            assertNull("Redirect validation must not disclose credentials", optionsRequest.getHeader("Authorization"));
+            assertEquals("DAV endpoint must not trigger a second redirect probe", 1, server.getRequestCount());
+        }
+    }
+
+    @Test
+    public void testNonDavRedirectTargetIsIgnored() throws Exception {
+        try (MockWebServer server = new MockWebServer()) {
+            server.enqueue(new MockResponse().setResponseCode(302).setHeader("Location", "/login"));
+            server.enqueue(new MockResponse().setResponseCode(200));
+            server.start();
+
+            Uri originalUri = Uri.parse("webdav://" + server.getHostName() + ":" + server.getPort() + "/videos/movie.mkv");
+            Uri finalHttpUri = WebdavFile2.uriToHttp(originalUri);
+
+            assertEquals("http://" + server.getHostName() + ":" + server.getPort() + "/videos/movie.mkv", finalHttpUri.toString());
+            RecordedRequest sourceRequest = server.takeRequest();
+            assertEquals("OPTIONS", sourceRequest.getMethod());
+            assertEquals("/", sourceRequest.getPath());
+            RecordedRequest targetRequest = server.takeRequest();
+            assertEquals("OPTIONS", targetRequest.getMethod());
+            assertEquals("/login", targetRequest.getPath());
         }
     }
 
@@ -300,12 +342,14 @@ public class WebdavSecurityAndRangeTest {
         try (MockWebServer server1 = new MockWebServer();
              MockWebServer server2 = new MockWebServer()) {
 
-            // Server 1 HEAD / (used by resolveRedirect) redirects to Server 2
+            // Server 1 OPTIONS / redirects to Server 2's DAV endpoint.
             server1.enqueue(new MockResponse()
                 .setResponseCode(302)
                 .setHeader("Location", server2.url("/webdav").toString()));
 
-            // Server 2 challenges with 401 Unauthorized
+            // Target validation proves the target is DAV-capable without credentials.
+            server2.enqueue(new MockResponse().setResponseCode(200).setHeader("DAV", "1, 2"));
+            // The actual PROPFIND challenges with 401 Unauthorized.
             server2.enqueue(new MockResponse()
                 .setResponseCode(401)
                 .setHeader("WWW-Authenticate", "Basic realm=\"target-realm\"")
@@ -333,14 +377,18 @@ public class WebdavSecurityAndRangeTest {
                 assertEquals(401, se.getStatusCode());
             }
 
-            // Server 2 received the PROPFIND request
+            RecordedRequest targetOptions = server2.takeRequest();
+            assertEquals("OPTIONS", targetOptions.getMethod());
+            assertNull("Redirect validation must not disclose credentials", targetOptions.getHeader("Authorization"));
+
+            // Server 2 received the PROPFIND request.
             RecordedRequest targetReq = server2.takeRequest();
             assertEquals("PROPFIND", targetReq.getMethod());
             // Verify Server 2 received NO Authorization header (neither preemptive nor via authenticator fallback)
             assertNull("Cross-origin target must receive NO source Authorization header", targetReq.getHeader("Authorization"));
 
-            // Verify Server 2 received only 1 request (no retry loops or credential disclosures)
-            assertEquals("Server 2 should have received exactly one request", 1, server2.getRequestCount());
+            // Validation must not trigger an authentication retry or disclose credentials.
+            assertEquals("Server 2 should receive one validation request and one PROPFIND", 2, server2.getRequestCount());
         }
     }
 
@@ -434,8 +482,8 @@ public class WebdavSecurityAndRangeTest {
                 + "  </D:response>\n"
                 + "</D:multistatus>";
 
-            // 1st request: HEAD / used by resolveRedirect
-            server.enqueue(new MockResponse().setResponseCode(200));
+            // 1st request: OPTIONS / used by resolveRedirect
+            server.enqueue(new MockResponse().setResponseCode(200).setHeader("DAV", "1, 2"));
             // 2nd request: PROPFIND used by fromUri
             server.enqueue(new MockResponse()
                 .setResponseCode(207)
@@ -451,9 +499,9 @@ public class WebdavSecurityAndRangeTest {
             assertEquals("video.mkv", metaFile.getName());
             assertEquals(1048576L, metaFile.length());
 
-            // 1st request was HEAD (resolveRedirect)
-            RecordedRequest headReq = server.takeRequest();
-            assertEquals("HEAD", headReq.getMethod());
+            // 1st request was OPTIONS (resolveRedirect)
+            RecordedRequest optionsReq = server.takeRequest();
+            assertEquals("OPTIONS", optionsReq.getMethod());
 
             // 2nd request was PROPFIND (fromUri)
             RecordedRequest propfindReq = server.takeRequest();
@@ -485,8 +533,8 @@ public class WebdavSecurityAndRangeTest {
                 + "  </D:response>\n"
                 + "</D:multistatus>";
 
-            // 1st request: HEAD / used by resolveRedirect
-            server.enqueue(new MockResponse().setResponseCode(200));
+            // 1st request: OPTIONS / used by resolveRedirect
+            server.enqueue(new MockResponse().setResponseCode(200).setHeader("DAV", "1, 2"));
             // 2nd request: selective PROPFIND returns 405 Method Not Allowed
             server.enqueue(new MockResponse().setResponseCode(405));
             // 3rd request: fallback allprop PROPFIND returns 207 Multi-Status
@@ -504,7 +552,7 @@ public class WebdavSecurityAndRangeTest {
             assertEquals("video.mkv", metaFile.getName());
             assertEquals(2097152L, metaFile.length());
 
-            server.takeRequest(); // HEAD
+            server.takeRequest(); // OPTIONS
             RecordedRequest selectiveReq = server.takeRequest(); // 1st PROPFIND (selective)
             assertEquals("PROPFIND", selectiveReq.getMethod());
             assertTrue("Selective PROPFIND must have custom prop body", selectiveReq.getBody().readUtf8().contains("resourcetype"));
@@ -519,10 +567,11 @@ public class WebdavSecurityAndRangeTest {
     @Test
     public void testUriToHttpDeduplicatesMountPath() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
-            // Root HEAD / redirects to /remote.php/webdav/
+            // Root OPTIONS / redirects to /remote.php/webdav/.
             server.enqueue(new MockResponse()
                 .setResponseCode(302)
                 .setHeader("Location", "http://" + server.getHostName() + ":" + server.getPort() + "/remote.php/webdav/"));
+            server.enqueue(new MockResponse().setResponseCode(200).setHeader("DAV", "1, 2"));
 
             server.start();
 
