@@ -16,6 +16,7 @@ package com.archos.filecorelibrary.ftp;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.time.Duration;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -139,7 +140,7 @@ public class Session {
             // enter passive mode
             ftp.enterLocalPassiveMode();
             // Send keepalive to preserve control channel every 5mn
-            ftp.setControlKeepAliveTimeout(300);
+            ftp.setControlKeepAliveTimeout(Duration.ofMinutes(5));
             // login to server
             if (!ftp.login(username, password)) {
                 if (log.isDebugEnabled()) log.debug("connectNewFTPClient: failed to login now logout + disconnect");
@@ -161,7 +162,6 @@ public class Session {
         return ftp;
     }
 
-    @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
     public FTPClient getNewFTPClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         try {
             return connectNewFTPClient(path, mode);
@@ -218,7 +218,7 @@ public class Session {
             // Set data channel protection to private
             ftp.execPROT("P");
             // Send keepalive to preserve control channel every 5mn
-            ftp.setControlKeepAliveTimeout(300);
+            ftp.setControlKeepAliveTimeout(Duration.ofMinutes(5));
             ftp.setControlEncoding("UTF-8");
             // login to server
             if (!ftp.login(username, password)) {
@@ -242,7 +242,6 @@ public class Session {
         return ftp;
     }
 
-    @SuppressWarnings("deprecation") // setControlKeepAliveTimeout(long): preserves API 23 compatibility (Duration is API 26+)
     public FTPSClient getNewFTPSClient(Uri path, int mode) throws SocketException, IOException, AuthenticationException {
         try {
             return connectNewFTPSClient(path, mode);
