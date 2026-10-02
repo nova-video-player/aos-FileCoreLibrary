@@ -470,6 +470,8 @@ public class StreamOverHttp {
 		private void openInputStream() throws Exception {
 			String path = readRequest();
 			prepareUpstream(mUri);
+			NetworkInitialization.awaitReadyForSmb(mUri, ArchosUtils.getGlobalContext());
+			if (isCancelled()) throw new IOException("Request cancelled");
 			boolean isAskingPoster = false;
 			canSeek = true;
 			if(mMetaFile==null&&mUri!=null) {

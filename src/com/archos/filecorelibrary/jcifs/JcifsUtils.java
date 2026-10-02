@@ -22,6 +22,7 @@ import android.net.Uri;
 import androidx.preference.PreferenceManager;
 
 import com.archos.environment.ArchosUtils;
+import com.archos.filecorelibrary.NetworkInitialization;
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import jcifs.SmbTransport;
 import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
+import jcifs.smb.SmbException;
 import jcifs.smb.SmbTransportInternal;
 
 import java.io.IOException;
@@ -458,12 +460,14 @@ public class JcifsUtils {
         }
     }
 
-    public static SmbProtocolMode getServerProtocolMode(Uri uri) throws MalformedURLException {
+    public static SmbProtocolMode getServerProtocolMode(Uri uri) throws MalformedURLException, SmbException {
+        NetworkInitialization.awaitReady(getContext());
         return getServerProtocolMode(getEndpoint(uri));
     }
 
     // Compatibility API: true means SMB2+, false means SMB1, null means unknown.
-    public static Boolean isServerSmbV2(String server, int port) throws MalformedURLException {
+    public static Boolean isServerSmbV2(String server, int port) throws MalformedURLException, SmbException {
+        NetworkInitialization.awaitReady(getContext());
         if (server == null || server.isEmpty()) {
             throw new MalformedURLException("SMB server is empty");
         }
@@ -473,14 +477,15 @@ public class JcifsUtils {
         return null;
     }
 
-    public static NovaSmbFile getSmbFile(Uri uri) throws MalformedURLException {
+    public static NovaSmbFile getSmbFile(Uri uri) throws MalformedURLException, SmbException {
+        NetworkInitialization.awaitReady(getContext());
         if (!isSMBv2Enabled()) {
             return new NovaSmbFile(uri, getCifsContextOnly(uri, false));
         }
         return getSmbFileStrictNego(uri);
     }
 
-    public static NovaSmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException {
+    public static NovaSmbFile getSmbFileStrictNego(Uri uri) throws MalformedURLException, SmbException {
         SmbProtocolMode mode = getServerProtocolMode(uri);
         CIFSContext context;
         if (mode == SmbProtocolMode.SMB2_OR_LATER) {
@@ -498,7 +503,8 @@ public class JcifsUtils {
         return new NovaSmbFile(uri, context);
     }
 
-    public static NovaSmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException {
+    public static NovaSmbFile getSmbFileAllProtocols(Uri uri, Boolean isSMBv2) throws MalformedURLException, SmbException {
+        NetworkInitialization.awaitReady(getContext());
         CIFSContext context = getCifsContext(uri, isSMBv2);
         return new NovaSmbFile(uri, context);
     }

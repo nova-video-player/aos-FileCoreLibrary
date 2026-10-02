@@ -31,8 +31,8 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -50,7 +50,8 @@ public class NetworkCredentialsDatabase {
 
     private static NetworkCredentialsDatabase networkDatabase;
     //useful to keep both temporary and saved credentials
-    private HashMap<String,Credential> mCredentials;
+    private final ConcurrentHashMap<String,Credential> mCredentials;
+    private boolean credentialsLoaded;
     private DatabaseHelper mDBHelper;
     private SQLiteDatabase mDB;
     private static final String DATABASE_NAME = "credentials_db";
@@ -147,7 +148,7 @@ public class NetworkCredentialsDatabase {
 
 
     public NetworkCredentialsDatabase(){
-        mCredentials = new HashMap<String, NetworkCredentialsDatabase.Credential>();
+        mCredentials = new ConcurrentHashMap<String, NetworkCredentialsDatabase.Credential>();
     }
     /**
      * Will add a credential to temporary credential list, 
@@ -157,7 +158,7 @@ public class NetworkCredentialsDatabase {
         mCredentials.put(cred.getUriString(), cred);
     }
 
-    public void saveCredential(Credential cred){
+    public synchronized void saveCredential(Credential cred){
         if (log.isDebugEnabled()) log.debug("saveCredential: path {}, username={}", cred.getUriString(), cred.getUsername());
         mCredentials.put(cred.getUriString(), cred);
         open();
@@ -178,36 +179,36 @@ public class NetworkCredentialsDatabase {
         }
         return persistentCredentials;
     }
-    public void loadCredentials(Context ct){
-        if(mCredentials.size()==0) {
+    public synchronized void loadCredentials(Context ct){
+        if (!credentialsLoaded) {
             mDBHelper = new DatabaseHelper(ct);
             try {
                 open();
-                Cursor cursor = mDB.query(CREDENTIALS_TABLE,
+                try (Cursor cursor = mDB.query(CREDENTIALS_TABLE,
                         COLS,
                         null,
                         null,
                         null,
                         null,
-                        null);
-                if (cursor != null) {
-                    int pathColumnIndex = cursor.getColumnIndex(KEY_PATH);
-                    int usernameColumnIndex = cursor.getColumnIndex(KEY_USERNAME);
-                    int passwordColumnIndex = cursor.getColumnIndex(KEY_PASSWORD);
-                    int domainColumnIndex = cursor.getColumnIndex(KEY_DOMAIN);
-                    int shortcutCount = cursor.getCount();
+                        null)) {
+                    if (cursor != null) {
+                        int pathColumnIndex = cursor.getColumnIndex(KEY_PATH);
+                        int usernameColumnIndex = cursor.getColumnIndex(KEY_USERNAME);
+                        int passwordColumnIndex = cursor.getColumnIndex(KEY_PASSWORD);
+                        int domainColumnIndex = cursor.getColumnIndex(KEY_DOMAIN);
+                        int shortcutCount = cursor.getCount();
 
-                    if (shortcutCount > 0) {
-                        cursor.moveToFirst();
-                        do {
-                            String path = cursor.getString(pathColumnIndex);
-                            String username = cursor.getString(usernameColumnIndex);
-                            String domain = cursor.getString(domainColumnIndex);
-                            String password = decrypt(cursor.getString(passwordColumnIndex));
-                            mCredentials.put(path, new Credential(username, password, path, domain,false));
-                        } while (cursor.moveToNext());
+                        if (shortcutCount > 0) {
+                            cursor.moveToFirst();
+                            do {
+                                String path = cursor.getString(pathColumnIndex);
+                                String username = cursor.getString(usernameColumnIndex);
+                                String domain = cursor.getString(domainColumnIndex);
+                                String password = decrypt(cursor.getString(passwordColumnIndex));
+                                mCredentials.putIfAbsent(path, new Credential(username, password, path, domain,false));
+                            } while (cursor.moveToNext());
+                        }
                     }
-                cursor.close();
                 }
                 close();
                 //load old credentials database
@@ -226,9 +227,10 @@ public class NetworkCredentialsDatabase {
 
                 }
             }
-            catch (SQLException e) { // to avoid lockexception, we still don't know what is causing it
-                e.printStackTrace();
+            finally {
+                close();
             }
+            credentialsLoaded = true;
         }
     }
     private void open() throws SQLException {
@@ -246,14 +248,14 @@ public class NetworkCredentialsDatabase {
             mDBHelper.close();
         }
     }
-    public static NetworkCredentialsDatabase getInstance(){
+    public static synchronized NetworkCredentialsDatabase getInstance(){
         if(networkDatabase==null){
             networkDatabase = new NetworkCredentialsDatabase();
         }
         return networkDatabase;
 
     }
-    public void deleteCredential(String uriString){
+    public synchronized void deleteCredential(String uriString){
         open();
         String [] args = new String[1];
         args[0] = uriString;
