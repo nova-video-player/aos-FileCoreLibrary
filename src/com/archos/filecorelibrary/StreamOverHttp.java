@@ -171,7 +171,7 @@ public class StreamOverHttp {
 		return primaryMedia ? mUpstreamBufferSize : DEFAULT_UPSTREAM_BUFFER_SIZE;
 	}
 
-	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt"};
+	private static final String[] SUBTITLES_ARRAY = { "idx", "smi", "ssa", "ass", "srr", "srt", "sub", "mpl", "txt","xml", "vtt", "sup"};
 
 	MetaFile2 getMetaFile(Uri uri) throws Exception {
 		return MetaFile2Factory.getMetaFileForUrl(uri);
