@@ -58,6 +58,7 @@
     <string name="server_ready">جاهز للاستلام</string>
     <string name="nonetwork_title" comment="deprecated">لا يوجد اتصال بالواي فاي</string>
     <string name="no_network_title">لا يوجد اتصال بالشبكة</string>
+    <string name="nonetwork_message">تحتاج إلى تنشيط الواي فاي لهذه الميزة</string>
     <!-- FileManager strings -->
     <string name="storage_busy_message">لا يمكنك استخدام التخزين الداخلى عندما تكون متصلة من خلال USB</string>
     <string name="network_storage">شبكة</string>
@@ -69,6 +70,7 @@
     <string name="loading">برجاء الإنتظار لحين التحميل …</string>
     <string name="cannot_list">لا يمكن عرض المحتويات</string>
     <string name="error_listing">حدث خطأ</string>
+    <string name="deleting">يتم الحذف</string>
     <string name="delete">حذف</string>
     <string name="rename">إعادة تسمية</string>
     <string name="details">تفاصيل</string>
