@@ -18,6 +18,8 @@ package com.archos.filecorelibrary.localstorage;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 
 import org.slf4j.Logger;
@@ -59,6 +61,15 @@ public class ExternalSDFileWriter {
     }
 
     /**
+     * Inserting a MediaStore row carrying a _data column is only allowed for legacy apps or apps holding
+     * MANAGE_EXTERNAL_STORAGE. From Android 11 the legacy write permission is ignored, and from Android 14
+     * MediaProvider throws IllegalArgumentException("Mutation of _data is not allowed.") for apps targeting 34+.
+     */
+    private static boolean isLegacyWriteAllowed() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.R || Environment.isExternalStorageManager();
+    }
+
+    /**
      * Deletes the file. Returns true if the file has been successfully deleted or otherwise does not exist. This operation is not
      * recursive.
      */
@@ -83,6 +94,10 @@ public class ExternalSDFileWriter {
         contentResolver.delete(filesUri, where, selectionArgs);
 
         if (file.exists()) {
+            if (!isLegacyWriteAllowed()) {
+                if (log.isDebugEnabled()) log.debug("delete: no legacy write access, cannot delete {}", file.getPath());
+                return false;
+            }
             // If the file is not a media file, create a new entry suggesting that this location is an image, even
             // though it is not.
             ContentValues values = new ContentValues();
@@ -112,6 +127,11 @@ public class ExternalSDFileWriter {
             return file.isDirectory();
         }
 
+        if (!isLegacyWriteAllowed()) {
+            if (log.isDebugEnabled()) log.debug("mkdir: no legacy write access, cannot create {}", file.getPath());
+            return false;
+        }
+
         ContentValues values;
         Uri uri;
 
@@ -125,6 +145,10 @@ public class ExternalSDFileWriter {
     }
 
     public void addFolderToDB(){
+        if (!isLegacyWriteAllowed()) {
+            if (log.isDebugEnabled()) log.debug("addFolderToDB: no legacy write access, cannot index {}", file.getPath());
+            return;
+        }
         // Create an entry for a temporary image file within the created directory.
         // This step actually causes the creation of the directory.
         ContentValues values;
@@ -143,6 +167,11 @@ public class ExternalSDFileWriter {
             throws IOException {
         if (file.exists() && file.isDirectory()) {
             throw new IOException("File exists and is a directory.");
+        }
+
+        if (!isLegacyWriteAllowed()) {
+            if (log.isDebugEnabled()) log.debug("write: no legacy write access, cannot write {}", file.getPath());
+            throw new IOException("Cannot write " + file.getPath() + " without MANAGE_EXTERNAL_STORAGE");
         }
 
         // Delete any existing entry from the media database.

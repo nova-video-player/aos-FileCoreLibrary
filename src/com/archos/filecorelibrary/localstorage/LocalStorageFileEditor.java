@@ -111,8 +111,8 @@ public class LocalStorageFileEditor extends FileEditor {
             fos = new FileOutputStream(new File(mUri.getPath()));
         }
         catch (FileNotFoundException e) {
-            // when permission error, try externalsdfilewriter
-            if (mContext != null) {
+            // when permission error, try externalsdfilewriter (legacy write access only, see ExternalSDFileWriter)
+            if (mContext != null && canManageExternalStorage()) {
                 ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), new File(mUri.getPath()));
                 fos = external.write();
             }
@@ -139,7 +139,7 @@ public class LocalStorageFileEditor extends FileEditor {
 
     @SuppressWarnings("deprecation") // ACTION_MEDIA_SCANNER_SCAN_FILE used as internal IPC (setPackage targets Nova's own receiver only)
     private void scanFile(Uri toIndex, boolean isAddingDirectory) {
-        if (isAddingDirectory) {
+        if (isAddingDirectory && canManageExternalStorage()) {
             ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), new File(toIndex.getPath()));
             external.addFolderToDB();
             return;
@@ -156,8 +156,8 @@ public class LocalStorageFileEditor extends FileEditor {
     @Override
     public boolean mkdir() {
         if (!new File(mUri.getPath()).mkdir()) {
-            //when permission error, try externalsdfilewriter
-            if (mContext != null) {
+            //when permission error, try externalsdfilewriter (legacy write access only, see ExternalSDFileWriter)
+            if (mContext != null && canManageExternalStorage()) {
                 ExternalSDFileWriter external = new ExternalSDFileWriter(mContext.getContentResolver(), new File(mUri.getPath()));
                 return external.mkdir();
             }
