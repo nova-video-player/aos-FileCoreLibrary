@@ -41,7 +41,7 @@ public final class NetworkInitialization {
             initialization = new BackgroundInitialization(() -> {
                 long start = System.nanoTime();
                 try {
-                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
                     warmCrypto();
                     NetworkCredentialsDatabase.getInstance().loadCredentials(application);
                     log.info("Network initialization ready in {} ms", (System.nanoTime() - start) / 1000000);
