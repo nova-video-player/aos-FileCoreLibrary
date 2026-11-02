@@ -7,6 +7,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Looper;
 import android.os.Process;
+import android.os.SystemClock;
 
 import com.archos.filecorelibrary.samba.NetworkCredentialsDatabase;
 
@@ -39,16 +40,27 @@ public final class NetworkInitialization {
             if (context == null) throw new IllegalStateException("Application context unavailable");
             Context application = context.getApplicationContext();
             initialization = new BackgroundInitialization(() -> {
-                long start = System.nanoTime();
+                boolean debugTiming = log.isDebugEnabled();
+                long start = debugTiming ? System.nanoTime() : 0;
+                long cpuStart = debugTiming ? SystemClock.currentThreadTimeMillis() : 0;
+                boolean ready = false;
                 try {
                     Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
                     warmCrypto();
                     NetworkCredentialsDatabase.getInstance().loadCredentials(application);
-                    log.info("Network initialization ready in {} ms", (System.nanoTime() - start) / 1000000);
+                    ready = true;
                     return null;
                 } catch (Exception e) {
                     log.error("Network initialization failed", e);
                     throw e;
+                } finally {
+                    if (debugTiming && log.isDebugEnabled()) {
+                        long wallMs = (System.nanoTime() - start) / 1000000;
+                        long cpuMs = SystemClock.currentThreadTimeMillis() - cpuStart;
+                        log.debug("network-init-timing: ready={} nice={} wallMs={} cpuMs={} nonCpuMs={}",
+                                ready, Process.getThreadPriority(Process.myTid()),
+                                wallMs, cpuMs, Math.max(0, wallMs - cpuMs));
+                    }
                 }
             }, command -> {
                 Thread thread = new Thread(command, "network-initialization");
@@ -69,9 +81,20 @@ public final class NetworkInitialization {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new SmbException("Network initialization must be awaited off the main thread");
         }
+        boolean debugTiming = log.isDebugEnabled();
+        long start = debugTiming ? System.nanoTime() : 0;
+        if (log.isDebugEnabled()) {
+            log.debug("Network initialization: waiting (timeout 30000 ms)");
+        }
         try {
             task.await(30, TimeUnit.SECONDS);
+            if (debugTiming && log.isDebugEnabled()) {
+                log.debug("Network initialization: ready after {} ms", (System.nanoTime() - start) / 1000000);
+            }
         } catch (IOException e) {
+            if (debugTiming && log.isDebugEnabled()) {
+                log.debug("Network initialization: wait failed after {} ms", (System.nanoTime() - start) / 1000000, e);
+            }
             throw new SmbException(e.getMessage(), e);
         }
     }
@@ -108,6 +131,8 @@ public final class NetworkInitialization {
             Security.insertProviderAt(provider, 1);
         }
         // Exercise jcifs' actual default-provider lookups and SMB 3 key derivation as well.
+        // Keep these warmups unconditional: constructing the provider alone does not exercise
+        // the digest, cipher and signing paths used by the first SMB connection.
         Crypto.getMD4().digest();
         Crypto.getMD5().digest();
         Crypto.getSHA512().digest();
