@@ -40,7 +40,7 @@ public class TcpDiscovery implements InternalDiscovery {
     private final int mSocketReadDurationMs;
     private final int mStartDelayMs;
 
-    private boolean mAbort = false;
+    private volatile boolean mAbort = false;
 
     /**
      *
@@ -106,6 +106,9 @@ public class TcpDiscovery implements InternalDiscovery {
         }
 
         for (int i = 1; i < 255; i++) {
+            if (mAbort) {
+                break;
+            }
             final String ip = netRange.concat(String.valueOf(i));
             //try to connect to tcp port 445
             SocketChannel socketChannel = null;

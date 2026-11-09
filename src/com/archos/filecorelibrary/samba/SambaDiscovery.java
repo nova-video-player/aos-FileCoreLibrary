@@ -110,7 +110,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     /**
      * true if user aborted the discovery
      */
-    private boolean mIsAborted = false;
+    private volatile boolean mIsAborted = false;
 
     /**
      * Workgroups indexed by name
@@ -302,8 +302,11 @@ public class SambaDiscovery implements InternalDiscoveryListener {
     /**
      * Start the discovery.
      * Calling start() when the discovery is already started abort it and start it again from scratch
+     *
+     * @return true if the discovery was actually started, false when there is no usable
+     *         local network or no local IP address yet.
      */
-    public void start() {
+    public boolean start() {
         abort();
         //reset abort variable
         mIsAborted = false;
@@ -311,7 +314,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
 
         if (!NetworkState.isLocalNetworkConnected(mContext)) {
             if (log.isDebugEnabled()) log.debug("start: no localNetworkConnected (eth/wifi), do not start discovery!");
-            return;
+            return false;
         }
 
         // Tell the listener we are starting discovery
@@ -333,7 +336,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
                     }
                 }
             });
-            return; // bye
+            return false; // bye
         }
 
         // It's like if the user asking to start was the first update time
@@ -356,6 +359,7 @@ public class SambaDiscovery implements InternalDiscoveryListener {
         for (InternalDiscovery discovery : mInternalDiscoveries) {
             discovery.start();
         }
+        return true;
     }
 
     /**
