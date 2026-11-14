@@ -237,7 +237,7 @@
     <string name="nomedia_fail">Falha, não foi possível remover esta pasta da biblioteca de mídia</string>
     <string name="nomedia_warning">O conteúdo multimídia desta pasta não aparecerá mais nos aplicativos multimídia.\nTem certeza de que deseja prosseguir?</string>
     <!-- Folder Picker -->
-    <string name="choose_a_folder">Escolha uma pasta</string>
+    <string name="choose_a_folder">Escolher uma pasta</string>
     <string name="choose_a_folder_help">Navegue até a pasta que deseja selecionar e pressione OK. Use o botão VOLTAR para subir um nível.</string>
     <string name="current_choice">Escolha atual:</string>
     <string name="no_selection">nenhuma seleção</string>
