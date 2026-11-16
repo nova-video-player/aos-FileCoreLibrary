@@ -186,7 +186,7 @@ dependencies {
     implementation 'io.sentry:sentry:8.64.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.robolectric:robolectric:4.17'
+    testImplementation 'org.robolectric:robolectric:4.18'
     testImplementation 'androidx.test:core:1.7.0'
     testImplementation 'ch.qos.logback:logback-classic:1.6.6'
     testImplementation 'com.squareup.okhttp3:mockwebserver:5.5.1'
