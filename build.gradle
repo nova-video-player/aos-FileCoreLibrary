@@ -152,7 +152,7 @@ dependencies {
         }
         api files(localJcifs)
         // File dependencies have no POM: retain jcifs-ng's public dependencies.
-        api 'org.slf4j:slf4j-api:1.7.36'
+        api 'org.slf4j:slf4j-api:2.0.20'
         api 'org.bouncycastle:bcprov-jdk18on:1.81'
     } else {
         api 'com.github.nova-video-player:jcifs-ng:v2.1.11-nova12'
