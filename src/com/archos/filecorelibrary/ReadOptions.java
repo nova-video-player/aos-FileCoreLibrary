@@ -21,7 +21,7 @@ import java.util.Objects;
 
 /** Per-open policy. Legacy editor APIs and production playback defaults are unchanged. */
 public final class ReadOptions {
-    public enum Purpose { DEFAULT, METADATA, PLAYBACK }
+    public enum Purpose { DEFAULT, METADATA, PLAYBACK, SUBTITLE_ANALYSIS }
     public enum SmbjAccess { RANDOM, SEQUENTIAL, UNSPECIFIED }
     public static final ReadOptions DEFAULT = new ReadOptions(Purpose.DEFAULT, -1, false);
     public static final ReadOptions METADATA = new ReadOptions(Purpose.METADATA, -1, false);

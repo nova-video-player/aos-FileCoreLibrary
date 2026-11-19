@@ -129,6 +129,16 @@ public class StreamOverHttpBufferTest {
     }
 
     @Test
+    public void analysisBatchesJcifsReads() throws Exception {
+        assertHttpTransfer(false, StreamOverHttp.ReadMode.SUBTITLE_ANALYSIS, MIB);
+    }
+
+    @Test
+    public void analysisSupportsUnknownLengthStreams() throws Exception {
+        assertHttpTransfer(true, StreamOverHttp.ReadMode.SUBTITLE_ANALYSIS, MIB);
+    }
+
+    @Test
     public void unknownLengthPlaybackHttpTransferKeepsOneMiBRefills() throws Exception {
         assertHttpTransfer(true, StreamOverHttp.ReadMode.PLAYBACK, MIB);
     }

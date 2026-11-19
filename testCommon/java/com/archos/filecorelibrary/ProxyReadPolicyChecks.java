@@ -79,6 +79,20 @@ public abstract class ProxyReadPolicyChecks {
             assertTrue(proxy.openedWith.conservative());
         } finally { proxy.close(); }
     }
+    @Test public void analysisPipelinesSequentialReadsButBoundsProbes() throws Exception {
+        Proxy proxy = new Proxy(StreamOverHttp.ReadMode.SUBTITLE_ANALYSIS);
+        try {
+            request(proxy, "bytes=0-", 64);
+            assertEquals(ReadOptions.Purpose.SUBTITLE_ANALYSIS, proxy.openedWith.purpose);
+            assertFalse(proxy.openedWith.conservative());
+            assertEquals(16, proxy.openedWith.pipelineDepth());
+            request(proxy, "bytes=16-31", 16);
+            assertTrue(proxy.openedWith.conservative());
+            assertEquals(1, proxy.openedWith.pipelineDepth());
+            request(proxy, "bytes=32-", 32);
+            assertEquals(16, proxy.openedWith.pipelineDepth());
+        } finally { proxy.close(); }
+    }
     @Test public void countersTrackApiBytesAndOwnedCleanup() throws Exception {
         StreamDiagnostics metrics = new StreamDiagnostics();
         Proxy proxy = new Proxy(metrics);

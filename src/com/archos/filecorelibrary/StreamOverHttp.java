@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class StreamOverHttp {
 	private static final Logger log = LoggerFactory.getLogger(StreamOverHttp.class);
+	private static final Logger transferLog = LoggerFactory.getLogger(StreamOverHttp.class.getName() + ".Transfer");
 
 	private final Uri mUri;
 	private final String mName;
@@ -68,7 +69,7 @@ public class StreamOverHttp {
 	private static final int JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE = 64 * 1024;
 	private static final int PLAYBACK_UPSTREAM_BUFFER_SIZE = 1024 * 1024;
 	/** Playback may batch backend reads; metadata and generic readers retain modest buffering. */
-	public enum ReadMode { DEFAULT, PLAYBACK }
+	public enum ReadMode { DEFAULT, PLAYBACK, SUBTITLE_ANALYSIS }
 	private final ReadMode mReadMode;
 	private final int mUpstreamBufferSize;
 	private final boolean mExplicitUpstreamBufferSize;
@@ -165,7 +166,8 @@ public class StreamOverHttp {
 		if (editor instanceof JcifsFileEditor) {
 			if (!primaryMedia) return JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE;
 			if (mExplicitUpstreamBufferSize) return mUpstreamBufferSize;
-			return mReadMode == ReadMode.PLAYBACK ? PLAYBACK_UPSTREAM_BUFFER_SIZE : JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE;
+			return mReadMode == ReadMode.PLAYBACK || mReadMode == ReadMode.SUBTITLE_ANALYSIS
+					? PLAYBACK_UPSTREAM_BUFFER_SIZE : JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE;
 		}
 		// smb:// may select SMBJ, which already prefetches.
 		return primaryMedia ? mUpstreamBufferSize : DEFAULT_UPSTREAM_BUFFER_SIZE;
@@ -259,6 +261,10 @@ public class StreamOverHttp {
 		private boolean supersedableMediaRequest;
 		private volatile boolean forceClosed;
 		private boolean responseStarted;
+		private boolean traceTransfer;
+		private long traceStarted, traceLastProgress, traceReadNanos, traceWriteNanos, traceMaxReadNanos;
+		private long traceReceived, traceDelivered;
+		private String tracePhase = "opening", traceFailure = "none";
 		private int upstreamBufferSize = DEFAULT_UPSTREAM_BUFFER_SIZE;
 		private int cleanupTasks = 1; // guarded by mSessionLock; includes the worker
 		private boolean cooperativeCancellation; // guarded by this session's monitor
@@ -303,6 +309,7 @@ public class StreamOverHttp {
 
         private void closeInput(InputStream input) {
             if (input == null) return;
+            long closeStarted = traceTransfer ? System.nanoTime() : 0;
             boolean owner = Thread.currentThread() == worker;
             boolean interrupted = false;
             if (owner) {
@@ -316,6 +323,8 @@ public class StreamOverHttp {
             try { input.close(); }
             catch (Exception e) { caughtException(e, "StreamOverHttp:closeInput", "Closing upstream input"); }
             finally {
+                if (traceTransfer) transferLog.debug("port={} request={} upstream-close_ms={}",
+                        serverSocket.getLocalPort(), requestId, (System.nanoTime() - closeStarted) / 1000000);
                 if (owner) {
                     synchronized (this) { workerClosingInput = false; }
                     if (interrupted) Thread.currentThread().interrupt();
@@ -400,10 +409,24 @@ public class StreamOverHttp {
 		}
 
 		public void run() {
+			traceTransfer = transferLog.isDebugEnabled();
+			traceStarted = traceLastProgress = System.nanoTime();
 			try {
+				trace("start");
 				openInputStream();
+				if (traceTransfer) {
+					ReadOptions options = readOptions();
+					transferLog.debug("port={} request={} opened scheme={} range_start={} range_end={} "
+							+ "purpose={} bounded={} pipeline={} buffer={} open_ms={}", serverSocket.getLocalPort(),
+							requestId, mUri == null ? "local" : mUri.getScheme(), requestedStart, requestedEnd,
+							options.purpose, options.boundedRange, options.pipelineDepth(), upstreamBufferSize,
+							(System.nanoTime() - traceStarted) / 1000000);
+				}
+				tracePhase = "transfer";
 				handleResponse();
 			} catch (Exception e) {
+				traceFailure = e.getClass().getSimpleName();
+				trace("failure");
 				if (!isCancelled()) {
 					caughtException(e, "StreamOverHttp:HttpSession", "Request failed for " + mUri);
 					if (!responseStarted) sendError(socket,
@@ -412,9 +435,23 @@ public class StreamOverHttp {
 				}
 			} finally {
 				closeSocket();
+				tracePhase = "closing";
+				trace("transfer-end");
 				closeInput(takeInput());
+				trace("worker-end");
 				finishTask();
 			}
+		}
+
+		private void trace(String event) {
+			if (!traceTransfer) return;
+			long now = System.nanoTime();
+			transferLog.debug("port={} request={} event={} phase={} received_bytes={} delivered_bytes={} "
+					+ "read_ms={} write_ms={} max_read_ms={} elapsed_ms={} cancelled={} failure={}",
+					serverSocket.getLocalPort(), requestId, event, tracePhase, traceReceived, traceDelivered,
+					traceReadNanos / 1000000, traceWriteNanos / 1000000, traceMaxReadNanos / 1000000,
+					(now - traceStarted) / 1000000, isCancelled(), traceFailure);
+			traceLastProgress = now;
 		}
 
 		private String readRequest() throws IOException {
@@ -567,6 +604,10 @@ public class StreamOverHttp {
 				log.debug("Unable to determine stream length", e);
 			}
 			resolveRange();
+			// Finite analysis ranges are header/index probes, not a sequential scan.
+			if (mReadMode == ReadMode.SUBTITLE_ANALYSIS && readOptions().conservative())
+				upstreamBufferSize = editor instanceof JcifsFileEditor
+						? JCIFS_DEFAULT_UPSTREAM_BUFFER_SIZE : DEFAULT_UPSTREAM_BUFFER_SIZE;
 			try {
 				if (isCancelled()) throw new IOException("Request cancelled");
 				publishInput(editor.getInputStream(requestedStart, readOptions()));
@@ -599,6 +640,8 @@ public class StreamOverHttp {
             ReadOptions.Purpose purpose = supersedableMediaRequest
                     && (mReadMode == ReadMode.PLAYBACK || mExplicitUpstreamBufferSize)
                     ? ReadOptions.Purpose.PLAYBACK : ReadOptions.Purpose.METADATA;
+            if (supersedableMediaRequest && mReadMode == ReadMode.SUBTITLE_ANALYSIS)
+                purpose = ReadOptions.Purpose.SUBTITLE_ANALYSIS;
             ReadOptions tuning = mDiagnosticOptions;
             return tuning == null ? new ReadOptions(purpose, count, bounded)
                     : new ReadOptions(purpose, count, bounded, tuning.sftpDepth,
@@ -694,14 +737,33 @@ public class StreamOverHttp {
 	private void copyStream(InputStream in, OutputStream out, byte[] buffer, long remaining, HttpSession session) throws IOException {
 		while (remaining != 0) {
 			if (session != null && session.isCancelled()) return;
-			int count = in.read(buffer, 0, remaining < 0 ? buffer.length : (int)Math.min(remaining, buffer.length));
+			boolean tracing = session != null && session.traceTransfer;
+			long started = tracing ? System.nanoTime() : 0;
+			int count;
+			if (tracing) session.tracePhase = "upstream-read";
+			try {
+				count = in.read(buffer, 0, remaining < 0 ? buffer.length : (int)Math.min(remaining, buffer.length));
+			} finally {
+				if (tracing) {
+					long duration = System.nanoTime() - started;
+					session.traceReadNanos += duration;
+					session.traceMaxReadNanos = Math.max(session.traceMaxReadNanos, duration);
+				}
+			}
 			if (count < 0) {
 				if (remaining > 0) throw new EOFException("Upstream ended before Content-Length");
 				return;
 			}
 			if (count == 0) throw new IOException("Upstream read made no progress");
+			if (tracing) session.traceReceived += count;
 			if (session != null && session.isCancelled()) return;
-			out.write(buffer, 0, count);
+			if (tracing) { session.tracePhase = "local-write"; started = System.nanoTime(); }
+			try { out.write(buffer, 0, count); }
+			finally { if (tracing) session.traceWriteNanos += System.nanoTime() - started; }
+			if (tracing) {
+				session.traceDelivered += count;
+				if (System.nanoTime() - session.traceLastProgress >= 5000000000L) session.trace("progress");
+			}
 			if (mDiagnostics != null) mDiagnostics.deliveredBytes.addAndGet(count);
 			if (remaining > 0) remaining -= count;
 		}
