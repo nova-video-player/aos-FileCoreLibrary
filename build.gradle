@@ -141,6 +141,7 @@ configurations.matching { it.name.toLowerCase().contains("unittest") }.configure
 }
 
 dependencies {
+    testImplementation "org.mockito:mockito-core:5.24.0"
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     // Test external/jcifs-ng before publishing it: -PjcifsNgJar=/absolute/path/to/jcifs-ng.jar
     // Playback refills remain 1 MiB; adaptive wire reads require the patched library.
